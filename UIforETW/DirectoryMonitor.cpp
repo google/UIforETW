@@ -63,13 +63,10 @@ DWORD DirectoryMonitor::DirectoryMonitorThread()
 
 		default:
 			assert(0);
-			return 0;
+			break;
 		}
 	}
-
-	assert(0);
-
-	return 0;
+  // Unreachable.
 }
 
 void DirectoryMonitor::StartThread(const std::wstring* traceDir)

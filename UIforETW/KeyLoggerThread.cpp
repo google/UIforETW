@@ -61,7 +61,7 @@ LRESULT CALLBACK LowLevelKeyboardHook(int nCode, WPARAM wParam, LPARAM lParam)
 		}
 		else if (code >= VK_F1 && code <= VK_F12)
 		{
-			sprintf_s(buffer, "F%d", code + 1 - VK_F1);
+			sprintf_s(buffer, "F%lu", code + 1 - VK_F1);
 		}
 		else
 		{

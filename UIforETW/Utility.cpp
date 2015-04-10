@@ -114,7 +114,7 @@ void SetRegistryDWORD(HKEY root, const std::wstring& subkey, const std::wstring&
 	LONG result = RegOpenKeyEx(root, subkey.c_str(), 0, KEY_ALL_ACCESS, &key);
 	if (result == ERROR_SUCCESS)
 	{
-		LONG setResult = RegSetValueEx(key, valueName.c_str(), 0, REG_DWORD, reinterpret_cast<const BYTE*>(&value), sizeof(value));
+		RegSetValueEx(key, valueName.c_str(), 0, REG_DWORD, reinterpret_cast<const BYTE*>(&value), sizeof(value));
 		RegCloseKey(key);
 	}
 }

@@ -1033,7 +1033,7 @@ void CUIforETWDlg::UpdateTraceList()
 	UpdateNotesState();
 }
 
-LRESULT CUIforETWDlg::UpdateTraceListHandler(WPARAM wParam, LPARAM lParam)
+LRESULT CUIforETWDlg::UpdateTraceListHandler(WPARAM /*wParam*/, LPARAM /*lParam*/)
 {
 	UpdateTraceList();
 
@@ -1062,7 +1062,7 @@ void CUIforETWDlg::OnGetMinMaxInfo(MINMAXINFO* lpMMI)
 }
 
 
-void CUIforETWDlg::OnSize(UINT nType, int cx, int cy)
+void CUIforETWDlg::OnSize(UINT nType, int /*cx*/, int /*cy*/)
 {
 	if (nType == SIZE_RESTORED && initialWidth_)
 	{
@@ -1144,7 +1144,7 @@ void CUIforETWDlg::OnBnClickedAbout()
 	dlgAbout.DoModal();
 }
 
-LRESULT CUIforETWDlg::OnHotKey(WPARAM wParam, LPARAM lParam)
+LRESULT CUIforETWDlg::OnHotKey(WPARAM wParam, LPARAM /*lParam*/)
 {
 	switch (wParam)
 	{
