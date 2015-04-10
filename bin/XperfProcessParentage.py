@@ -30,24 +30,24 @@ import sys
 csvFilename = "Processes_Summary_Table_ProcessParentage.csv"
 
 if len(sys.argv) < 2:
-	print "Usage: %s trace.etl" % sys.argv[0]
-	print "This script extracts process parentage data from the specified"
-	print "ETL file and prints it in a tree format, together with process name"
-	print "and command line information."
-	print "See this blog post for more details:"
-	print "http://randomascii.wordpress.com/2013/11/04/exporting-arbitrary-data-from-xperf-etl-files/"
-	sys.exit(0)
+  print "Usage: %s trace.etl" % sys.argv[0]
+  print "This script extracts process parentage data from the specified"
+  print "ETL file and prints it in a tree format, together with process name"
+  print "and command line information."
+  print "See this blog post for more details:"
+  print "http://randomascii.wordpress.com/2013/11/04/exporting-arbitrary-data-from-xperf-etl-files/"
+  sys.exit(0)
 
 if not os.path.exists(sys.argv[1]):
-	print "ETL file '%s' does not exist." % sys.argv[1]
-	sys.exit(0)
+  print "ETL file '%s' does not exist." % sys.argv[1]
+  sys.exit(0)
 
 # Delete any previous results to avoid accidentally using them.
 try:
-	os.remove(csvFilename)
+  os.remove(csvFilename)
 except WindowsError, e:
-	if e.winerror != 2: # WindowsError: [Error 2] The system cannot find the file specified
-		raise e
+  if e.winerror != 2: # WindowsError: [Error 2] The system cannot find the file specified
+    raise e
 
 # Find the location of the .wpaProfile that is needed for exporting the
 # process parentage data.
@@ -57,13 +57,13 @@ profilePath = os.path.join(scriptdir, "XperfProcessParentage.wpaProfile")
 # Run wpaexporter
 lines = os.popen("wpaexporter \"%s\" -profile \"%s\"" % (sys.argv[1], profilePath)).readlines()
 for line in lines:
-	sys.stderr.write(line)
+  sys.stderr.write(line)
 
 # Read the raw data.
 lines = open(csvFilename).readlines()
 if len(lines) < 2:
-	print "Missing data. Sorry."
-	sys.exit(0)
+  print "Missing data. Sorry."
+  sys.exit(0)
 
 # This dictionary maps from process IDs to their parents
 parents = {}
@@ -77,17 +77,17 @@ processedParent = -1
 # line which just contains column labels) and fill in the
 # parents and details dictionaries.
 for line in lines[1:]:
-	# Should probably do better CSV parsing, but I don't think it matters.
-	parts = line.strip().split(",")
-	procID = int(parts[0])
-	parentID = int(parts[1])
-	# Treat the remaining fields as a single string.
-	extraData = ",".join(parts[2:])
-	if parents.has_key(procID):
-		sys.stderr.write("Process ID %d found again. Discarding %s\n" % (procID, extraData))
-	else:
-		parents[procID] = parentID
-		details[procID] = extraData
+  # Should probably do better CSV parsing, but I don't think it matters.
+  parts = line.strip().split(",")
+  procID = int(parts[0])
+  parentID = int(parts[1])
+  # Treat the remaining fields as a single string.
+  extraData = ",".join(parts[2:])
+  if parents.has_key(procID):
+    sys.stderr.write("Process ID %d found again. Discarding %s\n" % (procID, extraData))
+  else:
+    parents[procID] = parentID
+    details[procID] = extraData
 
 """
 Print a process and recursively print all of its children.
@@ -101,25 +101,25 @@ if the process is part of a loop (some part of the loop must have
 reused a process ID).
 """
 def PrintProcessTree(procID, indent, bIsLoop):
-	missing = ""
-	detail = ""
-	loop = ""
-	# Look up this process in our database. It might
-	# not be there.
-	if details.has_key(procID):
-		detail = details[procID]
-	else:
-		missing = " (missing process)"
-	if bIsLoop:
-		loop = " (loop)"
-	parents[procID] = processedParent
-	print "%s%d%s%s, %s" % ("    " * indent, procID, missing, loop, detail)
-	# Loop through all of the processes looking for ones that have this
-	# process as their parent.
-	for childID in parents.keys():
-		parentID = parents[childID]
-		if parentID == procID:
-			PrintProcessTree(childID, indent+1, False)
+  missing = ""
+  detail = ""
+  loop = ""
+  # Look up this process in our database. It might
+  # not be there.
+  if details.has_key(procID):
+    detail = details[procID]
+  else:
+    missing = " (missing process)"
+  if bIsLoop:
+    loop = " (loop)"
+  parents[procID] = processedParent
+  print "%s%d%s%s, %s" % ("    " * indent, procID, missing, loop, detail)
+  # Loop through all of the processes looking for ones that have this
+  # process as their parent.
+  for childID in parents.keys():
+    parentID = parents[childID]
+    if parentID == procID:
+      PrintProcessTree(childID, indent+1, False)
 
 # Iterate through all processes. For each process try to find
 # its 'oldest' ancestor, and then print a tree starting from
@@ -128,23 +128,23 @@ def PrintProcessTree(procID, indent, bIsLoop):
 # correct structure impossible, so the code just randomly chooses
 # a point in the loop to print from.
 for procID in parents.keys():
-	if parents[procID] == processedParent:
-		continue
-	# For each one find the 'oldest' ancestor process
-	ultimateParentID = procID
-	count = 0
-	bIsLoop = False
-	# Stop on processes that are their own parents, or processes
-	# whose parents have already been printed.
-	while parents[ultimateParentID] != ultimateParentID and parents[ultimateParentID] != processedParent:
-		# Check for infinite loops. They do happen, presumably when
-		# parent processes go away and their process IDs are reused.
-		count += 1
-		if count > len(parents):
-			bIsLoop = True
-			break
-		ultimateParentID = parents[ultimateParentID]
-		# Stop if the parent is missing.
-		if not parents.has_key(ultimateParentID):
-			break
-	PrintProcessTree(ultimateParentID, 0, bIsLoop)
+  if parents[procID] == processedParent:
+    continue
+  # For each one find the 'oldest' ancestor process
+  ultimateParentID = procID
+  count = 0
+  bIsLoop = False
+  # Stop on processes that are their own parents, or processes
+  # whose parents have already been printed.
+  while parents[ultimateParentID] != ultimateParentID and parents[ultimateParentID] != processedParent:
+    # Check for infinite loops. They do happen, presumably when
+    # parent processes go away and their process IDs are reused.
+    count += 1
+    if count > len(parents):
+      bIsLoop = True
+      break
+    ultimateParentID = parents[ultimateParentID]
+    # Stop if the parent is missing.
+    if not parents.has_key(ultimateParentID):
+      break
+  PrintProcessTree(ultimateParentID, 0, bIsLoop)
