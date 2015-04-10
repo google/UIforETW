@@ -1,0 +1,23 @@
+This directory contains resources associated with using ETW/xperf.
+Most of these resources are associated with blog posts on:
+https://randomascii.wordpress.com/category/xperf/
+
+The core project is UIforETW which is a graphical user interface for
+recording and managing ETW traces. It makes it much easier to control
+how traces are recorded than using batch files or Microsoft's wprui.
+UIforETW also works around numerous problems with ETW tracing (fixing
+symbol loading issues) and adds extra features such as categorizing
+chrome processes.
+
+UIforETW also lists all the recorded traces and displays editable notes
+associated with each on.
+
+UIforETW is somewhat biased towards Chrome development - it has some
+features that are specific to Chrome developers - but it is fully
+functional for non-Chrome developers as well.
+
+To use UIforETW you have to install the Windows Performance Toolkit
+(version 8.1 is currently the latest version) and then run UIforETW.exe.
+
+This is not an official Google project and is not supported by Google
+in any way.

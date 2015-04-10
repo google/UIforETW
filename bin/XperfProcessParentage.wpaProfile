@@ -1,0 +1,579 @@
+﻿<WpaProfile xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" SavedWith="6.3.9600.16384 (winblue_rtm.130821-1623)" AppendNtSymbolPath="" AppendNtSymCachePath="" xmlns="clr-namespace:Microsoft.Performance.Shell;assembly=Microsoft.Performance.Shell">
+  <WpaProfile.UISessions>
+    <UISessionProperties Index="0" />
+  </WpaProfile.UISessions>
+  <WpaProfile.Views>
+    <AnalysisView Name="73cf95f4-3ba7-42ae-9263-fbc38daf9359" IsSelected="True" IsVisible="True" xmlns="clr-namespace:Microsoft.Performance.Shell.Graphing;assembly=Microsoft.Performance.Shell">
+      <AnalysisView.Title>
+        <ViewTitle Title="Analysis" xmlns="clr-namespace:Microsoft.Performance.Shell;assembly=Microsoft.Performance.Shell" />
+      </AnalysisView.Title>
+      <AnalysisView.UISessionRef>
+        <UISessionRef Index="0" xmlns="clr-namespace:Microsoft.Performance.Shell;assembly=Microsoft.Performance.Shell" />
+      </AnalysisView.UISessionRef>
+      <Core4SummaryTableFillerGraphTreeItem DataTableHeight="753" LayoutStyleFree="DataTable" Color="#FF005DE0" ClsID="b186f02d-8d06-4bbb-9ad1-abf7985fb61a" xmlns="clr-namespace:Microsoft.Performance.Shell.Tables;assembly=Microsoft.Performance.Shell">
+        <Core4SummaryTableFillerGraphTreeItem.HdvViewModelPreset>
+          <HdvViewModelPreset Name="ProcessParentage" GraphColumnCount="32" LeftFrozenColumnCount="16" RightFrozenColumnCount="31" InitialFilterQuery="" InitialSelectionQuery="" InitialExpansionQuery="" xmlns="clr-namespace:Microsoft.Performance.UI.DataEngine.ViewModelPresets;assembly=Microsoft.Performance.UI.DataEngine">
+            <HdvViewModelPreset.ColumnMetadataEntries>
+              <ColumnMetadataEntry Guid="36c00ec5-61f8-5f89-a066-641288a34ca9" Name="Start Time (s)" ColumnMetadata="StartTime" />
+              <ColumnMetadataEntry Guid="19fb5aa9-a5fc-5f14-cb83-fad0691e92a8" Name="End Time (s)" ColumnMetadata="EndTime" />
+            </HdvViewModelPreset.ColumnMetadataEntries>
+            <HdvViewModelPreset.HighlightEntries />
+            <HdvViewModelPreset.ConfigurableColumns>
+              <HdvColumnViewModelPreset Guid="5f381ee6-ad8e-5906-7de0-4b678b7d78f1" Name="Process ID" IsVisible="True" SortOrder="Ascending" TextAlignment="Right" Width="67" />
+              <HdvColumnViewModelPreset Guid="32ba004c-d028-5def-cc60-016892805d03" Name="Parent Process ID" IsVisible="True" SortPriority="1" TextAlignment="Right" Width="104" />
+              <HdvColumnViewModelPreset Guid="226170ea-7139-5ea5-ef82-c7b8eb950467" Name="Session ID" SortPriority="2" TextAlignment="Right" Width="60" />
+              <HdvColumnViewModelPreset Guid="1ba44c8d-e138-5cfa-c4d8-49580277ab41" Name="Lifetime" SortPriority="3" Width="80" />
+              <HdvColumnViewModelPreset Guid="0edbeee1-8d7b-5652-6639-86415222c6e0" Name="Process" SortPriority="4" Width="87" />
+              <HdvColumnViewModelPreset Guid="d8e83424-bba6-55cf-41b7-d164f0cd3c7a" Name="Creation Stack Tag" SortPriority="5" Width="200">
+                <HdvColumnViewModelPreset.Parameter>
+                  <PresetStackOptions Mode="StackTag" xmlns="clr-namespace:Microsoft.Performance.Shell.Stacks;assembly=Microsoft.Performance.Shell" />
+                </HdvColumnViewModelPreset.Parameter>
+              </HdvColumnViewModelPreset>
+              <HdvColumnViewModelPreset Guid="d8e83424-bba6-55cf-41b7-d164f0cd3c7a" Name="Creation Stack (Frame Tags)" SortPriority="6" Width="200">
+                <HdvColumnViewModelPreset.Parameter>
+                  <PresetStackOptions Mode="FrameTags" xmlns="clr-namespace:Microsoft.Performance.Shell.Stacks;assembly=Microsoft.Performance.Shell" />
+                </HdvColumnViewModelPreset.Parameter>
+              </HdvColumnViewModelPreset>
+              <HdvColumnViewModelPreset Guid="d8e83424-bba6-55cf-41b7-d164f0cd3c7a" Name="Creation Stack" SortPriority="7" Width="200">
+                <HdvColumnViewModelPreset.Parameter>
+                  <PresetStackOptions xmlns="clr-namespace:Microsoft.Performance.Shell.Stacks;assembly=Microsoft.Performance.Shell" />
+                </HdvColumnViewModelPreset.Parameter>
+              </HdvColumnViewModelPreset>
+              <HdvColumnViewModelPreset Guid="1b57a82a-5597-58e4-eddf-46d996048180" Name="Destruction Stack Tag" SortPriority="8" Width="200">
+                <HdvColumnViewModelPreset.Parameter>
+                  <PresetStackOptions Mode="StackTag" xmlns="clr-namespace:Microsoft.Performance.Shell.Stacks;assembly=Microsoft.Performance.Shell" />
+                </HdvColumnViewModelPreset.Parameter>
+              </HdvColumnViewModelPreset>
+              <HdvColumnViewModelPreset Guid="1b57a82a-5597-58e4-eddf-46d996048180" Name="Destruction Stack (Frame Tags)" SortPriority="9" Width="200">
+                <HdvColumnViewModelPreset.Parameter>
+                  <PresetStackOptions Mode="FrameTags" xmlns="clr-namespace:Microsoft.Performance.Shell.Stacks;assembly=Microsoft.Performance.Shell" />
+                </HdvColumnViewModelPreset.Parameter>
+              </HdvColumnViewModelPreset>
+              <HdvColumnViewModelPreset Guid="1b57a82a-5597-58e4-eddf-46d996048180" Name="Destruction Stack" SortPriority="10" Width="200">
+                <HdvColumnViewModelPreset.Parameter>
+                  <PresetStackOptions xmlns="clr-namespace:Microsoft.Performance.Shell.Stacks;assembly=Microsoft.Performance.Shell" />
+                </HdvColumnViewModelPreset.Parameter>
+              </HdvColumnViewModelPreset>
+              <HdvColumnViewModelPreset Guid="cb796d44-2927-5ac1-d231-4b71904c18f5" Name="Thread Name" SortPriority="11" Width="80" />
+              <HdvColumnViewModelPreset Guid="82ddfdff-ee93-5f35-08ac-4705069618dc" Name="Thread Activity Tag" SortPriority="12" Width="80" />
+              <HdvColumnViewModelPreset Guid="2818954f-2d30-5569-4510-dade0a5a605c" Name="Annotation" SortPriority="13" Width="80" />
+              <HdvColumnViewModelPreset Guid="26dd2129-e3d6-57aa-c56b-34b5a5b79fcb" Name="Count" AggregationMode="Count" SortPriority="14" TextAlignment="Right" Width="60" />
+              <HdvColumnViewModelPreset Guid="c4cf3680-7ab6-5b50-a66e-bb282e861842" Name="Duration (s)" SortPriority="15" TextAlignment="Right" Width="120" />
+              <HdvColumnViewModelPreset Guid="3546d491-9447-5abe-f1ea-c8363af9b77f" Name="Avg Duration (s)" AggregationMode="Average" SortPriority="16" TextAlignment="Right" Width="120" />
+              <HdvColumnViewModelPreset Guid="fd1c6bea-5148-5a94-f0d2-720385dfddf6" Name="Min Duration (s)" AggregationMode="Min" SortPriority="17" TextAlignment="Right" Width="120" />
+              <HdvColumnViewModelPreset Guid="fa105ddf-fff0-57fb-8472-3b02066ee626" Name="Max Duration (s)" SortPriority="18" TextAlignment="Right" Width="120" />
+              <HdvColumnViewModelPreset Guid="7b96de49-17c2-5b21-e879-cd3fa850202f" Name="Permanent Count" SortPriority="19" TextAlignment="Right" Width="80" />
+              <HdvColumnViewModelPreset Guid="a5e0fdb2-8afa-59e2-91e7-5ade1195b805" Name="Package Full Name" SortPriority="20" Width="200" />
+              <HdvColumnViewModelPreset Guid="a38e516d-6cf2-5659-97f7-5b4d7b128289" Name="Package Relative Application Id" SortPriority="21" Width="150" />
+              <HdvColumnViewModelPreset Guid="7c8085f1-33de-5a34-b975-ff02c3a942fb" Name="Modern Application Friendly Name" SortPriority="22" Width="150" />
+              <HdvColumnViewModelPreset Guid="a876035b-24bc-564f-3f6a-cede5f8c8918" Name="Hosted Services" SortPriority="23" Width="102" />
+              <HdvColumnViewModelPreset Guid="0b34b57d-f3cd-519a-4584-b182e0088701" Name="Process Name" IsVisible="True" SortPriority="24" Width="88" />
+              <HdvColumnViewModelPreset Guid="36c00ec5-61f8-5f89-a066-641288a34ca9" Name="Start Time (s)" AggregationMode="Min" IsVisible="True" SortPriority="27" TextAlignment="Right" Width="120" />
+              <HdvColumnViewModelPreset Guid="19fb5aa9-a5fc-5f14-cb83-fad0691e92a8" Name="End Time (s)" IsVisible="True" SortPriority="28" TextAlignment="Right" Width="120" />
+              <HdvColumnViewModelPreset Guid="1093bbae-e3f8-570d-d300-fe006ec801fe" Name="Command Line" IsVisible="True" SortPriority="25" Width="999" />
+              <HdvColumnViewModelPreset Guid="ce84d427-a0a7-58d9-0fde-e8d2e84770bc" Name="Table" SortPriority="26" Width="80" />
+            </HdvViewModelPreset.ConfigurableColumns>
+          </HdvViewModelPreset>
+        </Core4SummaryTableFillerGraphTreeItem.HdvViewModelPreset>
+      </Core4SummaryTableFillerGraphTreeItem>
+    </AnalysisView>
+  </WpaProfile.Views>
+  <WpaProfile.HdvPresetCollections>
+    <HdvPresetCollections xmlns="clr-namespace:Microsoft.Performance.UI.DataEngine.ViewModelPresets;assembly=Microsoft.Performance.UI.DataEngine">
+      <HdvPresetCollections.PresetCollections>
+        <HdvViewModelPresetCollection Name="84255312-bf75-49e3-ab62-fa6acc6a10da">
+          <HdvViewModelPresetCollection.UserPresets />
+        </HdvViewModelPresetCollection>
+        <HdvViewModelPresetCollection Name="31119377-4dc0-4c74-808d-3f45d34b6008">
+          <HdvViewModelPresetCollection.UserPresets />
+        </HdvViewModelPresetCollection>
+        <HdvViewModelPresetCollection Name="b186f02d-8d06-4bbb-9ad1-abf7985fb61a">
+          <HdvViewModelPresetCollection.UserPresets>
+            <HdvViewModelPreset Name="ProcessParentage" GraphColumnCount="30" KeyColumnCount="1" LeftFrozenColumnCount="17" RightFrozenColumnCount="29" InitialFilterQuery="" InitialSelectionQuery="" InitialExpansionQuery="">
+              <HdvViewModelPreset.ColumnMetadataEntries>
+                <ColumnMetadataEntry Guid="36c00ec5-61f8-5f89-a066-641288a34ca9" Name="Start Time (s)" ColumnMetadata="StartTime" />
+                <ColumnMetadataEntry Guid="19fb5aa9-a5fc-5f14-cb83-fad0691e92a8" Name="End Time (s)" ColumnMetadata="EndTime" />
+              </HdvViewModelPreset.ColumnMetadataEntries>
+              <HdvViewModelPreset.HighlightEntries />
+              <HdvViewModelPreset.ConfigurableColumns>
+                <HdvColumnViewModelPreset Guid="0b34b57d-f3cd-519a-4584-b182e0088701" Name="Process Name" SortPriority="5" Width="200" />
+                <HdvColumnViewModelPreset Guid="5f381ee6-ad8e-5906-7de0-4b678b7d78f1" Name="Process ID" IsVisible="True" SortPriority="6" TextAlignment="Right" Width="80" />
+                <HdvColumnViewModelPreset Guid="32ba004c-d028-5def-cc60-016892805d03" Name="Parent Process ID" IsVisible="True" SortPriority="8" TextAlignment="Right" Width="106" />
+                <HdvColumnViewModelPreset Guid="226170ea-7139-5ea5-ef82-c7b8eb950467" Name="Session ID" SortPriority="7" TextAlignment="Right" Width="60" />
+                <HdvColumnViewModelPreset Guid="1ba44c8d-e138-5cfa-c4d8-49580277ab41" Name="Lifetime" SortPriority="9" Width="80" />
+                <HdvColumnViewModelPreset Guid="0edbeee1-8d7b-5652-6639-86415222c6e0" Name="Process" IsVisible="True" SortPriority="10" Width="87" />
+                <HdvColumnViewModelPreset Guid="d8e83424-bba6-55cf-41b7-d164f0cd3c7a" Name="Creation Stack" SortPriority="11" Width="200">
+                  <HdvColumnViewModelPreset.Parameter>
+                    <PresetStackOptions Mode="StackTag" xmlns="clr-namespace:Microsoft.Performance.Shell.Stacks;assembly=Microsoft.Performance.Shell" />
+                  </HdvColumnViewModelPreset.Parameter>
+                </HdvColumnViewModelPreset>
+                <HdvColumnViewModelPreset Guid="d8e83424-bba6-55cf-41b7-d164f0cd3c7a" Name="Creation Stack" SortPriority="12" Width="200">
+                  <HdvColumnViewModelPreset.Parameter>
+                    <PresetStackOptions Mode="FrameTags" xmlns="clr-namespace:Microsoft.Performance.Shell.Stacks;assembly=Microsoft.Performance.Shell" />
+                  </HdvColumnViewModelPreset.Parameter>
+                </HdvColumnViewModelPreset>
+                <HdvColumnViewModelPreset Guid="d8e83424-bba6-55cf-41b7-d164f0cd3c7a" Name="Creation Stack" SortPriority="13" Width="200">
+                  <HdvColumnViewModelPreset.Parameter>
+                    <PresetStackOptions xmlns="clr-namespace:Microsoft.Performance.Shell.Stacks;assembly=Microsoft.Performance.Shell" />
+                  </HdvColumnViewModelPreset.Parameter>
+                </HdvColumnViewModelPreset>
+                <HdvColumnViewModelPreset Guid="1b57a82a-5597-58e4-eddf-46d996048180" Name="Destruction Stack" SortPriority="14" Width="200">
+                  <HdvColumnViewModelPreset.Parameter>
+                    <PresetStackOptions Mode="StackTag" xmlns="clr-namespace:Microsoft.Performance.Shell.Stacks;assembly=Microsoft.Performance.Shell" />
+                  </HdvColumnViewModelPreset.Parameter>
+                </HdvColumnViewModelPreset>
+                <HdvColumnViewModelPreset Guid="1b57a82a-5597-58e4-eddf-46d996048180" Name="Destruction Stack" SortPriority="15" Width="200">
+                  <HdvColumnViewModelPreset.Parameter>
+                    <PresetStackOptions Mode="FrameTags" xmlns="clr-namespace:Microsoft.Performance.Shell.Stacks;assembly=Microsoft.Performance.Shell" />
+                  </HdvColumnViewModelPreset.Parameter>
+                </HdvColumnViewModelPreset>
+                <HdvColumnViewModelPreset Guid="1b57a82a-5597-58e4-eddf-46d996048180" Name="Destruction Stack" SortPriority="16" Width="200">
+                  <HdvColumnViewModelPreset.Parameter>
+                    <PresetStackOptions xmlns="clr-namespace:Microsoft.Performance.Shell.Stacks;assembly=Microsoft.Performance.Shell" />
+                  </HdvColumnViewModelPreset.Parameter>
+                </HdvColumnViewModelPreset>
+                <HdvColumnViewModelPreset Guid="cb796d44-2927-5ac1-d231-4b71904c18f5" Name="Thread Name" Width="80" />
+                <HdvColumnViewModelPreset Guid="82ddfdff-ee93-5f35-08ac-4705069618dc" Name="Thread Activity Tag" SortPriority="1" Width="80" />
+                <HdvColumnViewModelPreset Guid="2818954f-2d30-5569-4510-dade0a5a605c" Name="Annotation" SortPriority="2" Width="80" />
+                <HdvColumnViewModelPreset Guid="26dd2129-e3d6-57aa-c56b-34b5a5b79fcb" Name="Count" AggregationMode="Count" SortPriority="17" TextAlignment="Right" Width="60" />
+                <HdvColumnViewModelPreset Guid="c4cf3680-7ab6-5b50-a66e-bb282e861842" Name="Duration (s)" SortPriority="18" TextAlignment="Right" Width="120" />
+                <HdvColumnViewModelPreset Guid="3546d491-9447-5abe-f1ea-c8363af9b77f" Name="Avg Duration (s)" AggregationMode="Average" SortPriority="19" TextAlignment="Right" Width="120" />
+                <HdvColumnViewModelPreset Guid="fd1c6bea-5148-5a94-f0d2-720385dfddf6" Name="Min Duration (s)" AggregationMode="Min" SortPriority="20" TextAlignment="Right" Width="120" />
+                <HdvColumnViewModelPreset Guid="fa105ddf-fff0-57fb-8472-3b02066ee626" Name="Max Duration (s)" SortPriority="21" TextAlignment="Right" Width="120" />
+                <HdvColumnViewModelPreset Guid="7b96de49-17c2-5b21-e879-cd3fa850202f" Name="Permanent Count" SortPriority="22" TextAlignment="Right" Width="80" />
+                <HdvColumnViewModelPreset Guid="a5e0fdb2-8afa-59e2-91e7-5ade1195b805" Name="Package Full Name" SortPriority="23" Width="200" />
+                <HdvColumnViewModelPreset Guid="a38e516d-6cf2-5659-97f7-5b4d7b128289" Name="Package Relative Application Id" SortPriority="24" Width="150" />
+                <HdvColumnViewModelPreset Guid="7c8085f1-33de-5a34-b975-ff02c3a942fb" Name="Modern Application Friendly Name" SortPriority="25" Width="150" />
+                <HdvColumnViewModelPreset Guid="a876035b-24bc-564f-3f6a-cede5f8c8918" Name="Hosted Services" SortPriority="26" Width="102" />
+                <HdvColumnViewModelPreset Guid="1093bbae-e3f8-570d-d300-fe006ec801fe" Name="Command Line" IsVisible="True" SortPriority="27" Width="999" />
+                <HdvColumnViewModelPreset Guid="ce84d427-a0a7-58d9-0fde-e8d2e84770bc" Name="Table" SortPriority="28" Width="80" />
+                <HdvColumnViewModelPreset Guid="36c00ec5-61f8-5f89-a066-641288a34ca9" Name="Start Time (s)" AggregationMode="Min" SortOrder="Ascending" SortPriority="3" TextAlignment="Right" Width="120" />
+                <HdvColumnViewModelPreset Guid="19fb5aa9-a5fc-5f14-cb83-fad0691e92a8" Name="End Time (s)" SortOrder="Ascending" SortPriority="4" TextAlignment="Right" Width="120" />
+              </HdvViewModelPreset.ConfigurableColumns>
+            </HdvViewModelPreset>
+          </HdvViewModelPresetCollection.UserPresets>
+        </HdvViewModelPresetCollection>
+        <HdvViewModelPresetCollection Name="04109c2c-d66b-46cf-8fd7-a7ea67c64cb0">
+          <HdvViewModelPresetCollection.UserPresets />
+        </HdvViewModelPresetCollection>
+        <HdvViewModelPresetCollection Name="88b342b3-e1b7-4ef3-95c2-664ce0d294d8">
+          <HdvViewModelPresetCollection.UserPresets />
+        </HdvViewModelPresetCollection>
+        <HdvViewModelPresetCollection Name="79926001-a767-4658-9d56-cdbfc8140de9">
+          <HdvViewModelPresetCollection.UserPresets />
+        </HdvViewModelPresetCollection>
+        <HdvViewModelPresetCollection Name="c58f5fea-0319-4046-932d-e695ebe20b47">
+          <HdvViewModelPresetCollection.UserPresets>
+            <HdvViewModelPreset Name="Wait analysis - with ready thread" GraphColumnCount="54" KeyColumnCount="9" RightFrozenColumnCount="52" InitialFilterQuery="" InitialSelectionQuery="([Series Name]:=&quot;NewProcess&quot; AND NOT ([NewProcess]:=&quot;Idle (0)&quot;))">
+              <HdvViewModelPreset.ColumnMetadataEntries>
+                <ColumnMetadataEntry Guid="944ed37a-5774-421e-b2d5-84f17a4b3a05" Name="NewThreadId" ColumnMetadata="EndThreadId" />
+                <ColumnMetadataEntry Guid="5417f63c-9b79-45aa-beb9-73e3c1959221" Name="SwitchInTime (s)" ColumnMetadata="StartTime" />
+                <ColumnMetadataEntry Guid="03a1d898-7231-4cc5-9712-4bfbf53908c7" Name="NewInSwitchTime (us)" ColumnMetadata="Duration" />
+                <ColumnMetadataEntry Guid="2575f38e-f991-4ce5-bafb-793e2ba1936a" Name="Cpu" ColumnMetadata="ResourceId" />
+                <ColumnMetadataEntry Guid="17a03387-5d14-405a-a5b2-0201c934f917" Name="TimeSinceLast (us)" ColumnMetadata="WaitDuration" />
+                <ColumnMetadataEntry Guid="5417f63c-9b79-45aa-beb9-73e3c1959221" Name="SwitchInTime (s)" ColumnMetadata="WaitEndTime" />
+              </HdvViewModelPreset.ColumnMetadataEntries>
+              <HdvViewModelPreset.HighlightEntries />
+              <HdvViewModelPreset.ConfigurableColumns>
+                <HdvColumnViewModelPreset Guid="f64abe19-837a-4e53-8087-4547026b82b2" Name="NewProcess Name" SortPriority="1" Width="180" />
+                <HdvColumnViewModelPreset Guid="b065487c-5e32-4f1f-a2cd-581e086ce29e" Name="NewProcess" IsVisible="True" SortPriority="2" Width="133" />
+                <HdvColumnViewModelPreset Guid="944ed37a-5774-421e-b2d5-84f17a4b3a05" Name="NewThreadId" IsVisible="True" SortPriority="3" TextAlignment="Right" Width="80" />
+                <HdvColumnViewModelPreset Guid="68482a06-b6a3-4eb9-922f-9fa43537148b" Name="NewThreadStack" IsVisible="True" SortPriority="4" Width="318" />
+                <HdvColumnViewModelPreset Guid="5b7c10a2-868c-415c-826e-0b8065de3872" Name="ReadyingProcess Name" SortPriority="5" Width="180" />
+                <HdvColumnViewModelPreset Guid="a91e1d66-1316-4baa-b95d-e69aeeef891e" Name="ReadyingProcess" IsVisible="True" SortPriority="6" Width="117" />
+                <HdvColumnViewModelPreset Guid="4ce38ba6-1665-4d3a-91cb-35b64f8c4280" Name="ReadyingThreadId" IsVisible="True" SortPriority="7" TextAlignment="Right" Width="61" />
+                <HdvColumnViewModelPreset Guid="74714606-d216-4cfa-a7d8-7ccb9c67de76" Name="ReadyThreadStack" IsVisible="True" SortPriority="8" Width="200" />
+                <HdvColumnViewModelPreset Guid="7bb1053b-8f03-4c72-89f1-a5f8b9c45a9e" Name="ReadyTime (s)" SortPriority="9" TextAlignment="Right" Width="120" />
+                <HdvColumnViewModelPreset Guid="d227f58f-ec9b-4a52-8fe5-e082771c55c6" Name="Count" AggregationMode="Count" IsVisible="True" SortPriority="10" TextAlignment="Right" Width="50" />
+                <HdvColumnViewModelPreset Guid="17a03387-5d14-405a-a5b2-0201c934f917" Name="TimeSinceLast (us)" AggregationMode="Sum" IsVisible="True" SortOrder="Descending" TextAlignment="Right" Width="107" />
+                <HdvColumnViewModelPreset Guid="17a03387-5d14-405a-a5b2-0201c934f917" Name="TimeSinceLast (us)" AggregationMode="Max" IsVisible="True" SortPriority="11" TextAlignment="Right" Width="108" />
+                <HdvColumnViewModelPreset Guid="906ea81e-ab68-4dfd-9b9f-3adafab60f83" Name="Ready (us)" AggregationMode="Sum" IsVisible="True" SortPriority="12" TextAlignment="Right" Width="87" />
+                <HdvColumnViewModelPreset Guid="906ea81e-ab68-4dfd-9b9f-3adafab60f83" Name="Ready (us)" AggregationMode="Max" SortPriority="13" TextAlignment="Right" Width="100" />
+                <HdvColumnViewModelPreset Guid="6d598aa8-2ec4-46cd-b71a-88a239dfacf7" Name="Waits (us)" AggregationMode="Sum" IsVisible="True" SortPriority="14" TextAlignment="Right" Width="92" />
+                <HdvColumnViewModelPreset Guid="6d598aa8-2ec4-46cd-b71a-88a239dfacf7" Name="Waits (us)" AggregationMode="Max" SortPriority="15" TextAlignment="Right" Width="100" />
+                <HdvColumnViewModelPreset Guid="1db45bc8-4cd5-49f3-a0ec-7f861d33c7a2" Name="Count:Waits" AggregationMode="Sum" SortPriority="16" TextAlignment="Right" Width="70" />
+                <HdvColumnViewModelPreset Guid="5417f63c-9b79-45aa-beb9-73e3c1959221" Name="SwitchInTime (s)" SortPriority="17" TextAlignment="Right" Width="120" />
+                <HdvColumnViewModelPreset Guid="71d9a1a9-f32c-4b0b-8f09-09b56cbbb843" Name="LastSwitchOutTime (s)" SortPriority="18" TextAlignment="Right" Width="120" />
+                <HdvColumnViewModelPreset Guid="b0394c3a-60ba-4305-84d6-82384bd863cb" Name="NextSwitchOutTime (s)" SortPriority="19" TextAlignment="Right" Width="120" />
+                <HdvColumnViewModelPreset Guid="f611f788-c420-49a0-84b2-21ad7cfea811" Name="NewPrevOutPri" SortPriority="20" TextAlignment="Right" Width="70" />
+                <HdvColumnViewModelPreset Guid="5664dbf4-e565-4b15-add0-3e826ee25c10" Name="NewInPri" SortPriority="21" TextAlignment="Right" Width="70" />
+                <HdvColumnViewModelPreset Guid="f88c657f-5f13-4477-a713-eaf1abf81ece" Name="NewOutPri" SortPriority="22" TextAlignment="Right" Width="70" />
+                <HdvColumnViewModelPreset Guid="32a7f4fc-f7ad-47a3-b5a8-ad740991c9c1" Name="NewQnt" SortPriority="23" TextAlignment="Right" Width="60" />
+                <HdvColumnViewModelPreset Guid="11628f2a-3000-43af-9924-d99198ae9be2" Name="NewPrevState" SortPriority="24" Width="100" />
+                <HdvColumnViewModelPreset Guid="fe7ccd45-6275-413e-a538-3587f0eb452b" Name="NewPrevWaitReason" SortPriority="25" Width="100" />
+                <HdvColumnViewModelPreset Guid="f9284962-f8ee-4344-817a-ca44acd3a75d" Name="NewPrevWaitMode" SortPriority="26" Width="80" />
+                <HdvColumnViewModelPreset Guid="ef1e0e6d-e243-48e8-b40a-71c408eeae9f" Name="NewState" SortPriority="27" Width="100" />
+                <HdvColumnViewModelPreset Guid="d8d5d554-5877-4b5a-8df5-7cfa1935430a" Name="NewWaitReason" SortPriority="28" Width="100" />
+                <HdvColumnViewModelPreset Guid="3fd1ebd9-3538-443f-b50b-d08de1352271" Name="NewWaitMode" SortPriority="29" Width="80" />
+                <HdvColumnViewModelPreset Guid="7d7dabe0-0896-4fd1-9617-1c6758d80da5" Name="NewPriDecr" SortPriority="30" TextAlignment="Right" Width="60" />
+                <HdvColumnViewModelPreset Guid="c10c7661-6e59-4743-894d-9fbc770a41f3" Name="OldProcess Name" SortPriority="31" Width="180" />
+                <HdvColumnViewModelPreset Guid="e93e468d-86a2-4f3a-a750-bb3b07c14a0b" Name="OldProcess" SortPriority="32" Width="200" />
+                <HdvColumnViewModelPreset Guid="7e24b8da-fe12-4e69-b8cc-9ab0c22c9734" Name="OldThreadId" SortPriority="33" TextAlignment="Right" Width="80" />
+                <HdvColumnViewModelPreset Guid="3aa1863c-4219-4667-9aa8-aedc0da92bbe" Name="OldOutPri" SortPriority="34" TextAlignment="Right" Width="70" />
+                <HdvColumnViewModelPreset Guid="2d8aa42b-6fde-45bb-8b4e-230c6adcc656" Name="OldQnt" SortPriority="35" TextAlignment="Right" Width="60" />
+                <HdvColumnViewModelPreset Guid="ad3b2db0-2dbb-449b-88f5-cf83b8db33ec" Name="OldInSwitchTime (us)" AggregationMode="Sum" SortPriority="36" TextAlignment="Right" Width="100" />
+                <HdvColumnViewModelPreset Guid="6d59239b-c825-4f19-bc0f-039d59568408" Name="OldState" SortPriority="37" Width="80" />
+                <HdvColumnViewModelPreset Guid="89a7715b-5b16-48ec-b6db-f6a28ac4ca63" Name="OldWaitReason" SortPriority="38" Width="100" />
+                <HdvColumnViewModelPreset Guid="0a1c969d-e94a-4ca8-83f1-086f55c46dd1" Name="OldWaitMode" SortPriority="39" Width="80" />
+                <HdvColumnViewModelPreset Guid="2575f38e-f991-4ce5-bafb-793e2ba1936a" Name="Cpu" SortPriority="40" TextAlignment="Right" Width="50" />
+                <HdvColumnViewModelPreset Guid="e93dcc3d-9960-446a-aa1d-fa05d47d5aa4" Name="IdealCpu" SortPriority="41" TextAlignment="Right" Width="60" />
+                <HdvColumnViewModelPreset Guid="6143445c-c984-49f5-994b-9351a7520f3c" Name="PrevCState" SortPriority="42" TextAlignment="Right" Width="60" />
+                <HdvColumnViewModelPreset Guid="59117e0d-0465-42c7-a758-52728c5b0099" Name="NewThreadStartModule" SortPriority="43" Width="200" />
+                <HdvColumnViewModelPreset Guid="b09b3bba-08ea-4e1b-9c16-4d0bb97926fb" Name="NewThreadStartFunction" SortPriority="44" Width="200" />
+                <HdvColumnViewModelPreset Guid="de478623-0270-43d8-b2b4-c7df7b93ec7a" Name="ReadyingThreadStartModule" SortPriority="45" Width="200" />
+                <HdvColumnViewModelPreset Guid="3a13296d-8e2d-40d7-8ab6-46ebb2646caa" Name="ReadyingThreadStartFunction" SortPriority="46" Width="200" />
+                <HdvColumnViewModelPreset Guid="96d10b76-4157-42d0-8163-91dc0b8b12b5" Name="OldThreadStartModule" SortPriority="47" Width="200" />
+                <HdvColumnViewModelPreset Guid="e99e2971-b205-41e9-894d-ba0c19e2af83" Name="OldThreadStartFunction" SortPriority="48" Width="200" />
+                <HdvColumnViewModelPreset Guid="03a1d898-7231-4cc5-9712-4bfbf53908c7" Name="NewInSwitchTime (us)" AggregationMode="Sum" SortPriority="49" TextAlignment="Right" Width="100" />
+                <HdvColumnViewModelPreset Guid="e008ed7a-15b0-40ab-854b-b5f6392f298b" Name="CPU Usage (ms)" AggregationMode="Sum" IsVisible="True" SortPriority="50" TextAlignment="Right" Width="94" />
+                <HdvColumnViewModelPreset Guid="fc672588-da05-4f43-991f-6b644a3f5b3d" Name="% CPU Usage" AggregationMode="Sum" IsVisible="True" SortPriority="51" TextAlignment="Right" Width="79" />
+              </HdvViewModelPreset.ConfigurableColumns>
+            </HdvViewModelPreset>
+          </HdvViewModelPresetCollection.UserPresets>
+        </HdvViewModelPresetCollection>
+        <HdvViewModelPresetCollection Name="4237fcb5-808e-4868-ae15-96772fb57e41">
+          <HdvViewModelPresetCollection.UserPresets />
+        </HdvViewModelPresetCollection>
+        <HdvViewModelPresetCollection Name="b0b4901b-0981-4842-b282-2a9904c53280">
+          <HdvViewModelPresetCollection.UserPresets />
+        </HdvViewModelPresetCollection>
+        <HdvViewModelPresetCollection Name="8d943a59-1562-425a-a65e-3932e457258b">
+          <HdvViewModelPresetCollection.UserPresets />
+        </HdvViewModelPresetCollection>
+        <HdvViewModelPresetCollection Name="9cfb2296-2c89-45af-a5bd-23b4885dcbab">
+          <HdvViewModelPresetCollection.UserPresets />
+        </HdvViewModelPresetCollection>
+        <HdvViewModelPresetCollection Name="7c60aeff-a47f-4ba8-942c-d2b154087ab9">
+          <HdvViewModelPresetCollection.UserPresets />
+        </HdvViewModelPresetCollection>
+        <HdvViewModelPresetCollection Name="3c18eb9c-2211-4988-bf94-bb029e4ce96e">
+          <HdvViewModelPresetCollection.UserPresets />
+        </HdvViewModelPresetCollection>
+        <HdvViewModelPresetCollection Name="a4a4ee28-f3e3-43f0-8b35-6fc4e37e8675">
+          <HdvViewModelPresetCollection.UserPresets />
+        </HdvViewModelPresetCollection>
+        <HdvViewModelPresetCollection Name="5279a15b-e0ad-4ec4-8d80-a8bc6bb8b7c8">
+          <HdvViewModelPresetCollection.UserPresets />
+        </HdvViewModelPresetCollection>
+        <HdvViewModelPresetCollection Name="3b77a6f0-391f-4d84-9ee9-67e7bae59fd1">
+          <HdvViewModelPresetCollection.UserPresets />
+        </HdvViewModelPresetCollection>
+        <HdvViewModelPresetCollection Name="cb079a8b-de14-4516-9f83-6c5695b0845a">
+          <HdvViewModelPresetCollection.UserPresets />
+        </HdvViewModelPresetCollection>
+        <HdvViewModelPresetCollection Name="ec60ccb2-4409-444e-98fa-792c5b3c36da">
+          <HdvViewModelPresetCollection.UserPresets />
+        </HdvViewModelPresetCollection>
+        <HdvViewModelPresetCollection Name="1fe3bbaa-6738-41b9-941e-7a6825821b35">
+          <HdvViewModelPresetCollection.UserPresets />
+        </HdvViewModelPresetCollection>
+        <HdvViewModelPresetCollection Name="d68e0a4e-52b1-4e1a-b83a-cddf45661efb">
+          <HdvViewModelPresetCollection.UserPresets />
+        </HdvViewModelPresetCollection>
+        <HdvViewModelPresetCollection Name="96560002-ea30-4a11-af10-52b51dbdb2a6">
+          <HdvViewModelPresetCollection.UserPresets />
+        </HdvViewModelPresetCollection>
+        <HdvViewModelPresetCollection Name="0d63da12-a68a-4ea8-8a12-dadd30f0fa1d">
+          <HdvViewModelPresetCollection.UserPresets />
+        </HdvViewModelPresetCollection>
+        <HdvViewModelPresetCollection Name="f05d032f-f475-4f4f-bbf6-c24c2b594f0f">
+          <HdvViewModelPresetCollection.UserPresets />
+        </HdvViewModelPresetCollection>
+        <HdvViewModelPresetCollection Name="faa52878-623e-4f74-9ed9-a65e379ccdd5">
+          <HdvViewModelPresetCollection.UserPresets />
+        </HdvViewModelPresetCollection>
+        <HdvViewModelPresetCollection Name="a1df89f9-5b2a-449e-aaab-1bcc3fd25c84">
+          <HdvViewModelPresetCollection.UserPresets />
+        </HdvViewModelPresetCollection>
+        <HdvViewModelPresetCollection Name="00f566da-55ea-4e31-a242-fb28c798a63e">
+          <HdvViewModelPresetCollection.UserPresets />
+        </HdvViewModelPresetCollection>
+        <HdvViewModelPresetCollection Name="920e6241-3dea-46c4-8e4f-04ce08f62c0a">
+          <HdvViewModelPresetCollection.UserPresets />
+        </HdvViewModelPresetCollection>
+        <HdvViewModelPresetCollection Name="0588f34c-77f0-48a3-a4fd-2e0a462ea764">
+          <HdvViewModelPresetCollection.UserPresets />
+        </HdvViewModelPresetCollection>
+        <HdvViewModelPresetCollection Name="04f69f98-176e-4d1c-b44e-97f734996ab8">
+          <HdvViewModelPresetCollection.UserPresets>
+            <HdvViewModelPreset Name="Activity by Process, Provider, Opcode" GraphColumnCount="36" KeyColumnCount="4" LeftFrozenColumnCount="5" RightFrozenColumnCount="34" InitialFilterQuery="[Provider Name]:~=&quot;Valve-&quot;" InitialSelectionQuery="" InitialExpansionQuery="">
+              <HdvViewModelPreset.ColumnMetadataEntries>
+                <ColumnMetadataEntry Guid="bbfc990a-b6c9-4dcd-858b-f040ab4a1efe" Name="Time (s)" ColumnMetadata="StartTime" />
+                <ColumnMetadataEntry Guid="bbfc990a-b6c9-4dcd-858b-f040ab4a1efe" Name="Time (s)" ColumnMetadata="EndTime" />
+                <ColumnMetadataEntry Guid="edf01e5d-3644-4dbc-ab9d-f8954e6db6ea" Name="ThreadId" ColumnMetadata="EndThreadId" />
+              </HdvViewModelPreset.ColumnMetadataEntries>
+              <HdvViewModelPreset.HighlightEntries />
+              <HdvViewModelPreset.ConfigurableColumns>
+                <HdvColumnViewModelPreset Guid="7ee6a5ff-1faf-428a-a7c2-7d2cb2b5cf26" Name="Process" IsVisible="True" SortPriority="9" Width="150" />
+                <HdvColumnViewModelPreset Guid="8b4c40f8-0d99-437d-86ab-56ec200137dc" Name="Provider Name" IsVisible="True" SortPriority="1" Width="200" />
+                <HdvColumnViewModelPreset Guid="511777f7-30ef-4e86-bd0b-0facaf23a0d3" Name="Task Name" SortPriority="2" Width="80" />
+                <HdvColumnViewModelPreset Guid="5b51716b-b88f-443a-a396-c6316296d5f8" Name="Opcode Name" IsVisible="True" SortPriority="3" Width="80" />
+                <HdvColumnViewModelPreset Guid="90fe0b49-e3bb-440f-b829-5813c42108a1" Name="Event Name" IsVisible="True" SortPriority="4" Width="100" />
+                <HdvColumnViewModelPreset Guid="2a23f9b1-65d6-46d2-87b2-72f3606b7f75" Name="Provider Id" SortPriority="5" Width="100" />
+                <HdvColumnViewModelPreset Guid="72892fbe-0f55-426a-9aa1-26b6baf09ffb" Name="Provider Type" SortPriority="6" Width="100" />
+                <HdvColumnViewModelPreset Guid="3be8610c-babb-4154-9970-1b2210928024" Name="Cpu" IsVisible="True" SortPriority="7" Width="30" />
+                <HdvColumnViewModelPreset Guid="edf01e5d-3644-4dbc-ab9d-f8954e6db6ea" Name="ThreadId" IsVisible="True" SortPriority="8" Width="50" />
+                <HdvColumnViewModelPreset Guid="85d40897-ae0f-4a6b-aea3-b4bcd27c14f7" Name="Process Name" IsVisible="True" SortPriority="10" Width="150" />
+                <HdvColumnViewModelPreset Guid="19eb156f-1908-4134-a783-b9e7e2555a1d" Name="Opcode/Type " SortPriority="-1" Width="80" />
+                <HdvColumnViewModelPreset Guid="65bc19fd-8f80-4011-8b00-c7be7d8ec256" Name="Level" SortPriority="-1" Width="80" />
+                <HdvColumnViewModelPreset Guid="d446a182-5203-4a29-aca1-4ab9bea0d1b5" Name="Version" SortPriority="-1" Width="80" />
+                <HdvColumnViewModelPreset Guid="ce9f33d1-08f5-4f4e-b844-d70bde706a53" Name="Task" SortPriority="-1" Width="80" />
+                <HdvColumnViewModelPreset Guid="704a10b2-3e2d-40e9-98c8-7f22e09f6d95" Name="Keyword" SortPriority="-1" Width="80" />
+                <HdvColumnViewModelPreset Guid="27165170-b6d1-44fe-ac86-a52749c651f4" Name="Channel" SortPriority="-1" Width="80" />
+                <HdvColumnViewModelPreset Guid="c72e1c5a-f6db-4c84-8c0b-85989e514075" Name="Id" SortPriority="-1" Width="80" />
+                <HdvColumnViewModelPreset Guid="53863053-1c61-431c-b5a2-8057bbebae9b" Name="UserDataLength" AggregationMode="Sum" SortPriority="-1" Width="30" />
+                <HdvColumnViewModelPreset Guid="ebb63d26-9372-4ab1-9f0b-d0d15edbc41e" Name="etw:ActivityId" SortPriority="-1" Width="60" />
+                <HdvColumnViewModelPreset Guid="9104edf0-5fc0-4d55-9627-8ca5f056492d" Name="etw:Related ActivityId" SortPriority="-1" Width="60" />
+                <HdvColumnViewModelPreset Guid="8bfa4827-c16b-4fd3-9956-89373052769a" Name="etw:UserSid" SortPriority="-1" Width="60" />
+                <HdvColumnViewModelPreset Guid="54257914-1075-471b-96f2-c809b4e6a877" Name="etw:SessionId" SortPriority="-1" Width="60" />
+                <HdvColumnViewModelPreset Guid="26eed6bf-f07d-4bb0-a36f-43a7d3a68828" Name="Stack" SortPriority="-1" Width="100" />
+                <HdvColumnViewModelPreset Guid="52795c3b-48e5-4e95-8fb0-bc00e07a1a96" Name="Thread Start Module" SortPriority="-1" Width="100" />
+                <HdvColumnViewModelPreset Guid="5dc9b807-1517-4e0f-bea4-ce75bea3e551" Name="Thread Start Function" SortPriority="-1" Width="100" />
+                <HdvColumnViewModelPreset Guid="0c5cf8cd-9b9e-5798-1a5d-09d429f7fa3c" Name="Field 1" IsVisible="True" SortPriority="-1" Width="80" />
+                <HdvColumnViewModelPreset Guid="71badd11-26e5-56bc-44ec-12f4cc6a8f3e" Name="Field 2" IsVisible="True" SortPriority="-1" Width="80" />
+                <HdvColumnViewModelPreset Guid="411dba2d-5d6e-5272-8287-636d0841768c" Name="Field 3" IsVisible="True" SortPriority="-1" Width="80" />
+                <HdvColumnViewModelPreset Guid="048f5050-1f17-59b3-fa22-4b0781ee630b" Name="Field 4" IsVisible="True" SortPriority="-1" Width="80" />
+                <HdvColumnViewModelPreset Guid="94e48f22-d499-5227-bb04-be011b4159b0" Name="Field 5" IsVisible="True" SortPriority="-1" Width="80" />
+                <HdvColumnViewModelPreset Guid="c1054028-424a-59ba-e760-6d30abbd69c5" Name="Field 6" IsVisible="True" SortPriority="-1" Width="80" />
+                <HdvColumnViewModelPreset Guid="5cbc4b58-2de1-5449-55b2-4651d4edf90a" Name="Field 7" IsVisible="True" SortPriority="-1" Width="80" />
+                <HdvColumnViewModelPreset Guid="342f7677-17b2-4c7e-b9ec-e89612c49792" Name="Count" AggregationMode="Sum" IsVisible="True" SortOrder="Descending" Width="80" />
+                <HdvColumnViewModelPreset Guid="bbfc990a-b6c9-4dcd-858b-f040ab4a1efe" Name="Time (s)" IsVisible="True" SortPriority="11" Width="80" />
+              </HdvViewModelPreset.ConfigurableColumns>
+            </HdvViewModelPreset>
+            <HdvViewModelPreset Name="Valve Generic Events" GraphColumnCount="44" KeyColumnCount="4" LeftFrozenColumnCount="5" RightFrozenColumnCount="42" InitialFilterQuery="[Provider Name]:~=&quot;Valve-&quot;" InitialSelectionQuery="" InitialExpansionQuery="">
+              <HdvViewModelPreset.ColumnMetadataEntries>
+                <ColumnMetadataEntry Guid="bbfc990a-b6c9-4dcd-858b-f040ab4a1efe" Name="Time (s)" ColumnMetadata="StartTime" />
+                <ColumnMetadataEntry Guid="bbfc990a-b6c9-4dcd-858b-f040ab4a1efe" Name="Time (s)" ColumnMetadata="EndTime" />
+                <ColumnMetadataEntry Guid="edf01e5d-3644-4dbc-ab9d-f8954e6db6ea" Name="ThreadId" ColumnMetadata="EndThreadId" />
+              </HdvViewModelPreset.ColumnMetadataEntries>
+              <HdvViewModelPreset.HighlightEntries />
+              <HdvViewModelPreset.ConfigurableColumns>
+                <HdvColumnViewModelPreset Guid="7ee6a5ff-1faf-428a-a7c2-7d2cb2b5cf26" Name="Process" IsVisible="True" SortPriority="9" Width="150" />
+                <HdvColumnViewModelPreset Guid="8b4c40f8-0d99-437d-86ab-56ec200137dc" Name="Provider Name" IsVisible="True" SortPriority="1" Width="200" />
+                <HdvColumnViewModelPreset Guid="511777f7-30ef-4e86-bd0b-0facaf23a0d3" Name="Task Name" SortPriority="2" Width="80" />
+                <HdvColumnViewModelPreset Guid="5b51716b-b88f-443a-a396-c6316296d5f8" Name="Opcode Name" IsVisible="True" SortPriority="3" Width="80" />
+                <HdvColumnViewModelPreset Guid="90fe0b49-e3bb-440f-b829-5813c42108a1" Name="Event Name" IsVisible="True" SortPriority="4" Width="100" />
+                <HdvColumnViewModelPreset Guid="2a23f9b1-65d6-46d2-87b2-72f3606b7f75" Name="Provider Id" SortPriority="5" Width="100" />
+                <HdvColumnViewModelPreset Guid="72892fbe-0f55-426a-9aa1-26b6baf09ffb" Name="Provider Type" SortPriority="6" Width="100" />
+                <HdvColumnViewModelPreset Guid="3be8610c-babb-4154-9970-1b2210928024" Name="Cpu" IsVisible="True" SortPriority="7" Width="30" />
+                <HdvColumnViewModelPreset Guid="edf01e5d-3644-4dbc-ab9d-f8954e6db6ea" Name="ThreadId" IsVisible="True" SortPriority="8" Width="50" />
+                <HdvColumnViewModelPreset Guid="85d40897-ae0f-4a6b-aea3-b4bcd27c14f7" Name="Process Name" IsVisible="True" SortPriority="10" Width="150" />
+                <HdvColumnViewModelPreset Guid="19eb156f-1908-4134-a783-b9e7e2555a1d" Name="Opcode/Type " SortPriority="-1" Width="80" />
+                <HdvColumnViewModelPreset Guid="65bc19fd-8f80-4011-8b00-c7be7d8ec256" Name="Level" SortPriority="-1" Width="80" />
+                <HdvColumnViewModelPreset Guid="d446a182-5203-4a29-aca1-4ab9bea0d1b5" Name="Version" SortPriority="-1" Width="80" />
+                <HdvColumnViewModelPreset Guid="ce9f33d1-08f5-4f4e-b844-d70bde706a53" Name="Task" SortPriority="-1" Width="80" />
+                <HdvColumnViewModelPreset Guid="704a10b2-3e2d-40e9-98c8-7f22e09f6d95" Name="Keyword" SortPriority="-1" Width="80" />
+                <HdvColumnViewModelPreset Guid="27165170-b6d1-44fe-ac86-a52749c651f4" Name="Channel" SortPriority="-1" Width="80" />
+                <HdvColumnViewModelPreset Guid="c72e1c5a-f6db-4c84-8c0b-85989e514075" Name="Id" SortPriority="-1" Width="80" />
+                <HdvColumnViewModelPreset Guid="53863053-1c61-431c-b5a2-8057bbebae9b" Name="UserDataLength" AggregationMode="Sum" SortPriority="-1" Width="30" />
+                <HdvColumnViewModelPreset Guid="ebb63d26-9372-4ab1-9f0b-d0d15edbc41e" Name="etw:ActivityId" SortPriority="-1" Width="60" />
+                <HdvColumnViewModelPreset Guid="9104edf0-5fc0-4d55-9627-8ca5f056492d" Name="etw:Related ActivityId" SortPriority="-1" Width="60" />
+                <HdvColumnViewModelPreset Guid="8bfa4827-c16b-4fd3-9956-89373052769a" Name="etw:UserSid" SortPriority="-1" Width="60" />
+                <HdvColumnViewModelPreset Guid="54257914-1075-471b-96f2-c809b4e6a877" Name="etw:SessionId" SortPriority="-1" Width="60" />
+                <HdvColumnViewModelPreset Guid="26eed6bf-f07d-4bb0-a36f-43a7d3a68828" Name="Stack" SortPriority="-1" Width="100" />
+                <HdvColumnViewModelPreset Guid="52795c3b-48e5-4e95-8fb0-bc00e07a1a96" Name="Thread Start Module" SortPriority="-1" Width="100" />
+                <HdvColumnViewModelPreset Guid="5dc9b807-1517-4e0f-bea4-ce75bea3e551" Name="Thread Start Function" SortPriority="-1" Width="100" />
+                <HdvColumnViewModelPreset Guid="0c5cf8cd-9b9e-5798-1a5d-09d429f7fa3c" Name="Field 1" IsVisible="True" SortPriority="-1" Width="80" />
+                <HdvColumnViewModelPreset Guid="71badd11-26e5-56bc-44ec-12f4cc6a8f3e" Name="Field 2" IsVisible="True" SortPriority="-1" Width="80" />
+                <HdvColumnViewModelPreset Guid="411dba2d-5d6e-5272-8287-636d0841768c" Name="Field 3" IsVisible="True" SortPriority="-1" Width="80" />
+                <HdvColumnViewModelPreset Guid="048f5050-1f17-59b3-fa22-4b0781ee630b" Name="Field 4" IsVisible="True" SortPriority="-1" Width="80" />
+                <HdvColumnViewModelPreset Guid="94e48f22-d499-5227-bb04-be011b4159b0" Name="Field 5" IsVisible="True" SortPriority="-1" Width="80" />
+                <HdvColumnViewModelPreset Guid="c1054028-424a-59ba-e760-6d30abbd69c5" Name="Field 6" IsVisible="True" SortPriority="-1" Width="80" />
+                <HdvColumnViewModelPreset Guid="5cbc4b58-2de1-5449-55b2-4651d4edf90a" Name="Field 7" IsVisible="True" SortPriority="-1" Width="80" />
+                <HdvColumnViewModelPreset Guid="fc01e6c9-a43b-51a1-fd2e-112ba48aff65" Name="Field 8" IsVisible="True" SortPriority="-1" Width="80" />
+                <HdvColumnViewModelPreset Guid="e3dcf300-46e2-5c43-ef4b-2c3db489ec25" Name="Field 9" IsVisible="True" SortPriority="-1" Width="80" />
+                <HdvColumnViewModelPreset Guid="87c21ddb-4b29-58e3-5ddc-f114c5ca209a" Name="Field 10" IsVisible="True" SortPriority="-1" Width="80" />
+                <HdvColumnViewModelPreset Guid="65f8fe42-ad02-5016-3521-f93329c76227" Name="Field 11" IsVisible="True" SortPriority="-1" Width="80" />
+                <HdvColumnViewModelPreset Guid="03d48fd3-0fe4-57f5-a477-49beb0d70a1f" Name="Field 12" IsVisible="True" SortPriority="-1" Width="80" />
+                <HdvColumnViewModelPreset Guid="998f8e2d-0f5a-5a54-0133-226e2de62c0b" Name="Field 13" IsVisible="True" SortPriority="-1" Width="80" />
+                <HdvColumnViewModelPreset Guid="bb772c34-9600-5bf7-3f54-e6080f8a0611" Name="Field 14" IsVisible="True" SortPriority="-1" Width="80" />
+                <HdvColumnViewModelPreset Guid="1479add7-3dcb-580b-f1e9-87d5186ced61" Name="Field 15" IsVisible="True" SortPriority="-1" Width="80" />
+                <HdvColumnViewModelPreset Guid="342f7677-17b2-4c7e-b9ec-e89612c49792" Name="Count" AggregationMode="Sum" IsVisible="True" SortOrder="Descending" Width="80" />
+                <HdvColumnViewModelPreset Guid="bbfc990a-b6c9-4dcd-858b-f040ab4a1efe" Name="Time (s)" IsVisible="True" SortPriority="11" Width="80" />
+              </HdvViewModelPreset.ConfigurableColumns>
+            </HdvViewModelPreset>
+          </HdvViewModelPresetCollection.UserPresets>
+        </HdvViewModelPresetCollection>
+        <HdvViewModelPresetCollection Name="cbbd1db6-d7e2-4410-8784-f3df48ad56a5">
+          <HdvViewModelPresetCollection.UserPresets />
+        </HdvViewModelPresetCollection>
+        <HdvViewModelPresetCollection Name="7ccef571-f72c-4bfa-891d-3106b7bbe54a">
+          <HdvViewModelPresetCollection.UserPresets />
+        </HdvViewModelPresetCollection>
+        <HdvViewModelPresetCollection Name="a3a3bf45-7ee8-45eb-95c1-0369c31420ce">
+          <HdvViewModelPresetCollection.UserPresets />
+        </HdvViewModelPresetCollection>
+        <HdvViewModelPresetCollection Name="3bc03cbc-93e0-4ffb-89ae-f80c8c03f568">
+          <HdvViewModelPresetCollection.UserPresets />
+        </HdvViewModelPresetCollection>
+        <HdvViewModelPresetCollection Name="da13748b-71c7-4ba1-a61d-6ae4e527e261">
+          <HdvViewModelPresetCollection.UserPresets />
+        </HdvViewModelPresetCollection>
+        <HdvViewModelPresetCollection Name="31b88db9-1be9-42fa-9452-3cd560899212">
+          <HdvViewModelPresetCollection.UserPresets />
+        </HdvViewModelPresetCollection>
+        <HdvViewModelPresetCollection Name="b855361e-7be0-4bc8-a754-3e8507715ca5">
+          <HdvViewModelPresetCollection.UserPresets>
+            <HdvViewModelPreset Name="Module and function based - exclusive" GraphColumnCount="20" KeyColumnCount="10" RightFrozenColumnCount="19" InitialFilterQuery="[DPC/ISR]:=&quot;DPC&quot; OR [DPC/ISR]:=&quot;ISR&quot;" InitialFilterShouldKeep="False" InitialSelectionQuery="([Series Name]:=&quot;Process&quot; AND NOT ([Process]:=&quot;Idle (0)&quot;))">
+              <HdvViewModelPreset.ColumnMetadataEntries>
+                <ColumnMetadataEntry Guid="0bbf4299-0176-445e-b1d9-991df475d631" Name="TimeStamp" ColumnMetadata="EndTime" />
+                <ColumnMetadataEntry Guid="e0c6cb9e-04c2-4bb5-ba5f-4ed765f4ecaa" Name="Weight" ColumnMetadata="Duration" />
+                <ColumnMetadataEntry Guid="55d56ebb-77af-4af5-a056-6122751ea093" Name="CPU" ColumnMetadata="ResourceId" />
+                <ColumnMetadataEntry Guid="05100ece-df05-40c7-aad6-ffff99b60491" Name="Thread ID" ColumnMetadata="EndThreadId" />
+              </HdvViewModelPreset.ColumnMetadataEntries>
+              <HdvViewModelPreset.HighlightEntries />
+              <HdvViewModelPreset.ConfigurableColumns>
+                <HdvColumnViewModelPreset Guid="9c1ceec3-ef4a-4865-b678-d774881187b9" Name="Process Name" Width="180" />
+                <HdvColumnViewModelPreset Guid="00875e0c-482f-418d-ab40-decf05030541" Name="Display Name" Width="200" />
+                <HdvColumnViewModelPreset Guid="5b77e48f-6d24-4f29-8972-69c30e32f87d" Name="Process" IsVisible="True" Width="200" />
+                <HdvColumnViewModelPreset Guid="05100ece-df05-40c7-aad6-ffff99b60491" Name="Thread ID" IsVisible="True" TextAlignment="Right" Width="80" />
+                <HdvColumnViewModelPreset Guid="842af11e-661d-477e-b7b6-556ed8181177" Name="Stack" Width="200" />
+                <HdvColumnViewModelPreset Guid="ccdb05c1-04a9-4289-aaa6-a376d1d66012" Name="Module" IsVisible="True" Width="124" />
+                <HdvColumnViewModelPreset Guid="7ad93780-708c-471c-9e3f-5a497cbefdd7" Name="Function" IsVisible="True" Width="184" />
+                <HdvColumnViewModelPreset Guid="d0028ea0-aa66-452a-882a-616fd8b9fdce" Name="DPC/ISR" Width="184" />
+                <HdvColumnViewModelPreset Guid="9aa2e00d-db0a-4207-a0bd-964aa492356e" Name="Address" TextAlignment="Right" Width="140" />
+                <HdvColumnViewModelPreset Guid="55d56ebb-77af-4af5-a056-6122751ea093" Name="CPU" TextAlignment="Right" Width="40" />
+                <HdvColumnViewModelPreset Guid="01a82c2c-5048-4c9d-ac37-eaf6556f6af5" Name="Count" AggregationMode="Sum" IsVisible="True" SortOrder="Descending" SortPriority="1" TextAlignment="Right" Width="60" />
+                <HdvColumnViewModelPreset Guid="e0c6cb9e-04c2-4bb5-ba5f-4ed765f4ecaa" Name="Weight" AggregationMode="Sum" IsVisible="True" TextAlignment="Right" Width="100" />
+                <HdvColumnViewModelPreset Guid="0bbf4299-0176-445e-b1d9-991df475d631" Name="TimeStamp" TextAlignment="Right" Width="100" />
+                <HdvColumnViewModelPreset Guid="5a1e1ba4-6a14-43e5-96eb-3b462be470fe" Name="Priority" TextAlignment="Right" Width="80" />
+                <HdvColumnViewModelPreset Guid="3cdbbb36-8a85-40ae-8e0d-f3a2e95636dd" Name="Thread Start Module" SortPriority="-1" Width="140" />
+                <HdvColumnViewModelPreset Guid="d2449267-714a-402e-af70-cffb62621dfa" Name="Thread Start Function" SortPriority="-1" Width="160" />
+                <HdvColumnViewModelPreset Guid="c3494b85-10ae-4b95-8963-f59ae71e867d" Name="All Count" AggregationMode="Count" SortPriority="-1" Width="80" />
+                <HdvColumnViewModelPreset Guid="f5ebf01b-f7cb-4afb-877d-c36edb2a62b6" Name="% Weight" AggregationMode="Sum" IsVisible="True" SortOrder="Descending" TextAlignment="Right" Width="80" />
+              </HdvViewModelPreset.ConfigurableColumns>
+            </HdvViewModelPreset>
+            <HdvViewModelPreset Name="Stack based - inclusive" GraphColumnCount="20" KeyColumnCount="9" RightFrozenColumnCount="19" InitialFilterQuery="[DPC/ISR]:=&quot;DPC&quot; OR [DPC/ISR]:=&quot;ISR&quot;" InitialFilterShouldKeep="False" InitialSelectionQuery="([Series Name]:=&quot;Process&quot; AND NOT ([Process]:=&quot;Idle (0)&quot;))" GraphFilterColumnName="Count" GraphFilterColumnGuid="01a82c2c-5048-4c9d-ac37-eaf6556f6af5">
+              <HdvViewModelPreset.ColumnMetadataEntries>
+                <ColumnMetadataEntry Guid="05100ece-df05-40c7-aad6-ffff99b60491" Name="Thread ID" ColumnMetadata="EndThreadId" />
+                <ColumnMetadataEntry Guid="0bbf4299-0176-445e-b1d9-991df475d631" Name="TimeStamp" ColumnMetadata="EndTime" />
+                <ColumnMetadataEntry Guid="e0c6cb9e-04c2-4bb5-ba5f-4ed765f4ecaa" Name="Weight" ColumnMetadata="Duration" />
+                <ColumnMetadataEntry Guid="55d56ebb-77af-4af5-a056-6122751ea093" Name="CPU" ColumnMetadata="ResourceId" />
+              </HdvViewModelPreset.ColumnMetadataEntries>
+              <HdvViewModelPreset.HighlightEntries />
+              <HdvViewModelPreset.ConfigurableColumns>
+                <HdvColumnViewModelPreset Guid="9c1ceec3-ef4a-4865-b678-d774881187b9" Name="Process Name" SortPriority="1" Width="180" />
+                <HdvColumnViewModelPreset Guid="00875e0c-482f-418d-ab40-decf05030541" Name="Display Name" SortPriority="2" Width="200" />
+                <HdvColumnViewModelPreset Guid="5b77e48f-6d24-4f29-8972-69c30e32f87d" Name="Process" IsVisible="True" SortPriority="3" Width="200" />
+                <HdvColumnViewModelPreset Guid="05100ece-df05-40c7-aad6-ffff99b60491" Name="Thread ID" IsVisible="True" SortPriority="9" TextAlignment="Right" Width="80" />
+                <HdvColumnViewModelPreset Guid="842af11e-661d-477e-b7b6-556ed8181177" Name="Stack" IsVisible="True" SortPriority="4" Width="623" />
+                <HdvColumnViewModelPreset Guid="ccdb05c1-04a9-4289-aaa6-a376d1d66012" Name="Module" SortPriority="5" Width="124" />
+                <HdvColumnViewModelPreset Guid="7ad93780-708c-471c-9e3f-5a497cbefdd7" Name="Function" SortPriority="6" Width="184" />
+                <HdvColumnViewModelPreset Guid="9aa2e00d-db0a-4207-a0bd-964aa492356e" Name="Address" SortPriority="8" TextAlignment="Right" Width="140" />
+                <HdvColumnViewModelPreset Guid="01a82c2c-5048-4c9d-ac37-eaf6556f6af5" Name="Count" AggregationMode="Sum" IsVisible="True" SortPriority="11" TextAlignment="Right" Width="60" />
+                <HdvColumnViewModelPreset Guid="e0c6cb9e-04c2-4bb5-ba5f-4ed765f4ecaa" Name="Weight" AggregationMode="Sum" IsVisible="True" SortOrder="Descending" TextAlignment="Right" Width="100" />
+                <HdvColumnViewModelPreset Guid="0bbf4299-0176-445e-b1d9-991df475d631" Name="TimeStamp" SortPriority="12" TextAlignment="Right" Width="100" />
+                <HdvColumnViewModelPreset Guid="55d56ebb-77af-4af5-a056-6122751ea093" Name="CPU" SortPriority="10" TextAlignment="Right" Width="40" />
+                <HdvColumnViewModelPreset Guid="5a1e1ba4-6a14-43e5-96eb-3b462be470fe" Name="Priority" SortPriority="13" TextAlignment="Right" Width="80" />
+                <HdvColumnViewModelPreset Guid="3cdbbb36-8a85-40ae-8e0d-f3a2e95636dd" Name="Thread Start Module" SortPriority="14" Width="140" />
+                <HdvColumnViewModelPreset Guid="d2449267-714a-402e-af70-cffb62621dfa" Name="Thread Start Function" SortPriority="15" Width="160" />
+                <HdvColumnViewModelPreset Guid="d0028ea0-aa66-452a-882a-616fd8b9fdce" Name="DPC/ISR" SortPriority="7" Width="184" />
+                <HdvColumnViewModelPreset Guid="c3494b85-10ae-4b95-8963-f59ae71e867d" Name="All Count" AggregationMode="Count" SortPriority="16" Width="80" />
+                <HdvColumnViewModelPreset Guid="f5ebf01b-f7cb-4afb-877d-c36edb2a62b6" Name="% Weight" AggregationMode="Sum" IsVisible="True" SortPriority="17" TextAlignment="Right" Width="60" />
+              </HdvViewModelPreset.ConfigurableColumns>
+            </HdvViewModelPreset>
+          </HdvViewModelPresetCollection.UserPresets>
+        </HdvViewModelPresetCollection>
+        <HdvViewModelPresetCollection Name="60578268-c574-4c17-9097-9c607b0b6c82">
+          <HdvViewModelPresetCollection.UserPresets />
+        </HdvViewModelPresetCollection>
+        <HdvViewModelPresetCollection Name="db839752-0e71-421f-99ff-51e2abbb4af5">
+          <HdvViewModelPresetCollection.UserPresets />
+        </HdvViewModelPresetCollection>
+        <HdvViewModelPresetCollection Name="54a0f0af-ac5d-4285-8276-ec3bf6b9b495">
+          <HdvViewModelPresetCollection.UserPresets />
+        </HdvViewModelPresetCollection>
+        <HdvViewModelPresetCollection Name="BBC8F512-A49B-451A-90FC-8497F20CFAD7">
+          <HdvViewModelPresetCollection.UserPresets />
+        </HdvViewModelPresetCollection>
+        <HdvViewModelPresetCollection Name="Wait Analysis">
+          <HdvViewModelPresetCollection.UserPresets />
+        </HdvViewModelPresetCollection>
+        <HdvViewModelPresetCollection Name="FFF01BCE-D67A-4D33-82B2-C993A0E82DA9">
+          <HdvViewModelPresetCollection.UserPresets />
+        </HdvViewModelPresetCollection>
+        <HdvViewModelPresetCollection Name="639F2500-02D6-4CF5-AB26-9C22E43D5D02">
+          <HdvViewModelPresetCollection.UserPresets />
+        </HdvViewModelPresetCollection>
+        <HdvViewModelPresetCollection Name="12C5387C-58CA-45D4-A5C6-450475C30E06">
+          <HdvViewModelPresetCollection.UserPresets />
+        </HdvViewModelPresetCollection>
+        <HdvViewModelPresetCollection Name="3de2a774-cbee-47ae-8ad1-1f9a03a5f8b6">
+          <HdvViewModelPresetCollection.UserPresets />
+        </HdvViewModelPresetCollection>
+        <HdvViewModelPresetCollection Name="851eeff6-c123-4da6-abfd-1cf1baf1d5bf">
+          <HdvViewModelPresetCollection.UserPresets />
+        </HdvViewModelPresetCollection>
+        <HdvViewModelPresetCollection Name="7B47975B-040D-4901-9A3F-E410228E30DF">
+          <HdvViewModelPresetCollection.UserPresets />
+        </HdvViewModelPresetCollection>
+        <HdvViewModelPresetCollection Name="47d3d0d5-b151-4a2e-a805-5e229fd69f8d">
+          <HdvViewModelPresetCollection.UserPresets />
+        </HdvViewModelPresetCollection>
+        <HdvViewModelPresetCollection Name="FA200443-7ECF-4ABC-A654-C76C81F27EC2">
+          <HdvViewModelPresetCollection.UserPresets />
+        </HdvViewModelPresetCollection>
+        <HdvViewModelPresetCollection Name="3dd69094-4675-4607-9fb4-0042b9e1a610">
+          <HdvViewModelPresetCollection.UserPresets />
+        </HdvViewModelPresetCollection>
+        <HdvViewModelPresetCollection Name="e97b189d-b977-4e41-9448-8c214c166f84">
+          <HdvViewModelPresetCollection.UserPresets />
+        </HdvViewModelPresetCollection>
+        <HdvViewModelPresetCollection Name="8FA4ED15-1687-4F8B-9AFD-A46C281E3A5A">
+          <HdvViewModelPresetCollection.UserPresets />
+        </HdvViewModelPresetCollection>
+        <HdvViewModelPresetCollection Name="1a64d983-f796-45f8-aa64-ac50b95d0e45">
+          <HdvViewModelPresetCollection.UserPresets />
+        </HdvViewModelPresetCollection>
+        <HdvViewModelPresetCollection Name="22C936DE-8DFC-462A-8CCF-C4D57E0FF12C">
+          <HdvViewModelPresetCollection.UserPresets />
+        </HdvViewModelPresetCollection>
+        <HdvViewModelPresetCollection Name="203F5854-90D5-4667-89CB-221FCF65F6E0">
+          <HdvViewModelPresetCollection.UserPresets />
+        </HdvViewModelPresetCollection>
+        <HdvViewModelPresetCollection Name="e6a4a964-3a87-46ef-9762-f9d9b9208051">
+          <HdvViewModelPresetCollection.UserPresets />
+        </HdvViewModelPresetCollection>
+        <HdvViewModelPresetCollection Name="4e358366-366b-4ec0-8fc8-0f5f1d38b397">
+          <HdvViewModelPresetCollection.UserPresets />
+        </HdvViewModelPresetCollection>
+        <HdvViewModelPresetCollection Name="21214383-88f8-4603-9eac-2a6422756b11">
+          <HdvViewModelPresetCollection.UserPresets />
+        </HdvViewModelPresetCollection>
+        <HdvViewModelPresetCollection Name="1CE7FD53-2344-4EA8-ACD6-1A0722A51427">
+          <HdvViewModelPresetCollection.UserPresets />
+        </HdvViewModelPresetCollection>
+        <HdvViewModelPresetCollection Name="bc4f0890-4a76-4fe7-b014-6ae70677f8f5">
+          <HdvViewModelPresetCollection.UserPresets />
+        </HdvViewModelPresetCollection>
+        <HdvViewModelPresetCollection Name="b859d131-dfb5-4605-be19-810b298b6975">
+          <HdvViewModelPresetCollection.UserPresets />
+        </HdvViewModelPresetCollection>
+        <HdvViewModelPresetCollection Name="a6a19e99-a04c-4569-9dfa-7ffa72f61a4f">
+          <HdvViewModelPresetCollection.UserPresets />
+        </HdvViewModelPresetCollection>
+        <HdvViewModelPresetCollection Name="21383122-63d6-4f2c-bdcd-0b8e5c34c694">
+          <HdvViewModelPresetCollection.UserPresets />
+        </HdvViewModelPresetCollection>
+        <HdvViewModelPresetCollection Name="e62570c0-7e0c-429f-b403-17a16e25daf0">
+          <HdvViewModelPresetCollection.UserPresets />
+        </HdvViewModelPresetCollection>
+        <HdvViewModelPresetCollection Name="00C2282D-6788-482D-8528-36C079EABBD5">
+          <HdvViewModelPresetCollection.UserPresets />
+        </HdvViewModelPresetCollection>
+        <HdvViewModelPresetCollection Name="4fc0828a-4555-480c-b485-6561cd0d0482">
+          <HdvViewModelPresetCollection.UserPresets />
+        </HdvViewModelPresetCollection>
+        <HdvViewModelPresetCollection Name="e24fd7fc-3c84-4d81-93b7-b690e4a24d11">
+          <HdvViewModelPresetCollection.UserPresets />
+        </HdvViewModelPresetCollection>
+        <HdvViewModelPresetCollection Name="24d87055-643a-4424-af3b-275593bf0f72">
+          <HdvViewModelPresetCollection.UserPresets />
+        </HdvViewModelPresetCollection>
+        <HdvViewModelPresetCollection Name="0F9F86E1-77EF-41FF-84AB-F412A49B1CB7">
+          <HdvViewModelPresetCollection.UserPresets />
+        </HdvViewModelPresetCollection>
+      </HdvPresetCollections.PresetCollections>
+    </HdvPresetCollections>
+  </WpaProfile.HdvPresetCollections>
+</WpaProfile>

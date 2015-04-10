@@ -1,0 +1,264 @@
+﻿<?xml version='1.0' encoding='utf-8' standalone='yes'?>
+<!-- 
+Copyright 2015 Google Inc. All Rights Reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+This files defines a set of ETW (Event Tracing for Windows) providers that can
+be used to emit events into an ETW stream for recording with xperf or logman.
+When used with the xperf kernel providers these can help investigate performance
+problems by adding arbitrary context to the kernel data.
+
+This file is built using the following custom build tool command line:
+  mc.exe -um %(Filename)%(Extension) -z %(Filename)Generated 
+The main outputs are:
+  %(Filename)Generated.h;%(Filename)Generated.rc
+
+The header file should be included by one or more source files, and the resource
+file should either be added to your project or included into an existing resource
+file.
+
+The header file contains macros and functions to emit events. The 
+
+For information on writing an instrumentation manifest see
+http://msdn.microsoft.com/en-us/library/dd996930(VS.85).aspx
+For more information on ETW see http://msdn.microsoft.com/en-us/magazine/cc163437.aspx
+and http://msdn.microsoft.com/en-us/library/aa363668(VS.85).aspx
+
+Documentation of the data types available for event payload templates is here:
+http://msdn.microsoft.com/en-us/library/aa382774(v=VS.85).aspx
+
+See also the Windows Platform SDK SimpleProvider and AdvancedProvider samples
+and the Scenario library at http://archive.msdn.microsoft.com/Scenario
+      
+Before recording traces you need to execute these commands to register the provider:
+xcopy /y ETWProviders.dll %temp%
+wevtutil um etwprovider.man
+wevtutil im etwprovider.man
+
+The "wevtutul um" command is to unregister previous versions of these providers, to
+allow arbitrary changes to be made. The copy to %temp% is because this file says, in
+messageFileName and resourceFileName, that the file will be found in the %temp% directory.
+Adjust that to match your games actual install path.
+-->
+<instrumentationManifest xmlns="http://schemas.microsoft.com/win/2004/08/events">
+  <instrumentation
+      xmlns:win="http://manifests.microsoft.com/win/2004/08/windows/events"
+      xmlns:xs="http://www.w3.org/2001/XMLSchema"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <events xmlns="http://schemas.microsoft.com/win/2004/08/events">
+      <!---
+      This is the main provider to emit low to medium frequency information about performance.
+      This includes Begin/End pairs, markers, and labeled thread IDs.
+      -->
+      <provider
+          guid="{231CF54B-22A0-49E4-A59A-47052A30FFED}"
+          name="Multi-Main"
+          symbol="MULTI_MAIN"
+          messageFileName="%temp%\ETWProviders.dll"
+          resourceFileName="%temp%\ETWProviders.dll" >
+        <templates>
+          <template tid="T_Start">
+            <data inType="win:AnsiString" name="Description" />
+            <data inType="win:Int32" name="Depth" />
+          </template>
+          <template tid="T_End">
+            <data inType="win:AnsiString" name="Description" />
+            <data inType="win:Int32" name="Depth" />
+            <data inType="win:Float" name="Duration (ms)" />
+          </template>
+          <template tid="T_Mark">
+            <data inType="win:AnsiString" name="Description" />
+          </template>
+          <template tid="T_Mark1I">
+            <data inType="win:AnsiString" name="Description" />
+            <data inType="win:Int32" name="Data1" />
+          </template>
+          <template tid="T_Mark2I">
+            <data inType="win:AnsiString" name="Description" />
+            <data inType="win:Int32" name="Data1" />
+            <data inType="win:Int32" name="Data2" />
+          </template>
+          <template tid="T_Mark1F">
+            <data inType="win:AnsiString" name="Description" />
+            <data inType="win:Float" name="Data1" />
+          </template>
+          <template tid="T_Mark2F">
+            <data inType="win:AnsiString" name="Description" />
+            <data inType="win:Float" name="Data1" />
+            <data inType="win:Float" name="Data2" />
+          </template>
+          <template tid="T_ThreadID">
+            <data inType="win:Int32" name="ThreadID" />
+            <data inType="win:AnsiString" name="ThreadName" />
+          </template>
+        </templates>
+        <keywords>
+          <keyword name="HighFrequency" mask="0x2" />
+          <keyword name="NormalFrequency" mask="0x1" />
+        </keywords>
+        <opcodes>
+          <opcode name="Begin" symbol="_BeginOpcode" value="10"/>
+          <opcode name="End" symbol="_EndOpcode" value="11"/>
+          <opcode name="Step" symbol="_StepOpcode" value="12"/>
+          <opcode name="Mark" symbol="_MarkOpcode" value="13"/>
+          <opcode name="Information" symbol="_InformationOpcode" value="14"/>
+        </opcodes>
+        <tasks>
+          <task name="Block" symbol="Block_Task" value="1" eventGUID="{4E9A75EB-4FBA-4BA0-9A1B-2175B671A16D}"/>
+          <task name="ThreadID" symbol="ThreadID_Task" value="2" eventGUID="{F2EC684F-AD3A-4AF5-8B10-E7B29AF67EE2}"/>
+        </tasks>
+        <events>
+          <event symbol="Start" template="T_Start" value="100" task="Block" opcode="Begin" keywords="NormalFrequency" />
+          <event symbol="Stop" template="T_End" value="101" task="Block" opcode="End" keywords="NormalFrequency" />
+          <event symbol="Mark" template="T_Mark" value="102" task="Block" opcode="Mark" keywords="NormalFrequency" />
+          <event symbol="Thread_ID" template="T_ThreadID" value="103" task="ThreadID" opcode="Information" keywords="NormalFrequency" />
+          <event symbol="Mark1I" template="T_Mark1I" value="104" task="Block" opcode="Mark" keywords="NormalFrequency" />
+          <event symbol="Mark2I" template="T_Mark2I" value="105" task="Block" opcode="Mark" keywords="NormalFrequency" />
+          <event symbol="Mark1F" template="T_Mark1F" value="106" task="Block" opcode="Mark" keywords="NormalFrequency" />
+          <event symbol="Mark2F" template="T_Mark2F" value="107" task="Block" opcode="Mark" keywords="NormalFrequency" />
+        </events>
+      </provider>
+
+      <!---
+      This provider is used for the worker threads, to keep their events on a separate line from
+      the main thread events.
+      -->
+      <provider
+          guid="{E9C3DA11-E2A5-48FD-9CD3-17E7C764D303}"
+          name="Multi-Worker"
+          symbol="MULTI_WORKER"
+          messageFileName="%temp%\ETWProviders.dll"
+          resourceFileName="%temp%\ETWProviders.dll" >
+        <templates>
+          <template tid="T_Start">
+            <data inType="win:AnsiString" name="Description" />
+            <data inType="win:Int32" name="Depth" />
+          </template>
+          <template tid="T_End">
+            <data inType="win:AnsiString" name="Description" />
+            <data inType="win:Int32" name="Depth" />
+            <data inType="win:Float" name="Duration (ms)" />
+          </template>
+          <template tid="T_Mark">
+            <data inType="win:AnsiString" name="Description" />
+          </template>
+        </templates>
+        <keywords>
+          <keyword name="HighFrequency" mask="0x2" />
+          <keyword name="NormalFrequency" mask="0x1" />
+        </keywords>
+        <opcodes>
+          <opcode name="Begin" symbol="_BeginOpcode" value="10"/>
+          <opcode name="End" symbol="_EndOpcode" value="11"/>
+          <opcode name="Step" symbol="_StepOpcode" value="12"/>
+          <opcode name="Mark" symbol="_MarkOpcode" value="13"/>
+        </opcodes>
+        <tasks>
+          <task name="BlockWorker" symbol="Block_Task" value="1" eventGUID="{9E4A04F0-C229-4A16-9454-D12A5BA24184}"/>
+        </tasks>
+        <events>
+          <event symbol="StartWorker" template="T_Start" value="100" task="BlockWorker" opcode="Begin" />
+          <event symbol="StopWorker" template="T_End" value="101" task="BlockWorker" opcode="End" />
+          <event symbol="MarkWorker" template="T_Mark" value="102" task="BlockWorker" opcode="Mark" />
+        </events>
+      </provider>
+
+      <!-- Additional provider, to emit information about rendering events. -->
+      <provider
+          guid="{2B25961D-BA6E-4D79-BEC7-3605366E2E09}"
+          name="Multi-FrameRate"
+          symbol="MULTI_FRAMERATE"
+          messageFileName="%temp%\ETWProviders.dll"
+          resourceFileName="%temp%\ETWProviders.dll"
+          >
+        <templates>
+          <template tid="T_FrameMark">
+            <data inType="win:Int32" name="Frame number" />
+            <data inType="win:Float" name="Duration (ms)" />
+          </template>
+        </templates>
+        <keywords>
+          <keyword name="HighFrequency" mask="0x2" />
+          <keyword name="NormalFrequency" mask="0x1" />
+        </keywords>
+        <opcodes>
+          <opcode name="RenderFrameMark" symbol="_RenderFrameMarkOpcode" value="10"/>
+        </opcodes>
+        <tasks>
+          <task name="Frame" symbol="Frame_Task" value="1" eventGUID="{43DADA85-49B6-4438-83D6-931477635DE3}"/>
+        </tasks>
+        <events>
+          <event symbol="RenderFrameMark" template="T_FrameMark" value="200" task="Frame" opcode="RenderFrameMark" keywords="NormalFrequency" />
+        </events>
+      </provider>
+
+      <!-- Additional provider, to emit information about user input. -->
+      <provider
+          guid="{70E2503B-C6F3-4780-B323-BD8ED0C61BF8}"
+          name="Multi-Input"
+          symbol="MULTI_INPUT"
+          messageFileName="%temp%\ETWProviders.dll"
+          resourceFileName="%temp%\ETWProviders.dll"
+          >
+        <templates>
+          <template tid="T_MouseClick">
+            <data inType="win:Int32" name="Button Type" />
+            <data inType="win:UInt32" name="Flags" />
+            <data inType="win:Int32" name="x" />
+            <data inType="win:Int32" name="y" />
+          </template>
+          <template tid="T_MouseMove">
+            <data inType="win:UInt32" name="Flags" />
+            <data inType="win:Int32" name="x" />
+            <data inType="win:Int32" name="y" />
+          </template>
+          <template tid="T_MouseWheel">
+            <data inType="win:UInt32" name="Flags" />
+            <data inType="win:Int32" name="zDelta" />
+            <data inType="win:Int32" name="x" />
+            <data inType="win:Int32" name="y" />
+          </template>
+          <template tid="T_KeyPress">
+            <data inType="win:UInt32" name="Virtual key code" />
+            <data inType="win:AnsiString" name="Key name" />
+            <data inType="win:UInt32" name="Repeat count" />
+            <data inType="win:UInt32" name="Flags" />
+          </template>
+        </templates>
+        <keywords>
+          <keyword name="HighFrequency" mask="0x2" />
+          <keyword name="NormalFrequency" mask="0x1" />
+        </keywords>
+        <opcodes>
+          <opcode name="MouseDown" symbol="_MouseDownOpcode" value="10" />
+          <opcode name="MouseUp" symbol="_MouseUpOpcode" value="11" />
+          <opcode name="MouseMove" symbol="_MouseMoveOpcode" value="12" />
+          <opcode name="MouseWheel" symbol="_MouseWheelOpcode" value="13" />
+          <opcode name="KeyDown" symbol="_KeyDownOpcode" value="14" />
+        </opcodes>
+        <tasks>
+          <task name="Mouse" symbol="Mouse_Task" value="1" eventGUID="{8317FF5B-2854-4FF4-AF5F-F4A123B514AE}"/>
+          <task name="Keyboard" symbol="Keyboard_Task" value="2" eventGUID="{8A86F981-C58B-4940-85E0-C03B612FFBE8}"/>
+        </tasks>
+        <events>
+          <event symbol="Mouse_down" template="T_MouseClick" value="400" task="Mouse" opcode="MouseDown" keywords="NormalFrequency" />
+          <event symbol="Mouse_up" template="T_MouseClick" value="401" task="Mouse" opcode="MouseUp"  keywords="NormalFrequency" />
+          <event symbol="Mouse_move" template="T_MouseMove" value="402" task="Mouse" opcode="MouseMove" keywords="HighFrequency" />
+          <event symbol="Mouse_wheel" template="T_MouseWheel" value="403" task="Mouse" opcode="MouseWheel"  keywords="NormalFrequency" />
+          <event symbol="Key_down" template="T_KeyPress" value="404" task="Keyboard" opcode="KeyDown"  keywords="NormalFrequency" />
+        </events>
+      </provider>
+    </events>
+  </instrumentation>
+</instrumentationManifest>

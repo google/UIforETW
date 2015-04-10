@@ -1,0 +1,22 @@
+*.user
+*.suo
+*.sdf
+*.aps
+*.opensdf
+*Generated*
+# Excluded most executables, but include a few specific ones.
+*.exe
+
+*.ilk
+*.pdb
+Debug/
+Release/
+*DoNotShip/
+ipch/
+
+# GPUView likes to drop these files when run.
+FuncStats.txt
+GuidStats.txt
+Log.txt
+present.txt
+*.exe.lastcodeanalysissucceeded
