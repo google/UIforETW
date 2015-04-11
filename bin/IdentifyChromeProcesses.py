@@ -26,9 +26,6 @@ processTypeRe = re.compile(r".*.exe\" --type=([^ ]*) .*")
 
 tracename = sys.argv[1]
 command = 'xperf -i "%s" -tle -tti -a process -withcmdline' % tracename
-# Note the importance of printing the '\r' so that the
-# output will be compatible with Windows edit controls.
-print "Chrome PIDs by process type:\r"
 pidsByType = {}
 for line in os.popen(command).readlines():
   if line.count("chrome.exe") > 0:
@@ -43,6 +40,9 @@ for line in os.popen(command).readlines():
 
 keys = pidsByType.keys()
 keys.sort()
+# Note the importance of printing the '\r' so that the
+# output will be compatible with Windows edit controls.
+print "Chrome PIDs by process type:\r"
 for type in keys:
   print "%-10s:" % type,
   for pid in pidsByType[type]:
