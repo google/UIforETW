@@ -10,9 +10,9 @@
       <AnalysisView.UISessionRef>
         <UISessionRef Index="0" xmlns="clr-namespace:Microsoft.Performance.Shell;assembly=Microsoft.Performance.Shell" />
       </AnalysisView.UISessionRef>
-      <GenericEventsGraphTreeItem DataTableHeight="290" GraphHeight="73" LayoutStyleFree="All" Color="#FF005DE0" xmlns="clr-namespace:Microsoft.Performance.Shell.Tables;assembly=Microsoft.Performance.Shell">
+      <GenericEventsGraphTreeItem DataTableHeight="107" GraphHeight="54" LayoutStyleFree="All" Color="#FF005DE0" xmlns="clr-namespace:Microsoft.Performance.Shell.Tables;assembly=Microsoft.Performance.Shell">
         <GenericEventsGraphTreeItem.HdvViewModelPreset>
-          <HdvViewModelPreset Name="Chrome and Multi Events" GraphColumnCount="32" KeyColumnCount="8" LeftFrozenColumnCount="7" RightFrozenColumnCount="31" InitialFilterQuery="[Provider Name]:*&quot;Multi-.*|Chrome.*&quot;" InitialSelectionQuery="" InitialExpansionQuery="" xmlns="clr-namespace:Microsoft.Performance.UI.DataEngine.ViewModelPresets;assembly=Microsoft.Performance.UI.DataEngine">
+          <HdvViewModelPreset Name="Chrome and Multi Events" GraphColumnCount="26" KeyColumnCount="8" LeftFrozenColumnCount="7" RightFrozenColumnCount="25" InitialFilterQuery="[Provider Name]:*&quot;Multi-.*|Chrome.*&quot;" InitialSelectionQuery="" InitialExpansionQuery="" xmlns="clr-namespace:Microsoft.Performance.UI.DataEngine.ViewModelPresets;assembly=Microsoft.Performance.UI.DataEngine">
             <HdvViewModelPreset.ColumnMetadataEntries>
               <ColumnMetadataEntry Guid="edf01e5d-3644-4dbc-ab9d-f8954e6db6ea" Name="ThreadId" ColumnMetadata="EndThreadId" />
               <ColumnMetadataEntry Guid="bbfc990a-b6c9-4dcd-858b-f040ab4a1efe" Name="Time (s)" ColumnMetadata="StartTime" />
@@ -43,18 +43,12 @@
               <HdvColumnViewModelPreset Guid="94e48f22-d499-5227-bb04-be011b4159b0" Name="Field 5" IsVisible="True" SortPriority="9" Width="80" />
               <HdvColumnViewModelPreset Guid="c1054028-424a-59ba-e760-6d30abbd69c5" Name="Field 6" IsVisible="True" SortPriority="10" Width="80" />
               <HdvColumnViewModelPreset Guid="5cbc4b58-2de1-5449-55b2-4651d4edf90a" Name="Field 7" IsVisible="True" SortPriority="11" Width="80" />
-              <HdvColumnViewModelPreset Guid="fc01e6c9-a43b-51a1-fd2e-112ba48aff65" Name="Field 8" IsVisible="True" SortPriority="12" Width="80" />
-              <HdvColumnViewModelPreset Guid="e3dcf300-46e2-5c43-ef4b-2c3db489ec25" Name="Field 9" IsVisible="True" SortPriority="13" Width="80" />
-              <HdvColumnViewModelPreset Guid="87c21ddb-4b29-58e3-5ddc-f114c5ca209a" Name="Field 10" IsVisible="True" SortPriority="14" Width="80" />
-              <HdvColumnViewModelPreset Guid="65f8fe42-ad02-5016-3521-f93329c76227" Name="Field 11" IsVisible="True" SortPriority="15" Width="80" />
-              <HdvColumnViewModelPreset Guid="03d48fd3-0fe4-57f5-a477-49beb0d70a1f" Name="Field 12" IsVisible="True" SortPriority="16" Width="80" />
-              <HdvColumnViewModelPreset Guid="998f8e2d-0f5a-5a54-0133-226e2de62c0b" Name="Field 13" IsVisible="True" SortPriority="17" Width="80" />
               <HdvColumnViewModelPreset Guid="bbfc990a-b6c9-4dcd-858b-f040ab4a1efe" Name="Time (s)" IsVisible="True" SortPriority="29" Width="80" />
             </HdvViewModelPreset.ConfigurableColumns>
           </HdvViewModelPreset>
         </GenericEventsGraphTreeItem.HdvViewModelPreset>
       </GenericEventsGraphTreeItem>
-      <Core4SummaryTableFillerGraphTreeItem GraphHeight="74" Color="#FF005DE0" ClsID="3c18eb9c-2211-4988-bf94-bb029e4ce96e" xmlns="clr-namespace:Microsoft.Performance.Shell.Tables;assembly=Microsoft.Performance.Shell">
+      <Core4SummaryTableFillerGraphTreeItem GraphHeight="57" Color="#FF005DE0" ClsID="3c18eb9c-2211-4988-bf94-bb029e4ce96e" xmlns="clr-namespace:Microsoft.Performance.Shell.Tables;assembly=Microsoft.Performance.Shell">
         <Core4SummaryTableFillerGraphTreeItem.HdvViewModelPreset>
           <HdvViewModelPreset Name="Focus by Process, Thread" GraphColumnCount="11" KeyColumnCount="3" LeftFrozenColumnCount="2" RightFrozenColumnCount="10" InitialFilterQuery="" InitialSelectionQuery="" xmlns="clr-namespace:Microsoft.Performance.UI.DataEngine.ViewModelPresets;assembly=Microsoft.Performance.UI.DataEngine">
             <HdvViewModelPreset.ColumnMetadataEntries>
@@ -77,7 +71,7 @@
           </HdvViewModelPreset>
         </Core4SummaryTableFillerGraphTreeItem.HdvViewModelPreset>
       </Core4SummaryTableFillerGraphTreeItem>
-      <Core4SummaryTableFillerGraphTreeItem GraphHeight="83" Color="#FFFFA500" ClsID="b859d131-dfb5-4605-be19-810b298b6975" xmlns="clr-namespace:Microsoft.Performance.Shell.Tables;assembly=Microsoft.Performance.Shell">
+      <Core4SummaryTableFillerGraphTreeItem GraphHeight="56" Color="#FFFFA500" ClsID="b859d131-dfb5-4605-be19-810b298b6975" xmlns="clr-namespace:Microsoft.Performance.Shell.Tables;assembly=Microsoft.Performance.Shell">
         <Core4SummaryTableFillerGraphTreeItem.HdvViewModelPreset>
           <HdvViewModelPreset Name="GPU by Process" GraphChartType="StackedLine" GraphColumnCount="18" KeyColumnCount="5" RightFrozenColumnCount="17" InitialFilterQuery="" InitialSelectionQuery="" InitialExpansionQuery="" GraphFilterColumnName="GPU Time (us)" GraphFilterColumnGuid="267ef705-7c6d-11e2-be78-b4b52fe06835" xmlns="clr-namespace:Microsoft.Performance.UI.DataEngine.ViewModelPresets;assembly=Microsoft.Performance.UI.DataEngine">
             <HdvViewModelPreset.ColumnMetadataEntries>
@@ -818,6 +812,9 @@
         <HdvViewModelPresetCollection Name="28d4d9ad-5391-4cde-9597-3f96bd58f9fc">
           <HdvViewModelPresetCollection.UserPresets />
         </HdvViewModelPresetCollection>
+        <HdvViewModelPresetCollection Name="4fc0828a-4555-480c-b485-6561cd0d0482">
+          <HdvViewModelPresetCollection.UserPresets />
+        </HdvViewModelPresetCollection>
         <HdvViewModelPresetCollection Name="5f5dc039-1901-464b-9260-a03801fde9c2">
           <HdvViewModelPresetCollection.UserPresets />
         </HdvViewModelPresetCollection>
@@ -846,9 +843,6 @@
           <HdvViewModelPresetCollection.UserPresets />
         </HdvViewModelPresetCollection>
         <HdvViewModelPresetCollection Name="50856918-ed01-4edb-9daa-70ba9360b891">
-          <HdvViewModelPresetCollection.UserPresets />
-        </HdvViewModelPresetCollection>
-        <HdvViewModelPresetCollection Name="4fc0828a-4555-480c-b485-6561cd0d0482">
           <HdvViewModelPresetCollection.UserPresets />
         </HdvViewModelPresetCollection>
         <HdvViewModelPresetCollection Name="ec91190c-6097-4935-aeec-d36b12289afa">
