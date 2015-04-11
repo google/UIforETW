@@ -73,7 +73,7 @@ Remove this line from RetrieveSymbols: Parsing symbol data for a PDB file.
 Support Ctrl+Shift+C to copy just the trace file name.
 Have an option (Shift+F2?) to allow renaming of the entire trace name
 Move ETWEventDemo out of bin directory.
-Measure and optionally display the save and merge times.
+Display how long a trace took to be recorded, save versus merge?
 Ship batch file to record trace of tracing, and detect when to use it (slow save or merge).
 
 
@@ -85,8 +85,6 @@ Implement more settings - configure trace directories, buffer sizes, option for 
 Handle the duplicate copies of etwproviders.man.
 Add some unit tests.
 Translate the error codes on starting tracing into English, and give advice.
-Detect slowdowns in the trace recording (circular-buffer) step and suggest diagnosis (supply profilerprofiler.bat).
-Display how long a trace took to be recorded, save versus merge?
 Remember window height
 Ship batch file to create non-DLL version of UIforETW
 
