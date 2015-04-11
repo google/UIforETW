@@ -775,7 +775,10 @@ void CUIforETWDlg::StopTracingAndMaybeRecord(bool bSaveTrace)
 	// been left behind by a previous failed tracing attempt.
 	DeleteFile(compatFileTemp);
 	BOOL moveSuccess = MoveFile(compatFile, compatFileTemp);
+	if (bShowCommands_ && !moveSuccess)
+		outputPrintf(L"Failed to rename Amcache.hve\n");
 
+	ElapsedTimer saveTimer;
 	{
 		// Stop the kernel and user sessions.
 		ChildProcess child(GetXperfPath());
@@ -794,10 +797,15 @@ void CUIforETWDlg::StopTracingAndMaybeRecord(bool bSaveTrace)
 				child.Run(bShowCommands_, L"xperf.exe -stop UIforETWSession -stop " + GetKernelLogger());
 		}
 	}
+	double saveTime = saveTimer.ElapsedSeconds();
+	if (bShowCommands_)
+		outputPrintf(L"Trace save took %1.1f s\n", saveTime);
 
+	double mergeTime = 0.0;
 	if (bSaveTrace)
 	{
 		outputPrintf(L"Merging trace...\n");
+		ElapsedTimer mergeTimer;
 		{
 			// Separate merge step to allow compression on Windows 8+
 			// https://randomascii.wordpress.com/2015/03/02/etw-trace-compression-and-xperf-syntax-refresher/
@@ -810,6 +818,9 @@ void CUIforETWDlg::StopTracingAndMaybeRecord(bool bSaveTrace)
 				args += L" -compress";
 			merge.Run(bShowCommands_, L"xperf.exe" + args);
 		}
+		mergeTime = mergeTimer.ElapsedSeconds();
+		if (bShowCommands_)
+			outputPrintf(L"Trace merge took %1.1f s\n", mergeTime);
 	}
 
 	if (moveSuccess)
@@ -837,6 +848,25 @@ void CUIforETWDlg::StopTracingAndMaybeRecord(bool bSaveTrace)
 			LaunchTraceViewer(traceFilename);
 		// Record the name so that it gets selected.
 		lastTraceFilename_ = CrackFilePart(traceFilename);
+
+		if (saveTime > 100.0 && tracingMode_ == kTracingToMemory)
+		{
+			// Some machines (one so far?) can take 5-10 minutes to do the trace
+			// saving stage.
+			outputPrintf(L"Saving the trace took %1.1f s, which is unusually long. Please "
+				L"try metatrace.bat, and share your results on "
+				L"https://groups.google.com/forum/#!forum/uiforetw.\n", saveTime);
+		}
+		if (mergeTime > 100.0)
+		{
+			// See the Amcache.hve comments above for details or to instrument.
+			outputPrintf(L"Merging the trace took %1.1fs, which is unusually long. This may "
+				L"mean that renaming of amcache.hve failed. Please try metatrace.bat "
+				L"and share this on "
+				L"https://groups.google.com/forum/#!forum/uiforetw\n", mergeTime);
+		}
+
+		outputPrintf(L"Finished recording trace.\n");
 	}
 	else
 		outputPrintf(L"Tracing stopped.\n");
@@ -1452,11 +1482,16 @@ void CUIforETWDlg::StripChromeSymbols(const std::wstring& traceFilename)
 	if (!pythonPath.empty())
 	{
 		outputPrintf(L"Stripping chrome symbols - this may take a while...\n");
-		ChildProcess child(pythonPath);
-		// Must pass -u to disable Python's output buffering when printing to
-		// a pipe, in order to get timely feedback.
-		std::wstring args = L" -u \"" + GetExeDir() + L"StripChromeSymbols.py\" \"" + traceFilename + L"\"";
-		child.Run(bShowCommands_, L"python.exe" + args);
+		ElapsedTimer stripTimer;
+		{
+			ChildProcess child(pythonPath);
+			// Must pass -u to disable Python's output buffering when printing to
+			// a pipe, in order to get timely feedback.
+			std::wstring args = L" -u \"" + GetExeDir() + L"StripChromeSymbols.py\" \"" + traceFilename + L"\"";
+			child.Run(bShowCommands_, L"python.exe" + args);
+		}
+		if (bShowCommands_)
+			outputPrintf(L"Stripping Chrome symbols took %1.1f s\n", stripTimer.ElapsedSeconds());
 	}
 	else
 	{

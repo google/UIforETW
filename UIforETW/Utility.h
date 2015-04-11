@@ -18,6 +18,7 @@ limitations under the License.
 
 #include <vector>
 #include <string>
+#include <chrono>
 
 std::vector<std::wstring> split(const std::wstring& s, char c);
 // If fullPaths == true then the names returned will be full Paths to the files. Otherwise
@@ -76,3 +77,16 @@ WindowsVersion GetWindowsVersion();
 bool IsWindowsServer();
 
 std::wstring FindPython(); // Returns a full path to python.exe or nothing.
+
+class ElapsedTimer
+{
+public:
+	double ElapsedSeconds() const
+	{
+		auto duration = std::chrono::steady_clock::now() - start_;
+		auto microseconds = std::chrono::duration_cast<std::chrono::microseconds>(duration);
+		return microseconds.count() / 1e6;
+	}
+private:
+	std::chrono::steady_clock::time_point start_ = std::chrono::steady_clock::now();
+};

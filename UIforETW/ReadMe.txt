@@ -72,6 +72,9 @@ Fix IdentifyChromeProcesses.py to print the heading after processing the trace.
 Remove this line from RetrieveSymbols: Parsing symbol data for a PDB file.
 Support Ctrl+Shift+C to copy just the trace file name.
 Have an option (Shift+F2?) to allow renaming of the entire trace name
+Move ETWEventDemo out of bin directory.
+Measure and optionally display the save and merge times.
+Ship batch file to record trace of tracing, and detect when to use it (slow save or merge).
 
 
 
@@ -79,12 +82,13 @@ Most important tasks:
 Figure out why .txt files keep getting left behind - race condition in renaming or deleting or???
 Create an installer that will install the MFC DLLs: https://msdn.microsoft.com/en-us/library/dd293568.aspx
 Implement more settings - configure trace directories, buffer sizes, option for stacks on user events.
-Move ETWEventDemo out of bin directory.
 Handle the duplicate copies of etwproviders.man.
 Add some unit tests.
 Translate the error codes on starting tracing into English, and give advice.
 Detect slowdowns in the trace recording (circular-buffer) step and suggest diagnosis (supply profilerprofiler.bat).
 Display how long a trace took to be recorded, save versus merge?
+Remember window height
+Ship batch file to create non-DLL version of UIforETW
 
 To-do eventually:
 Should have the option to run arbitrary scripts after each trace is recorded.
