@@ -206,6 +206,7 @@ BEGIN_MESSAGE_MAP(CUIforETWDlg, CDialogEx)
 	ON_BN_CLICKED(ID_TRACES_OPENTRACEINWPA, &CUIforETWDlg::OnOpenTraceWPA)
 	ON_BN_CLICKED(ID_TRACES_OPENTRACEINGPUVIEW, &CUIforETWDlg::OnOpenTraceGPUView)
 	ON_BN_CLICKED(ID_RENAME, &CUIforETWDlg::OnRenameKey)
+	ON_BN_CLICKED(ID_RENAMEFULL, &CUIforETWDlg::OnFullRenameKey)
 	ON_EN_KILLFOCUS(IDC_TRACENAMEEDIT, &CUIforETWDlg::FinishTraceRename)
 	ON_BN_CLICKED(ID_ENDRENAME, &CUIforETWDlg::FinishTraceRename)
 	ON_BN_CLICKED(ID_ESCKEY, &CUIforETWDlg::CancelTraceRename)
@@ -1305,7 +1306,7 @@ void CUIforETWDlg::OnContextMenu(CWnd* pWnd, CPoint point)
 				DeleteTrace();
 				break;
 			case ID_TRACES_RENAMETRACE:
-				StartRenameTrace();
+				StartRenameTrace(false);
 				break;
 			case ID_TRACES_COMPRESSTRACE:
 				CompressTrace(tracePath);
@@ -1372,7 +1373,12 @@ void CUIforETWDlg::CopyTraceName()
 
 	if (selIndex >= 0)
 	{
-		std::wstring tracePath = GetTraceDir() + traces_[selIndex] + L".etl";
+		std::wstring tracePath = traces_[selIndex] + L".etl";
+		// If the shift key is held down, just put the file path in the clipboard.
+		// If not, put the entire path in the clipboard. This is an undocumented
+		// but very handy option.
+		if (GetKeyState(VK_SHIFT) >= 0)
+			tracePath = GetTraceDir() + tracePath;
 		SetClipboardText(L"\"" + tracePath + L"\"");
 	}
 }
@@ -1536,7 +1542,7 @@ void CUIforETWDlg::PreprocessTrace(const std::wstring& traceFilename)
 }
 
 
-void CUIforETWDlg::StartRenameTrace()
+void CUIforETWDlg::StartRenameTrace(bool fullRename)
 {
 	SaveNotesIfNeeded();
 	int curSel = btTraces_.GetCurSel();
@@ -1547,7 +1553,7 @@ void CUIforETWDlg::StartRenameTrace()
 		// then just allow editing the suffix. Othewise allow editing
 		// the entire name.
 		validRenameDate_ = false;
-		if (traceName.size() >= kPrefixLength)
+		if (traceName.size() >= kPrefixLength && !fullRename)
 		{
 			validRenameDate_ = true;
 			for (size_t i = 0; i < kPrefixLength; ++i)
@@ -1587,7 +1593,15 @@ void CUIforETWDlg::StartRenameTrace()
 void CUIforETWDlg::OnRenameKey()
 {
 	if (!btTraceNameEdit_.IsWindowVisible())
-		StartRenameTrace();
+		StartRenameTrace(false);
+}
+
+void CUIforETWDlg::OnFullRenameKey()
+{
+	// Undocumented option to allow renaming of the entire trace, instead
+	// of just the post date/time portion, by using Shift+F2.
+	if (!btTraceNameEdit_.IsWindowVisible())
+		StartRenameTrace(true);
 }
 
 

@@ -75,7 +75,7 @@ private:
 	// The first 19 characters are the date and time.
 	// The remainder are eligible for editing.
 	const size_t kPrefixLength = 19;
-	void StartRenameTrace();
+	void StartRenameTrace(bool fullRename);
 
 	bool useChromeProviders_ = false;
 
@@ -206,6 +206,7 @@ private:
 	afx_msg void OnBnClickedSettings();
 	afx_msg void OnContextMenu(CWnd* pWnd, CPoint point);
 	afx_msg void OnRenameKey();
+	afx_msg void OnFullRenameKey();
 	afx_msg void FinishTraceRename();
 	afx_msg void CancelTraceRename();
 	afx_msg void OnOpenTraceWPA();

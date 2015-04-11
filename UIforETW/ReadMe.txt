@@ -67,6 +67,11 @@ Change path splitting functions to return wstring instead of wchar_t pointers.
 Fix StripChromeSymbols.py so that it can find RetrieveSymbols.exe - copy Microsoft DLLs over?
 Should have a Chrome developer checkbox.
 Have an option to not auto-view traces immediately after they are recorded.
+Remove deprecated file/extension usage, and have functions to return file part, extension, or stripped file part.
+Fix IdentifyChromeProcesses.py to print the heading after processing the trace.
+Remove this line from RetrieveSymbols: Parsing symbol data for a PDB file.
+Support Ctrl+Shift+C to copy just the trace file name.
+Have an option (Shift+F2?) to allow renaming of the entire trace name
 
 
 
@@ -81,12 +86,6 @@ Translate the error codes on starting tracing into English, and give advice.
 Detect slowdowns in the trace recording (circular-buffer) step and suggest diagnosis (supply profilerprofiler.bat).
 Display how long a trace took to be recorded, save versus merge?
 
-Support Ctrl+Shift+C to copy just the trace file name.
-Remove deprecated file/extension usage, and have functions to return file part, extension, or stripped file part.
-Fix IdentifyChromeProcesses.py to print the heading after processing the trace, and copy the results to the clipboard.
-Have an option (Shift+F2?) to allow renaming of the entire trace name
-Remove this line from RetrieveSymbols: Parsing symbol data for a PDB file.
-
 To-do eventually:
 Should have the option to run arbitrary scripts after each trace is recorded.
 PreprocessTrace should append to the trace text file.
@@ -94,9 +93,8 @@ Should have an option to put an entire process tree in the trace text file.
 ChildProcess or PreprocessTrace should convert from LF to CRLF for the edit control.
 Try using the -cancel option for more efficient stopping of traces without recording. See xperf -help stop
 Give the user a chance to rename trace before launching viewer
-Transparent compression/decompression into .zip files. Note that if a trace is
-compressed and then renamed that the trace inside the .zip file will be wrong - it should be fixed up when the renaming happens.
-Have a button to copy the recommended (or one of several recommended) startup profiles. Perhaps a first-run configuration dialog?
+Transparent compression/decompression into .zip files. When unzipping use the .zip file name as the base.
+Have the option to copy different startup profiles, for different situations.
 Resize output window as well when sizing the window, just a bit.
 Code cleanup:
 - getenv wrapper
