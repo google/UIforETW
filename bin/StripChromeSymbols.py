@@ -86,7 +86,7 @@ tempdirs = []
 # Typical output looks like:
 # "[RSDS] PdbSig: {be90dbc6-fe31-4842-9c72-7e2ea88f0adf}; Age: 1; Pdb: C:\b\build\slave\win\build\src\out\Release\syzygy\chrome.dll.pdb"
 pdbRe = re.compile(r'"\[RSDS\] PdbSig: {(.*-.*-.*-.*-.*)}; Age: (.*); Pdb: (.*)"')
-pdbCachedRe = re.compile(r"Found symbol file - placed it in (.*)")
+pdbCachedRe = re.compile(r"Found .*file - placed it in (.*)")
 
 print "Pre-translating chrome symbols from stripped PDBs to avoid 10-15 minute translation times."
 
