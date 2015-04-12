@@ -26,7 +26,7 @@ limitations under the License.
 // CUIforETWApp
 
 BEGIN_MESSAGE_MAP(CUIforETWApp, CWinApp)
-	ON_COMMAND(ID_HELP, &CWinApp::OnHelp)
+	ON_COMMAND(ID_HELP, &CUIforETWApp::OnHelp)
 END_MESSAGE_MAP()
 
 
@@ -104,3 +104,7 @@ BOOL CUIforETWApp::InitInstance()
 	return FALSE;
 }
 
+void CUIforETWApp::OnHelp()
+{
+	ShellExecute(NULL, NULL, L"https://randomascii.wordpress.com/category/xperf/", NULL, NULL, SW_SHOWNORMAL);
+}

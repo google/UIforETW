@@ -90,6 +90,7 @@ Ship batch file to create non-DLL version of UIforETW
 
 To-do eventually:
 Should have the option to run arbitrary scripts after each trace is recorded.
+Should have the option to run arbitrary scripts on every trace in the list.
 PreprocessTrace should append to the trace text file.
 Should have an option to put an entire process tree in the trace text file.
 ChildProcess or PreprocessTrace should convert from LF to CRLF for the edit control.
@@ -107,7 +108,5 @@ Perhaps use LBS_WANTKEYBOARDINPUT and WM_VKEYTOITEM to implement the list box ke
 
 Unimportant:
 Allow configuring which symbols should be stripped.
-Configure a maximum time to trace for to avoid infinitely long traces.
-CPU frequency monitoring.
-Trace list should let the user:
-- Run arbitrary scripts on all traces
+Configure a maximum time to trace for to avoid infinitely long traces that fill the hard drive.
+CPU frequency monitoring to look for thermal throttling.
