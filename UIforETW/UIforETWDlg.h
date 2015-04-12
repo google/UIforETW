@@ -57,13 +57,13 @@ private:
 	bool bCswitchStacks_ = true;
 	bool bSampledStacks_ = true;
 	bool bFastSampling_ = false;
-	bool bDirectXTracing_ = false;
+	bool bGPUTracing_ = false;
 	bool bShowCommands_ = false;
 	CButton btCompress_;
 	CButton btCswitchStacks_;
 	CButton btSampledStacks_;
 	CButton btFastSampling_;
-	CButton btDirectXTracing_;
+	CButton btGPUTracing_;
 	CButton btShowCommands_;
 
 	CEdit btTraceNameEdit_;
@@ -215,5 +215,5 @@ private:
 	afx_msg void DeleteTrace();
 	afx_msg void SelectAll();
 public:
-	afx_msg void OnBnClickedDirectxtracing();
+	afx_msg void OnBnClickedGPUtracing();
 };

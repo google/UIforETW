@@ -164,7 +164,7 @@ void CUIforETWDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_CPUSAMPLINGCALLSTACKS, btSampledStacks_);
 	DDX_Control(pDX, IDC_CONTEXTSWITCHCALLSTACKS, btCswitchStacks_);
 	DDX_Control(pDX, IDC_FASTSAMPLING, btFastSampling_);
-	DDX_Control(pDX, IDC_DIRECTXTRACING, btDirectXTracing_);
+	DDX_Control(pDX, IDC_GPUTRACING, btGPUTracing_);
 	DDX_Control(pDX, IDC_SHOWCOMMANDS, btShowCommands_);
 
 	DDX_Control(pDX, IDC_INPUTTRACING, btInputTracing_);
@@ -210,7 +210,7 @@ BEGIN_MESSAGE_MAP(CUIforETWDlg, CDialogEx)
 	ON_EN_KILLFOCUS(IDC_TRACENAMEEDIT, &CUIforETWDlg::FinishTraceRename)
 	ON_BN_CLICKED(ID_ENDRENAME, &CUIforETWDlg::FinishTraceRename)
 	ON_BN_CLICKED(ID_ESCKEY, &CUIforETWDlg::CancelTraceRename)
-	ON_BN_CLICKED(IDC_DIRECTXTRACING, &CUIforETWDlg::OnBnClickedDirectxtracing)
+	ON_BN_CLICKED(IDC_GPUTRACING, &CUIforETWDlg::OnBnClickedGPUtracing)
 	ON_BN_CLICKED(ID_COPYTRACENAME, &CUIforETWDlg::CopyTraceName)
 	ON_BN_CLICKED(ID_DELETETRACE, &CUIforETWDlg::DeleteTrace)
 	ON_BN_CLICKED(ID_SELECTALL, &CUIforETWDlg::SelectAll)
@@ -342,7 +342,7 @@ BOOL CUIforETWDlg::OnInitDialog()
 	CheckDlgButton(IDC_CONTEXTSWITCHCALLSTACKS, bCswitchStacks_);
 	CheckDlgButton(IDC_CPUSAMPLINGCALLSTACKS, bSampledStacks_);
 	CheckDlgButton(IDC_FASTSAMPLING, bFastSampling_);
-	CheckDlgButton(IDC_DIRECTXTRACING, bDirectXTracing_);
+	CheckDlgButton(IDC_GPUTRACING, bGPUTracing_);
 	CheckDlgButton(IDC_SHOWCOMMANDS, bShowCommands_);
 
 	// If a fast sampling speed is requested then set it now. Note that
@@ -393,7 +393,7 @@ BOOL CUIforETWDlg::OnInitDialog()
 					L"~1 KHz to the maximum speed of ~8 KHz. This increases the data rate and thus the size of traces "
 					L"but can make investigating brief CPU-bound performance problems (such as a single long frame) "
 					L"more practical.");
-		toolTip_.AddTool(&btDirectXTracing_, L"Check this to record the DX:0x2F provider to allow seeing GPU usage "
+		toolTip_.AddTool(&btGPUTracing_, L"Check this to allow seeing GPU usage "
 					L"in WPA, and more data in GPUView.");
 		toolTip_.AddTool(&btShowCommands_, L"This tells UIforETW to display the commands being "
 					L"executed. This can be helpful for diagnostic purposes but is not normally needed.");
@@ -536,7 +536,7 @@ void CUIforETWDlg::UpdateEnabling()
 
 	SmartEnableWindow(btSampledStacks_, !bIsTracing_);
 	SmartEnableWindow(btCswitchStacks_, !bIsTracing_);
-	SmartEnableWindow(btDirectXTracing_, !bIsTracing_);
+	SmartEnableWindow(btGPUTracing_, !bIsTracing_);
 }
 
 void CUIforETWDlg::OnSysCommand(UINT nID, LPARAM lParam)
@@ -687,7 +687,7 @@ void CUIforETWDlg::OnBnClickedStarttracing()
 	if (useChromeProviders_)
 		userProviders += L"+Chrome";
 
-	if (bDirectXTracing_)
+	if (bGPUTracing_)
 	{
 		// Apparently we need a different provider for graphics profiling
 		// on Windows 8 and above.
@@ -711,7 +711,7 @@ void CUIforETWDlg::OnBnClickedStarttracing()
 
 	std::wstring userBuffers = L" -buffersize 1024 -minbuffers 100 -maxbuffers 100";
 	// Increase the user buffer sizes when doing graphics tracing.
-	if (bDirectXTracing_)
+	if (bGPUTracing_)
 		userBuffers = L" -buffersize 1024 -minbuffers 200 -maxbuffers 200";
 	std::wstring userFile = L" -f \"" + GetUserFile() + L"\"";
 	if (tracingMode_ == kTracingToMemory)
@@ -972,9 +972,9 @@ void CUIforETWDlg::OnBnClickedFastsampling()
 }
 
 
-void CUIforETWDlg::OnBnClickedDirectxtracing()
+void CUIforETWDlg::OnBnClickedGPUtracing()
 {
-	bDirectXTracing_ = !bDirectXTracing_;
+	bGPUTracing_ = !bGPUTracing_;
 }
 
 
