@@ -355,8 +355,8 @@ BOOL CUIforETWDlg::OnInitDialog()
 	btInputTracing_.AddString(L"Full");
 	btInputTracing_.SetCurSel(InputTracing_);
 
-	btTracingMode_.AddString(L"Tracing to file");
 	btTracingMode_.AddString(L"Circular buffer tracing");
+	btTracingMode_.AddString(L"Tracing to file");
 	btTracingMode_.AddString(L"Heap tracing to file");
 	btTracingMode_.SetCurSel(tracingMode_);
 
@@ -647,10 +647,10 @@ std::wstring CUIforETWDlg::GenerateResultFilename() const
 
 void CUIforETWDlg::OnBnClickedStarttracing()
 {
-	if (tracingMode_ == kTracingToFile)
-		outputPrintf(L"\nStarting tracing to disk...\n");
-	else if (tracingMode_ == kTracingToMemory)
+	if (tracingMode_ == kTracingToMemory)
 		outputPrintf(L"\nStarting tracing to in-memory circular buffers...\n");
+	else if (tracingMode_ == kTracingToFile)
+		outputPrintf(L"\nStarting tracing to disk...\n");
 	else if (tracingMode_ == kHeapTracingToFile)
 		outputPrintf(L"\nStarting heap tracing to disk of %s...\n", heapTracingExe_.c_str());
 	else
@@ -1235,12 +1235,12 @@ void CUIforETWDlg::OnCbnSelchangeTracingmode()
 	tracingMode_ = (TracingMode)btTracingMode_.GetCurSel();
 	switch (tracingMode_)
 	{
-	case kTracingToFile:
-		outputPrintf(L"Traces will be recorded to disk to allow arbitrarily long recordings.\n");
-		break;
 	case kTracingToMemory:
 		outputPrintf(L"Traces will be recorded to in-memory circular buffers. Tracing can be enabled "
-				L"indefinitely long, and will record the last ~10-60 seconds.\n");
+			L"indefinitely long, and will record the last ~10-60 seconds.\n");
+		break;
+	case kTracingToFile:
+		outputPrintf(L"Traces will be recorded to disk to allow arbitrarily long recordings.\n");
 		break;
 	case kHeapTracingToFile:
 		outputPrintf(L"Heap traces will be recorded to disk for %s. Note that only %s processes "

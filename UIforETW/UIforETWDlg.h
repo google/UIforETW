@@ -24,8 +24,8 @@ limitations under the License.
 
 enum TracingMode
 {
-	kTracingToFile,
 	kTracingToMemory,
+	kTracingToFile,
 	kHeapTracingToFile
 };
 
