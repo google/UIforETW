@@ -12,7 +12,7 @@
       </AnalysisView.UISessionRef>
       <GenericEventsGraphTreeItem DataTableHeight="107" GraphHeight="54" LayoutStyleFree="All" Color="#FF005DE0" xmlns="clr-namespace:Microsoft.Performance.Shell.Tables;assembly=Microsoft.Performance.Shell">
         <GenericEventsGraphTreeItem.HdvViewModelPreset>
-          <HdvViewModelPreset Name="Randomascii Chrome and Multi Events" GraphColumnCount="26" KeyColumnCount="8" LeftFrozenColumnCount="7" RightFrozenColumnCount="25" InitialFilterQuery="[Provider Name]:*&quot;Multi-.*|Chrome.*&quot;" InitialSelectionQuery="" InitialExpansionQuery="" xmlns="clr-namespace:Microsoft.Performance.UI.DataEngine.ViewModelPresets;assembly=Microsoft.Performance.UI.DataEngine">
+          <HdvViewModelPreset Name="Randomascii Chrome and Multi Events" GraphColumnCount="33" KeyColumnCount="8" LeftFrozenColumnCount="7" RightFrozenColumnCount="32" InitialFilterQuery="[Provider Name]:*&quot;Multi-.*|Chrome.*&quot;" InitialSelectionQuery="" InitialExpansionQuery="" xmlns="clr-namespace:Microsoft.Performance.UI.DataEngine.ViewModelPresets;assembly=Microsoft.Performance.UI.DataEngine">
             <HdvViewModelPreset.ColumnMetadataEntries>
               <ColumnMetadataEntry Guid="edf01e5d-3644-4dbc-ab9d-f8954e6db6ea" Name="ThreadId" ColumnMetadata="EndThreadId" />
               <ColumnMetadataEntry Guid="bbfc990a-b6c9-4dcd-858b-f040ab4a1efe" Name="Time (s)" ColumnMetadata="StartTime" />
@@ -43,6 +43,13 @@
               <HdvColumnViewModelPreset Guid="94e48f22-d499-5227-bb04-be011b4159b0" Name="Field 5" IsVisible="True" SortPriority="9" Width="80" />
               <HdvColumnViewModelPreset Guid="c1054028-424a-59ba-e760-6d30abbd69c5" Name="Field 6" IsVisible="True" SortPriority="10" Width="80" />
               <HdvColumnViewModelPreset Guid="5cbc4b58-2de1-5449-55b2-4651d4edf90a" Name="Field 7" IsVisible="True" SortPriority="11" Width="80" />
+              <HdvColumnViewModelPreset Guid="fc01e6c9-a43b-51a1-fd2e-112ba48aff65" Name="Field 8" IsVisible="True" SortPriority="-1" Width="80" />
+              <HdvColumnViewModelPreset Guid="e3dcf300-46e2-5c43-ef4b-2c3db489ec25" Name="Field 9" IsVisible="True" SortPriority="-1" Width="80" />
+              <HdvColumnViewModelPreset Guid="87c21ddb-4b29-58e3-5ddc-f114c5ca209a" Name="Field 10" IsVisible="True" SortPriority="-1" Width="80" />
+              <HdvColumnViewModelPreset Guid="65f8fe42-ad02-5016-3521-f93329c76227" Name="Field 11" IsVisible="True" SortPriority="-1" Width="80" />
+              <HdvColumnViewModelPreset Guid="03d48fd3-0fe4-57f5-a477-49beb0d70a1f" Name="Field 12" IsVisible="True" SortPriority="-1" Width="80" />
+              <HdvColumnViewModelPreset Guid="998f8e2d-0f5a-5a54-0133-226e2de62c0b" Name="Field 13" IsVisible="True" SortPriority="-1" Width="80" />
+              <HdvColumnViewModelPreset Guid="bb772c34-9600-5bf7-3f54-e6080f8a0611" Name="Field 14" IsVisible="True" SortPriority="-1" Width="80" />
               <HdvColumnViewModelPreset Guid="bbfc990a-b6c9-4dcd-858b-f040ab4a1efe" Name="Time (s)" IsVisible="True" SortPriority="29" Width="80" />
             </HdvViewModelPreset.ConfigurableColumns>
           </HdvViewModelPreset>
@@ -457,12 +464,12 @@
                 <HdvColumnViewModelPreset Guid="ce84d427-a0a7-58d9-0fde-e8d2e84770bc" Name="Table" SortPriority="4" Width="114" />
                 <HdvColumnViewModelPreset Guid="c1859dc2-9fc8-5609-41b6-c5eb4eb35206" Name="Process Name" IsVisible="True" SortPriority="8" Width="120" />
                 <HdvColumnViewModelPreset Guid="3fd82a5a-fcbb-501e-4d61-c07025286ad1" Name="Process" IsVisible="True" SortPriority="9" Width="140" />
-                <HdvColumnViewModelPreset Guid="839f35ec-c1ce-5a16-e3b1-1aa8dfe9a10a" Name="Stack Tag" SortPriority="10" Width="200">
+                <HdvColumnViewModelPreset Guid="839f35ec-c1ce-5a16-e3b1-1aa8dfe9a10a" Name="Stack" SortPriority="10" Width="200">
                   <HdvColumnViewModelPreset.Parameter>
                     <PresetStackOptions Mode="StackTag" xmlns="clr-namespace:Microsoft.Performance.Shell.Stacks;assembly=Microsoft.Performance.Shell" />
                   </HdvColumnViewModelPreset.Parameter>
                 </HdvColumnViewModelPreset>
-                <HdvColumnViewModelPreset Guid="839f35ec-c1ce-5a16-e3b1-1aa8dfe9a10a" Name="Stack (Frame Tags)" SortPriority="11" Width="200">
+                <HdvColumnViewModelPreset Guid="839f35ec-c1ce-5a16-e3b1-1aa8dfe9a10a" Name="Stack" SortPriority="11" Width="200">
                   <HdvColumnViewModelPreset.Parameter>
                     <PresetStackOptions Mode="FrameTags" xmlns="clr-namespace:Microsoft.Performance.Shell.Stacks;assembly=Microsoft.Performance.Shell" />
                   </HdvColumnViewModelPreset.Parameter>
@@ -1030,7 +1037,55 @@
           <HdvViewModelPresetCollection.UserPresets />
         </HdvViewModelPresetCollection>
         <HdvViewModelPresetCollection Name="1a64d983-f796-45f8-aa64-ac50b95d0e45">
-          <HdvViewModelPresetCollection.UserPresets />
+          <HdvViewModelPresetCollection.UserPresets>
+            <HdvViewModelPreset Name="Randomascii Outstanding Size by Process, Handle, Stack" AggregationOverTime="OutstandingPeak" GraphColumnCount="28" KeyColumnCount="8" LeftFrozenColumnCount="9" RightFrozenColumnCount="26" InitialFilterQuery="" InitialSelectionQuery="[Series Name]:=Handle" InitialExpansionQuery="[Series Name]:=Handle" GraphFilterColumnGuid="642a8591-f858-4345-b7fa-99e8e4567cca">
+              <HdvViewModelPreset.ColumnMetadataEntries>
+                <ColumnMetadataEntry Guid="514a6402-4276-405d-9a46-f8a583089c38" Name="AllocTime" ColumnMetadata="StartTime" />
+                <ColumnMetadataEntry Guid="859cecc2-100a-4b55-8756-5b83df7e5a93" Name="FreeTime" ColumnMetadata="EndTime" />
+              </HdvViewModelPreset.ColumnMetadataEntries>
+              <HdvViewModelPreset.HighlightEntries />
+              <HdvViewModelPreset.ConfigurableColumns>
+                <HdvColumnViewModelPreset Guid="8693852d-a7e2-4c48-bad6-bd076d2d587a" Name="Process Name" SortPriority="2" Width="150" />
+                <HdvColumnViewModelPreset Guid="06155709-500b-4182-8944-29665014b5c2" Name="Process" IsVisible="True" SortPriority="9" Width="131" />
+                <HdvColumnViewModelPreset Guid="27654de6-995a-4162-a6a6-6dfacb4fa316" Name="Handle" IsVisible="True" SortPriority="10" Width="90" />
+                <HdvColumnViewModelPreset Guid="0e8ea5da-f511-49fb-9f64-bde5bb6d3f95" Name="ImpactingType" SortPriority="11" Width="100" />
+                <HdvColumnViewModelPreset Guid="d75f9647-91de-4814-82e1-77a5d6213876" Name="Allocation Nature" SortPriority="3" Width="80" />
+                <HdvColumnViewModelPreset Guid="759dc840-5079-49db-bae0-3c54e553b7fd" Name="Stack" SortPriority="12" Width="200">
+                  <HdvColumnViewModelPreset.Parameter>
+                    <PresetStackOptions Mode="StackTag" xmlns="clr-namespace:Microsoft.Performance.Shell.Stacks;assembly=Microsoft.Performance.Shell" />
+                  </HdvColumnViewModelPreset.Parameter>
+                </HdvColumnViewModelPreset>
+                <HdvColumnViewModelPreset Guid="759dc840-5079-49db-bae0-3c54e553b7fd" Name="Stack" SortPriority="13" Width="200">
+                  <HdvColumnViewModelPreset.Parameter>
+                    <PresetStackOptions Mode="FrameTags" xmlns="clr-namespace:Microsoft.Performance.Shell.Stacks;assembly=Microsoft.Performance.Shell" />
+                  </HdvColumnViewModelPreset.Parameter>
+                </HdvColumnViewModelPreset>
+                <HdvColumnViewModelPreset Guid="759dc840-5079-49db-bae0-3c54e553b7fd" Name="Stack" IsVisible="True" SortPriority="14" Width="483">
+                  <HdvColumnViewModelPreset.Parameter>
+                    <PresetStackOptions xmlns="clr-namespace:Microsoft.Performance.Shell.Stacks;assembly=Microsoft.Performance.Shell" />
+                  </HdvColumnViewModelPreset.Parameter>
+                </HdvColumnViewModelPreset>
+                <HdvColumnViewModelPreset Guid="cb796d44-2927-5ac1-d231-4b71904c18f5" Name="Thread Name" SortPriority="4" Width="80" />
+                <HdvColumnViewModelPreset Guid="fe123e27-eca6-461a-9a1b-b98056a84feb" Name="Type" SortPriority="5" Width="50" />
+                <HdvColumnViewModelPreset Guid="82ddfdff-ee93-5f35-08ac-4705069618dc" Name="Thread Activity Tag" SortPriority="6" Width="80" />
+                <HdvColumnViewModelPreset Guid="2818954f-2d30-5569-4510-dade0a5a605c" Name="Annotation" SortPriority="7" Width="80" />
+                <HdvColumnViewModelPreset Guid="24937cb7-4655-43d0-8bdc-901cb2ac65d5" Name="Address" SortPriority="15" Width="150" />
+                <HdvColumnViewModelPreset Guid="5ba0767a-7403-45b4-a991-6d74fd8b7338" Name="Page Address" SortPriority="16" Width="150" />
+                <HdvColumnViewModelPreset Guid="fbbd2929-3110-4d36-b252-47e65c52ff55" Name="Source" SortPriority="8" Width="60" />
+                <HdvColumnViewModelPreset Guid="9db2c0ba-d1ca-4cd5-9861-a8875208193c" Name="Bucket" SortPriority="17" Width="100" />
+                <HdvColumnViewModelPreset Guid="7e63c342-84a2-4e36-a866-09b681551086" Name="SubSegment" SortPriority="18" Width="150" />
+                <HdvColumnViewModelPreset Guid="454a2bd1-379a-4c5b-8437-1fe4bdccfa8f" Name="Thread" SortPriority="19" TextAlignment="Right" Width="150" />
+                <HdvColumnViewModelPreset Guid="514a6402-4276-405d-9a46-f8a583089c38" Name="AllocTime" SortPriority="20" Width="200" />
+                <HdvColumnViewModelPreset Guid="859cecc2-100a-4b55-8756-5b83df7e5a93" Name="FreeTime" SortPriority="21" Width="200" />
+                <HdvColumnViewModelPreset Guid="7f3683a7-0b54-41e5-957e-84904844d506" Name="SelectionLifeTime" SortPriority="22" Width="100" />
+                <HdvColumnViewModelPreset Guid="aecdc967-1546-420b-a035-1d7184115e33" Name="Is Realloc" SortPriority="23" Width="50" />
+                <HdvColumnViewModelPreset Guid="7710276b-86b8-42c8-8674-4e51cfc673f0" Name="FreeType" SortPriority="24" Width="80" />
+                <HdvColumnViewModelPreset Guid="62f5e535-a192-475d-8d4d-a725b8a160bd" Name="Count" AggregationMode="Sum" IsVisible="True" SortPriority="25" TextAlignment="Right" Width="80" />
+                <HdvColumnViewModelPreset Guid="642a8591-f858-4345-b7fa-99e8e4567cca" Name="Impacting Size" AggregationMode="Sum" IsVisible="True" SortOrder="Descending" TextAlignment="Right" Width="120" />
+                <HdvColumnViewModelPreset Guid="29a4dfc2-cd62-4de8-85c3-f580af6a47dd" Name="Size" AggregationMode="Sum" IsVisible="True" SortOrder="Descending" SortPriority="1" TextAlignment="Right" Width="120" />
+              </HdvViewModelPreset.ConfigurableColumns>
+            </HdvViewModelPreset>
+          </HdvViewModelPresetCollection.UserPresets>
         </HdvViewModelPresetCollection>
         <HdvViewModelPresetCollection Name="22C936DE-8DFC-462A-8CCF-C4D57E0FF12C">
           <HdvViewModelPresetCollection.UserPresets />
