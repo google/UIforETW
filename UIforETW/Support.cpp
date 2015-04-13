@@ -96,6 +96,7 @@ void CUIforETWDlg::TransferSettings(bool saving)
 	NameToString strings[] =
 	{
 		{ L"HeapProfiledProcess", &heapTracingExe_ },
+		{ L"ChromeDllPath", &chromeDllPath_ },
 	};
 
 	for (auto& m : strings)

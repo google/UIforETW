@@ -366,7 +366,6 @@ BOOL CUIforETWDlg::OnInitDialog()
 	// Don't change traceDir_ because the monitor thread has a pointer to it.
 	monitorThread_.StartThread(&traceDir_);
 
-	RegisterProviders();
 	DisablePagingExecutive();
 
 	UpdateTraceList();
@@ -476,18 +475,18 @@ void CUIforETWDlg::RegisterProviders()
 		child.Run(bShowCommands_, L"wevtutil.exe" + args);
 	}
 
-	// Register chrome.dll
+	// Register chrome.dll if the Chrome Developper option is set.
+	if (bChromeDeveloper_)
 	{
 		std::wstring manifestPath = GetExeDir() + L"chrome_events_win.man";
 		std::wstring dllSuffix = L"chrome.dll";
-		std::wstring chromeBase1 = L"d:\\src\\chromium\\src\\out\\Release\\";
-		std::wstring chromeBase2 = L"d:\\projects\\chromium\\src\\out\\Release\\";
-		std::wstring chromeBase = chromeBase1;
-		if (!PathFileExists((chromeBase + dllSuffix).c_str()))
-			chromeBase = chromeBase2;
-		if (!PathFileExists((chromeBase + dllSuffix).c_str()))
+		// Make sure we have a trailing backslash in the path.
+		if (chromeDllPath_.back() != L'\\')
+			chromeDllPath_ += L'\\';
+		std::wstring chromeDllFullPath = chromeDllPath_ + dllSuffix;
+		if (!PathFileExists(chromeDllFullPath.c_str()))
 		{
-			outputPrintf(L"Couldn't find %s in %s or %s\n", dllSuffix.c_str(), chromeBase1.c_str(), chromeBase2.c_str());
+			outputPrintf(L"Couldn't find %s.\n", chromeDllFullPath.c_str());
 			outputPrintf(L"Chrome providers will not be recorded.\n");
 			return;
 		}
@@ -498,8 +497,7 @@ void CUIforETWDlg::RegisterProviders()
 			args += L" \"" + manifestPath + L"\"";
 			if (pass)
 			{
-				std::wstring dllPath = chromeBase + dllSuffix;
-				args += L" \"/mf:" + dllPath + L"\" \"/rf:" + dllPath + L"\"";
+				args += L" \"/mf:" + chromeDllFullPath + L"\" \"/rf:" + chromeDllFullPath + L"\"";
 			}
 			child.Run(bShowCommands_, L"wevtutil.exe" + args);
 			if (pass)
@@ -647,6 +645,7 @@ std::wstring CUIforETWDlg::GenerateResultFilename() const
 
 void CUIforETWDlg::OnBnClickedStarttracing()
 {
+	RegisterProviders();
 	if (tracingMode_ == kTracingToMemory)
 		outputPrintf(L"\nStarting tracing to in-memory circular buffers...\n");
 	else if (tracingMode_ == kTracingToFile)
@@ -1262,12 +1261,14 @@ void CUIforETWDlg::OnBnClickedSettings()
 {
 	CSettings dlgAbout(nullptr, GetExeDir(), GetWPTDir());
 	dlgAbout.heapTracingExe_ = heapTracingExe_;
+	dlgAbout.chromeDllPath_ = chromeDllPath_;
 	dlgAbout.bChromeDeveloper_ = bChromeDeveloper_;
 	dlgAbout.bAutoViewTraces_ = bAutoViewTraces_;
 	dlgAbout.bHeapStacks_ = bHeapStacks_;
 	if (dlgAbout.DoModal() == IDOK)
 	{
 		heapTracingExe_ = dlgAbout.heapTracingExe_;
+		chromeDllPath_ = dlgAbout.chromeDllPath_;
 		bChromeDeveloper_ = dlgAbout.bChromeDeveloper_;
 		bAutoViewTraces_ = dlgAbout.bAutoViewTraces_;
 		bHeapStacks_ = dlgAbout.bHeapStacks_;

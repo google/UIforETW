@@ -48,6 +48,7 @@ void CSettings::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_CHROMEDEVELOPER, btChromeDeveloper_);
 	DDX_Control(pDX, IDC_AUTOVIEWTRACES, btAutoViewTraces_);
 	DDX_Control(pDX, IDC_HEAPSTACKS, btHeapStacks_);
+	DDX_Control(pDX, IDC_CHROMEDLLPATH, btChromeDllPath_);
 
 	CDialogEx::DoDataExchange(pDX);
 }
@@ -69,6 +70,7 @@ BOOL CSettings::OnInitDialog()
 	CheckDlgButton(IDC_CHROMEDEVELOPER, bChromeDeveloper_);
 	CheckDlgButton(IDC_AUTOVIEWTRACES, bAutoViewTraces_);
 	CheckDlgButton(IDC_HEAPSTACKS, bHeapStacks_);
+	SetDlgItemText(IDC_CHROMEDLLPATH, chromeDllPath_.c_str());
 
 	btExtraProviders_.EnableWindow(FALSE);
 	btExtraStackwalks_.EnableWindow(FALSE);
@@ -95,6 +97,8 @@ BOOL CSettings::OnInitDialog()
 					L"immediately after a trace is recorded.");
 		toolTip_.AddTool(&btHeapStacks_, L"Check this to record call stacks on HeapAlloc, HeapRealloc, "
 					L"and similar calls, when doing heap traces.");
+    toolTip_.AddTool(&btChromeDllPath_, L"Specify the path where chrome.dll resides. This is used "
+					L"to register the Chrome providers if the Chrome developper option is set.");
 	}
 
 	return TRUE;  // return TRUE  unless you set the focus to a control
@@ -103,6 +107,7 @@ BOOL CSettings::OnInitDialog()
 void CSettings::OnOK()
 {
 	heapTracingExe_ = GetEditControlText(btHeapTracingExe_);
+	chromeDllPath_ = GetEditControlText(btChromeDllPath_);
 	if (heapTracingExe_.size() <= 4 || heapTracingExe_.substr(heapTracingExe_.size() - 4, heapTracingExe_.size()) != L".exe")
 	{
 		AfxMessageBox(L"The heap-profiled process name must end in .exe");
