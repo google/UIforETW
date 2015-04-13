@@ -35,6 +35,7 @@ public:
 	std::wstring heapTracingExe_;
 	bool bChromeDeveloper_ = false;
 	bool bAutoViewTraces_ = false;
+	bool bHeapStacks_ = false;
 
 protected:
 	CEdit btHeapTracingExe_;
@@ -47,6 +48,7 @@ protected:
 
 	CButton btChromeDeveloper_;
 	CButton btAutoViewTraces_;
+	CButton btHeapStacks_;
 
 	CToolTipCtrl toolTip_;
 
@@ -64,4 +66,5 @@ public:
 	afx_msg BOOL PreTranslateMessage(MSG* pMsg);
 	afx_msg void OnBnClickedChromedeveloper();
 	afx_msg void OnBnClickedAutoviewtraces();
+	afx_msg void OnBnClickedHeapstacks();
 };

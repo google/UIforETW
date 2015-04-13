@@ -66,6 +66,8 @@ private:
 	CButton btGPUTracing_;
 	CButton btShowCommands_;
 
+	bool bHeapStacks_ = true;
+
 	CEdit btTraceNameEdit_;
 	CRect traceNameEditRect_;
 	std::wstring preRenameTraceName_;

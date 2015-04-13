@@ -722,7 +722,9 @@ void CUIforETWDlg::OnBnClickedStarttracing()
 	// Could also record stacks on HeapFree
 	std::wstring heapBuffers = L" -buffersize 1024 -minbuffers 200";
 	std::wstring heapFile = L" -f \"" + GetHeapFile() + L"\"";
-	std::wstring heapStackWalk = L" -stackwalk HeapCreate+HeapDestroy+HeapAlloc+HeapRealloc";
+	std::wstring heapStackWalk;
+	if (bHeapStacks_)
+		heapStackWalk = L" -stackwalk HeapCreate+HeapDestroy+HeapAlloc+HeapRealloc";
 	std::wstring heapArgs = L" -start xperfHeapSession -heap -Pids 0" + heapStackWalk + heapBuffers + heapFile;
 
 	{
@@ -1261,11 +1263,13 @@ void CUIforETWDlg::OnBnClickedSettings()
 	dlgAbout.heapTracingExe_ = heapTracingExe_;
 	dlgAbout.bChromeDeveloper_ = bChromeDeveloper_;
 	dlgAbout.bAutoViewTraces_ = bAutoViewTraces_;
+	dlgAbout.bHeapStacks_ = bHeapStacks_;
 	if (dlgAbout.DoModal() == IDOK)
 	{
 		heapTracingExe_ = dlgAbout.heapTracingExe_;
 		bChromeDeveloper_ = dlgAbout.bChromeDeveloper_;
 		bAutoViewTraces_ = dlgAbout.bAutoViewTraces_;
+		bHeapStacks_ = dlgAbout.bHeapStacks_;
 	}
 }
 

@@ -47,6 +47,7 @@ void CSettings::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_COPYSYMBOLDLLS, btCopySymbolDLLs_);
 	DDX_Control(pDX, IDC_CHROMEDEVELOPER, btChromeDeveloper_);
 	DDX_Control(pDX, IDC_AUTOVIEWTRACES, btAutoViewTraces_);
+	DDX_Control(pDX, IDC_HEAPSTACKS, btHeapStacks_);
 
 	CDialogEx::DoDataExchange(pDX);
 }
@@ -57,6 +58,7 @@ BEGIN_MESSAGE_MAP(CSettings, CDialogEx)
 	ON_BN_CLICKED(IDC_COPYSYMBOLDLLS, &CSettings::OnBnClickedCopysymboldlls)
 	ON_BN_CLICKED(IDC_CHROMEDEVELOPER, &CSettings::OnBnClickedChromedeveloper)
 	ON_BN_CLICKED(IDC_AUTOVIEWTRACES, &CSettings::OnBnClickedAutoviewtraces)
+	ON_BN_CLICKED(IDC_HEAPSTACKS, &CSettings::OnBnClickedHeapstacks)
 END_MESSAGE_MAP()
 
 BOOL CSettings::OnInitDialog()
@@ -66,6 +68,7 @@ BOOL CSettings::OnInitDialog()
 	SetDlgItemText(IDC_HEAPEXE, heapTracingExe_.c_str());
 	CheckDlgButton(IDC_CHROMEDEVELOPER, bChromeDeveloper_);
 	CheckDlgButton(IDC_AUTOVIEWTRACES, bAutoViewTraces_);
+	CheckDlgButton(IDC_HEAPSTACKS, bHeapStacks_);
 
 	btExtraProviders_.EnableWindow(FALSE);
 	btExtraStackwalks_.EnableWindow(FALSE);
@@ -90,6 +93,8 @@ BOOL CSettings::OnInitDialog()
 					L"traces.");
 		toolTip_.AddTool(&btAutoViewTraces_, L"Check this to have UIforETW launch the trace viewer "
 					L"immediately after a trace is recorded.");
+		toolTip_.AddTool(&btHeapStacks_, L"Check this to record call stacks on HeapAlloc, HeapRealloc, "
+					L"and similar calls, when doing heap traces.");
 	}
 
 	return TRUE;  // return TRUE  unless you set the focus to a control
@@ -179,4 +184,10 @@ void CSettings::OnBnClickedChromedeveloper()
 void CSettings::OnBnClickedAutoviewtraces()
 {
 	bAutoViewTraces_ = !bAutoViewTraces_;
+}
+
+
+void CSettings::OnBnClickedHeapstacks()
+{
+	bHeapStacks_ = !bHeapStacks_;
 }
