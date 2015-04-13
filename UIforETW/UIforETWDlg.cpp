@@ -720,7 +720,8 @@ void CUIforETWDlg::OnBnClickedStarttracing()
 
 	// Heap tracing settings -- only used for heap tracing.
 	// Could also record stacks on HeapFree
-	std::wstring heapBuffers = L" -buffersize 1024 -minbuffers 200";
+	// Buffer sizes need to be huge for some programs - should be configurable.
+	std::wstring heapBuffers = L" -buffersize 1024 -minbuffers 1000";
 	std::wstring heapFile = L" -f \"" + GetHeapFile() + L"\"";
 	std::wstring heapStackWalk;
 	if (bHeapStacks_)
