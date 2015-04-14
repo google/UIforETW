@@ -106,5 +106,5 @@ BOOL CUIforETWApp::InitInstance()
 
 void CUIforETWApp::OnHelp()
 {
-	ShellExecute(NULL, NULL, L"https://randomascii.wordpress.com/category/xperf/", NULL, NULL, SW_SHOWNORMAL);
+	ShellExecute(NULL, NULL, L"https://randomascii.wordpress.com/2015/04/14/uiforetw-windows-performance-made-easier/", NULL, NULL, SW_SHOWNORMAL);
 }
