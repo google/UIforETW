@@ -64,6 +64,9 @@ ourModuleCount = 0
 
 # Get the users build directory
 vgame = os.getenv("vgame")
+if vgame == None:
+  print( "Environment variable 'vgame' not found!" )
+  sys.exit(-1)
 vgame = vgame[:-5].lower()
 
 prefixes = ["u:\\", "e:\\build_slave", vgame]
