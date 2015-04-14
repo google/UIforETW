@@ -75,6 +75,7 @@ Have an option (Shift+F2?) to allow renaming of the entire trace name
 Move ETWEventDemo out of bin directory.
 Display how long a trace took to be recorded, save versus merge?
 Ship batch file to record trace of tracing, and detect when to use it (slow save or merge).
+Ship batch file to create non-DLL version of UIforETW
 
 
 
@@ -86,7 +87,6 @@ Handle the duplicate copies of etwproviders.man.
 Add some unit tests.
 Translate the error codes on starting tracing into English, and give advice.
 Remember window height
-Ship batch file to create non-DLL version of UIforETW
 
 To-do eventually:
 Should have the option to run arbitrary scripts after each trace is recorded.
@@ -105,6 +105,7 @@ Code cleanup:
 - moving more code to separate functions/files
 - Remove usage of bool as function parameters to choose behaviors
 Perhaps use LBS_WANTKEYBOARDINPUT and WM_VKEYTOITEM to implement the list box keyboard shortcuts?
+Detect when UIforETW's startup profile is newer than the WPA Files copy and ask user if it should be copied over.
 
 Unimportant:
 Allow configuring which symbols should be stripped.
