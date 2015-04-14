@@ -68,6 +68,9 @@ private:
 
 	bool bHeapStacks_ = true;
 
+	// Set this to true if _NT_SYMBOL_PATH is not set.
+	bool bManageSymbolPath_ = false;
+
 	CEdit btTraceNameEdit_;
 	CRect traceNameEditRect_;
 	std::wstring preRenameTraceName_;

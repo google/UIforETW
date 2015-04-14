@@ -222,15 +222,15 @@ void CUIforETWDlg::SetSymbolPath()
 	// Make sure that the symbol paths are set.
 
 #pragma warning(suppress : 4996)
-	const char* symPath = getenv("_NT_SYMBOL_PATH");
-	if (!symPath)
+	if (bManageSymbolPath_ || !getenv("_NT_SYMBOL_PATH"))
 	{
+		bManageSymbolPath_ = true;
 		std::string symbolPath = "SRV*c:\\symbols*http://msdl.microsoft.com/download/symbols";
 		if (bChromeDeveloper_)
 			symbolPath = "SRV*c:\\symbols*http://msdl.microsoft.com/download/symbols;SRV*c:\\symbols*https://chromium-browser-symsrv.commondatastorage.googleapis.com";
 		(void)_putenv(("_NT_SYMBOL_PATH=" + symbolPath).c_str());
 		outputPrintf(L"Setting _NT_SYMBOL_PATH to %s (Microsoft%s). "
-			L"Set _NT_SYMBOL_PATH yourself if you want different defaults.\n",
+			L"Set _NT_SYMBOL_PATH yourself or toggle 'Chrome developer' if you want different defaults.\n",
 			AnsiToUnicode(symbolPath).c_str(), bChromeDeveloper_ ? L" plus Chrome" : L"");
 	}
 #pragma warning(suppress : 4996)
@@ -1269,7 +1269,11 @@ void CUIforETWDlg::OnBnClickedSettings()
 	{
 		heapTracingExe_ = dlgAbout.heapTracingExe_;
 		chromeDllPath_ = dlgAbout.chromeDllPath_;
-		bChromeDeveloper_ = dlgAbout.bChromeDeveloper_;
+		if (bChromeDeveloper_ != dlgAbout.bChromeDeveloper_)
+		{
+			bChromeDeveloper_ = dlgAbout.bChromeDeveloper_;
+			SetSymbolPath();
+		}
 		bAutoViewTraces_ = dlgAbout.bAutoViewTraces_;
 		bHeapStacks_ = dlgAbout.bHeapStacks_;
 	}
