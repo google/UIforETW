@@ -11,17 +11,20 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import print_function
 
 import os
 import re
 import shutil
 import sys
 
+
+
 if len(sys.argv) < 3:
-  print "Syntax: PackETWSymbols ETWFilename.etl destdirname [-verbose]"
-  print "This script looks for symbols needed to decode the specified trace, and"
-  print "copies them to the specified directory. This allows moving traces to"
-  print "other machines for analysis and sharing."
+  print( "Syntax: PackETWSymbols ETWFilename.etl destdirname [-verbose]" )
+  print( "This script looks for symbols needed to decode the specified trace, and" )
+  print( "copies them to the specified directory. This allows moving traces to" )
+  print( "other machines for analysis and sharing." )
   sys.exit(0)
 
 ETLName = sys.argv[1]
@@ -33,20 +36,20 @@ verbose = False
 if len(sys.argv) > 3 and sys.argv[3].lower() == "-verbose":
   verbose = True
 
-print "Extracting symbols from ETL file '%s'." % ETLName
+print( "Extracting symbols from ETL file '%s'." % ETLName )
 
 # This command is slow but thorough -- it tries to build the symbol cache.
 #command = "xperf.exe -i \"%s\" -tle -symbols -a symcache -quiet -build -imageid -dbgid" % ETLName
 # This command is faster. It relies on symbols being loaded already for the modules of interest.
 command = "xperf.exe -i \"%s\" -tle -a symcache -quiet -imageid -dbgid" % ETLName
 
-print "Executing command '%s'" % command
+print( "Executing command '%s'" % command )
 lines = os.popen(command).readlines()
 
 if len(lines) < 30:
-  print "Error:"
+  print( "Error:" )
   for line in lines:
-    print line,
+    print( line, end='')
   sys.exit(0)
 
 # Typical output lines (including one heading) look like this:
@@ -65,9 +68,9 @@ vgame = vgame[:-5].lower()
 
 prefixes = ["u:\\", "e:\\build_slave", vgame]
 
-print "Looking for symbols built to:"
+print( "Looking for symbols built to:" )
 for prefix in prefixes:
-  print "    %s" % prefix
+  print( "    %s" % prefix )
 
 # Default to looking for the SymCache on the C drive
 prefix = "c"
@@ -110,13 +113,13 @@ for line in lines:
       symCachePath = symCachePathBase + symFilePath
       if os.path.isfile(symCachePath):
         matchExists += 1
-        print "Copying %s" % symCachePath
+        print( "Copying %s" % symCachePath )
         shutil.copyfile(symCachePath, DestDirName + "\\" + symFilePath)
       else:
-        print "Symbols for '%s' are not in %s" % (OrigFileName, symCachePathBase)
+        print( "Symbols for '%s' are not in %s" % (OrigFileName, symCachePathBase) )
     else:
       #This is normally too verbose
       if verbose:
-        print "Skipping %s" % PDBPath
+        print( "Skipping %s" % PDBPath )
 
-print "%d symbol files found in the trace, %d appear to be ours, and %d of those exist in symcache." % (matchCount, ourModuleCount, matchExists)
+print( "%d symbol files found in the trace, %d appear to be ours, and %d of those exist in symcache." % (matchCount, ourModuleCount, matchExists) )
