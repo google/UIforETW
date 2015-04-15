@@ -75,6 +75,7 @@ BOOL CSettings::OnInitDialog()
 	btExtraProviders_.EnableWindow(FALSE);
 	btExtraStackwalks_.EnableWindow(FALSE);
 	btBufferSizes_.EnableWindow(FALSE);
+	btChromeDllPath_.EnableWindow(bChromeDeveloper_);
 
 	if (toolTip_.Create(this))
 	{
@@ -183,6 +184,7 @@ void CSettings::OnBnClickedCopysymboldlls()
 void CSettings::OnBnClickedChromedeveloper()
 {
 	bChromeDeveloper_ = !bChromeDeveloper_;
+	btChromeDllPath_.EnableWindow(bChromeDeveloper_);
 }
 
 
