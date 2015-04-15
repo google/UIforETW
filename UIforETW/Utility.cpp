@@ -191,21 +191,27 @@ static HWND GetNextDlgItem(HWND win, bool Wrap)
 	HWND next = GetWindow(win, GW_HWNDNEXT);
 	while (next != win && !ControlOK(next))
 	{
-		if (next)
-			next = GetWindow(next, GW_HWNDNEXT);
+		if ( next )
+		{
+			next = GetWindow( next, GW_HWNDNEXT );
+		}
 		else
 		{
-			if (Wrap)
-				next = GetWindow(win, GW_HWNDFIRST);
+			if ( Wrap )
+			{
+				next = GetWindow( win, GW_HWNDFIRST );
+			}
 			else
+			{
 				return 0;
+			}
 		}
 	}
 	assert(!Wrap || next);
 	return next;
 }
 
-void SmartEnableWindow(HWND Win, BOOL Enable)
+void SmartEnableWindow(_In_ const HWND Win, _In_ const BOOL Enable)
 {
 	assert(Win);
 	if (!Enable)
@@ -213,14 +219,20 @@ void SmartEnableWindow(HWND Win, BOOL Enable)
 		HWND hasfocus = GetFocus();
 		bool FocusProblem = false;
 		HWND focuscopy;
-		for (focuscopy = hasfocus; focuscopy; focuscopy = (GetParent)(focuscopy))
-			if (focuscopy == Win)
+		for ( focuscopy = hasfocus; focuscopy; focuscopy = ( GetParent ) ( focuscopy ) )
+		{
+			if ( focuscopy == Win )
+			{
 				FocusProblem = true;
+			}
+		}
 		if (FocusProblem)
 		{
 			HWND nextctrl = GetNextDlgItem(Win, true);
-			if (nextctrl)
-				SetFocus(nextctrl);
+			if ( nextctrl )
+			{
+				SetFocus( nextctrl );
+			}
 		}
 	}
 	::EnableWindow(Win, Enable);
@@ -381,14 +393,14 @@ WindowsVersion GetWindowsVersion()
 	return kWindowsVersionXP;
 }
 
-bool IsWindowsServer()
-{
-	OSVERSIONINFOEXW osvi = { sizeof(osvi), 0, 0, 0, 0, { 0 }, 0, 0, 0, VER_NT_WORKSTATION };
-	DWORDLONG        const dwlConditionMask = VerSetConditionMask(0, VER_PRODUCT_TYPE, VER_EQUAL);
-
-	bool result = !VerifyVersionInfoW(&osvi, VER_PRODUCT_TYPE, dwlConditionMask);
-	return result;
-}
+//bool IsWindowsServer()
+//{
+//	OSVERSIONINFOEXW osvi = { sizeof(osvi), 0, 0, 0, 0, { 0 }, 0, 0, 0, VER_NT_WORKSTATION };
+//	DWORDLONG        const dwlConditionMask = VerSetConditionMask(0, VER_PRODUCT_TYPE, VER_EQUAL);
+//
+//	bool result = !VerifyVersionInfoW(&osvi, VER_PRODUCT_TYPE, dwlConditionMask);
+//	return result;
+//}
 
 
 

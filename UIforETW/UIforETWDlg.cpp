@@ -40,10 +40,512 @@ const int kRecordTraceHotKey = 1234;
 // outputPrintf function.
 static CUIforETWDlg* pMainWindow;
 
+namespace {
+
+_Null_terminated_ const wchar_t StartEtwTracingString[ ] =
+	L"Start ETW tracing.";
+
+_Null_terminated_ const wchar_t btCompressToolTipString[ ] =
+	L"Only uncheck this if you record traces on Windows 8 and above and want to analyze "
+	L"them on Windows 7 and below.\n"
+	L"Enable ETW trace compression. On Windows 8 and above this compresses traces "
+	L"as they are saved, making them 5-10x smaller. However compressed traces cannot be loaded on "
+	L"Windows 7 or earlier. On Windows 7 this setting has no effect.";
+
+_Null_terminated_ const wchar_t btCswitchStacksString[ ] = 
+	L"This enables recording of call stacks on context switches, from both "
+	L"the thread being switched in and the readying thread. This should only be disabled if the performance "
+	L"of functions like WaitForSingleObject and SetEvent appears to be distorted, which can happen when the "
+	L"context-switch rate is very high.";
+
+_Null_terminated_ const wchar_t InputTipString[ ] =
+	L"Input tracing inserts custom ETW events into traces which can be helpful when "
+	L"investigating performance problems that are correlated with user input. The default setting of "
+	L"'private' records alphabetic keys as 'A' and numeric keys as '0'. The 'full' setting records "
+	L"alphanumeric details. Both 'private' and 'full' record mouse movement and button clicks. The "
+	L"'off' setting records no input.";
+
+_Null_terminated_ const wchar_t SampledStacksString[ ] = 
+	L"This enables recording of call stacks on CPU sampling events, which "
+	L"by default happen at 1 KHz. This should rarely be disabled.";
+
+_Null_terminated_ const wchar_t SampleRateString[ ] = 
+	L"Checking this changes the CPU sampling frequency from the default of "
+	L"~1 KHz to the maximum speed of ~8 KHz. This increases the data rate and thus the size of traces "
+	L"but can make investigating brief CPU-bound performance problems (such as a single long frame) "
+	L"more practical.";
+
+_Null_terminated_ const wchar_t GPUTracingString[ ] =
+	L"Check this to allow seeing GPU usage "
+	L"in WPA, and more data in GPUView.";
+
+_Null_terminated_ const wchar_t ShowCommandsString[ ] =
+	L"This tells UIforETW to display the commands being "
+	L"executed. This can be helpful for diagnostic purposes but is not normally needed.";
+
+_Null_terminated_ const wchar_t TracingModeString[ ] =
+	L"Select whether to trace straight to disk or to in-memory circular buffers.";
+
+_Null_terminated_ const wchar_t TracesString[ ] =
+	L"This is a list of all traces found in %etwtracedir%, which defaults to "
+	L"documents\\etwtraces.";
+
+_Null_terminated_ const wchar_t TraceNotesString[ ] =
+	L"Trace notes are intended for recording information about ETW traces, such "
+	L"as an analysis of what was discovered in the trace. Trace notes are auto-saved to a parallel text "
+	L"file - just type your analysis. The notes files will be renamed when you rename traces "
+	L"through the trace-list context menu.";
+
+void handle_vprintfFailure( _In_ const HRESULT fmtResult, _In_ const rsize_t bufferCount )
+{
+	if ( fmtResult == STRSAFE_E_INSUFFICIENT_BUFFER )
+	{
+		ATLTRACE2( atlTraceGeneral, 0, L"CUIforETWDlg::vprintf FAILED TO format args to buffer!\r\n\tthe buffer ( size: %I64u ) was too small)\r\n", static_cast<uint64_t>( bufferCount ) );
+		return;
+	}
+	if ( fmtResult == STRSAFE_E_INVALID_PARAMETER )
+	{
+		ATLTRACE2( atlTraceGeneral, 0, L"CUIforETWDlg::vprintf FAILED TO format args to buffer! An invalid parameter was passed to StringCchVPrintf!\r\n" );
+		return;
+	}
+	//how should we handle this correctly?
+	ATLTRACE2( atlTraceGeneral, 0, L"CUIforETWDlg::vprintf FAILED TO format args to buffer! An expected error was encountered!\r\n" );
+	if ( IsDebuggerPresent( ) )
+	{
+		_CrtDbgBreak( );
+	}
+	return;
+}
+
+bool copyWpaProfileToExecutableDirectory( _In_ const std::wstring& documents, _In_ const std::wstring exeDir )
+{
+	std::wstring wpaStartup = documents + std::wstring(L"\\WPA Files\\Startup.wpaProfile");
+	if ( PathFileExists( wpaStartup.c_str( ) ) )
+	{
+		return true;
+	}
+	// Auto-copy a startup profile if there isn't one.
+	const std::wstring sourceFile( exeDir + L"Startup.wpaProfile" );
+
+	//If [CopyFile] succeeds, the return value is nonzero.
+	//If [CopyFile] fails, the return value is zero.
+	//To get extended error information, call GetLastError.
+	const BOOL copyFileResult = CopyFile(sourceFile.c_str(), wpaStartup.c_str(), TRUE);
+
+
+	//TODO: handle error properly!
+	if ( copyFileResult == 0 )
+	{
+		return false;
+	}
+	return true;
+
+}
+
+_Success_( return )
+bool addStringToCComboBox( _Inout_ CComboBox* const comboBox, _In_z_ PCWSTR const stringToAdd )
+{
+	//CComboBox::AddString calls SendMessage, to send a CB_ADDSTRING message.
+	//CB_ADDSTRING returns CB_ERR or CB_ERRSPACE on failure.
+	const int addStringResult = comboBox->AddString( stringToAdd );
+	if ( addStringResult == CB_ERR )
+	{
+		ATLTRACE2( atlTraceGeneral, 0, L"Unexpected error adding string `%s`!!\r\n", stringToAdd );
+		return false;
+	}
+	if ( addStringResult == CB_ERRSPACE )
+	{
+		ATLTRACE2( atlTraceGeneral, 0, L"Not enough space available to store string `%s`!!\r\n", stringToAdd );
+		return false;
+	}
+	ATLTRACE2( atlTraceGeneral, 2, L"Successfully added string `%s` to CComboBox\r\n", stringToAdd );
+	return true;
+}
+
+_Success_( return )
+bool addbtInputTracingStrings( _Inout_ CComboBox* const btInputTracing )
+{
+
+	const bool addOffStringResult = addStringToCComboBox( btInputTracing, L"Off" );
+	if ( !addOffStringResult )
+	{
+		return false;
+	}
+
+	const bool addPrivateStringResult = addStringToCComboBox( btInputTracing, L"Private");
+	if ( !addPrivateStringResult )
+	{
+		return false;
+	}
+
+	const bool addFullStringResult = addStringToCComboBox( btInputTracing, L"Full");
+	if ( !addFullStringResult )
+	{
+		return false;
+	}
+	return true;
+}
+
+_Success_( return )
+bool addbtTracingModeStrings( _Inout_ CComboBox* const btTracingMode )
+{
+	const bool addCircularBufferStringResult = addStringToCComboBox( btTracingMode, L"Circular buffer tracing");
+	if ( !addCircularBufferStringResult )
+	{
+		return false;
+	}
+
+	const bool addTraceToFileStringResult = addStringToCComboBox( btTracingMode, L"Tracing to file");
+	if ( !addTraceToFileStringResult )
+	{
+		return false;
+	}
+
+	const bool addHeapTraceToFileStringResult = addStringToCComboBox( btTracingMode, L"Heap tracing to file");
+	if ( !addHeapTraceToFileStringResult )
+	{
+		return false;
+	}
+
+	return true;
+}
+
+_Success_( return )
+bool setCComboBoxSelection( _Inout_ CComboBox* const comboBoxToSet, _In_ _In_range_( -1, INT_MAX ) const int selectionToSet )
+{
+	//CComboBox::SetCurSel calls SendMessage, to send a CB_SETCURSEL message.
+
+	//The documentation for CB_SETCURSEL is a bit confusing!
+	//CB_SETCURSEL, if successful, returns the index of the item that was selected.
+	//CB_SETCURSEL, on failure, returns CB_ERR.
+	//The documentation suggests that -1 might be a valid argument for clearing the selection,
+	//however, it also says that if passed -1, it will return CB_ERR.
+	const int setSelectionResult = comboBoxToSet->SetCurSel( selectionToSet );
+	if ( setSelectionResult == CB_ERR )
+	{
+		
+		ATLTRACE2( atlTraceGeneral, 0,
+				   L"Failed to set selection (for a comboBox)\r\n"
+				   L"\tIndex that we attempted to set the selection to: %i\r\n"
+				   L"\tCue banner of CComboBox: %s\r\n",
+				   selectionToSet,
+				   comboBoxToSet->GetCueBanner( ) //Grr. I hate CString.
+				 );
+		return false;
+	}
+	return true;
+}
+
+template<class DerivedButton>
+_Success_( return )
+bool addSingleToolToToolTip( 
+							_Inout_ CToolTipCtrl*  const toolTip,
+							_Inout_ DerivedButton* const btToAdd,
+							_In_z_  PCWSTR         const toolTipMessageToAdd
+						   )
+{
+	static_assert( std::is_base_of<CWnd, DerivedButton>::value, "Cannot add a non-CWnd-derived class as a tooltip!" );
+	const BOOL addToolTipResult = toolTip->AddTool( btToAdd, toolTipMessageToAdd );
+	if ( addToolTipResult != TRUE )
+	{
+		ATLTRACE2( atlTraceGeneral, 0, L"Failed to add a message to a tooltip!!\r\nThe tooltip message:\r\n\t`%s`\r\n", toolTipMessageToAdd );
+		return false;
+	}
+	return true;
+}
+
+
+_Success_( return )
+bool initializeToolTip(
+						_Out_ CToolTipCtrl* const toolTip,
+						_In_  CButton*      const btStartTracing,
+						_In_  CButton*      const btCompress,
+						_In_  CButton*      const btCswitchStacks,
+						_In_  CButton*      const btSampledStacks,
+						_In_  CButton*      const btFastSampling,
+						_In_  CButton*      const btGPUTracing,
+						_In_  CButton*      const btShowCommands,
+						_In_  CStatic*      const btInputTracingLabel,
+						_In_  CComboBox*    const btInputTracing,
+						_In_  CComboBox*    const btTracingMode,
+						_In_  CListBox*     const btTraces,
+						_In_  CEdit*        const btTraceNotes
+					  )
+{
+	
+	toolTip->SetMaxTipWidth(400);
+	toolTip->Activate(TRUE);
+
+	//toolTip->AddTool( btStartTracing, L"Start ETW tracing.");
+
+	const bool addStartETWTracingToolTip =
+		addSingleToolToToolTip( toolTip, btStartTracing, StartEtwTracingString );
+	if ( !addStartETWTracingToolTip )
+	{
+		return false;
+	}
+
+	//toolTip->AddTool( btCompress, btCompressToolTipString );
+	
+	const bool addBtCompressTollTip =
+		addSingleToolToToolTip( toolTip, btCompress, btCompressToolTipString );
+	if ( !addBtCompressTollTip )
+	{
+		return false;
+	}
+
+	//toolTip->AddTool( btCswitchStacks, btCswitchStacksString );
+	
+	const bool addBtCswitchStacksString =
+		addSingleToolToToolTip( toolTip, btCswitchStacks, btCswitchStacksString );
+	if ( !addBtCswitchStacksString )
+	{
+		return false;
+	}
+	
+	//toolTip->AddTool( btSampledStacks, );
+	
+	const bool addBtSampledStacksString =
+		addSingleToolToToolTip( toolTip, btSampledStacks, SampledStacksString );
+	if ( !addBtSampledStacksString )
+	{
+		return false;
+	}
+
+
+	//toolTip->AddTool( btFastSampling, SampleRateString);
+	
+	const bool addToolString =
+		addSingleToolToToolTip( toolTip, btFastSampling, SampleRateString );
+	if ( !addToolString )
+	{
+		return false;
+	}
+
+	//toolTip->AddTool( btGPUTracing, GPUTracingString );
+
+	const bool addGPUTracing =
+		addSingleToolToToolTip( toolTip, btGPUTracing, GPUTracingString );
+	if ( !addGPUTracing )
+	{
+		return false;
+	}
+
+
+	//toolTip->AddTool( btShowCommands, ShowCommandsString );
+
+	const bool addShowCommands =
+		addSingleToolToToolTip( toolTip, btShowCommands, ShowCommandsString );
+	if ( !addShowCommands )
+	{
+		return false;
+	}
+
+	
+	//toolTip->AddTool( btInputTracingLabel, InputTipString);
+	const bool addTracingLabel =
+		addSingleToolToToolTip( toolTip, btInputTracingLabel, InputTipString);
+	if ( !addTracingLabel )
+	{
+		return false;
+	}
+	
+	//toolTip->AddTool( btInputTracing, InputTipString);
+	const bool addInputTracing =
+		addSingleToolToToolTip( toolTip, btInputTracing, InputTipString );
+	if ( !addInputTracing )
+	{
+		return false;
+	}
+
+	//toolTip->AddTool( btTracingMode, TracingModeString);
+	const bool addTracingMode =
+		addSingleToolToToolTip( toolTip, btTracingMode, TracingModeString);
+	if ( !addTracingMode )
+	{
+		return false;
+	}
+
+
+	//toolTip->AddTool( btTraces, TracesString );
+	const bool addTraces =
+		addSingleToolToToolTip( toolTip, btTraces, TracesString );
+	if ( !addTraces )
+	{
+		return false;
+	}
+
+	
+	//toolTip->AddTool( btTraceNotes, TraceNotesString);
+	const bool addTraceNotes =
+		addSingleToolToToolTip( toolTip, btTraceNotes, TraceNotesString);
+	if ( !addTraceNotes )
+	{
+		return false;
+	}
+
+	return true;
+}
+
+std::wstring GetPathToWindowsPerformanceToolkit( )
+{
+	// The WPT 8.1 installer is always a 32-bit installer, so on 64-bit
+	// Windows it ends up in the (x86) directory.
+	if ( Is64BitWindows( ) )
+	{
+		return L"C:\\Program Files (x86)\\Windows Kits\\8.1\\Windows Performance Toolkit\\";
+	}
+	return L"C:\\Program Files\\Windows Kits\\8.1\\Windows Performance Toolkit\\";
+}
+
+
+CRect GetWindowRectFromHwnd( _In_ const HWND hwnd )
+{
+	RECT windowRect_temp;
+	ASSERT( ::IsWindow( hwnd ) );
+	const BOOL getWindowRectResult = ::GetWindowRect( hwnd, &windowRect_temp );
+	if ( getWindowRectResult == 0 )
+	{
+		const DWORD err = GetLastError( );
+
+		//TODO: format error code!
+		ATLTRACE2( atlTraceGeneral, 0, L"GetWindowRect failed!! Error code: %u\r\n", err );
+		
+		exit(10);
+	}
+
+	return CRect( windowRect_temp );
+}
+
+void SetSaveTraceBuffersWindowText( _In_ const HWND hWnd )
+{
+	const BOOL btSaveTbSetTextResult = ::SetWindowTextW( hWnd, L"Sa&ve Trace Buffers");
+	if ( btSaveTbSetTextResult == 0 )
+	{
+		const DWORD err = GetLastError( );
+
+		//TODO: format error code!
+		ATLTRACE2( atlTraceGeneral, 0, L"::SetWindowTextW( btSaveTraceBuffers_.m_hWnd, L\"Sa&ve Trace Buffers\" failed!!! Error code: %u\r\n", err );
+		exit(10);
+	}
+
+}
+
+
+bool appendAboutBoxToSystemMenu( _In_ const CWnd& window )
+{
+	// Add "About..." menu item to system menu.
+
+	// IDM_ABOUTBOX must be in the system command range.
+	static_assert( ( IDM_ABOUTBOX & 0xFFF0 ) == IDM_ABOUTBOX, "IDM_ABOUTBOX IS NOT in the system command range!" );
+	static_assert( IDM_ABOUTBOX < 0xF000, "IDM_ABOUTBOX IS NOT in the system command range!" );
+
+
+
+	//The pointer returned by [CWnd::GetSystemMenu(FALSE)] may be temporary and should not be stored for later use.
+	CMenu* const pSysMenu = window.GetSystemMenu(FALSE);
+	if ( pSysMenu == NULL )
+	{
+		return false;
+	}
+
+	CString strAboutMenu;
+
+	//[CStringT:LoadString returns] nonzero if resource load was successful; otherwise 0.
+	const BOOL bNameValid = strAboutMenu.LoadString(IDS_ABOUTBOX);
+	ASSERT(bNameValid);
+	if ( bNameValid == 0 )
+	{
+		ATLTRACE2( atlTraceGeneral, 0, L"Failed to load about box menu string!!\r\n" );
+		return false;
+	}
+	if ( strAboutMenu.IsEmpty( ) )
+	{
+		ATLTRACE2( atlTraceGeneral, 0, L"About box string is empty?!?!\r\n" );
+		return false;
+	}
+
+
+	//[CWnd::AppendMenu returns] nonzero if the function is successful; otherwise 0.
+	const BOOL appendSeparatorResult = pSysMenu->AppendMenu(MF_SEPARATOR);
+	if ( appendSeparatorResult == 0 )
+	{
+		ATLTRACE2( atlTraceGeneral, 0, L"Failed to append separator to menu!\r\n" );
+		return false;
+	}
+	const BOOL appendAboutBoxResult = pSysMenu->AppendMenu(MF_STRING, IDM_ABOUTBOX, strAboutMenu);
+	if ( appendAboutBoxResult == 0 )
+	{
+		ATLTRACE2( atlTraceGeneral, 0, L"Failed to append about box string to menu!\r\n" );
+		return false;
+	}
+
+	return true;
+
+}
+
+void checkETWCompatibility( )
+{
+	if (!IsWindowsVistaOrGreater( ))
+	{
+		AfxMessageBox(L"ETW tracing requires Windows Vista or above.");
+		exit(10);
+	}
+	return;
+}
+
+void CheckDialogButtons( 
+						_In_ CWnd* const dlgToCheck,
+						_In_ const bool bCompress,
+						_In_ const bool bCswitchStacks,
+						_In_ const bool bSampledStacks,
+						_In_ const bool bFastSampling,
+						_In_ const bool bGPUTracing,
+						_In_ const bool bShowCommands
+					   )
+{
+	//This MFC function (CheckDlgButton) doesn't properly check return codes for internal calls.
+	dlgToCheck->CheckDlgButton(IDC_COMPRESSTRACE, bCompress );
+	dlgToCheck->CheckDlgButton(IDC_CONTEXTSWITCHCALLSTACKS, bCswitchStacks );
+	dlgToCheck->CheckDlgButton(IDC_CPUSAMPLINGCALLSTACKS, bSampledStacks);
+	dlgToCheck->CheckDlgButton(IDC_FASTSAMPLING, bFastSampling);
+	dlgToCheck->CheckDlgButton(IDC_GPUTRACING, bGPUTracing);
+	dlgToCheck->CheckDlgButton(IDC_SHOWCOMMANDS, bShowCommands);
+}
+
+HACCEL loadAcceleratorsForF2andESC( _In_ const HINSTANCE instance )
+{
+	// Load the F2 (rename) and ESC (silently swallow ESC) accelerators
+	return LoadAccelerators( instance, MAKEINTRESOURCE(IDR_ACCELERATORS));
+}
+
+HACCEL loadAcceleratorsForExitingRenaming( _In_ const HINSTANCE instance )
+{
+	// Load the Enter accelerator for exiting renaming.
+	return LoadAccelerators( instance, MAKEINTRESOURCE(IDR_RENAMEACCELERATORS));
+}
+
+HACCEL loadAcceleratorsForEditingTraceNotes( _In_ const HINSTANCE instance )
+{
+	// Load the accelerators for when editing trace notes.
+	return LoadAccelerators( instance, MAKEINTRESOURCE(IDR_NOTESACCELERATORS));
+}
+
+HACCEL loadAcceleratorsForActiveTraceList( _In_ const HINSTANCE instance )
+{
+	// Load the accelerators for when the trace list is active.
+	return LoadAccelerators( instance, MAKEINTRESOURCE(IDR_TRACESACCELERATORS));
+
+}
+
+
+}// namespace {
+
+
 // This convenient hack function is so that the ChildProcess code can
 // print to the main output window. This function can only be called
 // from the main thread.
-void outputPrintf(_Printf_format_string_ const wchar_t* pFormat, ...)
+void outputPrintf(_Printf_format_string_ PCWSTR pFormat, ...)
 {
 	va_list args;
 	va_start(args, pFormat);
@@ -51,24 +553,46 @@ void outputPrintf(_Printf_format_string_ const wchar_t* pFormat, ...)
 	va_end(args);
 }
 
-void CUIforETWDlg::vprintf(const wchar_t* pFormat, va_list args)
+void CUIforETWDlg::vprintf(PCWSTR pFormat, va_list args)
 {
-	wchar_t buffer[5000];
-	_vsnwprintf_s(buffer, _TRUNCATE, pFormat, args);
+	const rsize_t bufferCount = 5000u;
+	
+	wchar_t buffer[ bufferCount ];
 
-	for (const wchar_t* pBuf = buffer; *pBuf; ++pBuf)
+
+	//_vsnwprintf_s(buffer, _TRUNCATE, pFormat, args);
+
+	const HRESULT printFormattedArgsToBuffer = StringCchVPrintfW( buffer, bufferCount, pFormat, args );
+	ASSERT( SUCCEEDED( printFormattedArgsToBuffer ) );
+	if ( FAILED( printFormattedArgsToBuffer ) )
+	{
+		//how should we handle this correctly?
+		handle_vprintfFailure( printFormattedArgsToBuffer, bufferCount );
+		return;
+	}
+
+
+	for (PCWSTR pBuf = buffer; *pBuf; ++pBuf)
 	{
 		// Need \r\n as a line separator.
 		if (pBuf[0] == '\n')
 		{
 			// Don't add a line separator at the very beginning.
-			if (!output_.empty())
+			if ( !output_.empty( ) )
+			{
 				output_ += L"\r\n";
+			}
 		}
 		else
-			output_ += pBuf[0];
+		{
+			output_ += pBuf[ 0 ];
+		}
 	}
 
+	//const BOOL setDlgTextResult = SetDlgItemText(IDC_OUTPUT, output_.c_str());
+
+	//This is why I hate MFC, they've overloaded a function with a macro-defined name!
+	//And CWnd::SetDlgItemText doesn't even check the return value of SetDlgItemText
 	SetDlgItemText(IDC_OUTPUT, output_.c_str());
 
 	// Make sure the end of the data is visible.
@@ -87,7 +611,7 @@ void CUIforETWDlg::vprintf(const wchar_t* pFormat, va_list args)
 }
 
 
-CUIforETWDlg::CUIforETWDlg(CWnd* pParent /*=NULL*/)
+CUIforETWDlg::CUIforETWDlg(_In_opt_ CWnd* pParent /*=NULL*/)
 	: CDialogEx(CUIforETWDlg::IDD, pParent)
 	, monitorThread_(this)
 {
@@ -191,14 +715,14 @@ BEGIN_MESSAGE_MAP(CUIforETWDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_SHOWCOMMANDS, &CUIforETWDlg::OnBnClickedShowcommands)
 	ON_BN_CLICKED(IDC_FASTSAMPLING, &CUIforETWDlg::OnBnClickedFastsampling)
 	ON_CBN_SELCHANGE(IDC_INPUTTRACING, &CUIforETWDlg::OnCbnSelchangeInputtracing)
-	ON_MESSAGE(WM_UPDATETRACELIST, UpdateTraceListHandler)
+	ON_MESSAGE(WM_UPDATETRACELIST, &CUIforETWDlg::UpdateTraceListHandler)
 	ON_LBN_DBLCLK(IDC_TRACELIST, &CUIforETWDlg::OnLbnDblclkTracelist)
 	ON_WM_GETMINMAXINFO()
 	ON_WM_SIZE()
 	ON_LBN_SELCHANGE(IDC_TRACELIST, &CUIforETWDlg::OnLbnSelchangeTracelist)
 	ON_BN_CLICKED(IDC_ABOUT, &CUIforETWDlg::OnBnClickedAbout)
 	ON_BN_CLICKED(IDC_SAVETRACEBUFFERS, &CUIforETWDlg::OnBnClickedSavetracebuffers)
-	ON_MESSAGE(WM_HOTKEY, OnHotKey)
+	ON_MESSAGE(WM_HOTKEY, &CUIforETWDlg::OnHotKey)
 	ON_WM_CLOSE()
 	ON_CBN_SELCHANGE(IDC_TRACINGMODE, &CUIforETWDlg::OnCbnSelchangeTracingmode)
 	ON_BN_CLICKED(IDC_SETTINGS, &CUIforETWDlg::OnBnClickedSettings)
@@ -244,79 +768,74 @@ BOOL CUIforETWDlg::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
 
-	// Load the F2 (rename) and ESC (silently swallow ESC) accelerators
-	hAccelTable_ = LoadAccelerators(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDR_ACCELERATORS));
-	// Load the Enter accelerator for exiting renaming.
-	hRenameAccelTable_ = LoadAccelerators(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDR_RENAMEACCELERATORS));
-	// Load the accelerators for when editing trace notes.
-	hNotesAccelTable_ = LoadAccelerators(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDR_NOTESACCELERATORS));
-	// Load the accelerators for when the trace list is active.
-	hTracesAccelTable_ = LoadAccelerators(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDR_TRACESACCELERATORS));
+	const HINSTANCE instanceHandle = AfxGetInstanceHandle( );
 
-	CRect windowRect;
-	GetWindowRect(&windowRect);
-	initialWidth_ = lastWidth_ = windowRect.Width();
-	initialHeight_ = lastHeight_ = windowRect.Height();
+	hAccelTable_ = loadAcceleratorsForF2andESC( instanceHandle );
+	hRenameAccelTable_ = loadAcceleratorsForExitingRenaming( instanceHandle );
+	hNotesAccelTable_ = loadAcceleratorsForEditingTraceNotes( instanceHandle );
+	hTracesAccelTable_ = loadAcceleratorsForActiveTraceList( instanceHandle );
 
+	CRect windowRect = GetWindowRectFromHwnd( m_hWnd );
+
+	initialWidth_ = windowRect.Width();
+	lastWidth_ = windowRect.Width( );
+
+	initialHeight_ = windowRect.Height();
+	lastHeight_ = windowRect.Height( );
+	
 	// 0x41 is 'C', compatible with wprui
-	if (!RegisterHotKey(*this, kRecordTraceHotKey, MOD_WIN + MOD_CONTROL, 0x43))
+	if (!RegisterHotKey(m_hWnd, kRecordTraceHotKey, MOD_WIN + MOD_CONTROL, 0x43))
 	{
 		AfxMessageBox(L"Couldn't register hot key.");
-		btSaveTraceBuffers_.SetWindowTextW(L"Sa&ve Trace Buffers");
+
+		SetSaveTraceBuffersWindowText( btSaveTraceBuffers_.m_hWnd );
 	}
 
-	// Add "About..." menu item to system menu.
 
-	// IDM_ABOUTBOX must be in the system command range.
-	ASSERT((IDM_ABOUTBOX & 0xFFF0) == IDM_ABOUTBOX);
-	ASSERT(IDM_ABOUTBOX < 0xF000);
-
-	CMenu* pSysMenu = GetSystemMenu(FALSE);
-	if (pSysMenu)
+	const bool appendAboutBoxResult = appendAboutBoxToSystemMenu( *this );
+	if ( !appendAboutBoxResult )
 	{
-		BOOL bNameValid;
-		CString strAboutMenu;
-		bNameValid = strAboutMenu.LoadString(IDS_ABOUTBOX);
-		ASSERT(bNameValid);
-		if (!strAboutMenu.IsEmpty())
-		{
-			pSysMenu->AppendMenu(MF_SEPARATOR);
-			pSysMenu->AppendMenu(MF_STRING, IDM_ABOUTBOX, strAboutMenu);
-		}
+		AfxMessageBox(L"Couldn't append about box!");
+		exit( 10 );
 	}
 
-	if (GetWindowsVersion() == kWindowsVersionXP)
+
+	checkETWCompatibility( );
+
+
+	wptDir_ = GetPathToWindowsPerformanceToolkit( );
+	const std::wstring xperfPath( GetXperfPath( ) );
+
+	if (!PathFileExists(xperfPath.c_str()))
 	{
-		AfxMessageBox(L"ETW tracing requires Windows Vista or above.");
+		AfxMessageBox( ( xperfPath + L" does not exist. Please install WPT 8.1. Exiting." ).c_str( ) );
 		exit(10);
 	}
 
-	// The WPT 8.1 installer is always a 32-bit installer, so on 64-bit
-	// Windows it ends up in the (x86) directory.
-	if (Is64BitWindows())
-		wptDir_ = L"C:\\Program Files (x86)\\Windows Kits\\8.1\\Windows Performance Toolkit\\";
-	else
-		wptDir_ = L"C:\\Program Files\\Windows Kits\\8.1\\Windows Performance Toolkit\\";
-	if (!PathFileExists(GetXperfPath().c_str()))
+	_Null_terminated_ wchar_t documents_temp[ MAX_PATH ] = { 0 };
+
+	//We want to CREATE IT if it doesn't exist??!?
+	//SHGetSpecialFolder path is NOT supported!
+	const HRESULT shGetMyDocResult = SHGetFolderPath( 0, CSIDL_MYDOCUMENTS, NULL, SHGFP_TYPE_CURRENT, documents_temp );
+	ASSERT( SUCCEEDED( shGetMyDocResult ) );
+
+	if ( FAILED( shGetMyDocResult ) )
 	{
-		AfxMessageBox((GetXperfPath() + L" does not exist. Please install WPT 8.1. Exiting.").c_str());
+		ATLTRACE2( atlTraceGeneral, 0, L"Failed to find the My Documents directory!\r\n" );
 		exit(10);
 	}
 
-	wchar_t documents[MAX_PATH];
-	if (!SHGetSpecialFolderPath(*this, documents, CSIDL_MYDOCUMENTS, TRUE))
-	{
-		assert(!"Failed to find My Documents directory.\n");
-		exit(10);
-	}
+	//request Unicode (long-path compatible) versions of APIs
+	const std::wstring documents( L"\\\\?\\" + std::wstring( documents_temp ) );
+
 	std::wstring defaultTraceDir = documents + std::wstring(L"\\etwtraces\\");
 	traceDir_ = GetDirectory(L"etwtracedir", defaultTraceDir);
 
-	std::wstring wpaStartup = documents + std::wstring(L"\\WPA Files\\Startup.wpaProfile");
-	if (!PathFileExists(wpaStartup.c_str()))
+	const bool copyToDirResult = copyWpaProfileToExecutableDirectory( documents, std::move( GetExeDir( ) ) );
+	if ( !copyToDirResult )
 	{
-		// Auto-copy a startup profile if there isn't one.
-		CopyFile((GetExeDir() + L"Startup.wpaProfile").c_str(), wpaStartup.c_str(), TRUE);
+		//TODO: properly handle error!
+		exit(10);
 	}
 
 	tempTraceDir_ = GetDirectory(L"temp", traceDir_);
@@ -324,6 +843,8 @@ BOOL CUIforETWDlg::OnInitDialog()
 	SetSymbolPath();
 
 	btTraceNameEdit_.GetWindowRect(&traceNameEditRect_);
+
+	//This MFC function (ScreenToClient) doesn't properly check return codes for internal calls.
 	ScreenToClient(&traceNameEditRect_);
 
 	// Set the icon for this dialog. The framework does this automatically
@@ -331,35 +852,73 @@ BOOL CUIforETWDlg::OnInitDialog()
 	SetIcon(m_hIcon, TRUE);			// Set big icon
 	SetIcon(m_hIcon, FALSE);		// Set small icon
 
-	WindowsVersion winver = GetWindowsVersion();
-	if (winver <= kWindowsVersion7)
+
+	//WindowsVersion winver = GetWindowsVersion();
+	if ( IsWindows8OrGreater( ) )
 	{
 		bCompress_ = false; // ETW trace compression requires Windows 8.0
 		SmartEnableWindow(btCompress_, false);
 	}
 
-	CheckDlgButton(IDC_COMPRESSTRACE, bCompress_);
-	CheckDlgButton(IDC_CONTEXTSWITCHCALLSTACKS, bCswitchStacks_);
-	CheckDlgButton(IDC_CPUSAMPLINGCALLSTACKS, bSampledStacks_);
-	CheckDlgButton(IDC_FASTSAMPLING, bFastSampling_);
-	CheckDlgButton(IDC_GPUTRACING, bGPUTracing_);
-	CheckDlgButton(IDC_SHOWCOMMANDS, bShowCommands_);
+	//void CheckDialogButtons( _In_ CUIforETWDlg* const dlgToCheck );
 
-	// If a fast sampling speed is requested then set it now. Note that
-	// this assumes that the speed will otherwise be normal.
+	CheckDialogButtons(
+						this,
+						bCompress_,
+						bCswitchStacks_,
+						bSampledStacks_,
+						bFastSampling_,
+						bGPUTracing_,
+						bShowCommands_
+					  );
+
+
+
+	// If a fast sampling speed is requested then set it now.
+	//**Note that this assumes that the speed will otherwise be normal**.
 	if (bFastSampling_)
 		SetSamplingSpeed();
 
-	btInputTracing_.AddString(L"Off");
-	btInputTracing_.AddString(L"Private");
-	btInputTracing_.AddString(L"Full");
-	btInputTracing_.SetCurSel(InputTracing_);
 
-	btTracingMode_.AddString(L"Circular buffer tracing");
-	btTracingMode_.AddString(L"Tracing to file");
-	btTracingMode_.AddString(L"Heap tracing to file");
-	btTracingMode_.SetCurSel(tracingMode_);
+	
+	const bool addInputTracingStringsResult = addbtInputTracingStrings( &btInputTracing_ );
+	if ( !addInputTracingStringsResult )
+	{
+		ATLTRACE2( atlTraceGeneral, 0, L"Failed to add strings to btInputTracing_!\r\n" );
+		exit(10);
+	}
+	
 
+
+	//btInputTracing_.SetCurSel(InputTracing_);
+
+	static_assert( std::is_convertible<decltype( InputTracing_ ), int>::value, "Bad argument to set CComboBox selection to (on next line)! We need to be able to convert to an int!" );
+	const bool setBtInputTracingSelectionResult = setCComboBoxSelection( &btInputTracing_, InputTracing_ );
+	if ( !setBtInputTracingSelectionResult )
+	{
+		ATLTRACE( atlTraceGeneral, 0, L"Failed to set btInputTracing_ selection to index: %i\r\n", InputTracing_ );
+		exit(10);
+
+	}
+
+	const bool addTracingModeStringsResult = addbtTracingModeStrings( &btTracingMode_ );
+	if ( !addTracingModeStringsResult )
+	{
+		ATLTRACE2( atlTraceGeneral, 0, L"Failed to add strings to btTracingMode_!\r\n" );
+		exit(10);
+	}
+
+	
+	
+	//btTracingMode_.SetCurSel(tracingMode_);
+	
+	static_assert( std::is_convertible<decltype( tracingMode_ ), int>::value, "Bad argument to set CComboBox selection to (on next line)! We need to be able to convert to an int!" );
+	const bool setBtTracingModeSelection = setCComboBoxSelection( &btTracingMode_, tracingMode_ );
+	if ( !setBtTracingModeSelection )
+	{
+		ATLTRACE2( atlTraceGeneral, 0, L"Failed to set btTracingMode_ selection to index: %i\r\n", tracingMode_ );
+		exit(10);
+	}
 	UpdateEnabling();
 	SmartEnableWindow(btTraceNotes_, false); // This window always starts out disabled.
 
@@ -370,49 +929,31 @@ BOOL CUIforETWDlg::OnInitDialog()
 
 	UpdateTraceList();
 
-	if (toolTip_.Create(this))
+	const BOOL toolTipCreateResult = toolTip_.Create( this );
+
+	if (toolTipCreateResult)
 	{
-		toolTip_.SetMaxTipWidth(400);
-		toolTip_.Activate(TRUE);
-
-		toolTip_.AddTool(&btStartTracing_, L"Start ETW tracing.");
-
-		toolTip_.AddTool(&btCompress_, L"Only uncheck this if you record traces on Windows 8 and above and want to analyze "
-					L"them on Windows 7 and below.\n"
-					L"Enable ETW trace compression. On Windows 8 and above this compresses traces "
-					L"as they are saved, making them 5-10x smaller. However compressed traces cannot be loaded on "
-					L"Windows 7 or earlier. On Windows 7 this setting has no effect.");
-		toolTip_.AddTool(&btCswitchStacks_, L"This enables recording of call stacks on context switches, from both "
-					L"the thread being switched in and the readying thread. This should only be disabled if the performance "
-					L"of functions like WaitForSingleObject and SetEvent appears to be distorted, which can happen when the "
-					L"context-switch rate is very high.");
-		toolTip_.AddTool(&btSampledStacks_, L"This enables recording of call stacks on CPU sampling events, which "
-					L"by default happen at 1 KHz. This should rarely be disabled.");
-		toolTip_.AddTool(&btFastSampling_, L"Checking this changes the CPU sampling frequency from the default of "
-					L"~1 KHz to the maximum speed of ~8 KHz. This increases the data rate and thus the size of traces "
-					L"but can make investigating brief CPU-bound performance problems (such as a single long frame) "
-					L"more practical.");
-		toolTip_.AddTool(&btGPUTracing_, L"Check this to allow seeing GPU usage "
-					L"in WPA, and more data in GPUView.");
-		toolTip_.AddTool(&btShowCommands_, L"This tells UIforETW to display the commands being "
-					L"executed. This can be helpful for diagnostic purposes but is not normally needed.");
-
-		const TCHAR* pInputTip = L"Input tracing inserts custom ETW events into traces which can be helpful when "
-					L"investigating performance problems that are correlated with user input. The default setting of "
-					L"'private' records alphabetic keys as 'A' and numeric keys as '0'. The 'full' setting records "
-					L"alphanumeric details. Both 'private' and 'full' record mouse movement and button clicks. The "
-					L"'off' setting records no input.";
-		toolTip_.AddTool(&btInputTracingLabel_, pInputTip);
-		toolTip_.AddTool(&btInputTracing_, pInputTip);
-
-		toolTip_.AddTool(&btTracingMode_, L"Select whether to trace straight to disk or to in-memory circular buffers.");
-
-		toolTip_.AddTool(&btTraces_, L"This is a list of all traces found in %etwtracedir%, which defaults to "
-					L"documents\\etwtraces.");
-		toolTip_.AddTool(&btTraceNotes_, L"Trace notes are intended for recording information about ETW traces, such "
-					L"as an analysis of what was discovered in the trace. Trace notes are auto-saved to a parallel text "
-					L"file - just type your analysis. The notes files will be renamed when you rename traces "
-					L"through the trace-list context menu.");
+		const bool initializeToolTipResult =
+			initializeToolTip(
+								&toolTip_,
+								&btStartTracing_,
+								&btCompress_,
+								&btCswitchStacks_,
+								&btSampledStacks_,
+								&btFastSampling_,
+								&btGPUTracing_,
+								&btShowCommands_,
+								&btInputTracingLabel_,
+								&btInputTracing_,
+								&btTracingMode_,
+								&btTraces_,
+								&btTraceNotes_
+							 );
+		if ( !initializeToolTipResult )
+		{
+			ATLTRACE2( atlTraceGeneral, 0, L"Failed to initialize tool tips!" );
+			exit(10);
+		}
 	}
 
 	SetHeapTracing(false);
