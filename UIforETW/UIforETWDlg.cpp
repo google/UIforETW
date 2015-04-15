@@ -92,9 +92,28 @@ _Null_terminated_ const wchar_t TracesString[ ] =
 
 _Null_terminated_ const wchar_t TraceNotesString[ ] =
 	L"Trace notes are intended for recording information about ETW traces, such "
-	L"as an analysis of what was discovered in the trace. Trace notes are auto-saved to a parallel text "
-	L"file - just type your analysis. The notes files will be renamed when you rename traces "
+	L"as an analysis of what was discovered in the trace. "
+	L"Trace notes are auto-saved to a parallel text "
+	L"file - just type your analysis. "
+	L"The notes files will be renamed when you rename traces "
 	L"through the trace-list context menu.";
+
+_Null_terminated_ const char NtSymbolEnvironmentVariableName[ ] =
+	"_NT_SYMBOL_PATH";
+
+_Null_terminated_ const char NtSymCacheEnvironmentVariableName[ ] =
+	"_NT_SYMCACHE_PATH";
+
+_Null_terminated_ const char DefaultSymbolPath[ ] =
+	"SRV*c:\\symbols*http://msdl.microsoft.com/download/symbols";
+
+_Null_terminated_ const char ChromiumSymbolPath[ ] =
+	"SRV*c:\\symbols*http://msdl.microsoft.com/download/symbols;"
+	"SRV*c:\\symbols*https://chromium-browser-symsrv.commondatastorage.googleapis.com";
+
+_Null_terminated_ const char DefaultSymbolCachePath[ ] =
+	"c:\\symcache";
+
 
 void handle_vprintfFailure( _In_ const HRESULT fmtResult, _In_ const rsize_t bufferCount )
 {
@@ -538,6 +557,58 @@ HACCEL loadAcceleratorsForActiveTraceList( _In_ const HINSTANCE instance )
 
 }
 
+std::string getChromiumSymbolPath( _In_ const bool bIsChromeDev )
+{
+	if ( bIsChromeDev )
+	{
+		return ChromiumSymbolPath;
+	}
+	return DefaultSymbolPath;
+}
+
+_Success_( return )
+bool setEnvironmentVariable( _In_z_ PCSTR const variableName, _In_z_ PCSTR const value )
+{
+	//If [SetEnvironmentVariableA] succeeds, the return value of [SetEnvironmentVariableA] is nonzero.
+	//If the [SetEnvironmentVariableA] fails, the return value of [SetEnvironmentVariableA] is zero.
+	//To get extended error information, call GetLastError.
+	const BOOL setSymbolPathResult = SetEnvironmentVariableA( variableName, value );
+
+	if ( setSymbolPathResult == 0 )
+	{
+		const DWORD err = GetLastError( );
+		ATLTRACE2( atlTraceGeneral, 0, L"Failed to set symbol path!\r\n\tAttempted to set environment variable: `%S`\r\n\tValue that we attempted to set the variable to: `%S`\r\n\tError code: %u\r\n", variableName, value, err );
+		return false;
+	}
+	return true;
+
+}
+
+_Success_( return )
+bool setChromiumSymbolPath( _In_ const bool bChromeDeveloper )
+{
+	const std::string symbolPath = getChromiumSymbolPath( bChromeDeveloper );
+
+	const bool setSymbolPathResult =
+		setEnvironmentVariable( 
+								NtSymbolEnvironmentVariableName,
+								symbolPath.c_str( )
+								);
+
+	if ( !setSymbolPathResult )
+	{
+		return false;
+	}
+
+	outputPrintf( L"Setting _NT_SYMBOL_PATH to %S (Microsoft%s). "
+					L"Set _NT_SYMBOL_PATH yourself or toggle"
+					L"'Chrome developer' if you want different defaults.\n",
+					symbolPath.c_str( ),
+					( bChromeDeveloper ? L" plus Chrome" : L"" )
+				);
+
+	return true;
+}
 
 }// namespace {
 
@@ -741,26 +812,50 @@ BEGIN_MESSAGE_MAP(CUIforETWDlg, CDialogEx)
 END_MESSAGE_MAP()
 
 
-void CUIforETWDlg::SetSymbolPath()
+_Success_( return )
+bool CUIforETWDlg::SetSymbolPath()
 {
 	// Make sure that the symbol paths are set.
+	// See:
+	//    "Changing Environment Variables"
+	//    https://msdn.microsoft.com/en-us/library/windows/desktop/ms682009.aspx
 
 #pragma warning(suppress : 4996)
-	if (bManageSymbolPath_ || !getenv("_NT_SYMBOL_PATH"))
+	if (bManageSymbolPath_ || !getenv(NtSymbolEnvironmentVariableName))
 	{
 		bManageSymbolPath_ = true;
-		std::string symbolPath = "SRV*c:\\symbols*http://msdl.microsoft.com/download/symbols";
-		if (bChromeDeveloper_)
-			symbolPath = "SRV*c:\\symbols*http://msdl.microsoft.com/download/symbols;SRV*c:\\symbols*https://chromium-browser-symsrv.commondatastorage.googleapis.com";
-		(void)_putenv(("_NT_SYMBOL_PATH=" + symbolPath).c_str());
-		outputPrintf(L"Setting _NT_SYMBOL_PATH to %s (Microsoft%s). "
-			L"Set _NT_SYMBOL_PATH yourself or toggle 'Chrome developer' if you want different defaults.\n",
-			AnsiToUnicode(symbolPath).c_str(), bChromeDeveloper_ ? L" plus Chrome" : L"");
+		const bool setChromiumSymbolPathResult = setChromiumSymbolPath( bChromeDeveloper_ );
+		if ( !setChromiumSymbolPathResult )
+		{
+			return false;
+		}
 	}
-#pragma warning(suppress : 4996)
-	const char* symCachePath = getenv("_NT_SYMCACHE_PATH");
-	if (!symCachePath)
-		(void)_putenv("_NT_SYMCACHE_PATH=c:\\symcache");
+	
+	size_t sizeRequired = 0;
+	//pReturnValue (first parameter)
+	//The buffer size that's required, or 0 if the variable is not found.
+	//[getenv_s returns] zero if successful; otherwise, an error code on failure.
+	//What the hell does a "not found" look like?
+	const errno_t getSymCachePathResult = getenv_s( &sizeRequired, NULL, 0, NtSymCacheEnvironmentVariableName );
+	
+	//TODO: does this make any goddamned sense?
+	if ( getSymCachePathResult != 0 )
+	{
+		return false;
+	}
+
+	if ( sizeRequired != 0 )
+	{
+		ATLTRACE2( atlTraceGeneral, 1, L"_NT_SYMCACHE_PATH was found! No work necessary!\r\n" );
+		return true;
+	}
+
+	const bool SetSymbolCachePathresult = setEnvironmentVariable( NtSymCacheEnvironmentVariableName, DefaultSymbolCachePath );
+	if ( !SetSymbolCachePathresult )
+	{
+		return false;
+	}
+	return true;
 }
 
 
@@ -784,6 +879,8 @@ BOOL CUIforETWDlg::OnInitDialog()
 	lastHeight_ = windowRect.Height( );
 	
 	// 0x41 is 'C', compatible with wprui
+	//const DWORD c = 'C';
+	//static_assert( 'C' == 0x41, "" );
 	if (!RegisterHotKey(m_hWnd, kRecordTraceHotKey, MOD_WIN + MOD_CONTROL, 0x43))
 	{
 		AfxMessageBox(L"Couldn't register hot key.");
@@ -815,7 +912,6 @@ BOOL CUIforETWDlg::OnInitDialog()
 	_Null_terminated_ wchar_t documents_temp[ MAX_PATH ] = { 0 };
 
 	//We want to CREATE IT if it doesn't exist??!?
-	//SHGetSpecialFolder path is NOT supported!
 	const HRESULT shGetMyDocResult = SHGetFolderPath( 0, CSIDL_MYDOCUMENTS, NULL, SHGFP_TYPE_CURRENT, documents_temp );
 	ASSERT( SUCCEEDED( shGetMyDocResult ) );
 
@@ -852,15 +948,11 @@ BOOL CUIforETWDlg::OnInitDialog()
 	SetIcon(m_hIcon, TRUE);			// Set big icon
 	SetIcon(m_hIcon, FALSE);		// Set small icon
 
-
-	//WindowsVersion winver = GetWindowsVersion();
 	if ( IsWindows8OrGreater( ) )
 	{
 		bCompress_ = false; // ETW trace compression requires Windows 8.0
 		SmartEnableWindow(btCompress_, false);
 	}
-
-	//void CheckDialogButtons( _In_ CUIforETWDlg* const dlgToCheck );
 
 	CheckDialogButtons(
 						this,
@@ -888,9 +980,6 @@ BOOL CUIforETWDlg::OnInitDialog()
 		exit(10);
 	}
 	
-
-
-	//btInputTracing_.SetCurSel(InputTracing_);
 
 	static_assert( std::is_convertible<decltype( InputTracing_ ), int>::value, "Bad argument to set CComboBox selection to (on next line)! We need to be able to convert to an int!" );
 	const bool setBtInputTracingSelectionResult = setCComboBoxSelection( &btInputTracing_, InputTracing_ );
