@@ -2140,129 +2140,230 @@ void CUIforETWDlg::StripChromeSymbols(const std::wstring& traceFilename)
 }
 
 
+//This is a mess!
 void CUIforETWDlg::PreprocessTrace(const std::wstring& traceFilename)
 {
-	if (bChromeDeveloper_)
+	if ( !bChromeDeveloper_ )
 	{
-		outputPrintf(L"Preprocessing trace to identify Chrome processes...\n");
-#ifdef IDENTIFY_CHROME_PROCESSES_IN_PYTHON
-		std::wstring pythonPath = FindPython();
-		if (!pythonPath.empty())
-		{
-			outputPrintf(L"Preprocessing Chrome trace...\n");
-			ChildProcess child(pythonPath);
-			std::wstring args = L" -u \"" + GetExeDir() + L"IdentifyChromeProcesses.py\" \"" + traceFilename + L"\"";
-			child.Run(bShowCommands_, L"python.exe" + args);
-			std::wstring output = child.GetOutput();
-			// The output of the script is written to the trace description file.
-			// Ideally it would be appended, but good enough for now.
-			std::wstring textFilename = traceFilename.substr(0, traceFilename.size() - 4) + L".txt";
-			WriteTextAsFile(textFilename, output);
-		}
-#else
-		ChildProcess child(GetXperfPath());
-		// Typical output of the process action looks like this (large parts
-		// elided):
-		// ... chrome.exe (3456), ... \chrome.exe" --type=renderer ...
-		std::wstring args = L" -i \"" + traceFilename + L"\" -tle -tti -a process -withcmdline";
-		child.Run(bShowCommands_, L"xperf.exe" + args);
-		std::wstring output = child.GetOutput();
-		std::map<std::wstring, std::vector<DWORD>> pidsByType;
-		for (auto& line : split(output, '\n'))
-		{
-			if (wcsstr(line.c_str(), L"chrome.exe"))
-			{
-				std::wstring type = L"browser";
-				const wchar_t* typeLabel = L" --type=";
-				const wchar_t* typeFound = wcsstr(line.c_str(), typeLabel);
-				if (typeFound)
-				{
-					typeFound += wcslen(typeLabel);
-					const wchar_t* typeEnd = wcschr(typeFound, ' ');
-					if (typeEnd)
-					{
-						type = std::wstring(typeFound).substr(0, typeEnd - typeFound);
-					}
-				}
-				DWORD pid = 0;
-				const wchar_t* pidstr = wcschr(line.c_str(), '(');
-				if (pidstr)
-				{
-					swscanf_s(pidstr + 1, L"%lu", &pid);
-				}
-				if (pid)
-				{
-					pidsByType[type].push_back(pid);
-				}
-			}
-		}
-#pragma warning(suppress : 4996)
-		FILE* pFile = _wfopen((traceFilename.substr(0, traceFilename.size() - 4) + L".txt").c_str(), L"a");
-		if (pFile)
-		{
-			fwprintf(pFile, L"Chrome PIDs by process type:\n");
-			for (auto& types : pidsByType)
-			{
-				fwprintf(pFile, L"%-10s:", types.first.c_str());
-				for (auto& pid : types.second)
-				{
-					fwprintf(pFile, L" %lu", pid);
-				}
-				fwprintf(pFile, L"\n");
-			}
-			fclose(pFile);
-		}
-#endif
+		return;
 	}
+
+	outputPrintf(L"Preprocessing trace to identify Chrome processes...\n");
+#ifdef IDENTIFY_CHROME_PROCESSES_IN_PYTHON
+	std::wstring pythonPath = FindPython();
+	if (!pythonPath.empty())
+	{
+		outputPrintf(L"Preprocessing Chrome trace...\n");
+		ChildProcess child(pythonPath);
+		std::wstring args = L" -u \"" + GetExeDir() + L"IdentifyChromeProcesses.py\" \"" + traceFilename + L"\"";
+		child.Run(bShowCommands_, L"python.exe" + args);
+		std::wstring output = child.GetOutput();
+		// The output of the script is written to the trace description file.
+		// Ideally it would be appended, but good enough for now.
+		std::wstring textFilename = traceFilename.substr(0, traceFilename.size() - 4) + L".txt";
+		WriteTextAsFile(textFilename, output);
+	}
+#else
+	ChildProcess child(GetXperfPath());
+	// Typical output of the process action looks like this (large parts
+	// elided):
+	// ... chrome.exe (3456), ... \chrome.exe" --type=renderer ...
+	std::wstring args = L" -i \"" + traceFilename + L"\" -tle -tti -a process -withcmdline";
+	child.Run(bShowCommands_, L"xperf.exe" + args);
+	std::wstring output = child.GetOutput();
+	std::map<std::wstring, std::vector<DWORD>> pidsByType;
+	for (auto& line : split(output, '\n'))
+	{
+		if (wcsstr(line.c_str(), L"chrome.exe"))
+		{
+			std::wstring type = L"browser";
+			PCWSTR const typeLabel = L" --type=";
+			PCWSTR typeFound = wcsstr(line.c_str(), typeLabel);
+			if (typeFound)
+			{
+				typeFound += wcslen(typeLabel);
+				const wchar_t* typeEnd = wcschr(typeFound, ' ');
+				if (typeEnd)
+				{
+					type = std::wstring(typeFound).substr(0, typeEnd - typeFound);
+				}
+			}
+			DWORD pid = 0;
+			PCWSTR const pidstr = wcschr(line.c_str(), '(');
+			if (pidstr)
+			{
+				const int scanToStringResult = swscanf_s(pidstr + 1, L"%lu", &pid);
+				if ( scanToStringResult == 0 )
+				{
+					ATLTRACE2( atlTraceGeneral, 0, L"No fields assigned from pidstr+1 (%s)!!\r\n", ( pidstr+1 ) );
+					//0 is an invalid process ID!
+					//http://blogs.msdn.com/b/oldnewthing/archive/2004/02/23/78395.aspx
+					pidsByType[type].push_back( 0 );
+					continue;
+				}
+				if ( scanToStringResult == EOF )
+				{
+					ATLTRACE2( atlTraceGeneral, 0, L"EOF hit before assigning fields from pidstr+1 (%s)!!\r\n", ( pidstr+1 ) );
+					//0 is an invalid process ID!
+					//http://blogs.msdn.com/b/oldnewthing/archive/2004/02/23/78395.aspx
+					pidsByType[type].push_back( 0 );
+					continue;
+				}
+				static_assert( EOF == -1, "swscanf_s might return a value that's not handled!" );
+			}
+			if (pid)
+			{
+				pidsByType[type].push_back(pid);
+			}
+		}
+	}
+	//Maybe we should request the unicode version of the APIs (for long path support)?
+	const std::wstring fileToOpen = ( traceFilename.substr( 0, traceFilename.size( ) - 4 ) + L".txt" );
+
+#pragma warning(suppress : 4996)
+	//FILE* pFile = _wfopen(fileToOpen.c_str(), L"a");
+	FILE* pFile = NULL;
+
+	//[_wfopen_s returns] zero if successful; an error code on failure.
+	const errno_t fileOpenResult = _wfopen_s( &pFile, fileToOpen.c_str( ), L"a" );
+	if ( fileOpenResult != 0 )
+	{
+		//const std::string err_str( std::to_string( fileToOpen ) );//Grr. Need a proper way to convert!
+		throw std::runtime_error( "Failed to open a file for preprocessing!" );
+	}
+
+	const int PIDsByProcessTypeResult = fwprintf_s(pFile, L"Chrome PIDs by process type:\n");
+	if ( PIDsByProcessTypeResult < 0 )
+	{
+		const int closeResult = fclose( pFile );
+		if ( closeResult != 0 )
+		{
+			ATLTRACE( atlTraceGeneral, 0, L"DOUBLE FAULT: serious error occurred! Failed to write to file, then failed to close it!\r\n" );
+			std::terminate( );
+		}
+		throw std::runtime_error( "Failed to write 'PIDs by process type' to file!" );
+	}
+	for (auto& types : pidsByType)
+	{
+		const int firstTypesResult = fwprintf_s(pFile, L"%-10s:", types.first.c_str());
+		if ( firstTypesResult < 0 )
+		{
+			const int closeResult = fclose( pFile );
+			if ( closeResult != 0 )
+			{
+				ATLTRACE( atlTraceGeneral, 0, L"DOUBLE FAULT: serious error occurred! Failed to write to file, then failed to close it!\r\n" );
+				std::terminate( );
+			}
+			throw std::runtime_error( "Failed to write types.first to file!" );
+		}
+
+		for (auto& pid : types.second)
+		{
+			const int secondTypesResult = fwprintf_s(pFile, L" %lu", pid);
+			if ( secondTypesResult < 0 )
+			{
+				const int closeResult = fclose( pFile );
+				if ( closeResult != 0 )
+				{
+					ATLTRACE( atlTraceGeneral, 0, L"DOUBLE FAULT: serious error occurred! Failed to write to file, then failed to close it!\r\n" );
+					std::terminate( );
+				}
+				throw std::runtime_error( "Failed to write types.second.pid to file!" );
+			}
+		}
+
+		const int endOfFileNewLineResult = fwprintf_s(pFile, L"\n");
+		if ( endOfFileNewLineResult < 0 )
+		{
+			const int closeResult = fclose( pFile );
+			if ( closeResult != 0 )
+			{
+				ATLTRACE( atlTraceGeneral, 0, L"DOUBLE FAULT: serious error occurred! Failed to write to file, then failed to close it!\r\n" );
+				std::terminate( );
+			}
+			throw std::runtime_error( "Failed to new line to end of file!" );
+		}
+	}
+	const int fcloseResultFinal = fclose(pFile);
+	if ( fcloseResultFinal != 0 )
+	{
+		throw std::runtime_error( "Failed to close file, after successfully writing to it!" );
+	}
+
+#endif
+
 }
 
 
 void CUIforETWDlg::StartRenameTrace(bool fullRename)
 {
 	SaveNotesIfNeeded();
-	int curSel = btTraces_.GetCurSel();
-	if (curSel >= 0 && curSel < (int)traces_.size())
+	const int curSel = btTraces_.GetCurSel();
+
+	ASSERT( traces_.size( ) < INT_MAX );
+	if ( curSel < 0 )
 	{
-		std::wstring traceName = traces_[curSel];
-		// If the trace name starts with the default date/time pattern
-		// then just allow editing the suffix. Othewise allow editing
-		// the entire name.
-		validRenameDate_ = false;
-		if (traceName.size() >= kPrefixLength && !fullRename)
+		return;
+	}
+
+	if ( curSel >= static_cast< int >( traces_.size( ) ) )
+	{
+		return;
+	}
+
+	std::wstring traceName = traces_[curSel];
+
+	// If the trace name starts with the default date/time pattern
+	// then just allow editing the suffix. Othewise allow editing
+	// the entire name.
+	validRenameDate_ = false;
+	if (traceName.size() >= kPrefixLength && !fullRename)
+	{
+		validRenameDate_ = true;
+		for (size_t i = 0; i < kPrefixLength; ++i)
 		{
-			validRenameDate_ = true;
-			for (size_t i = 0; i < kPrefixLength; ++i)
+			wchar_t c = traceName[i];
+			if ( ( c != '-' ) && ( c != '_' ) && ( c != '.' ) && ( !iswdigit( c ) ) )
 			{
-				wchar_t c = traceName[i];
-				if (c != '-' && c != '_' && c != '.' && !iswdigit(c))
-					validRenameDate_ = false;
+				validRenameDate_ = false;
 			}
 		}
-		std::wstring editablePart = traceName;
-		if (validRenameDate_)
-		{
-			editablePart = traceName.substr(kPrefixLength, traceName.size());
-		}
-		// This gets the location of the selected item relative to the
-		// list box.
-		CRect itemRect;
-		btTraces_.GetItemRect(curSel, &itemRect);
-		CRect newEditRect = traceNameEditRect_;
-		newEditRect.MoveToY(traceNameEditRect_.top + itemRect.top);
-		if (!validRenameDate_)
-		{
-			// Extend the edit box to the full list box width.
-			CRect listBoxRect;
-			btTraces_.GetWindowRect(&listBoxRect);
-			ScreenToClient(&listBoxRect);
-			newEditRect.left = listBoxRect.left;
-		}
-		btTraceNameEdit_.MoveWindow(newEditRect, TRUE);
-		btTraceNameEdit_.ShowWindow(SW_SHOWNORMAL);
-		btTraceNameEdit_.SetFocus();
-		btTraceNameEdit_.SetWindowTextW(editablePart.c_str());
-		preRenameTraceName_ = traceName;
 	}
+	
+	std::wstring editablePart = traceName;
+	if (validRenameDate_)
+	{
+		editablePart = traceName.substr(kPrefixLength, traceName.size());
+	}
+	// This gets the location of the selected item relative to the
+	// list box.
+	CRect itemRect;
+
+
+	//[CListBox::GetItemRect returns] LB_ERR if an error occurs.
+	const int getRectResult = btTraces_.GetItemRect(curSel, &itemRect);
+	if ( getRectResult == LB_ERR )
+	{
+		//Yeah, we should probably unwind here.
+		throw std::runtime_error( "CUIforETWDlg::StartRenameTrace - Unexpected error in btTraces_.GetItemRect!" );
+	}
+
+	CRect newEditRect = traceNameEditRect_;
+	newEditRect.MoveToY(traceNameEditRect_.top + itemRect.top);
+	if (!validRenameDate_)
+	{
+		// Extend the edit box to the full list box width.
+		CRect listBoxRect;
+		btTraces_.GetWindowRect(&listBoxRect);
+		ScreenToClient(&listBoxRect);
+		newEditRect.left = listBoxRect.left;
+	}
+	btTraceNameEdit_.MoveWindow(newEditRect, TRUE);
+	btTraceNameEdit_.ShowWindow(SW_SHOWNORMAL);
+	btTraceNameEdit_.SetFocus();
+	btTraceNameEdit_.SetWindowTextW(editablePart.c_str());
+	preRenameTraceName_ = traceName;
+
 }
 
 void CUIforETWDlg::OnRenameKey()
@@ -2285,28 +2386,33 @@ void CUIforETWDlg::FinishTraceRename()
 	// Make sure this doesn't get double-called.
 	if (!btTraceNameEdit_.IsWindowVisible())
 		return;
+
 	std::wstring newText = GetEditControlText(btTraceNameEdit_);
 	std::wstring newTraceName = newText;
+	
 	if (validRenameDate_)
 		newTraceName = preRenameTraceName_.substr(0, kPrefixLength) + newText;
+	
 	btTraceNameEdit_.ShowWindow(SW_HIDE);
 
 	if (newTraceName != preRenameTraceName_)
 	{
 		auto oldNames = GetFileList(GetTraceDir() + preRenameTraceName_ + L".*");
 		std::vector<std::pair<std::wstring, std::wstring>> renamed;
+		renamed.reserve( oldNames.size( ) );
+
 		std::wstring failedSource;
-		for (auto oldName : oldNames)
+		for (const auto& oldName : oldNames)
 		{
 			std::wstring extension = GetFileExt(oldName);;
 			std::wstring newName = newTraceName + extension;
-			BOOL result = MoveFile((GetTraceDir() + oldName).c_str(), (GetTraceDir() + newName).c_str());
+			const BOOL result = MoveFile((GetTraceDir() + oldName).c_str(), (GetTraceDir() + newName).c_str());
 			if (!result)
 			{
 				failedSource = oldName;
 				break;
 			}
-			renamed.push_back(std::pair<std::wstring, std::wstring>(oldName, newName));
+			renamed.emplace_back(std::make_pair(oldName, newName));
 		}
 		// If any of the renaming steps fail then undo the renames that
 		// succeeded. This should usually fail. If not, there isn't much that
@@ -2320,7 +2426,7 @@ void CUIforETWDlg::FinishTraceRename()
 		}
 		else
 		{
-			for (auto& renamePair : renamed)
+			for (const auto& renamePair : renamed)
 			{
 				(void)MoveFile((GetTraceDir() + renamePair.second).c_str(), (GetTraceDir() + renamePair.first).c_str());
 			}
