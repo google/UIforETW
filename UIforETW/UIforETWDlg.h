@@ -32,13 +32,13 @@ enum TracingMode
 class CUIforETWDlg : public CDialogEx
 {
 public:
-	CUIforETWDlg(CWnd* pParent = NULL);	// standard constructor
+	CUIforETWDlg(_In_opt_ CWnd* pParent = NULL);	// standard constructor
 	~CUIforETWDlg();
 
 // Dialog Data
 	enum { IDD = IDD_UIFORETW_DIALOG };
 
-	void vprintf(const wchar_t* pFormat, va_list marker);
+	void vprintf(PCWSTR pFormat, va_list marker);
 
 private:
 	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV support
