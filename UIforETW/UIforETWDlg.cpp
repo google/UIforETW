@@ -786,6 +786,8 @@ void CUIforETWDlg::StopTracingAndMaybeRecord(bool bSaveTrace)
 	const std::wstring compatFileTemp = windowsDir_ + L"AppCompat\\Programs\\Amcache_temp.hve";
 	// Delete any previously existing Amcache_temp.hve file that might have
 	// been left behind by a previous failed tracing attempt.
+	// Note that this has to be done before the -flush step -- it makes both it
+	// and the -merge step painfully slow.
 	DeleteFile(compatFileTemp.c_str());
 	BOOL moveSuccess = MoveFile(compatFile.c_str(), compatFileTemp.c_str());
 	if (bShowCommands_ && !moveSuccess)
@@ -873,10 +875,20 @@ void CUIforETWDlg::StopTracingAndMaybeRecord(bool bSaveTrace)
 		if (mergeTime > 100.0)
 		{
 			// See the Amcache.hve comments above for details or to instrument.
-			outputPrintf(L"Merging the trace took %1.1fs, which is unusually long. This may "
-				L"mean that renaming of amcache.hve failed. Please try metatrace.bat "
-				L"and share this on "
-				L"https://groups.google.com/forum/#!forum/uiforetw\n", mergeTime);
+			if (moveSuccess)
+			{
+				outputPrintf(L"Merging the trace took %1.1fs, which is unusually long. This is surprising "
+					L"because renaming of amcache.hve to avoid this worked. Please try metatrace.bat "
+					L"and share this on "
+					L"https://groups.google.com/forum/#!forum/uiforetw\n", mergeTime);
+			}
+			else
+			{
+				outputPrintf(L"Merging the trace took %1.1fs, which is unusually long. This is probably "
+					L"be because renaming of amcache.hve failed. Please try metatrace.bat "
+					L"and share this on "
+					L"https://groups.google.com/forum/#!forum/uiforetw\n", mergeTime);
+			}
 		}
 
 		outputPrintf(L"Finished recording trace.\n");

@@ -111,4 +111,3 @@ Unimportant:
 Allow configuring which symbols should be stripped.
 Configure a maximum time to trace for to avoid infinitely long traces that fill the hard drive.
 CPU frequency monitoring to look for thermal throttling.
-Shorten scope of amcache.hve renaming.
