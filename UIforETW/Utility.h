@@ -20,6 +20,61 @@ limitations under the License.
 #include <string>
 #include <chrono>
 
+
+//Annotation macro that describes the behavior of a buffer-writing function
+//e.g.: 
+//CStyle_GetLastErrorAsFormattedMessage(
+//										ETWUI_WRITES_TO_STACK( strSize, chars_written ) 
+//										PWSTR psz_formatted_error,
+//										_In_range_( 128, 32767 ) const rsize_t strSize, 
+//										_Out_ rsize_t& chars_written, 
+//										const DWORD error 
+//									   )
+//It's kinda ugly, sorry, but it works well.
+#define ETWUI_WRITES_TO_STACK( strSize, chars_written ) \
+								_Out_writes_z_( strSize ) \
+								_Pre_writable_size_( strSize ) \
+								_Post_readable_size_( chars_written ) \
+								_Pre_satisfies_( strSize >= chars_written ) \
+								_Post_satisfies_( _Old_( chars_written ) <= chars_written )
+
+namespace ErrorHandling {
+void DisplayWindowsMessageBoxWithErrorMessage( const DWORD error );
+
+//On returning E_FAIL, call GetLastError for details. That's not my idea!
+_Success_( SUCCEEDED( return ) )
+HRESULT 
+GetLastErrorAsFormattedMessage( 
+								ETWUI_WRITES_TO_STACK( strSize, chars_written )
+									PWSTR psz_formatted_error,
+								_In_range_( 128, 32767 )
+									const rsize_t strSize,
+								_Out_
+									rsize_t* const chars_written,
+								const DWORD error = GetLastError( )
+							  );
+
+
+//On returning E_FAIL, call GetLastError for details. That's not my idea!
+template<rsize_t strSize>
+_Success_( SUCCEEDED( return ) )
+HRESULT 
+GetLastErrorAsFormattedMessage( 
+								ETWUI_WRITES_TO_STACK( strSize, chars_written )
+									wchar_t (&psz_formatted_error)[strSize],
+								_Out_
+									rsize_t* const chars_written,
+								const DWORD error = GetLastError( )
+							  )
+{
+	static_assert( 128 <= strSize <= 32767, "Unsupported range!" );
+	return GetLastErrorAsFormattedMessage( psz_formatted_error, strSize, error );
+}
+
+}
+
+
+
 std::vector<std::wstring> split(const std::wstring& s, char c);
 // If fullPaths == true then the names returned will be full Paths to the files. Otherwise
 // they will just be the file portions.

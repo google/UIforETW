@@ -64,7 +64,7 @@ void outputPrintf(_Printf_format_string_ PCWSTR pFormat, ...);
 #include <inttypes.h>
 
 #include <Strsafe.h>
-
+#include <ciso646>
 #include <VersionHelpers.h>
 
 // Using #define NOMINMAX would be nice but gdiplustypes.h *depends*

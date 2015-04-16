@@ -18,6 +18,111 @@ limitations under the License.
 #include "Utility.h"
 #include <fstream>
 
+namespace {
+
+void write_BAD_FMT(
+					_Out_writes_z_( 8 )
+					_Pre_writable_size_( 8 )
+					_Post_readable_size_( 8 )
+						PWSTR pszFMT,
+					_Out_
+						rsize_t* const chars_written
+				  )
+{
+	pszFMT[ 0 ] = 'B';
+	pszFMT[ 1 ] = 'A';
+	pszFMT[ 2 ] = 'D';
+	pszFMT[ 3 ] = '_';
+	pszFMT[ 4 ] = 'F';
+	pszFMT[ 5 ] = 'M';
+	pszFMT[ 6 ] = 'T';
+	pszFMT[ 7 ] = 0;
+	(*chars_written) = 8;
+}
+
+}
+
+
+
+namespace ErrorHandling {
+void DisplayWindowsMessageBoxWithErrorMessage( const DWORD error )
+{
+	const rsize_t errorMessageBufferSize = 512u;
+	wchar_t errorMessageBuffer[ errorMessageBufferSize ] = { 0 };
+	const DWORD error = GetLastError( );
+	rsize_t readable_chars = 0;
+	const HRESULT errorMessageFormatBuffer = GetLastErrorAsFormattedMessage( errorMessageBuffer, &readable_chars, error );
+	if ( FAILED( errorMessageFormatBuffer ) )
+	{
+		const int messageBoxResult = ::MessageBoxW( NULL, L"DOUBLE FAULT! We tried to display an error message, but failed to format it correctly!", L"UIforETW FATAL ERROR!", ( MB_OK bitor MB_ICONERROR ) );
+		if ( messageBoxResult == 0 )
+		{
+			OutputDebugStringA( "UIforETW triple faulted in DisplayWindowsMessageBoxWithErrorMessage. We have no choice but to crash & burn.\r\n" );
+			std::terminate( );
+		}
+		return;
+	}
+	const int messageBoxResult = ::MessageBoxW( NULL, errorMessageBuffer, L"UIforETW", ( MB_OK bitor MB_ICONERROR ) );
+	if ( messageBoxResult == 0 )
+	{
+		OutputDebugStringA( "UIforETW sucessfully formatted an error message, but failed to display it in a message box. There's nothing we can do, except crash & burn\r\n" );
+		std::terminate( );
+	}
+}
+
+
+//Sorry, this is ugly, but that's the 80-column limit in action.
+static_assert( !SUCCEEDED( E_FAIL ), 
+			   "CStyle_GetLastErrorAsFormattedMessage doesn't return a valid error code!" );
+static_assert( SUCCEEDED( S_OK ), 
+			   "CStyle_GetLastErrorAsFormattedMessage doesn't return a valid success code!" );
+_Success_( SUCCEEDED( return ) )
+HRESULT 
+GetLastErrorAsFormattedMessage( 
+								ETWUI_WRITES_TO_STACK( strSize, chars_written )
+									PWSTR psz_formatted_error,
+								_In_range_( 128, 32767 )
+									const rsize_t strSize,
+								_Out_
+									rsize_t* const chars_written,
+									const DWORD error = GetLastError( )
+							  )
+{
+	const DWORD ret = FormatMessageW( 
+										( FORMAT_MESSAGE_FROM_SYSTEM bitor FORMAT_MESSAGE_IGNORE_INSERTS ), 
+										NULL, 
+										error, 
+										MAKELANGID( LANG_NEUTRAL, SUBLANG_DEFAULT ), 
+										psz_formatted_error, 
+										static_cast<DWORD>( strSize ), 
+										NULL 
+									);
+	if ( ret != 0 )
+	{
+		(*chars_written) = ret;
+		return S_OK;
+	}
+	const DWORD error_err = GetLastError( );
+	ATLTRACE2( atlTraceGeneral, 0, L"FormatMessageW failed with error code: `%lu`!!\r\n", error_err );
+	
+	const rsize_t err_msg_buff_size = 128;
+	_Null_terminated_ char err_msg_buff[ err_msg_buff_size ] = { 0 };
+	const HRESULT output_error_message_format_result = StringCchPrintfA( err_msg_buff, err_msg_buff_size, "UIforETW: FormatMessageW failed with error code: `%lu`!!\r\n", error_err );
+	if ( SUCCEEDED( output_error_message_format_result ) )
+	{
+		OutputDebugStringA( err_msg_buff );
+	}
+	if ( strSize > 8 )
+	{
+		write_BAD_FMT( psz_formatted_error, chars_written );
+		return E_FAIL;
+	}
+	chars_written = 0;
+	return E_FAIL;
+}
+}
+
+
 std::vector<std::wstring> split(const std::wstring& s, char c)
 {
 	std::wstring::size_type i = 0;
