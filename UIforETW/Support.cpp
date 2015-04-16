@@ -75,7 +75,7 @@ void CUIforETWDlg::TransferSettings(bool saving)
 		// Note that a setting of kKeyLoggerFull cannot be restored from
 		// settings, to avoid privacy problems.
 		{ L"InputTracing", (int*)&InputTracing_, kKeyLoggerOff, kKeyLoggerAnonymized },
-		{ L"TracingMode", (int*)&tracingMode_, kTracingToFile, kHeapTracingToFile },
+		{ L"TracingMode", (int*)&tracingMode_, kTracingToMemory, kHeapTracingToFile },
 	};
 
 	for (auto& m : ints)
