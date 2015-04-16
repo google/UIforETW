@@ -610,6 +610,84 @@ bool setChromiumSymbolPath( _In_ const bool bChromeDeveloper )
 	return true;
 }
 
+std::wstring getRawDirectoryFromEnvironmentVariable( _In_z_ PCWSTR env )
+{
+	rsize_t returnValue = 0;
+	const errno_t getEnvironmentVariableLengthResult = _wgetenv_s( &returnValue, NULL, 0, env );
+	if ( getEnvironmentVariableLengthResult != 0 )
+	{
+		//Failure!
+#ifndef DEBUG
+#error fix this!
+#endif
+	}
+	if ( returnValue == 0 )
+	{
+		//Not found!
+		return L"";
+	}
+
+	// Get a directory (from an environment variable, if set) and make sure it exists.
+	//std::wstring result = default;
+	const rsize_t bufferSize = 512u;
+	
+	
+	if ( ( returnValue + 1 ) > bufferSize )
+	{
+		std::unique_ptr<wchar_t[ ]> dynamicBuffer = std::make_unique<wchar_t[ ]>( returnValue + 1 );
+		const errno_t getEnvResult = _wgetenv_s( &returnValue, dynamicBuffer.get( ), ( returnValue + 1 ), env );
+		if ( getEnvResult != 0 )
+		{
+			//Failure!
+#ifndef DEBUG
+#error fix this!
+#endif
+		}
+		return dynamicBuffer.get( );
+	}
+
+	wchar_t environmentVariableBuffer[ bufferSize ] = { 0 };
+	const errno_t getEnvResult = _wgetenv_s( &returnValue, environmentVariableBuffer, env );
+	if ( getEnvResult != 0 )
+	{
+		//Failure!
+#ifndef DEBUG
+#error fix this!
+#endif
+	}
+	return environmentVariableBuffer;
+}
+
+std::wstring getTraceDirFromEnvironmentVariable( _In_z_ PCWSTR env, const std::wstring& default )
+{
+	
+	std::wstring rawDirectory = getRawDirectoryFromEnvironmentVariable( env );
+
+	std::wstring result = default;
+
+	if (!rawDirectory.empty( ) )
+	{
+		result = rawDirectory;
+	}
+
+	// Make sure the name ends with a backslash.
+	if ( ( !result.empty( ) ) && ( result[ result.size( ) - 1 ] != '\\' ) )
+	{
+		result += '\\';
+	}
+	return result;
+
+}
+
+bool isValidPathToFSObject( std::wstring path )
+{
+	if ( path.size( ) < MAX_PATH )
+	{
+
+	}
+}
+
+
 }// namespace {
 
 
@@ -629,9 +707,6 @@ void CUIforETWDlg::vprintf(PCWSTR pFormat, va_list args)
 	const rsize_t bufferCount = 5000u;
 	
 	wchar_t buffer[ bufferCount ];
-
-
-	//_vsnwprintf_s(buffer, _TRUNCATE, pFormat, args);
 
 	const HRESULT printFormattedArgsToBuffer = StringCchVPrintfW( buffer, bufferCount, pFormat, args );
 	ASSERT( SUCCEEDED( printFormattedArgsToBuffer ) );
@@ -660,8 +735,6 @@ void CUIforETWDlg::vprintf(PCWSTR pFormat, va_list args)
 		}
 	}
 
-	//const BOOL setDlgTextResult = SetDlgItemText(IDC_OUTPUT, output_.c_str());
-
 	//This is why I hate MFC, they've overloaded a function with a macro-defined name!
 	//And CWnd::SetDlgItemText doesn't even check the return value of SetDlgItemText
 	SetDlgItemText(IDC_OUTPUT, output_.c_str());
@@ -682,7 +755,7 @@ void CUIforETWDlg::vprintf(PCWSTR pFormat, va_list args)
 }
 
 
-CUIforETWDlg::CUIforETWDlg(_In_opt_ CWnd* pParent /*=NULL*/)
+CUIforETWDlg::CUIforETWDlg(_In_opt_ CWnd* pParent )
 	: CDialogEx(CUIforETWDlg::IDD, pParent)
 	, monitorThread_(this)
 {
@@ -841,6 +914,7 @@ bool CUIforETWDlg::SetSymbolPath()
 	//TODO: does this make any goddamned sense?
 	if ( getSymCachePathResult != 0 )
 	{
+		//getenv_s failed!
 		return false;
 	}
 
@@ -862,6 +936,8 @@ bool CUIforETWDlg::SetSymbolPath()
 BOOL CUIforETWDlg::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
+
+	ATLTRACE2( atlTraceGeneral, 0, L"Initializing dialog box!\r\n" );
 
 	const HINSTANCE instanceHandle = AfxGetInstanceHandle( );
 
@@ -1052,24 +1128,26 @@ BOOL CUIforETWDlg::OnInitDialog()
 	return TRUE; // return TRUE unless you set the focus to a control
 }
 
-std::wstring CUIforETWDlg::GetDirectory(const wchar_t* env, const std::wstring& default)
+std::wstring CUIforETWDlg::GetDirectory( _In_z_ PCWSTR env, const std::wstring& default)
 {
 	// Get a directory (from an environment variable, if set) and make sure it exists.
-	std::wstring result = default;
-#pragma warning(suppress : 4996)
-	const wchar_t* traceDir = _wgetenv(env);
-	if (traceDir)
-	{
-		result = traceDir;
-	}
-	// Make sure the name ends with a backslash.
-	if (!result.empty() && result[result.size() - 1] != '\\')
-		result += '\\';
-	if (!PathFileExists(result.c_str()))
+
+	std::wstring result = getTraceDirFromEnvironmentVariable( env, default );
+
+	//This is a very bad way of doing things!
+	//if (!PathFileExistsW(result.c_str()))
+	//{
+	//	(void)_wmkdir(result.c_str());
+	//}
+
+	const bool doesFileExist = isValidPathToFSObject( result );
+
+	if (!PathFileExistsW(result.c_str()))
 	{
 		(void)_wmkdir(result.c_str());
 	}
-	if (!PathIsDirectory(result.c_str()))
+
+	if (!PathIsDirectoryW(result.c_str()))
 	{
 		AfxMessageBox((result + L" is not a directory. Exiting.").c_str());
 		exit(10);
@@ -1273,17 +1351,26 @@ std::wstring CUIforETWDlg::GenerateResultFilename() const
 	return GetTraceDir() + filePart + L".etl";
 }
 
+_Pre_satisfies_( ( tracingMode_ == kTracingToMemory ) || ( tracingMode_ == kTracingToFile ) || ( tracingMode_ == kHeapTracingToFile ) )
 void CUIforETWDlg::OnBnClickedStarttracing()
 {
 	RegisterProviders();
-	if (tracingMode_ == kTracingToMemory)
-		outputPrintf(L"\nStarting tracing to in-memory circular buffers...\n");
-	else if (tracingMode_ == kTracingToFile)
-		outputPrintf(L"\nStarting tracing to disk...\n");
-	else if (tracingMode_ == kHeapTracingToFile)
-		outputPrintf(L"\nStarting heap tracing to disk of %s...\n", heapTracingExe_.c_str());
+	if ( tracingMode_ == kTracingToMemory )
+	{
+		outputPrintf( L"\nStarting tracing to in-memory circular buffers...\n" );
+	}
+	else if ( tracingMode_ == kTracingToFile )
+	{
+		outputPrintf( L"\nStarting tracing to disk...\n" );
+	}
+	else if ( tracingMode_ == kHeapTracingToFile )
+	{
+		outputPrintf( L"\nStarting heap tracing to disk of %s...\n", heapTracingExe_.c_str( ) );
+	}
 	else
-		assert(0);
+	{
+		assert( 0 );
+	}
 
 	std::wstring kernelProviders = L" Latency+POWER+DISPATCHER+FILE_IO+FILE_IO_INIT+VIRT_ALLOC";
 	std::wstring kernelStackWalk = L"";
@@ -1393,10 +1480,14 @@ void CUIforETWDlg::OnBnClickedStarttracing()
 void CUIforETWDlg::StopTracingAndMaybeRecord(bool bSaveTrace)
 {
 	std::wstring traceFilename = GenerateResultFilename();
-	if (bSaveTrace)
-		outputPrintf(L"\nSaving trace to disk...\n");
+	if ( bSaveTrace )
+	{
+		outputPrintf( L"\nSaving trace to disk...\n" );
+	}
 	else
-		outputPrintf(L"\nStopping tracing...\n");
+	{
+		outputPrintf( L"\nStopping tracing...\n" );
+	}
 
 	// Rename Amcache.hve to work around a merge hang that can last up to six
 	// minutes.
@@ -1408,7 +1499,7 @@ void CUIforETWDlg::StopTracingAndMaybeRecord(bool bSaveTrace)
 	DeleteFile(compatFileTemp);
 	BOOL moveSuccess = MoveFile(compatFile, compatFileTemp);
 	if (bShowCommands_ && !moveSuccess)
-		outputPrintf(L"Failed to rename Amcache.hve\n");
+		outputPrintf(L"FAILED to rename Amcache.hve\n");
 
 	ElapsedTimer saveTimer;
 	{
@@ -1423,10 +1514,14 @@ void CUIforETWDlg::StopTracingAndMaybeRecord(bool bSaveTrace)
 		}
 		else
 		{
-			if (tracingMode_ == kHeapTracingToFile)
-				child.Run(bShowCommands_, L"xperf.exe -stop xperfHeapSession -stop UIforETWSession -stop " + GetKernelLogger());
+			if ( tracingMode_ == kHeapTracingToFile )
+			{
+				child.Run( bShowCommands_, L"xperf.exe -stop xperfHeapSession -stop UIforETWSession -stop " + GetKernelLogger( ) );
+			}
 			else
-				child.Run(bShowCommands_, L"xperf.exe -stop UIforETWSession -stop " + GetKernelLogger());
+			{
+				child.Run( bShowCommands_, L"xperf.exe -stop UIforETWSession -stop " + GetKernelLogger( ) );
+			}
 		}
 	}
 	double saveTime = saveTimer.ElapsedSeconds();
@@ -1443,11 +1538,15 @@ void CUIforETWDlg::StopTracingAndMaybeRecord(bool bSaveTrace)
 			// https://randomascii.wordpress.com/2015/03/02/etw-trace-compression-and-xperf-syntax-refresher/
 			ChildProcess merge(GetXperfPath());
 			std::wstring args = L" -merge \"" + GetKernelFile() + L"\" \"" + GetUserFile() + L"\"";
-			if (tracingMode_ == kHeapTracingToFile)
-				args += L" \"" + GetHeapFile() + L"\"";
+			if ( tracingMode_ == kHeapTracingToFile )
+			{
+				args += L" \"" + GetHeapFile( ) + L"\"";
+			}
 			args += L" \"" + traceFilename + L"\"";
-			if (bCompress_)
+			if ( bCompress_ )
+			{
 				args += L" -compress";
+			}
 			merge.Run(bShowCommands_, L"xperf.exe" + args);
 		}
 		mergeTime = mergeTimer.ElapsedSeconds();
@@ -1474,6 +1573,7 @@ void CUIforETWDlg::StopTracingAndMaybeRecord(bool bSaveTrace)
 	{
 		if (bChromeDeveloper_)
 			StripChromeSymbols(traceFilename);
+		
 		PreprocessTrace(traceFilename);
 
 		if (bAutoViewTraces_)
@@ -1501,7 +1601,9 @@ void CUIforETWDlg::StopTracingAndMaybeRecord(bool bSaveTrace)
 		outputPrintf(L"Finished recording trace.\n");
 	}
 	else
-		outputPrintf(L"Tracing stopped.\n");
+	{
+		outputPrintf( L"Tracing stopped.\n" );
+	}
 }
 
 
@@ -1512,6 +1614,7 @@ void CUIforETWDlg::OnBnClickedSavetracebuffers()
 
 void CUIforETWDlg::OnBnClickedStoptracing()
 {
+	OutputDebugStringA( "\"Stop Tracing\" clicked!\r\n" );
 	StopTracingAndMaybeRecord(false);
 }
 
@@ -2231,6 +2334,12 @@ void CUIforETWDlg::PreprocessTrace(const std::wstring& traceFilename)
 		//const std::string err_str( std::to_string( fileToOpen ) );//Grr. Need a proper way to convert!
 		throw std::runtime_error( "Failed to open a file for preprocessing!" );
 	}
+
+	if ( pFile == NULL )
+	{
+		throw std::runtime_error( "(apparently) Failed to open a file for preprocessing! pFile is NULL!" );
+	}
+
 
 	const int PIDsByProcessTypeResult = fwprintf_s(pFile, L"Chrome PIDs by process type:\n");
 	if ( PIDsByProcessTypeResult < 0 )

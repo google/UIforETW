@@ -162,7 +162,7 @@ private:
 	bool SetSymbolPath();
 	// Call this to retrieve a directory from an environment variable, or use
 	// a default, and make sure it exists.
-	std::wstring GetDirectory(const wchar_t* env, const std::wstring& default);
+	std::wstring GetDirectory(_In_z_ PCWSTR env, const std::wstring& default);
 	void CUIforETWDlg::UpdateTraceList();
 	void RegisterProviders();
 	void DisablePagingExecutive();
@@ -190,6 +190,8 @@ private:
 	afx_msg void OnPaint();
 	afx_msg HCURSOR OnQueryDragIcon();
 	DECLARE_MESSAGE_MAP()
+
+	_Pre_satisfies_( ( tracingMode_ == kTracingToMemory ) || ( tracingMode_ == kTracingToFile ) || ( tracingMode_ == kHeapTracingToFile ) )
 	afx_msg void OnBnClickedStarttracing();
 	afx_msg void OnBnClickedStoptracing();
 	afx_msg void OnBnClickedCompresstrace();
