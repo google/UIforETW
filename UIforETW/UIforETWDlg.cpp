@@ -294,6 +294,7 @@ BOOL CUIforETWDlg::OnInitDialog()
 	wchar_t* windowsDir = nullptr;
 	VERIFY(SUCCEEDED(SHGetKnownFolderPath(FOLDERID_Windows, 0, NULL, &windowsDir)));
 	windowsDir_ = windowsDir;
+	windowsDir_ += '\\';
 	CoTaskMemFree(windowsDir);
 	// ANSI string, not unicode.
 	systemDrive_ = static_cast<char>(windowsDir_[0]);
@@ -787,7 +788,7 @@ void CUIforETWDlg::StopTracingAndMaybeRecord(bool bSaveTrace)
 	DeleteFile(compatFileTemp.c_str());
 	BOOL moveSuccess = MoveFile(compatFile.c_str(), compatFileTemp.c_str());
 	if (bShowCommands_ && !moveSuccess)
-		outputPrintf(L"Failed to rename Amcache.hve\n");
+		outputPrintf(L"Failed to rename %s to %s\n", compatFile.c_str(), compatFileTemp.c_str());
 
 	ElapsedTimer saveTimer;
 	{
