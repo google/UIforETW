@@ -225,9 +225,9 @@ void CUIforETWDlg::SetSymbolPath()
 	if (bManageSymbolPath_ || !getenv("_NT_SYMBOL_PATH"))
 	{
 		bManageSymbolPath_ = true;
-		std::string symbolPath = "SRV*c:\\symbols*http://msdl.microsoft.com/download/symbols";
+		std::string symbolPath = "SRV*" + systemDrive_ + "symbols*http://msdl.microsoft.com/download/symbols";
 		if (bChromeDeveloper_)
-			symbolPath = "SRV*c:\\symbols*http://msdl.microsoft.com/download/symbols;SRV*c:\\symbols*https://chromium-browser-symsrv.commondatastorage.googleapis.com";
+			symbolPath = "SRV*" + systemDrive_ + "symbols*http://msdl.microsoft.com/download/symbols;SRV*" + systemDrive_ + "symbols*https://chromium-browser-symsrv.commondatastorage.googleapis.com";
 		(void)_putenv(("_NT_SYMBOL_PATH=" + symbolPath).c_str());
 		outputPrintf(L"Setting _NT_SYMBOL_PATH to %s (Microsoft%s). "
 			L"Set _NT_SYMBOL_PATH yourself or toggle 'Chrome developer' if you want different defaults.\n",
@@ -236,7 +236,7 @@ void CUIforETWDlg::SetSymbolPath()
 #pragma warning(suppress : 4996)
 	const char* symCachePath = getenv("_NT_SYMCACHE_PATH");
 	if (!symCachePath)
-		(void)_putenv("_NT_SYMCACHE_PATH=c:\\symcache");
+		(void)_putenv(("_NT_SYMCACHE_PATH=" + systemDrive_ + "symcache").c_str());
 }
 
 
@@ -291,12 +291,21 @@ BOOL CUIforETWDlg::OnInitDialog()
 		exit(10);
 	}
 
-	// The WPT 8.1 installer is always a 32-bit installer, so on 64-bit
-	// Windows it ends up in the (x86) directory.
-	if (Is64BitWindows())
-		wptDir_ = L"C:\\Program Files (x86)\\Windows Kits\\8.1\\Windows Performance Toolkit\\";
-	else
-		wptDir_ = L"C:\\Program Files\\Windows Kits\\8.1\\Windows Performance Toolkit\\";
+	wchar_t* windowsDir = nullptr;
+	VERIFY(SUCCEEDED(SHGetKnownFolderPath(FOLDERID_Windows, 0, NULL, &windowsDir)));
+	windowsDir_ = windowsDir;
+	CoTaskMemFree(windowsDir);
+	// ANSI string, not unicode.
+	systemDrive_ = static_cast<char>(windowsDir_[0]);
+	systemDrive_ += ":\\";
+
+	// The WPT 8.1 installer is always a 32-bit installer, so we look for it in
+	// ProgramFilesX86, on 32-bit and 64-bit operating systems.
+	wchar_t* progFilesx86Dir = nullptr;
+	VERIFY(SUCCEEDED(SHGetKnownFolderPath(FOLDERID_ProgramFilesX86, 0, NULL, &progFilesx86Dir)));
+	wptDir_ = progFilesx86Dir;
+	wptDir_ += L"\\Windows Kits\\8.1\\Windows Performance Toolkit\\";
+	CoTaskMemFree(progFilesx86Dir);
 	if (!PathFileExists(GetXperfPath().c_str()))
 	{
 		AfxMessageBox((GetXperfPath() + L" does not exist. Please install WPT 8.1. Exiting.").c_str());
@@ -771,12 +780,12 @@ void CUIforETWDlg::StopTracingAndMaybeRecord(bool bSaveTrace)
 	// Rename Amcache.hve to work around a merge hang that can last up to six
 	// minutes.
 	// https://randomascii.wordpress.com/2015/03/02/profiling-the-profiler-working-around-a-six-minute-xperf-hang/
-	const wchar_t* const compatFile = L"c:\\Windows\\AppCompat\\Programs\\Amcache.hve";
-	const wchar_t* const compatFileTemp = L"c:\\Windows\\AppCompat\\Programs\\Amcache_temp.hve";
+	const std::wstring compatFile = windowsDir_ + L"AppCompat\\Programs\\Amcache.hve";
+	const std::wstring compatFileTemp = windowsDir_ + L"AppCompat\\Programs\\Amcache_temp.hve";
 	// Delete any previously existing Amcache_temp.hve file that might have
 	// been left behind by a previous failed tracing attempt.
-	DeleteFile(compatFileTemp);
-	BOOL moveSuccess = MoveFile(compatFile, compatFileTemp);
+	DeleteFile(compatFileTemp.c_str());
+	BOOL moveSuccess = MoveFile(compatFile.c_str(), compatFileTemp.c_str());
 	if (bShowCommands_ && !moveSuccess)
 		outputPrintf(L"Failed to rename Amcache.hve\n");
 
@@ -826,7 +835,7 @@ void CUIforETWDlg::StopTracingAndMaybeRecord(bool bSaveTrace)
 	}
 
 	if (moveSuccess)
-		MoveFile(compatFileTemp, compatFile);
+		MoveFile(compatFileTemp.c_str(), compatFile.c_str());
 
 	// Delete the temporary files.
 	DeleteFile(GetKernelFile().c_str());

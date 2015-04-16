@@ -117,6 +117,8 @@ private:
 	std::wstring traceDir_;
 	std::wstring tempTraceDir_;
 	std::wstring wptDir_;
+	std::wstring windowsDir_; // C:\Windows\, or some-such.
+	std::string systemDrive_; // C:\, or something like that, ANSI.
 
 	std::wstring output_;
 	CEdit btOutput_;
