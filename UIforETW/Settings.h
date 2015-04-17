@@ -16,7 +16,8 @@ limitations under the License.
 
 #pragma once
 
-#include <string>
+#include "stdafx.h"
+//#include <string>
 
 // CSettings dialog
 

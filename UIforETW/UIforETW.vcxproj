@@ -68,6 +68,7 @@
       <AdditionalIncludeDirectories>..\include</AdditionalIncludeDirectories>
       <ErrorReporting>Send</ErrorReporting>
       <EnablePREfast>true</EnablePREfast>
+      <AdditionalOptions>/Bt+</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -75,6 +76,7 @@
       <UACExecutionLevel>RequireAdministrator</UACExecutionLevel>
       <AdditionalLibraryDirectories>..\lib</AdditionalLibraryDirectories>
       <AdditionalDependencies>ETWProviders.lib</AdditionalDependencies>
+      <AdditionalOptions>/time+</AdditionalOptions>
     </Link>
     <Midl>
       <MkTypLibCompatible>false</MkTypLibCompatible>
@@ -104,6 +106,7 @@
       <AdditionalIncludeDirectories>..\include</AdditionalIncludeDirectories>
       <ErrorReporting>Send</ErrorReporting>
       <EnablePREfast>true</EnablePREfast>
+      <AdditionalOptions>/Bt+</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -113,6 +116,7 @@
       <UACExecutionLevel>RequireAdministrator</UACExecutionLevel>
       <AdditionalLibraryDirectories>..\lib</AdditionalLibraryDirectories>
       <AdditionalDependencies>ETWProviders.lib</AdditionalDependencies>
+      <AdditionalOptions>/time+</AdditionalOptions>
     </Link>
     <Midl>
       <MkTypLibCompatible>false</MkTypLibCompatible>

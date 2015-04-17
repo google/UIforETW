@@ -16,8 +16,9 @@ limitations under the License.
 
 #pragma once
 
-#include <string>
-#include <vector>
+#include "stdafx.h"
+//#include <string>
+//#include <vector>
 #include <memory>
 #include "KeyLoggerThread.h"
 #include "DirectoryMonitor.h"
