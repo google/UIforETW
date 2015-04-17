@@ -23,14 +23,6 @@ limitations under the License.
 
 
 //Annotation macro that describes the behavior of a buffer-writing function
-//e.g.: 
-//CStyle_GetLastErrorAsFormattedMessage(
-//										ETWUI_WRITES_TO_STACK( strSize, chars_written ) 
-//										PWSTR psz_formatted_error,
-//										_In_range_( 128, 32767 ) const rsize_t strSize, 
-//										_Out_ rsize_t& chars_written, 
-//										const DWORD error 
-//									   )
 //It's kinda ugly, sorry, but it works well.
 #define ETWUI_WRITES_TO_STACK( strSize ) \
 								_Out_writes_z_( strSize ) \
@@ -138,8 +130,8 @@ class ElapsedTimer
 public:
 	double ElapsedSeconds() const
 	{
-		auto duration = std::chrono::steady_clock::now() - start_;
-		auto microseconds = std::chrono::duration_cast<std::chrono::microseconds>(duration);
+		const auto duration = std::chrono::steady_clock::now() - start_;
+		const auto microseconds = std::chrono::duration_cast<std::chrono::microseconds>(duration);
 		return microseconds.count() / 1e6;
 	}
 private:
