@@ -39,6 +39,7 @@ https://randomascii.wordpress.com/2013/03/09/symbols-the-microsoft-way/
 If "chromium-browser-symsrv" is not found in _NT_SYMBOL_PATH or RetrieveSymbols.exe
 and pdbcopy.exe are not found then this script will exit early.
 """
+from __future__ import print_function
 
 import os
 import sys
@@ -47,12 +48,12 @@ import tempfile
 import shutil
 
 if len(sys.argv) < 2:
-  print "Usage: %s trace.etl" % sys.argv[0]
+  print( "Usage: %s trace.etl" % sys.argv[0] )
   sys.exit(0)
 
 symbolPath = os.environ.get("_NT_SYMBOL_PATH", "")
 if symbolPath.count("chromium-browser-symsrv") == 0:
-  print "Chromium symbol server is not in _NT_SYMBOL_PATH. No symbol stripping needed."
+  print( "Chromium symbol server is not in _NT_SYMBOL_PATH. No symbol stripping needed." )
   sys.exit(0)
 
 scriptDir = os.path.split(sys.argv[0])[0]
@@ -70,11 +71,11 @@ for third_party in ["pdbcopy.exe", "dbghelp.dll", "symsrv.dll"]:
     shutil.copy2(source, dest)
 
 if not os.path.exists(pdbcopyPath):
-  print "pdbcopy.exe not found. No symbol stripping is possible."
+  print( "pdbcopy.exe not found. No symbol stripping is possible." )
   sys.exit(0)
 
 if not os.path.exists(retrievePath):
-  print "RetrieveSymbols.exe not found. No symbol retrieval is possible."
+  print( "RetrieveSymbols.exe not found. No symbol retrieval is possible." )
   sys.exit(0)
 
 tracename = sys.argv[1]
@@ -88,7 +89,7 @@ tempdirs = []
 pdbRe = re.compile(r'"\[RSDS\] PdbSig: {(.*-.*-.*-.*-.*)}; Age: (.*); Pdb: (.*)"')
 pdbCachedRe = re.compile(r"Found .*file - placed it in (.*)")
 
-print "Pre-translating chrome symbols from stripped PDBs to avoid 10-15 minute translation times."
+print( "Pre-translating chrome symbols from stripped PDBs to avoid 10-15 minute translation times." )
 
 symcacheFiles = []
 # Keep track of the local symbol files so that we can temporarily rename them
@@ -96,7 +97,7 @@ symcacheFiles = []
 localSymbolFiles = []
 
 command = 'xperf -i "%s" -tle -tti -a symcache -dbgid' % tracename
-print "> %s" % command
+print( "> %s" % command )
 foundUncached = False
 for line in os.popen(command).readlines():
   if line.count("chrome.dll") > 0 or line.count("chrome_child.dll") > 0:
@@ -111,13 +112,13 @@ for line in os.popen(command).readlines():
         continue
       # Only print messages for chrome PDBs that aren't in the symcache
       foundUncached = True
-      print "Found uncached reference to %s: %s - %s" % (filepart, guid, age, )
+      print( "Found uncached reference to %s: %s - %s" % (filepart, guid, age, ) )
       symcacheFiles.append(symcacheFile)
       pdbCachePath = None
       retrieveCommand = "%s %s %s %s" % (retrievePath, guid, age, filepart)
-      print "> %s" % retrieveCommand
+      print( "> %s" % retrieveCommand )
       for subline in os.popen(retrieveCommand):
-        print subline.strip()
+        print( subline.strip() )
         cacheMatch = pdbCachedRe.match(subline.strip())
         if cacheMatch:
           pdbCachePath = cacheMatch.groups()[0]
@@ -130,22 +131,22 @@ for line in os.popen(command).readlines():
         tempdir = tempfile.mkdtemp()
         tempdirs.append(tempdir)
         destPath = os.path.join(tempdir, os.path.split(pdbCachePath)[1])
-        print "Copying PDB to %s" % destPath
+        print( "Copying PDB to %s" % destPath )
         for copyline in os.popen("%s %s %s -p" % (pdbcopyPath, pdbCachePath, destPath)):
-          print copyline.strip()
+          print( copyline.strip() )
       else:
-        print "Failed to retrieve symbols. Check for RetrieveSymbols.exe and support files."
+        print( "Failed to retrieve symbols. Check for RetrieveSymbols.exe and support files." )
 
 if tempdirs:
   symbolPath = ";".join(tempdirs)
-  print "Stripped PDBs are in %s. Converting to symcache files now." % symbolPath
+  print( "Stripped PDBs are in %s. Converting to symcache files now." % symbolPath )
   os.environ["_NT_SYMBOL_PATH"] = symbolPath
   for localPDB in localSymbolFiles:
     tempName = localPDB + "x"
-    print "Renaming %s to %s to stop unstripped PDBs from being used." % (localPDB, tempName)
+    print( "Renaming %s to %s to stop unstripped PDBs from being used." % (localPDB, tempName) )
     os.rename(localPDB, tempName)
   genCommand = 'xperf -i "%s" -symbols -tle -tti -a symcache -build' % tracename
-  print "> %s" % genCommand
+  print( "> %s" % genCommand )
   for line in os.popen(genCommand).readlines():
     pass # Don't print line
   for localPDB in localSymbolFiles:
@@ -154,18 +155,18 @@ if tempdirs:
   error = False
   for symcacheFile in symcacheFiles:
     if os.path.exists(symcacheFile):
-      print "%s generated." % symcacheFile
+      print( "%s generated." % symcacheFile )
     else:
-      print "Error: %s not generated." % symcacheFile
+      print( "Error: %s not generated." % symcacheFile )
       error = True
   # Delete the stripped PDB files
   if error:
-    print "Retaining PDBs to allow rerunning xperf command-line."
+    print( "Retaining PDBs to allow rerunning xperf command-line." )
   else:
     for dir in tempdirs:
       shutil.rmtree(dir, ignore_errors=True)
 else:
   if foundUncached:
-    print "No PDBs copied, nothing to do."
+    print( "No PDBs copied, nothing to do." )
   else:
-    print "No uncached PDBS found, nothing to do."
+    print( "No uncached PDBS found, nothing to do." )

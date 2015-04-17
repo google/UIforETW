@@ -243,13 +243,13 @@ bool setCComboBoxSelection( _Inout_ CComboBox* const comboBoxToSet, _In_ _In_ran
 	if ( setSelectionResult == CB_ERR )
 	{
 		
-		ATLTRACE2( atlTraceGeneral, 0,
-				   L"Failed to set selection (for a comboBox)\r\n"
-				   L"\tIndex that we attempted to set the selection to: %i\r\n"
-				   L"\tCue banner of CComboBox: %s\r\n",
-				   selectionToSet,
-				   comboBoxToSet->GetCueBanner( ) //Grr. I hate CString.
-				 );
+		outputPrintf( 
+					 L"Failed to set selection (for a comboBox)\r\n"
+					 L"\tIndex that we attempted to set the selection to: %i\r\n"
+					 L"\tCue banner of CComboBox: %s\r\n",
+					 selectionToSet,
+					 comboBoxToSet->GetCueBanner( ).GetString( ) //Grr. I hate CString.
+					);
 		return false;
 	}
 	return true;
@@ -268,6 +268,7 @@ bool addSingleToolToToolTip(
 	if ( addToolTipResult != TRUE )
 	{
 		ATLTRACE2( atlTraceGeneral, 0, L"Failed to add a message to a tooltip!!\r\nThe tooltip message:\r\n\t`%s`\r\n", toolTipMessageToAdd );
+		outputPrintf( L"Failed to add a message to a tooltip!!\r\nThe tooltip message:\r\n\t`%s`\r\n", toolTipMessageToAdd );
 		return false;
 	}
 	return true;
@@ -930,8 +931,15 @@ std::wstring getKernelFile( _In_ const TracingMode tracingMode, _In_ const std::
 	}
 	return L" -f \"" + kf + L"\"";
 }
-std::wstring getKernelArgs( _In_ const std::wstring kernelProviders, _In_ const std::wstring kernelStackWalk, _In_ const std::wstring kernelBuffers, _In_ const std::wstring kernelFile, _In_ const std::wstring kernelLogger )
+
+std::wstring getKernelArgs( _In_ const std::wstring kernelStackWalk, _In_ const std::wstring kernelFile, _In_ const std::wstring kernelLogger )
 {
+	const std::wstring kernelProviders = L" Latency+POWER+DISPATCHER+FILE_IO+FILE_IO_INIT+VIRT_ALLOC";
+
+	// Buffer sizes are in KB, so 1024 is actually 1 MB
+	// Make this configurable.
+	const std::wstring kernelBuffers = L" -buffersize 1024 -minbuffers 600 -maxbuffers 600";
+
 	return L" -start " + kernelLogger + L" -on" + kernelProviders + kernelStackWalk + kernelBuffers + kernelFile;
 }
 
@@ -950,8 +958,6 @@ std::wstring getBaseUserProviders( )
 
 void addGPUTracingProviders( _Inout_ std::wstring* const userProviders )
 {
-
-	WindowsVersion winver = GetWindowsVersion();
 	// Apparently we need a different provider for graphics profiling
 	// on Windows 8 and above.
 	if (IsWindows8OrGreater( ))
@@ -981,6 +987,20 @@ std::wstring getUserBuffers( _In_ const bool bGPUTracing )
 
 	return L" -buffersize 1024 -minbuffers 100 -maxbuffers 100";
 }
+
+
+std::wstring getHeapArgs( _In_ const std::wstring heapStackWalk, _In_ const std::wstring heapBuffers, _In_ const std::wstring heapFile )
+{
+	return L" -start xperfHeapSession -heap -Pids 0" + heapStackWalk + heapBuffers + heapFile;
+}
+
+std::wstring getHeapStackWalk( _In_ const bool bHeapStacks )
+{
+	if (bHeapStacks)
+		return L" -stackwalk HeapCreate+HeapDestroy+HeapAlloc+HeapRealloc";
+	return L"";
+}
+
 
 }// namespace {
 
@@ -1753,17 +1773,10 @@ void CUIforETWDlg::OnBnClickedStarttracing()
 		abort( );
 	}
 
-	const std::wstring kernelProviders = L" Latency+POWER+DISPATCHER+FILE_IO+FILE_IO_INIT+VIRT_ALLOC";
-
-	// Buffer sizes are in KB, so 1024 is actually 1 MB
-	// Make this configurable.
-	const std::wstring kernelBuffers = L" -buffersize 1024 -minbuffers 600 -maxbuffers 600";
-
 	const std::wstring kernelStackWalk = getKernelStackWalk( bSampledStacks_, bCswitchStacks_ );
-
 	const std::wstring kernelFile = getKernelFile( tracingMode_, GetKernelFile( ) );
 
-	const std::wstring kernelArgs = getKernelArgs( kernelProviders, kernelStackWalk, kernelBuffers, kernelFile, GetKernelLogger( ) );
+	const std::wstring kernelArgs = getKernelArgs( kernelStackWalk, kernelFile, GetKernelLogger( ) );
 
 	std::wstring userProviders = getBaseUserProviders( );
 
@@ -1790,6 +1803,7 @@ void CUIforETWDlg::OnBnClickedStarttracing()
 	std::wstring userFile = L" -f \"" + GetUserFile() + L"\"";
 	if (tracingMode_ == kTracingToMemory)
 		userFile = L" -buffering";
+
 	std::wstring userArgs = L" -start UIforETWSession -on " + userProviders + userBuffers + userFile;
 
 	// Heap tracing settings -- only used for heap tracing.
@@ -1797,10 +1811,11 @@ void CUIforETWDlg::OnBnClickedStarttracing()
 	// Buffer sizes need to be huge for some programs - should be configurable.
 	std::wstring heapBuffers = L" -buffersize 1024 -minbuffers 1000";
 	std::wstring heapFile = L" -f \"" + GetHeapFile() + L"\"";
-	std::wstring heapStackWalk;
-	if (bHeapStacks_)
-		heapStackWalk = L" -stackwalk HeapCreate+HeapDestroy+HeapAlloc+HeapRealloc";
-	std::wstring heapArgs = L" -start xperfHeapSession -heap -Pids 0" + heapStackWalk + heapBuffers + heapFile;
+
+	std::wstring heapStackWalk = getHeapStackWalk( bHeapStacks_ );
+
+	std::wstring heapArgs = getHeapArgs( heapStackWalk, heapBuffers, heapFile );
+	
 
 	{
 		ChildProcess child(GetXperfPath());
@@ -1850,14 +1865,31 @@ void CUIforETWDlg::StopTracingAndMaybeRecord(bool bSaveTrace)
 	// Rename Amcache.hve to work around a merge hang that can last up to six
 	// minutes.
 	// https://randomascii.wordpress.com/2015/03/02/profiling-the-profiler-working-around-a-six-minute-xperf-hang/
-	const wchar_t* const compatFile = L"c:\\Windows\\AppCompat\\Programs\\Amcache.hve";
-	const wchar_t* const compatFileTemp = L"c:\\Windows\\AppCompat\\Programs\\Amcache_temp.hve";
-	// Delete any previously existing Amcache_temp.hve file that might have
-	// been left behind by a previous failed tracing attempt.
-	DeleteFile(compatFileTemp);
-	BOOL moveSuccess = MoveFile(compatFile, compatFileTemp);
-	if (bShowCommands_ && !moveSuccess)
-		outputPrintf(L"FAILED to rename Amcache.hve\n");
+	const wchar_t* const compatFile = L"\\\\?\\C:\\Windows\\AppCompat\\Programs\\Amcache.hve";
+	const wchar_t* const compatFileTemp = L"\\\\?\\C:\\Windows\\AppCompat\\Programs\\Amcache_temp.hve";
+
+	const bool isExistingTempFile = isValidPathToFSObject( compatFileTemp );
+	if ( isExistingTempFile )
+	{
+		// Delete any previously existing Amcache_temp.hve file that might have
+		// been left behind by a previous failed tracing attempt.
+		//If [DeleteFile] succeeds, the return value is nonzero.
+		const BOOL deleteResult = DeleteFileW( compatFileTemp );
+		if ( deleteResult == 0 )
+		{
+			const DWORD lastErr = GetLastError( );
+			outputPrintf( L"FAILED to delete `%s`!! Error code: %u\r\n", compatFileTemp, lastErr );
+			ErrorHandling::DisplayWindowsMessageBoxWithErrorMessage( lastErr );
+		}
+	}
+
+	ATLASSERT( isValidPathToFSObject( compatFile ) );
+	const BOOL moveSuccess = MoveFileW(compatFile, compatFileTemp);
+	if ( bShowCommands_ && !moveSuccess )
+	{
+		const DWORD lastErr = GetLastError( );
+		outputPrintf( L"FAILED to rename/move `Amcache.hve`, Error code: %u\n", lastErr );
+	}
 
 	ElapsedTimer saveTimer;
 	{
