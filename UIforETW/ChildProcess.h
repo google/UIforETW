@@ -16,7 +16,8 @@ limitations under the License.
 
 #pragma once
 
-#include <string>
+#include "stdafx.h"
+//#include <string>
 
 // This class encapsulates running a child thread and reading
 // its output. Typical usage is:

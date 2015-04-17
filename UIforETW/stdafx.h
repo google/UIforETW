@@ -29,25 +29,15 @@ limitations under the License.
 
 
 #include <afxwin.h>         // MFC core and standard components. I get ~1 billion error messages if this isn't first.
-
-
 #include "targetver.h"
-
-
-
-
-
-
 #include <afxext.h>         // MFC extensions
+//#include <afxdisp.h>        // MFC Automation classes
 
-
-#include <afxdisp.h>        // MFC Automation classes
-
-#include <assert.h>
 
 #ifndef _AFX_NO_OLE_SUPPORT
-#include <afxdtctl.h>           // MFC support for Internet Explorer 4 Common Controls
+//#include <afxdtctl.h>           // MFC support for Internet Explorer 4 Common Controls
 #endif
+
 #ifndef _AFX_NO_AFXCMN_SUPPORT
 #include <afxcmn.h>             // MFC support for Windows Common Controls
 #endif // _AFX_NO_AFXCMN_SUPPORT
@@ -60,12 +50,16 @@ limitations under the License.
 void outputPrintf(_Printf_format_string_ PCWSTR pFormat, ...);
 
 
-// Needed for int64_t and friends
-#include <inttypes.h>
-
-#include <Strsafe.h>
-#include <ciso646>
 #include <VersionHelpers.h>
+#include <Strsafe.h>
+
+#include <inttypes.h> // Needed for int64_t and friends
+#include <ciso646>
+#include <assert.h>
+
+#include <string>
+#include <vector>
+
 
 // Using #define NOMINMAX would be nice but gdiplustypes.h *depends*
 // on min/max macros, so the best I can do is to undefine them here.
