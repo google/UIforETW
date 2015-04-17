@@ -24,9 +24,7 @@ void write_BAD_FMT(
 					_Out_writes_z_( 8 )
 					_Pre_writable_size_( 8 )
 					_Post_readable_size_( 8 )
-						PWSTR pszFMT,
-					_Out_
-						rsize_t* const chars_written
+						PWSTR pszFMT
 				  )
 {
 	pszFMT[ 0 ] = 'B';
@@ -37,21 +35,25 @@ void write_BAD_FMT(
 	pszFMT[ 5 ] = 'M';
 	pszFMT[ 6 ] = 'T';
 	pszFMT[ 7 ] = 0;
-	(*chars_written) = 8;
 }
 
 }
 
+namespace handle_close {
 
+LONG regCloseKey( _In_ _Pre_valid_ _Post_ptr_invalid_ HKEY hKey )
+{
+	return ::RegCloseKey( hKey );
+
+}
+}
 
 namespace ErrorHandling {
 void DisplayWindowsMessageBoxWithErrorMessage( const DWORD error )
 {
 	const rsize_t errorMessageBufferSize = 512u;
 	wchar_t errorMessageBuffer[ errorMessageBufferSize ] = { 0 };
-	const DWORD error = GetLastError( );
-	rsize_t readable_chars = 0;
-	const HRESULT errorMessageFormatBuffer = GetLastErrorAsFormattedMessage( errorMessageBuffer, &readable_chars, error );
+	const HRESULT errorMessageFormatBuffer = GetLastErrorAsFormattedMessage( errorMessageBuffer, error );
 	if ( FAILED( errorMessageFormatBuffer ) )
 	{
 		const int messageBoxResult = ::MessageBoxW( NULL, L"DOUBLE FAULT! We tried to display an error message, but failed to format it correctly!", L"UIforETW FATAL ERROR!", ( MB_OK bitor MB_ICONERROR ) );
@@ -79,13 +81,11 @@ static_assert( SUCCEEDED( S_OK ),
 _Success_( SUCCEEDED( return ) )
 HRESULT 
 GetLastErrorAsFormattedMessage( 
-								ETWUI_WRITES_TO_STACK( strSize, chars_written )
+								ETWUI_WRITES_TO_STACK( strSize )
 									PWSTR psz_formatted_error,
 								_In_range_( 128, 32767 )
 									const rsize_t strSize,
-								_Out_
-									rsize_t* const chars_written,
-									const DWORD error = GetLastError( )
+									const DWORD error
 							  )
 {
 	const DWORD ret = FormatMessageW( 
@@ -99,7 +99,6 @@ GetLastErrorAsFormattedMessage(
 									);
 	if ( ret != 0 )
 	{
-		(*chars_written) = ret;
 		return S_OK;
 	}
 	const DWORD error_err = GetLastError( );
@@ -114,10 +113,9 @@ GetLastErrorAsFormattedMessage(
 	}
 	if ( strSize > 8 )
 	{
-		write_BAD_FMT( psz_formatted_error, chars_written );
+		write_BAD_FMT( psz_formatted_error );
 		return E_FAIL;
 	}
-	chars_written = 0;
 	return E_FAIL;
 }
 }
@@ -213,14 +211,51 @@ void WriteTextAsFile(const std::wstring& fileName, const std::wstring& text)
 	outFile.write(reinterpret_cast<const char*>(text.c_str()), text.size() * sizeof(text[0]));
 }
 
-void SetRegistryDWORD(HKEY root, const std::wstring& subkey, const std::wstring& valueName, DWORD value)
+void SetRegistryDWORD(HKEY root, const std::wstring& subkey, const std::wstring& valueName, const DWORD value)
 {
-	HKEY key;
-	LONG result = RegOpenKeyEx(root, subkey.c_str(), 0, KEY_ALL_ACCESS, &key);
-	if (result == ERROR_SUCCESS)
+
+	//See Registry Element Size Limits:
+	//    https://msdn.microsoft.com/en-us/library/windows/desktop/ms724872.aspx
+	if ( subkey.length( ) >= 255 )
 	{
-		RegSetValueEx(key, valueName.c_str(), 0, REG_DWORD, reinterpret_cast<const BYTE*>(&value), sizeof(value));
-		RegCloseKey(key);
+		//TODO: how to best handle?
+		throw std::logic_error( "Key too long!" );
+	}
+	if ( valueName.length( ) >= 16383 )
+	{
+		//TODO: how to best handle?
+		throw std::logic_error( "Value too long!" );
+	}
+
+
+	HKEY key;
+	//If [RegOpenKeyEx] succeeds, the return value is ERROR_SUCCESS.
+	//If [RegOpenKeyEx] fails,
+	//    the return value is a nonzero error code defined in Winerror.h.
+	//  You can use the FormatMessage function with the 
+	//    FORMAT_MESSAGE_FROM_SYSTEM flag to get a generic description of the error.
+	const LONG openResult = RegOpenKeyExW(root, subkey.c_str(), 0, KEY_ALL_ACCESS, &key);
+	if (openResult == ERROR_SUCCESS)
+	{
+		//RegSetValueEx has the exact same return behavior as RegOpenKeyEx
+		const LONG setValueResult =
+			RegSetValueEx(key, valueName.c_str(), 0, REG_DWORD, reinterpret_cast<const BYTE*>(&value), sizeof(value));
+		if ( setValueResult != ERROR_SUCCESS )
+		{
+			//TODO: how to best handle?
+			throw std::runtime_error( "Failed to write value to registry!!!!" );
+		}
+		const LONG closeResult = handle_close::regCloseKey( key );
+		if ( closeResult != ERROR_SUCCESS )
+		{
+			//TODO: how to best handle?
+			throw std::runtime_error( "Failed to close registry key!!!!" );
+		}
+
+		
+		//SAL catches this :)
+		//handle_close::regCloseKey( key );
+
 	}
 }
 

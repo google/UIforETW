@@ -31,12 +31,9 @@ limitations under the License.
 //										const DWORD error 
 //									   )
 //It's kinda ugly, sorry, but it works well.
-#define ETWUI_WRITES_TO_STACK( strSize, chars_written ) \
+#define ETWUI_WRITES_TO_STACK( strSize ) \
 								_Out_writes_z_( strSize ) \
 								_Pre_writable_size_( strSize ) \
-								_Post_readable_size_( chars_written ) \
-								_Pre_satisfies_( strSize >= chars_written ) \
-								_Post_satisfies_( _Old_( chars_written ) <= chars_written )
 
 namespace ErrorHandling {
 void DisplayWindowsMessageBoxWithErrorMessage( const DWORD error );
@@ -45,12 +42,10 @@ void DisplayWindowsMessageBoxWithErrorMessage( const DWORD error );
 _Success_( SUCCEEDED( return ) )
 HRESULT 
 GetLastErrorAsFormattedMessage( 
-								ETWUI_WRITES_TO_STACK( strSize, chars_written )
+								ETWUI_WRITES_TO_STACK( strSize )
 									PWSTR psz_formatted_error,
 								_In_range_( 128, 32767 )
 									const rsize_t strSize,
-								_Out_
-									rsize_t* const chars_written,
 								const DWORD error = GetLastError( )
 							  );
 
@@ -60,17 +55,21 @@ template<rsize_t strSize>
 _Success_( SUCCEEDED( return ) )
 HRESULT 
 GetLastErrorAsFormattedMessage( 
-								ETWUI_WRITES_TO_STACK( strSize, chars_written )
+								ETWUI_WRITES_TO_STACK( strSize )
 									wchar_t (&psz_formatted_error)[strSize],
-								_Out_
-									rsize_t* const chars_written,
 								const DWORD error = GetLastError( )
 							  )
 {
-	static_assert( 128 <= strSize <= 32767, "Unsupported range!" );
+	static_assert( ( 128 <= strSize ) && ( strSize <= 32767 ), "Unsupported range!" );
 	return GetLastErrorAsFormattedMessage( psz_formatted_error, strSize, error );
 }
 
+}
+
+
+namespace handle_close {
+
+LONG regCloseKey( _In_ _Pre_valid_ _Post_ptr_invalid_ HKEY hKey );
 }
 
 
@@ -85,7 +84,7 @@ std::wstring LoadFileAsText(const std::wstring& fileName);
 // Write a wstring as UTF-16.
 void WriteTextAsFile(const std::wstring& fileName, const std::wstring& text);
 
-void SetRegistryDWORD(HKEY root, const std::wstring& subkey, const std::wstring& valueName, DWORD value);
+void SetRegistryDWORD(HKEY root, const std::wstring& subkey, const std::wstring& valueName, const DWORD value);
 void CreateRegistryKey(HKEY root, const std::wstring& subkey, const std::wstring& newKey);
 
 std::wstring GetEditControlText(HWND hwnd);
