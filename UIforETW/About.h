@@ -17,19 +17,38 @@ limitations under the License.
 #pragma once
 
 // CAboutDlg dialog used for App About
+#include "stdafx.h"
 
-class CAboutDlg : public CDialogEx
+//class CAboutDlg : public CDialogEx
+//{
+//public:
+//	CAboutDlg();
+//
+//	// Dialog Data
+//	enum { IDD = IDD_ABOUTBOX };
+//
+//protected:
+//	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
+//
+//	// Implementation
+//protected:
+//	DECLARE_MESSAGE_MAP()
+//};
+
+class CATLAboutDlg : public ATL::CDialogImpl< CATLAboutDlg >
 {
 public:
-	CAboutDlg();
-
-	// Dialog Data
 	enum { IDD = IDD_ABOUTBOX };
+	
+	BEGIN_MSG_MAP( CATLAboutDlg )
+		//COMMAND_HANDLER(IDOK, BN_CLICKED, OnBnClickedOk)
+	END_MSG_MAP()
 
-protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
+	//LRESULT OnBnClickedOk( WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/ )
+	//{
 
-	// Implementation
-protected:
-	DECLARE_MESSAGE_MAP()
+	//	EndDialog( 1 );
+	//	return 1;
+	//}
+
 };
