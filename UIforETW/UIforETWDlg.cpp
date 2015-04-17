@@ -679,14 +679,308 @@ std::wstring getTraceDirFromEnvironmentVariable( _In_z_ PCWSTR env, const std::w
 
 }
 
-bool isValidPathToFSObject( std::wstring path )
+void handleUnexpectedCreateDirectory( _In_ const std::wstring& path, _In_ const DWORD lastErr )
 {
-	if ( path.size( ) < MAX_PATH )
+	const rsize_t bufferSize = 512u;
+	wchar_t errBuffer[ bufferSize ] = { 0 };
+	const HRESULT errFmt = ErrorHandling::GetLastErrorAsFormattedMessage( errBuffer, lastErr );
+	if ( FAILED( errFmt ) )
 	{
-
+		outputPrintf( L"Encountered an unexpected error after calling CreateDirectory!\r\n" );
+		outputPrintf( L"Even worse, we then failed to format the error message!\r\n" );
+		outputPrintf( L"\tAttempting to create folder: `%s`, error code that we hit: %u\r\n", path.c_str( ), lastErr );
+		return;
 	}
+	outputPrintf( L"Encountered an unexpected error after calling CreateDirectory!\r\n" );
+	outputPrintf( L"\tAttempting to create folder: `%s`\r\n", path.c_str( ) );
+	outputPrintf( L"\tError message: %s\r\n", errBuffer );
 }
 
+
+
+void handleUnexpectedErrorPathFileExists( _In_ const std::wstring& path, _In_ const DWORD lastErr )
+{
+	const rsize_t bufferSize = 512u;
+	wchar_t errBuffer[ bufferSize ] = { 0 };
+	const HRESULT errFmt = ErrorHandling::GetLastErrorAsFormattedMessage( errBuffer, lastErr );
+	if ( FAILED( errFmt ) )
+	{
+		outputPrintf( L"Encountered an unexpected error after calling PathFileExists!\r\n" );
+		outputPrintf( L"Even worse, we then failed to format the error message!\r\n" );
+		outputPrintf( L"\tPath that we were checking: `%s`, error code that we hit: %u\r\n", path.c_str( ), lastErr );
+		return;
+	}
+	outputPrintf( L"Encountered an unexpected error after calling PathFileExists!\r\n" );
+	outputPrintf( L"\tPath that we were checking: `%s`\r\n", path.c_str( ) );
+	outputPrintf( L"\tError message: %s\r\n", errBuffer );
+}
+
+void handleUnexpectedErrorGetFileAttributes( _In_ const std::wstring& path, _In_ const DWORD lastErr )
+{
+	const rsize_t bufferSize = 512u;
+	wchar_t errBuffer[ bufferSize ] = { 0 };
+	const HRESULT errFmt = ErrorHandling::GetLastErrorAsFormattedMessage( errBuffer, lastErr );
+	if ( FAILED( errFmt ) )
+	{
+		outputPrintf( L"Encountered an unexpected error after calling GetFileAttributes!\r\n" );
+		outputPrintf( L"Even worse, we then failed to format the error message!\r\n" );
+		outputPrintf( L"\tPath that we were checking: `%s`, error code that we hit: %u\r\n", path.c_str( ), lastErr );
+		return;
+	}
+	outputPrintf( L"Encountered an unexpected error after calling GetFileAttributes!\r\n" );
+	outputPrintf( L"\tPath that we were checking: `%s`\r\n", path.c_str( ) );
+	outputPrintf( L"\tError message: %s\r\n", errBuffer );
+}
+
+bool enhancedFileExists( _In_ const std::wstring path )
+{
+	//[PathFileExists returns] TRUE if the file exists; otherwise, FALSE.
+	//Call GetLastError for extended error information.
+	const BOOL fileExists = PathFileExistsW( path.c_str( ) );
+	if ( fileExists == TRUE )
+	{
+		return true;
+	}
+	const DWORD lastErr = GetLastError( );
+	if ( lastErr == ERROR_FILE_NOT_FOUND )
+	{
+		return false;
+	}
+	if ( lastErr == ERROR_PATH_NOT_FOUND )
+	{
+		return false;
+	}
+
+	handleUnexpectedErrorPathFileExists( path, lastErr );
+	//doesn't exist?
+	return false;
+}
+
+bool enhancedExistCheckGetFileAttributes( _In_ const std::wstring path )
+{
+	//If the [GetFileAttributes] fails, the return value is INVALID_FILE_ATTRIBUTES.
+	//To get extended error information, call GetLastError.
+	//Checking file existence is actually a hard problem.
+	//See
+	//    http://blogs.msdn.com/b/oldnewthing/archive/2007/10/23/5612082.aspx
+	//    http://mfctips.com/2012/03/26/best-way-to-check-if-file-or-directory-exists/
+	//    http://mfctips.com/2013/01/10/getfileattributes-lies/
+
+	const DWORD longPathAttributes = GetFileAttributesW( path.c_str( ) );
+	if ( longPathAttributes != INVALID_FILE_ATTRIBUTES )
+	{
+		return true;
+	}
+
+	const DWORD lastErr = GetLastError( );
+	if ( lastErr == ERROR_FILE_NOT_FOUND )
+	{
+		return false;
+	}
+	if ( lastErr == ERROR_PATH_NOT_FOUND )
+	{
+		return false;
+	}
+
+	handleUnexpectedErrorGetFileAttributes( path, lastErr );
+	//doesn't exist?
+	return false;
+
+}
+
+
+bool isValidPathToFSObject( _In_ std::wstring path )
+{
+	//PathFileExists expects a path thats no longer than MAX_PATH
+	if ( path.size( ) < MAX_PATH )
+	{
+		return enhancedFileExists( path );
+	}
+
+	//TODO: what if network path?
+	//should we check if just starts with L"\\\\"?
+	if ( path.compare( 0, 4, L"\\\\?\\" ) != 0 )
+	{
+		path = ( L"\\\\?\\" + path );
+	}
+
+	const std::wstring& longPath = path;
+
+	return enhancedExistCheckGetFileAttributes( longPath );
+}
+
+bool enhancedCreateDirectory( _In_ std::wstring pathName )
+{
+	//(first parameter):
+	//    There is a default string size limit for paths of 248 characters.
+	//    To extend this limit to 32,767 wide characters,
+	//        call the Unicode version of the function
+	//        and prepend "\\?\" to the path.
+	//                    ^ ==> L"\\\\?\\"
+
+	//TODO: what if network path?
+	//should we check if just starts with L"\\\\"?
+	if ( pathName.compare( 0, 4, L"\\\\?\\" ) != 0 )
+	{
+		pathName = ( L"\\\\?\\" + pathName );
+	}
+
+	const std::wstring& longPath = pathName;
+
+
+
+	//If [CreateDirectoryW] succeeds, the return value is nonzero.
+	//If [CreateDirectoryW] fails, the return value is zero.
+	//To get extended error information, call GetLastError.
+	//Possible errors include the following:
+	//    ERROR_ALREADY_EXISTS
+	//    ERROR_PATH_NOT_FOUND
+	const BOOL directoryCreated = CreateDirectoryW( longPath.c_str( ), NULL );
+	if ( directoryCreated != 0 )
+	{
+		return true;
+	}
+
+	const DWORD lastErr = GetLastError( );
+	if ( lastErr == ERROR_ALREADY_EXISTS )
+	{
+		return false;
+	}
+	if ( lastErr == ERROR_PATH_NOT_FOUND )
+	{
+		return false;
+	}
+	handleUnexpectedCreateDirectory( longPath, lastErr );
+	return false;
+}
+
+bool isValidDirectory( _In_ std::wstring path )
+{
+	//PathIsDirectoryW expects a path thats no longer than MAX_PATH
+	if ( path.size( ) < MAX_PATH )
+	{
+		//[PathIsDirectory] returns (BOOL)FILE_ATTRIBUTE_DIRECTORY if the path is a valid directory; otherwise, FALSE.
+		const BOOL pathIsDir = PathIsDirectoryW( path.c_str( ) );
+		if ( pathIsDir == ( (BOOL)( FILE_ATTRIBUTE_DIRECTORY ) ) )
+		{
+			return true;
+		}
+		return false;
+	}
+
+	//TODO: what if network path?
+	//should we check if just starts with L"\\\\"?
+	if ( path.compare( 0, 4, L"\\\\?\\" ) != 0 )
+	{
+		path = ( L"\\\\?\\" + path );
+	}
+	const std::wstring& longPath = path;
+	const bool isPathAtAllValid = isValidPathToFSObject( longPath );
+	if ( !isPathAtAllValid )
+	{
+		return false;
+	}
+	//If [GetFileAttributes] fails, the return value is INVALID_FILE_ATTRIBUTES.
+	//To get extended error information, call GetLastError.
+	const DWORD pathAttributes = GetFileAttributesW( longPath.c_str( ) );
+	if ( pathAttributes == INVALID_FILE_ATTRIBUTES )
+	{
+		const DWORD lastErr = GetLastError( );
+		if ( lastErr == ERROR_BAD_NETPATH )
+		{
+			outputPrintf( L"Oops! %s is NOT a valid directory, "
+						  L"it's a network share! GetFileAttributes "
+						  L"needs a subfolder of it!\r\n", longPath.c_str( )
+						);
+		}
+		return false;
+	}
+
+	if ( ( pathAttributes bitand FILE_ATTRIBUTE_DIRECTORY ) == 0 )
+	{
+		return false;
+	}
+	//all tests passed!
+	return true;
+}
+
+std::wstring getKernelStackWalk( _In_ const bool bSampledStacks, _In_ const bool bCswitchStacks )
+{
+	if ( bSampledStacks && bCswitchStacks )
+	{
+		return L" -stackwalk PROFILE+CSWITCH+READYTHREAD";
+	}
+	else if ( bSampledStacks )
+	{
+		return L" -stackwalk PROFILE";
+	}
+	else if ( bCswitchStacks )
+	{
+		return L" -stackwalk CSWITCH+READYTHREAD";
+	}
+
+	return L"";
+}
+
+std::wstring getKernelFile( _In_ const TracingMode tracingMode, _In_ const std::wstring kf )
+{
+	if ( tracingMode == kTracingToMemory )
+	{
+		return L" -buffering";
+	}
+	return L" -f \"" + kf + L"\"";
+}
+std::wstring getKernelArgs( _In_ const std::wstring kernelProviders, _In_ const std::wstring kernelStackWalk, _In_ const std::wstring kernelBuffers, _In_ const std::wstring kernelFile, _In_ const std::wstring kernelLogger )
+{
+	return L" -start " + kernelLogger + L" -on" + kernelProviders + kernelStackWalk + kernelBuffers + kernelFile;
+}
+
+std::wstring getBaseUserProviders( )
+{
+	WindowsVersion winver = GetWindowsVersion();
+	std::wstring userProviders = L"Microsoft-Windows-Win32k";
+	if ( winver <= kWindowsVersionVista )
+	{
+		userProviders = L"Microsoft-Windows-LUA"; // Because Microsoft-Windows-Win32k doesn't work on Vista.
+	}
+	
+	userProviders += L"+Multi-MAIN+Multi-FrameRate+Multi-Input+Multi-Worker";
+	return userProviders;
+}
+
+void addGPUTracingProviders( _Inout_ std::wstring* const userProviders )
+{
+
+	WindowsVersion winver = GetWindowsVersion();
+	// Apparently we need a different provider for graphics profiling
+	// on Windows 8 and above.
+	if (IsWindows8OrGreater( ))
+	{
+		// This provider is needed for GPU profiling on Windows 8+
+		(*userProviders) += L"+Microsoft-Windows-DxgKrnl:0xFFFF:5";
+		if (!IsWindowsServer())
+		{
+			// Present events on Windows 8 + -- non-server SKUs only.
+			(*userProviders) += L"+Microsoft-Windows-MediaEngine";
+		}
+	}
+	else
+	{
+		// Necessary providers for a minimal GPU profiling setup.
+		// DirectX logger:
+		(*userProviders) += L"+DX:0x2F";
+	}
+
+}
+
+std::wstring getUserBuffers( _In_ const bool bGPUTracing )
+{
+	// Increase the user buffer sizes when doing graphics tracing.
+	if (bGPUTracing)
+		return L" -buffersize 1024 -minbuffers 200 -maxbuffers 200";
+
+	return L" -buffersize 1024 -minbuffers 100 -maxbuffers 100";
+}
 
 }// namespace {
 
@@ -997,6 +1291,7 @@ BOOL CUIforETWDlg::OnInitDialog()
 		exit(10);
 	}
 
+	
 	//request Unicode (long-path compatible) versions of APIs
 	const std::wstring documents( L"\\\\?\\" + std::wstring( documents_temp ) );
 
@@ -1142,19 +1437,36 @@ std::wstring CUIforETWDlg::GetDirectory( _In_z_ PCWSTR env, const std::wstring& 
 
 	const bool doesFileExist = isValidPathToFSObject( result );
 
-	if (!PathFileExistsW(result.c_str()))
+	if (!doesFileExist)
 	{
-		(void)_wmkdir(result.c_str());
+		//(void)_wmkdir(result.c_str());
+		const bool sucessfullyCreatedDirectory = enhancedCreateDirectory( result );
+		if ( !sucessfullyCreatedDirectory )
+		{
+			if ( IsDebuggerPresent( ) )
+			{
+				_CrtDbgBreak( );
+			}
+			throw std::runtime_error( "CUIforETWDlg::GetDirectory attempted to create a directory, but unexpectedly failed!" );
+		}
 	}
 
-	if (!PathIsDirectoryW(result.c_str()))
+	if ( !isValidDirectory( result ) )
 	{
 		AfxMessageBox((result + L" is not a directory. Exiting.").c_str());
 		exit(10);
 	}
+
+	//if (!PathIsDirectoryW(result.c_str()))
+	//{
+	//	AfxMessageBox((result + L" is not a directory. Exiting.").c_str());
+	//	exit(10);
+	//}
+
 	return result;
 }
 
+//This shit is crazy!
 void CUIforETWDlg::RegisterProviders()
 {
 	std::wstring dllSource = GetExeDir() + L"ETWProviders.dll";
@@ -1178,7 +1490,7 @@ void CUIforETWDlg::RegisterProviders()
 	for (int pass = 0; pass < 2; ++pass)
 	{
 		ChildProcess child(wevtPath);
-		std::wstring args = pass ? L" im" : L" um";
+		std::wstring args = ( pass ? L" im" : L" um" );
 		args += L" \"" + GetExeDir() + L"etwproviders.man\"";
 		child.Run(bShowCommands_, L"wevtutil.exe" + args);
 	}
@@ -1228,7 +1540,7 @@ void CUIforETWDlg::DisablePagingExecutive()
 {
 	if (Is64BitWindows())
 	{
-		const wchar_t* keyName = L"SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Memory Management";
+		PCWSTR const keyName = L"SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Memory Management";
 		SetRegistryDWORD(HKEY_LOCAL_MACHINE, keyName, L"DisablePagingExecutive", 1);
 	}
 }
@@ -1297,15 +1609,46 @@ HCURSOR CUIforETWDlg::OnQueryDragIcon()
 
 std::wstring CUIforETWDlg::GetExeDir() const
 {
-	wchar_t exePath[MAX_PATH];
-	if (GetModuleFileName(0, exePath, ARRAYSIZE(exePath)))
+	//Maybe we can get away with the MAX_PATH limit here?
+	//TODO: rewrite to support longer paths!
+	const rsize_t bufferSize = MAX_PATH;
+	wchar_t exePath[ bufferSize ] = { 0 };
+	//If [GetModuleFileName] succeeds, the return value is the length of the string that is copied to the buffer, in characters, not including the terminating null character.
+
+	//If [GetModuleFileName] fails, the return value is 0 (zero).
+	//To get extended error information, call GetLastError.
+	const DWORD moduleFileNameResult = GetModuleFileNameW( NULL, exePath, bufferSize );
+
+	//    If the buffer is too small to hold the module name,
+	//        the function returns nSize, 
+	//        the function sets the last error to ERROR_INSUFFICIENT_BUFFER.
+	//        the string is truncated to nSize characters including the terminating null character,
+	//Windows XP:
+	//    If the buffer is too small to hold the module name,
+	//        the function returns nSize.
+	//        The last error code remains ERROR_SUCCESS.
+	//    If nSize is zero, the return value is zero and the last error code is ERROR_SUCCESS.
+	if ( moduleFileNameResult >= bufferSize )
 	{
-		wchar_t* lastSlash = wcsrchr(exePath, '\\');
-		if (lastSlash)
-		{
-			lastSlash[1] = 0;
-			return exePath;
-		}
+		//Don't need to check for Windows XP? (ETW is Vista+)?
+		const DWORD lastErr = GetLastError( );
+		ATLASSERT( lastErr == ERROR_INSUFFICIENT_BUFFER );
+		outputPrintf( L"CUIforETWDlg::GetExeDir failed! (buffer too small!)\r\n" );
+		ErrorHandling::DisplayWindowsMessageBoxWithErrorMessage( lastErr );
+		exit( 10 );
+	}
+	if ( moduleFileNameResult == 0 )
+	{
+		const DWORD lastErr = GetLastError( );
+		ErrorHandling::DisplayWindowsMessageBoxWithErrorMessage( lastErr );
+		exit( 10 );
+	}
+	//Huh?
+	PWSTR lastSlash = wcsrchr(exePath, '\\');
+	if (lastSlash)
+	{
+		lastSlash[1] = 0;
+		return exePath;
 	}
 
 	exit(10);
@@ -1315,32 +1658,68 @@ std::wstring CUIforETWDlg::GenerateResultFilename() const
 {
 	std::wstring traceDir = GetTraceDir();
 
-	char time[10];
+	char time[ 10 ] = { 0 };
 	_strtime_s(time);
-	char date[10];
+	char date[ 10 ] = { 0 };
 	_strdate_s(date);
-	int hour, min, sec;
-	int year, month, day;
-#pragma warning(suppress : 4996)
-	const wchar_t* username = _wgetenv(L"USERNAME");
-	if (!username)
-		username = L"";
-	wchar_t fileName[MAX_PATH];
-	// Hilarious /analyze warning on this line from bug in _strtime_s annotation!
-	// warning C6054: String 'time' might not be zero-terminated.
-#pragma warning(suppress : 6054)
-	if (3 == sscanf_s(time, "%d:%d:%d", &hour, &min, &sec) &&
-		3 == sscanf_s(date, "%d/%d/%d", &month, &day, &year))
+	int hour = 0;
+	int min = 0;
+	int sec = 0;
+	int year = 0;
+	int month = 0;
+	int day = 0;
+//#pragma warning(suppress : 4996)
+//	const wchar_t* username = _wgetenv(L"USERNAME");
+//	if (!username)
+//		username = L"";
+
+	PCWSTR username_temp = NULL;
+	wchar_t usernameBuffer[ MAX_PATH ] = { 0 };
+	size_t usernameReturnValue = 0;
+	
+	//[_wgetenv_s returns] Zero if successful.
+	const errno_t getUsernameResult = _wgetenv_s( &usernameReturnValue, usernameBuffer, L"USERNAME" );
+	if ( getUsernameResult == 0 )
+	{
+		username_temp = usernameBuffer;
+	}
+
+	PCWSTR const username = username_temp;
+
+	//MAX_PATH is safe here, single file name component is limited to MAX_PATH;
+	//In fact, for NTFS, that's what MAX_PATH means!
+	//FAT is a different story.
+	//Anything else is wrong!
+	const rsize_t filenameBufferSize = MAX_PATH;
+	wchar_t fileName[ filenameBufferSize ] = { 0 };
+
+	const bool validTimeStr = ( 3 == sscanf_s( time, "%d:%d:%d", &hour, &min, &sec ) );
+	const bool validDateStr = ( 3 == sscanf_s( date, "%d/%d/%d", &month, &day, &year ) );
+
+	std::wstring filePart;
+
+	if ( validTimeStr && validDateStr )
 	{
 		// The filenames are chosen to sort by date, with username as the LSB.
-		swprintf_s(fileName, L"%04d-%02d-%02d_%02d-%02d-%02d_%s", year + 2000, month, day, hour, min, sec, username);
+		//swprintf_s(fileName, L"%04d-%02d-%02d_%02d-%02d-%02d_%s", year + 2000, month, day, hour, min, sec, username);
+		const HRESULT fmtResult = StringCchPrintfW( fileName, filenameBufferSize, L"%04d-%02d-%02d_%02d-%02d-%02d_%s", year + 2000, month, day, hour, min, sec, username );
+		if ( SUCCEEDED( fmtResult ) )
+		{
+			filePart = fileName;
+		}
+		else
+		{
+			outputPrintf( L"CUIforETWDlg::GenerateResultFilename - failed to properly format a file name!\r\n" );
+			filePart = L"UIforETW";
+		}
 	}
 	else
 	{
-		wcscpy_s(fileName, L"UIforETW");
+		outputPrintf( L"CUIforETWDlg::GenerateResultFilename - failed to properly read time & date strings!\r\n" );
+		filePart = L"UIforETW";
 	}
 
-	std::wstring filePart = fileName;
+	//filePart = fileName;
 
 	if (tracingMode_ == kHeapTracingToFile)
 	{
@@ -1348,6 +1727,7 @@ std::wstring CUIforETWDlg::GenerateResultFilename() const
 		filePart += L"_heap";
 	}
 
+	//We should check that ( filePart + L".etl" ) is less than MAX_PATH long!
 	return GetTraceDir() + filePart + L".etl";
 }
 
@@ -1369,30 +1749,23 @@ void CUIforETWDlg::OnBnClickedStarttracing()
 	}
 	else
 	{
-		assert( 0 );
+		ATLASSERT( 0 );
+		abort( );
 	}
 
-	std::wstring kernelProviders = L" Latency+POWER+DISPATCHER+FILE_IO+FILE_IO_INIT+VIRT_ALLOC";
-	std::wstring kernelStackWalk = L"";
-	if (bSampledStacks_ && bCswitchStacks_)
-		kernelStackWalk = L" -stackwalk PROFILE+CSWITCH+READYTHREAD";
-	else if (bSampledStacks_)
-		kernelStackWalk = L" -stackwalk PROFILE";
-	else if (bCswitchStacks_)
-		kernelStackWalk = L" -stackwalk CSWITCH+READYTHREAD";
+	const std::wstring kernelProviders = L" Latency+POWER+DISPATCHER+FILE_IO+FILE_IO_INIT+VIRT_ALLOC";
+
 	// Buffer sizes are in KB, so 1024 is actually 1 MB
 	// Make this configurable.
-	std::wstring kernelBuffers = L" -buffersize 1024 -minbuffers 600 -maxbuffers 600";
-	std::wstring kernelFile = L" -f \"" + GetKernelFile() + L"\"";
-	if (tracingMode_ == kTracingToMemory)
-		kernelFile = L" -buffering";
-	std::wstring kernelArgs = L" -start " + GetKernelLogger() + L" -on" + kernelProviders + kernelStackWalk + kernelBuffers + kernelFile;
+	const std::wstring kernelBuffers = L" -buffersize 1024 -minbuffers 600 -maxbuffers 600";
 
-	WindowsVersion winver = GetWindowsVersion();
-	std::wstring userProviders = L"Microsoft-Windows-Win32k";
-	if (winver <= kWindowsVersionVista)
-		userProviders = L"Microsoft-Windows-LUA"; // Because Microsoft-Windows-Win32k doesn't work on Vista.
-	userProviders += L"+Multi-MAIN+Multi-FrameRate+Multi-Input+Multi-Worker";
+	const std::wstring kernelStackWalk = getKernelStackWalk( bSampledStacks_, bCswitchStacks_ );
+
+	const std::wstring kernelFile = getKernelFile( tracingMode_, GetKernelFile( ) );
+
+	const std::wstring kernelArgs = getKernelArgs( kernelProviders, kernelStackWalk, kernelBuffers, kernelFile, GetKernelLogger( ) );
+
+	std::wstring userProviders = getBaseUserProviders( );
 
 	// DWM providers can be helpful also. Uncomment to enable.
 	//userProviders += L"+Microsoft-Windows-Dwm-Dwm";
@@ -1405,30 +1778,15 @@ void CUIforETWDlg::OnBnClickedStarttracing()
 
 	if (bGPUTracing_)
 	{
-		// Apparently we need a different provider for graphics profiling
-		// on Windows 8 and above.
-		if (winver >= kWindowsVersion8)
-		{
-			// This provider is needed for GPU profiling on Windows 8+
-			userProviders += L"+Microsoft-Windows-DxgKrnl:0xFFFF:5";
-			if (!IsWindowsServer())
-			{
-				// Present events on Windows 8 + -- non-server SKUs only.
-				userProviders += L"+Microsoft-Windows-MediaEngine";
-			}
-		}
-		else
-		{
-			// Necessary providers for a minimal GPU profiling setup.
-			// DirectX logger:
-			userProviders += L"+DX:0x2F";
-		}
+		addGPUTracingProviders( &userProviders );
 	}
 
-	std::wstring userBuffers = L" -buffersize 1024 -minbuffers 100 -maxbuffers 100";
-	// Increase the user buffer sizes when doing graphics tracing.
-	if (bGPUTracing_)
-		userBuffers = L" -buffersize 1024 -minbuffers 200 -maxbuffers 200";
+	
+	std::wstring userBuffers = getUserBuffers( bGPUTracing_ );
+
+	//std::wstring getUserBuffers( )
+
+
 	std::wstring userFile = L" -f \"" + GetUserFile() + L"\"";
 	if (tracingMode_ == kTracingToMemory)
 		userFile = L" -buffering";
