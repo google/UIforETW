@@ -54,13 +54,12 @@ private:
 
 	void TransferSettings(bool saving);
 
-	bool bCompress_      = true;
+	bool bCompress_ = true;
 	bool bCswitchStacks_ = true;
 	bool bSampledStacks_ = true;
-	bool bFastSampling_  = false;
-	bool bGPUTracing_    = false;
-	bool bShowCommands_  = false;
-
+	bool bFastSampling_ = false;
+	bool bGPUTracing_ = false;
+	bool bShowCommands_ = false;
 	CButton btCompress_;
 	CButton btCswitchStacks_;
 	CButton btSampledStacks_;
@@ -75,11 +74,8 @@ private:
 
 	CEdit btTraceNameEdit_;
 	CRect traceNameEditRect_;
-	
 	std::wstring preRenameTraceName_;
-	
 	bool validRenameDate_ = false;
-	
 	// Typical trace names look like this:
 	// 2015-03-21_08-52-11_Bruce
 	// The first 19 characters are the date and time.
@@ -127,11 +123,11 @@ private:
 	CEdit btOutput_;
 
 	// General purpose keyboard accelerators.
-	HACCEL hAccelTable_       = NULL;
+	HACCEL hAccelTable_ = NULL;
 	// Keyboard accelerators that are active only when renaming a trace.
 	HACCEL hRenameAccelTable_ = NULL;
 	// Keyboard accelerators that are active only when editing trace.
-	HACCEL hNotesAccelTable_  = NULL;
+	HACCEL hNotesAccelTable_ = NULL;
 	// Keyboard accelerators that are active only when the trace list is active.
 	HACCEL hTracesAccelTable_ = NULL;
 
@@ -158,9 +154,9 @@ private:
 	//const std::wstring logger_ = L"\"Circular Kernel Context Logger\"";
 	std::wstring GetKernelLogger() const { return kernelLogger_; }
 
-	int initialWidth_  = 0;
+	int initialWidth_ = 0;
 	int initialHeight_ = 0;
-	int lastWidth_  = 0;
+	int lastWidth_ = 0;
 	int lastHeight_ = 0;
 
 	_Success_( return )
@@ -176,7 +172,7 @@ private:
 
 	// Editable only by the settings dialog.
 	bool bChromeDeveloper_ = true;
-	bool bAutoViewTraces_  = false;
+	bool bAutoViewTraces_ = false;
 
 	void CompressTrace(const std::wstring& tracePath);
 	// Update the enabled/disabled states of buttons.
