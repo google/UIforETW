@@ -93,18 +93,10 @@
     <None Include="res\UIforETW.rc2">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="UIforETW.rgs">
-      <Filter>Resource Files</Filter>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\UIforETW.ico">
       <Filter>Resource Files</Filter>
     </Image>
-  </ItemGroup>
-  <ItemGroup>
-    <Midl Include="UIforETW.idl">
-      <Filter>Source Files</Filter>
-    </Midl>
   </ItemGroup>
 </Project>
