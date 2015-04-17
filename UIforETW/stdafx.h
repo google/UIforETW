@@ -44,6 +44,9 @@ limitations under the License.
 
 #include <afxcontrolbars.h>     // MFC support for ribbons and control bars
 
+
+#include <atlwin.h>             //ATL stuff
+
 #include <sal.h>
 
 // Global function for printing to the dialog output window.
