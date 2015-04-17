@@ -16,6 +16,7 @@ limitations under the License.
 
 #pragma once
 
+#define _ATL_APARTMENT_THREADED 
 #ifndef VC_EXTRALEAN
 #define VC_EXTRALEAN            // Exclude rarely-used stuff from Windows headers
 #endif
@@ -82,3 +83,7 @@ const int WM_UPDATETRACELIST = WM_USER + 10;
 #pragma comment(linker,"/manifestdependency:\"type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 #endif
 #endif
+
+#include <atlbase.h>
+#include <atlcom.h>
+#include <atlctl.h>

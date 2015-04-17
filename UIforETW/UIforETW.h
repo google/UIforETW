@@ -21,6 +21,7 @@ limitations under the License.
 #endif
 
 #include "resource.h"		// main symbols
+#include "UIforETW_i.h"
 
 
 // CUIforETWApp:
@@ -40,6 +41,7 @@ public:
 // Implementation
 
 	DECLARE_MESSAGE_MAP()
+	BOOL ExitInstance( );
 };
 
 extern CUIforETWApp theApp;
