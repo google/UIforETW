@@ -17,7 +17,7 @@ limitations under the License.
 #pragma once
 
 // CAboutDlg dialog used for App About
-#include "stdafx.h"
+//#include "stdafx.h"
 
 //class CAboutDlg : public CDialogEx
 //{

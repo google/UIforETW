@@ -16,8 +16,9 @@ limitations under the License.
 
 #pragma once
 
-#include "stdafx.h"
-//#include <string>
+//#include "stdafx.h"
+#include <string>
+#include <atlsync.h>
 
 // This class encapsulates running a child thread and reading
 // its output. Typical usage is:
@@ -38,6 +39,8 @@ public:
 	~ChildProcess();
 
 	// Returns true if the process started.
+	_Pre_satisfies_( hProcess_ == 0 )
+	_Success_( return )
 	bool Run(bool showCommand, std::wstring args);
 
 	// This can be called even if the process doesn't start, but
@@ -63,8 +66,8 @@ private:
 
 	// The processOutput_ string is written to by the listener thread.
 	// Don't modify processOutput_ without acquiring the lock.
-	CCriticalSection outputLock_;
-	std::wstring processOutput_;
+	ATL::CCriticalSection outputLock_;
+	_Guarded_by_( outputLock_ ) std::wstring processOutput_;
 
 	// Output handles for the child process -- connected to the pipe.
 	HANDLE hStdOutput_ = INVALID_HANDLE_VALUE;

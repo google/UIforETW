@@ -18,7 +18,6 @@ limitations under the License.
 #include "ChildProcess.h"
 #include "Utility.h"
 
-#include <assert.h>
 #include <vector>
 
 static const wchar_t* kPipeName = L"\\\\.\\PIPE\\UIforETWPipe";
@@ -28,8 +27,8 @@ ChildProcess::ChildProcess(std::wstring exePath)
 {
 	// Create the pipe here so that it is guaranteed to be created before
 	// we try starting the process.
-	hPipe_ = CreateNamedPipe(kPipeName,
-		PIPE_ACCESS_DUPLEX | PIPE_TYPE_BYTE | PIPE_READMODE_BYTE,
+	hPipe_ = CreateNamedPipeW(kPipeName,
+		( PIPE_ACCESS_DUPLEX bitor PIPE_TYPE_BYTE bitor PIPE_READMODE_BYTE ),
 		PIPE_WAIT,
 		1,
 		1024 * 16,
@@ -38,16 +37,18 @@ ChildProcess::ChildProcess(std::wstring exePath)
 		NULL);
 	hChildThread_ = CreateThread(0, 0, ListenerThreadStatic, this, 0, 0);
 
-	hOutputAvailable_ = CreateEvent(nullptr, FALSE, FALSE, nullptr);
+	hOutputAvailable_ = CreateEventW(nullptr, FALSE, FALSE, nullptr);
 }
 
 ChildProcess::~ChildProcess()
 {
 	if (hProcess_)
 	{
-		DWORD exitCode = GetExitCode();
-		if (exitCode)
-			outputPrintf(L"Process exit code was %08x (%lu)\n", exitCode, exitCode);
+		const DWORD exitCode = GetExitCode();
+		if ( exitCode )
+		{
+			outputPrintf( L"Process exit code was %08x (%lu)\n", exitCode, exitCode );
+		}
 		handle_close::closeHandle(hProcess_);
 	}
 	if (hOutputAvailable_)
@@ -70,9 +71,10 @@ bool ChildProcess::IsStillRunning()
 
 std::wstring ChildProcess::RemoveOutputText()
 {
-	CSingleLock locker(&outputLock_);
+	outputLock_.Enter( );
 	std::wstring result = processOutput_;
 	processOutput_ = L"";
+	outputLock_.Leave( );
 	return result;
 }
 
@@ -94,17 +96,18 @@ DWORD ChildProcess::ListenerThread()
 		{
 			if (dwRead > 0)
 			{
-				CSingleLock locker(&outputLock_);
+				outputLock_.Enter( );
 				buffer[dwRead] = 0;
 				OutputDebugStringA(buffer);
 				processOutput_ += AnsiToUnicode(buffer);
+				outputLock_.Leave( );
 			}
 			SetEvent(hOutputAvailable_);
 		}
 	}
 	else
 	{
-		OutputDebugString(L"Connect failed.\n");
+		OutputDebugStringW(L"Connect failed.\n");
 	}
 
 	DisconnectNamedPipe(hPipe_);
@@ -112,24 +115,32 @@ DWORD ChildProcess::ListenerThread()
 	return 0;
 }
 
-
+_Pre_satisfies_( hProcess_ == 0 )
+_Success_( return )
 bool ChildProcess::Run(bool showCommand, std::wstring args)
 {
-	assert(!hProcess_);
+	ATLASSERT(!hProcess_);
 
-	if (showCommand)
-		outputPrintf(L"%s\n", args.c_str());
+	if ( showCommand )
+	{
+		outputPrintf( L"%s\n", args.c_str( ) );
+	}
 
 	SECURITY_ATTRIBUTES security = { sizeof(security), 0, TRUE };
 
-	hStdOutput_ = CreateFile(kPipeName, GENERIC_WRITE, 0, &security,
+	hStdOutput_ = CreateFileW(kPipeName, GENERIC_WRITE, 0, &security,
 		OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, INVALID_HANDLE_VALUE);
-	if (hStdOutput_ == INVALID_HANDLE_VALUE)
+	if ( hStdOutput_ == INVALID_HANDLE_VALUE )
+	{
 		return false;
-	if (!DuplicateHandle(GetCurrentProcess(), hStdOutput_, GetCurrentProcess(),
-		&hStdError_, 0, TRUE, DUPLICATE_SAME_ACCESS))
-		return false;
+	}
 
+	const HANDLE currentProcess = GetCurrentProcess( );
+	if ( !DuplicateHandle( currentProcess, hStdOutput_, currentProcess,
+		&hStdError_, 0, TRUE, DUPLICATE_SAME_ACCESS ) )
+	{
+		return false;
+	}
 	STARTUPINFO startupInfo = {};
 	startupInfo.hStdOutput = hStdOutput_;
 	startupInfo.hStdError = hStdError_;
@@ -138,10 +149,28 @@ bool ChildProcess::Run(bool showCommand, std::wstring args)
 
 	PROCESS_INFORMATION processInfo = {};
 	DWORD flags = CREATE_NO_WINDOW;
+
 	// Wacky CreateProcess rules say args has to be writable!
 	std::vector<wchar_t> argsCopy(args.size() + 1);
-	wcscpy_s(&argsCopy[0], argsCopy.size(), args.c_str());
-	BOOL success = CreateProcess(exePath_.c_str(), &argsCopy[0], NULL, NULL,
+
+	//wcscpy_s(&argsCopy[0], argsCopy.size(), args.c_str());
+	const HRESULT strCpyResult = StringCchCopyNW( &argsCopy[ 0 ], argsCopy.size( ), args.c_str( ), args.length( ) );
+	if ( FAILED( strCpyResult ) )
+	{
+		if ( strCpyResult == STRSAFE_E_END_OF_FILE )
+		{
+			std::terminate( );
+		}
+		if ( strCpyResult == STRSAFE_E_INVALID_PARAMETER )
+		{
+			std::terminate( );
+		}
+		ATLASSERT( strCpyResult == STRSAFE_E_INSUFFICIENT_BUFFER );
+		outputPrintf( L"Failed to copy arguments into writable buffer!\r\n" );
+		return false;
+	}
+
+	const BOOL success = CreateProcessW(exePath_.c_str(), &argsCopy[0], NULL, NULL,
 		TRUE, flags, NULL, NULL, &startupInfo, &processInfo);
 	if (success)
 	{
@@ -151,7 +180,7 @@ bool ChildProcess::Run(bool showCommand, std::wstring args)
 	}
 	else
 	{
-		outputPrintf(L"Error %d starting %s, %s\n", (int)GetLastError(), exePath_.c_str(), args.c_str());
+		outputPrintf(L"Error %u starting %s, %s\n", GetLastError(), exePath_.c_str(), args.c_str());
 	}
 
 	return false;
@@ -230,7 +259,9 @@ void ChildProcess::WaitForCompletion(bool printOutput)
 		// Now that the child thread has exited we can finally read
 		// the last of the child-process output.
 		std::wstring output = RemoveOutputText();
-		if (!output.empty())
-			outputPrintf(L"%s", output.c_str());
+		if ( !output.empty( ) )
+		{
+			outputPrintf( L"%s", output.c_str( ) );
+		}
 	}
 }

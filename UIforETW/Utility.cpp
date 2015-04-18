@@ -17,6 +17,8 @@ limitations under the License.
 #include "stdafx.h"
 #include "Utility.h"
 #include <fstream>
+#include <Strsafe.h>
+
 
 namespace {
 
@@ -109,7 +111,7 @@ GetLastErrorAsFormattedMessage(
 		return S_OK;
 	}
 	const DWORD error_err = GetLastError( );
-	ATLTRACE2( atlTraceGeneral, 0, L"FormatMessageW failed with error code: `%lu`!!\r\n", error_err );
+	ATLTRACE2( ATL::atlTraceGeneral, 0, L"FormatMessageW failed with error code: `%lu`!!\r\n", error_err );
 	
 	const rsize_t err_msg_buff_size = 128;
 	_Null_terminated_ char err_msg_buff[ err_msg_buff_size ] = { 0 };
@@ -549,6 +551,12 @@ WindowsVersion GetWindowsVersion()
 //	return result;
 //}
 
+double ElapsedTimer::ElapsedSeconds() const
+{
+	const auto duration = std::chrono::steady_clock::now() - start_;
+	const auto microseconds = std::chrono::duration_cast<std::chrono::microseconds>(duration);
+	return microseconds.count() / 1e6;
+}
 
 
 std::wstring FindPython()
