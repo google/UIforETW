@@ -48,11 +48,11 @@ ChildProcess::~ChildProcess()
 		DWORD exitCode = GetExitCode();
 		if (exitCode)
 			outputPrintf(L"Process exit code was %08x (%lu)\n", exitCode, exitCode);
-		CloseHandle(hProcess_);
+		handle_close::closeHandle(hProcess_);
 	}
 	if (hOutputAvailable_)
 	{
-		CloseHandle(hOutputAvailable_);
+		handle_close::closeHandle(hOutputAvailable_);
 	}
 }
 
@@ -145,7 +145,7 @@ bool ChildProcess::Run(bool showCommand, std::wstring args)
 		TRUE, flags, NULL, NULL, &startupInfo, &processInfo);
 	if (success)
 	{
-		CloseHandle(processInfo.hThread);
+		handle_close::closeHandle(processInfo.hThread);
 		hProcess_ = processInfo.hProcess;
 		return true;
 	}
@@ -201,12 +201,12 @@ void ChildProcess::WaitForCompletion(bool printOutput)
 	// close these if the process never started.
 	if (hStdError_ != INVALID_HANDLE_VALUE)
 	{
-		CloseHandle(hStdError_);
+		handle_close::closeHandle(hStdError_);
 		hStdError_ = INVALID_HANDLE_VALUE;
 	}
 	if (hStdOutput_ != INVALID_HANDLE_VALUE)
 	{
-		CloseHandle(hStdOutput_);
+		handle_close::closeHandle(hStdOutput_);
 		hStdOutput_ = INVALID_HANDLE_VALUE;
 	}
 
@@ -214,14 +214,14 @@ void ChildProcess::WaitForCompletion(bool printOutput)
 	if (hChildThread_)
 	{
 		WaitForSingleObject(hChildThread_, INFINITE);
-		CloseHandle(hChildThread_);
+		handle_close::closeHandle(hChildThread_);
 		hChildThread_ = 0;
 	}
 
 	// Clean up.
 	if (hPipe_ != INVALID_HANDLE_VALUE)
 	{
-		CloseHandle(hPipe_);
+		handle_close::closeHandle(hPipe_);
 		hPipe_ = INVALID_HANDLE_VALUE;
 	}
 

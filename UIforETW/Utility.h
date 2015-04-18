@@ -63,6 +63,8 @@ GetLastErrorAsFormattedMessage(
 namespace handle_close {
 
 LONG regCloseKey( _In_ _Pre_valid_ _Post_ptr_invalid_ HKEY hKey );
+
+BOOL closeHandle( _In_ _Pre_valid_ _Post_ptr_invalid_ HANDLE handle );
 }
 
 
