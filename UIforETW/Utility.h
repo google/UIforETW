@@ -127,7 +127,7 @@ bool IsWindowsServer();
 
 std::wstring FindPython(); // Returns a full path to python.exe or nothing.
 
-class ElapsedTimer
+class ElapsedTimer final
 {
 public:
 	double ElapsedSeconds( ) const;

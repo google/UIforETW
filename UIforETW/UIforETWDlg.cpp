@@ -116,25 +116,40 @@ _Null_terminated_ const char DefaultSymbolCachePath[ ] =
 	"c:\\symcache";
 
 
-void handle_vprintfFailure( _In_ const HRESULT fmtResult, _In_ const rsize_t bufferCount )
+//returns true if we can continue!
+bool handle_vprintfFailure( _In_ const HRESULT fmtResult, _In_ const rsize_t bufferCount )
 {
+#ifndef DEBUG
+	UNREFERENCED_PARAMETER( bufferCount );
+#endif
 	if ( fmtResult == STRSAFE_E_INSUFFICIENT_BUFFER )
 	{
 		ATLTRACE2( ATL::atlTraceGeneral, 0, L"CUIforETWDlg::vprintf FAILED TO format args to buffer!\r\n\tthe buffer ( size: %I64u ) was too small)\r\n", static_cast<uint64_t>( bufferCount ) );
-		return;
+		MessageBoxW( NULL, L"CUIforETWDlg::vprintf FAILED TO format args to buffer! the buffer was too small)", L"Serious error!", MB_OK );
+		return true;
 	}
 	if ( fmtResult == STRSAFE_E_INVALID_PARAMETER )
 	{
 		ATLTRACE2( ATL::atlTraceGeneral, 0, L"CUIforETWDlg::vprintf FAILED TO format args to buffer! An invalid parameter was passed to StringCchVPrintf!\r\n" );
-		return;
+		MessageBoxW( NULL, L"CUIforETWDlg::vprintf FAILED TO format args to buffer! An invalid parameter was passed to StringCchVPrintf!", L"Fatal error!", MB_OK );
+		std::terminate( );
+		//return;
+	}
+	if ( fmtResult == STRSAFE_E_END_OF_FILE )
+	{
+		ATLTRACE2( ATL::atlTraceGeneral, 0, L"CUIforETWDlg::vprintf FAILED TO format args to buffer! An invalid parameter was passed to StringCchVPrintf!\r\n" );
+		MessageBoxW( NULL, L"CUIforETWDlg::vprintf FAILED TO format args to buffer! StringCchVPrintf reached end of file!!", L"nonsensical error!", MB_OK );
+		std::terminate( );
 	}
 	//how should we handle this correctly?
 	ATLTRACE2( ATL::atlTraceGeneral, 0, L"CUIforETWDlg::vprintf FAILED TO format args to buffer! An expected error was encountered!\r\n" );
+	MessageBoxW( NULL, L"CUIforETWDlg::vprintf FAILED TO format args to buffer! This error was unexpected!!", L"Fatal error!", MB_OK );
 	if ( IsDebuggerPresent( ) )
 	{
 		_CrtDbgBreak( );
 	}
-	return;
+	std::terminate( );
+	//return;
 }
 
 bool copyWpaProfileToExecutableDirectory( _In_ const std::wstring& documents, _In_ const std::wstring exeDir )
@@ -1104,6 +1119,7 @@ void CUIforETWDlg::vprintf(PCWSTR pFormat, va_list args)
 	if ( FAILED( printFormattedArgsToBuffer ) )
 	{
 		//how should we handle this correctly?
+		//returns true if we can continue!
 		handle_vprintfFailure( printFormattedArgsToBuffer, bufferCount );
 		return;
 	}
@@ -1114,6 +1130,7 @@ void CUIforETWDlg::vprintf(PCWSTR pFormat, va_list args)
 		// Need \r\n as a line separator.
 		if (pBuf[0] == '\n')
 		{
+
 			// Don't add a line separator at the very beginning.
 			if ( !output_.empty( ) )
 			{

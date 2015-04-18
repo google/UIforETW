@@ -27,14 +27,14 @@ limitations under the License.
 // See UIforETW.cpp for the implementation of this class
 //
 
-class CUIforETWApp : public CWinApp
+class CUIforETWApp final : public CWinApp
 {
 public:
 	CUIforETWApp();
 
 // Overrides
 public:
-	virtual BOOL InitInstance();
+	virtual BOOL InitInstance() override;
 	afx_msg void OnHelp();
 
 // Implementation

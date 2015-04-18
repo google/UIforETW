@@ -32,7 +32,7 @@ limitations under the License.
 // the process to exit.
 //   DWORD exitCode = child.GetExitCode();
 
-class ChildProcess
+class ChildProcess final
 {
 public:
 	ChildProcess(std::wstring exePath);

@@ -39,6 +39,35 @@ void write_BAD_FMT(
 	pszFMT[ 7 ] = 0;
 }
 
+void handleMultiByteToWideCharFailure( const DWORD error )
+{
+	if ( error == ERROR_INSUFFICIENT_BUFFER )
+	{
+		outputPrintf( L"MultiByteToWideChar failed!!: ERROR_INSUFFICIENT_BUFFER\r\n" );
+		return;
+	}
+	if ( error == ERROR_NO_UNICODE_TRANSLATION )
+	{
+		outputPrintf( L"MultiByteToWideChar failed!!: ERROR_NO_UNICODE_TRANSLATION\r\n" );
+		return;
+	}
+	if ( error == ERROR_INVALID_FLAGS )
+	{
+		outputPrintf( L"MultiByteToWideChar failed!!: ERROR_INVALID_FLAGS\r\n" );
+		MessageBoxW( NULL, L"MultiByteToWideChar failed!!: ERROR_INVALID_FLAGS - this indicates a logic error!", L"Fatal error!", MB_OK );
+		std::terminate( );
+	}
+	if ( error == ERROR_INVALID_PARAMETER )
+	{
+		outputPrintf( L"MultiByteToWideChar failed!!: ERROR_INVALID_PARAMETER\r\n" );
+		MessageBoxW( NULL, L"MultiByteToWideChar failed!!: ERROR_INVALID_PARAMETER - this indicates a logic error!", L"Fatal error!", MB_OK );
+		std::terminate( );
+	}
+	outputPrintf( L"MultiByteToWideChar failed!!: (unexpected error!)\r\n" );
+	MessageBoxW( NULL, L"MultiByteToWideChar failed!!: (unexpected error!) - this indicates a logic error!", L"Fatal error!", MB_OK );
+	std::terminate( );
+}
+
 }
 
 namespace handle_close {
@@ -178,19 +207,27 @@ std::wstring LoadFileAsText(const std::wstring& fileName)
 {
 	std::ifstream f;
 	f.open(fileName, std::ios_base::binary);
-	if (!f)
+	if ( !f )
+	{
 		return L"";
+	}
 
 	// Find the file length.
 	f.seekg(0, std::ios_base::end);
-	size_t length = (size_t)f.tellg();
+	const auto raw_length = f.tellg( );
+	ATLASSERT( raw_length >= 0 );
+	ATLASSERT( raw_length < SIZE_T_MAX );
+	size_t length = static_cast<size_t>( f.tellg() );
+	
 	f.seekg(0, std::ios_base::beg);
 
 	// Allocate a buffer and read the file.
 	std::vector<char> data(length + 2);
 	f.read(&data[0], length);
-	if (!f)
+	if ( !f )
+	{
 		return L"";
+	}
 
 	// Add a multi-byte null terminator.
 	data[length] = 0;
@@ -299,7 +336,7 @@ std::wstring AnsiToUnicode(const std::string& text)
 {
 	// Determine number of wide characters to be allocated for the
 	// Unicode string.
-	size_t cCharacters = text.size() + 1;
+	const size_t cCharacters = text.size() + 1;
 
 	std::vector<wchar_t> buffer(cCharacters);
 
@@ -313,6 +350,8 @@ std::wstring AnsiToUnicode(const std::string& text)
 		return result;
 	}
 
+	const DWORD lastErr = GetLastError( );
+	handleMultiByteToWideCharFailure( lastErr );
 	return result;
 }
 

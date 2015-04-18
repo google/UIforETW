@@ -19,7 +19,7 @@ limitations under the License.
 #include "stdafx.h"
 //#include <string>
 
-class DirectoryMonitor
+class DirectoryMonitor final
 {
 public:
 	DirectoryMonitor(CWnd* pMainWindow);
