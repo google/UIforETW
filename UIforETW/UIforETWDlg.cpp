@@ -24,6 +24,7 @@ limitations under the License.
 #include "Settings.h"
 #include "Utility.h"
 
+#include <Strsafe.h>
 #include <algorithm>
 #include <direct.h>
 #include <ETWProviders\etwprof.h>
@@ -119,16 +120,16 @@ void handle_vprintfFailure( _In_ const HRESULT fmtResult, _In_ const rsize_t buf
 {
 	if ( fmtResult == STRSAFE_E_INSUFFICIENT_BUFFER )
 	{
-		ATLTRACE2( atlTraceGeneral, 0, L"CUIforETWDlg::vprintf FAILED TO format args to buffer!\r\n\tthe buffer ( size: %I64u ) was too small)\r\n", static_cast<uint64_t>( bufferCount ) );
+		ATLTRACE2( ATL::atlTraceGeneral, 0, L"CUIforETWDlg::vprintf FAILED TO format args to buffer!\r\n\tthe buffer ( size: %I64u ) was too small)\r\n", static_cast<uint64_t>( bufferCount ) );
 		return;
 	}
 	if ( fmtResult == STRSAFE_E_INVALID_PARAMETER )
 	{
-		ATLTRACE2( atlTraceGeneral, 0, L"CUIforETWDlg::vprintf FAILED TO format args to buffer! An invalid parameter was passed to StringCchVPrintf!\r\n" );
+		ATLTRACE2( ATL::atlTraceGeneral, 0, L"CUIforETWDlg::vprintf FAILED TO format args to buffer! An invalid parameter was passed to StringCchVPrintf!\r\n" );
 		return;
 	}
 	//how should we handle this correctly?
-	ATLTRACE2( atlTraceGeneral, 0, L"CUIforETWDlg::vprintf FAILED TO format args to buffer! An expected error was encountered!\r\n" );
+	ATLTRACE2( ATL::atlTraceGeneral, 0, L"CUIforETWDlg::vprintf FAILED TO format args to buffer! An expected error was encountered!\r\n" );
 	if ( IsDebuggerPresent( ) )
 	{
 		_CrtDbgBreak( );
@@ -177,7 +178,7 @@ bool addStringToCComboBox( _Inout_ CComboBox* const comboBox, _In_z_ PCWSTR cons
 		outputPrintf( L"Not enough space available to store string `%s`!!\r\n", stringToAdd );
 		return false;
 	}
-	ATLTRACE2( atlTraceGeneral, 2, L"Successfully added string `%s` to CComboBox\r\n", stringToAdd );
+	ATLTRACE2( ATL::atlTraceGeneral, 2, L"Successfully added string `%s` to CComboBox\r\n", stringToAdd );
 	return true;
 }
 
@@ -263,11 +264,15 @@ bool addSingleToolToToolTip(
 							_In_z_  PCWSTR         const toolTipMessageToAdd
 						   )
 {
-	static_assert( std::is_base_of<CWnd, DerivedButton>::value, "Cannot add a non-CWnd-derived class as a tooltip!" );
+	static_assert( std::is_base_of<CWnd, DerivedButton>::value,
+				   "Cannot add a non-CWnd-derived class as a tooltip!" );
 	const BOOL addToolTipResult = toolTip->AddTool( btToAdd, toolTipMessageToAdd );
 	if ( addToolTipResult != TRUE )
 	{
-		outputPrintf( L"Failed to add a message to a tooltip!!\r\nThe tooltip message:\r\n\t`%s`\r\n", toolTipMessageToAdd );
+		outputPrintf( L"Failed to add a message to a tooltip!!\r\n"
+					  L"The tooltip message:\r\n\t`%s`\r\n",
+					  toolTipMessageToAdd
+					);
 		return false;
 	}
 	return true;
@@ -444,7 +449,11 @@ void SetSaveTraceBuffersWindowText( _In_ const HWND hWnd )
 		const DWORD err = GetLastError( );
 
 		//TODO: format error code!
-		outputPrintf( L"::SetWindowTextW( btSaveTraceBuffers_.m_hWnd, L\"Sa&ve Trace Buffers\" failed!!! Error code: %u\r\n", err );
+		outputPrintf( L"::SetWindowTextW( btSaveTraceBuffers_.m_hWnd, "
+					  L"L\"Sa&ve Trace Buffers\" failed!!! "
+					  L"Error code: %u\r\n",
+					  err
+					);
 		exit(10);
 	}
 
@@ -456,8 +465,10 @@ bool appendAboutBoxToSystemMenu( _In_ const CWnd& window )
 	// Add "About..." menu item to system menu.
 
 	// IDM_ABOUTBOX must be in the system command range.
-	static_assert( ( IDM_ABOUTBOX & 0xFFF0 ) == IDM_ABOUTBOX, "IDM_ABOUTBOX IS NOT in the system command range!" );
-	static_assert( IDM_ABOUTBOX < 0xF000, "IDM_ABOUTBOX IS NOT in the system command range!" );
+	static_assert( ( IDM_ABOUTBOX & 0xFFF0 ) == IDM_ABOUTBOX,
+				   "IDM_ABOUTBOX IS NOT in the system command range!" );
+	static_assert( IDM_ABOUTBOX < 0xF000,
+				   "IDM_ABOUTBOX IS NOT in the system command range!" );
 
 
 
@@ -584,7 +595,14 @@ bool setEnvironmentVariable( _In_z_ PCSTR const variableName, _In_z_ PCSTR const
 					);
 		return false;
 	}
-	ATLTRACE2( atlTraceGeneral, 1, L"Successfully set an environment variable.\r\n\tvariable name: %S\r\n\tvalue set:       %S\r\n", variableName, value );
+	ATLTRACE2( 
+				ATL::atlTraceGeneral,
+				1,
+				L"Successfully set an environment variable.\r\n\t"
+				L"variable name: %S\r\n\tvalue set:       %S\r\n",
+				variableName,
+				value
+			 );
 	return true;
 }
 
@@ -625,6 +643,8 @@ std::wstring getRawDirectoryFromEnvironmentVariable( _In_z_ PCWSTR env )
 	const rsize_t returnValue = returnValue_temp;
 	if ( getEnvironmentVariableLengthResult != 0 )
 	{
+		ATLASSERT( getEnvironmentVariableLengthResult != ERANGE );
+		ATLASSERT( getEnvironmentVariableLengthResult != EINVAL );
 		outputPrintf( L"Failed to get value (expected a directory)"
 					  L"of environment variable `%s`!!\r\n", env
 					);
@@ -632,9 +652,11 @@ std::wstring getRawDirectoryFromEnvironmentVariable( _In_z_ PCWSTR env )
 	}
 	if ( returnValue == 0 )
 	{
-		outputPrintf( L"Environment variable `%s` not found "
-					  L"(expected a directory)!!\r\n", env
+#ifdef DEBUG
+		outputPrintf( L"Environment variable `%s` not found - "
+					  L"(will use default directory).\r\n", env
 					);
+#endif
 		return L"";
 	}
 
@@ -646,13 +668,23 @@ std::wstring getRawDirectoryFromEnvironmentVariable( _In_z_ PCWSTR env )
 	if ( ( returnValue + 1 ) > bufferSize )
 	{
 		rsize_t dynReturnValue = 0;
-		std::unique_ptr<wchar_t[ ]> dynamicBuffer = std::make_unique<wchar_t[ ]>( returnValue + 1 );
-		const errno_t getEnvResult = _wgetenv_s( &dynReturnValue, dynamicBuffer.get( ), ( returnValue + 1 ), env );
-		ATLASSERT( wcslen( dynamicBuffer.get( ) ) == dynReturnValue );
+		std::unique_ptr<wchar_t[ ]> dynamicBuffer =
+			std::make_unique<wchar_t[ ]>( returnValue + 1 );
+		
+		const errno_t getEnvResult =
+			_wgetenv_s(
+						&dynReturnValue,
+						dynamicBuffer.get( ),
+						( returnValue + 1 ),
+						env
+					  );
+		
+		ATLASSERT( ( wcslen( dynamicBuffer.get( ) ) + 1 ) == dynReturnValue );
 
 		if ( getEnvResult != 0 )
 		{
-
+			ATLASSERT( getEnvResult != ERANGE );
+			ATLASSERT( getEnvResult != EINVAL );
 			outputPrintf( L"Failed to get value (expected a directory)"
 						  L"of environment variable `%s`!!\r\n", env
 						);
@@ -664,9 +696,11 @@ std::wstring getRawDirectoryFromEnvironmentVariable( _In_z_ PCWSTR env )
 	rsize_t stackbufferReturnValue = 0;
 	wchar_t environmentVariableBuffer[ bufferSize ] = { 0 };
 	const errno_t getEnvResult = _wgetenv_s( &stackbufferReturnValue, environmentVariableBuffer, env );
-	ATLASSERT( wcslen( environmentVariableBuffer ) == stackbufferReturnValue );
+	ATLASSERT( ( wcslen( environmentVariableBuffer ) + 1 ) == stackbufferReturnValue );
 	if ( getEnvResult != 0 )
 	{
+		ATLASSERT( getEnvResult != ERANGE );
+		ATLASSERT( getEnvResult != EINVAL );
 		outputPrintf( L"Failed to get value (expected a directory)"
 					  L"of environment variable `%s`!!\r\n", env
 					);
@@ -705,7 +739,11 @@ void handleUnexpectedCreateDirectory( _In_ const std::wstring& path, _In_ const 
 	{
 		outputPrintf( L"Encountered an unexpected error after calling CreateDirectory!\r\n" );
 		outputPrintf( L"Even worse, we then failed to format the error message!\r\n" );
-		outputPrintf( L"\tAttempting to create folder: `%s`, error code that we hit: %u\r\n", path.c_str( ), lastErr );
+		outputPrintf( L"\tAttempting to create folder: `%s`, "
+					  L"error code that we hit: %u\r\n",
+					  path.c_str( ),
+					  lastErr
+					);
 		return;
 	}
 	outputPrintf( L"Encountered an unexpected error after calling CreateDirectory!\r\n" );
@@ -724,7 +762,11 @@ void handleUnexpectedErrorPathFileExists( _In_ const std::wstring& path, _In_ co
 	{
 		outputPrintf( L"Encountered an unexpected error after calling PathFileExists!\r\n" );
 		outputPrintf( L"Even worse, we then failed to format the error message!\r\n" );
-		outputPrintf( L"\tPath that we were checking: `%s`, error code that we hit: %u\r\n", path.c_str( ), lastErr );
+		outputPrintf( L"\tPath that we were checking: `%s`, "
+					  L"error code that we hit: %u\r\n",
+					  path.c_str( ),
+					  lastErr
+					);
 		return;
 	}
 	outputPrintf( L"Encountered an unexpected error after calling PathFileExists!\r\n" );
@@ -741,7 +783,11 @@ void handleUnexpectedErrorGetFileAttributes( _In_ const std::wstring& path, _In_
 	{
 		outputPrintf( L"Encountered an unexpected error after calling GetFileAttributes!\r\n" );
 		outputPrintf( L"Even worse, we then failed to format the error message!\r\n" );
-		outputPrintf( L"\tPath that we were checking: `%s`, error code that we hit: %u\r\n", path.c_str( ), lastErr );
+		outputPrintf( L"\tPath that we were checking: `%s`, "
+					  L"error code that we hit: %u\r\n",
+					  path.c_str( ),
+					  lastErr
+					);
 		return;
 	}
 	outputPrintf( L"Encountered an unexpected error after calling GetFileAttributes!\r\n" );
@@ -950,7 +996,8 @@ std::wstring getKernelFile( _In_ const TracingMode tracingMode, _In_ const std::
 
 std::wstring getKernelArgs( _In_ const std::wstring kernelStackWalk, _In_ const std::wstring kernelFile, _In_ const std::wstring kernelLogger )
 {
-	const std::wstring kernelProviders = L" Latency+POWER+DISPATCHER+FILE_IO+FILE_IO_INIT+VIRT_ALLOC";
+	const std::wstring kernelProviders =
+		L" Latency+POWER+DISPATCHER+FILE_IO+FILE_IO_INIT+VIRT_ALLOC";
 
 	// Buffer sizes are in KB, so 1024 is actually 1 MB
 	// Make this configurable.
@@ -1024,7 +1071,8 @@ void DisablePagingExecutive( )
 {
 	if (Is64BitWindows())
 	{
-		PCWSTR const keyName = L"SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Memory Management";
+		PCWSTR const keyName =
+			L"SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Memory Management";
 		SetRegistryDWORD(HKEY_LOCAL_MACHINE, keyName, L"DisablePagingExecutive", 1);
 	}
 }
@@ -1050,7 +1098,8 @@ void CUIforETWDlg::vprintf(PCWSTR pFormat, va_list args)
 	
 	wchar_t buffer[ bufferCount ];
 
-	const HRESULT printFormattedArgsToBuffer = StringCchVPrintfW( buffer, bufferCount, pFormat, args );
+	const HRESULT printFormattedArgsToBuffer =
+		StringCchVPrintfW( buffer, bufferCount, pFormat, args );
 	ASSERT( SUCCEEDED( printFormattedArgsToBuffer ) );
 	if ( FAILED( printFormattedArgsToBuffer ) )
 	{
@@ -1239,7 +1288,8 @@ bool CUIforETWDlg::SetSymbolPath()
 	if (bManageSymbolPath_ || !getenv(NtSymbolEnvironmentVariableName))
 	{
 		bManageSymbolPath_ = true;
-		const bool setChromiumSymbolPathResult = setChromiumSymbolPath( bChromeDeveloper_ );
+		const bool setChromiumSymbolPathResult =
+			setChromiumSymbolPath( bChromeDeveloper_ );
 		if ( !setChromiumSymbolPathResult )
 		{
 			return false;
@@ -1251,7 +1301,8 @@ bool CUIforETWDlg::SetSymbolPath()
 	//The buffer size that's required, or 0 if the variable is not found.
 	//[getenv_s returns] zero if successful; otherwise, an error code on failure.
 	//What the hell does a "not found" look like?
-	const errno_t getSymCachePathResult = getenv_s( &sizeRequired, NULL, 0, NtSymCacheEnvironmentVariableName );
+	const errno_t getSymCachePathResult =
+		getenv_s( &sizeRequired, NULL, 0, NtSymCacheEnvironmentVariableName );
 	
 	//TODO: does this make any goddamned sense?
 	if ( getSymCachePathResult != 0 )
@@ -1262,11 +1313,14 @@ bool CUIforETWDlg::SetSymbolPath()
 
 	if ( sizeRequired != 0 )
 	{
-		ATLTRACE2( atlTraceGeneral, 1, L"_NT_SYMCACHE_PATH was found! No work necessary!\r\n" );
+		ATLTRACE2( ATL::atlTraceGeneral, 1, L"_NT_SYMCACHE_PATH was found! "
+				   L"No work necessary!\r\n"
+				 );
 		return true;
 	}
 
-	const bool SetSymbolCachePathresult = setEnvironmentVariable( NtSymCacheEnvironmentVariableName, DefaultSymbolCachePath );
+	const bool SetSymbolCachePathresult =
+		setEnvironmentVariable( NtSymCacheEnvironmentVariableName, DefaultSymbolCachePath );
 	if ( !SetSymbolCachePathresult )
 	{
 		return false;
@@ -1279,7 +1333,7 @@ BOOL CUIforETWDlg::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
 
-	ATLTRACE2( atlTraceGeneral, 0, L"Initializing dialog box!\r\n" );
+	ATLTRACE2( ATL::atlTraceGeneral, 0, L"Initializing dialog box!\r\n" );
 
 	const HINSTANCE instanceHandle = AfxGetInstanceHandle( );
 
@@ -1343,7 +1397,9 @@ BOOL CUIforETWDlg::OnInitDialog()
 	_Null_terminated_ wchar_t documents_temp[ MAX_PATH ] = { 0 };
 
 	//We want to CREATE IT if it doesn't exist??!?
-	const HRESULT shGetMyDocResult = SHGetFolderPath( 0, CSIDL_MYDOCUMENTS, NULL, SHGFP_TYPE_CURRENT, documents_temp );
+	const HRESULT shGetMyDocResult =
+		SHGetFolderPath( 0, CSIDL_MYDOCUMENTS, NULL, SHGFP_TYPE_CURRENT, documents_temp );
+	
 	ASSERT( SUCCEEDED( shGetMyDocResult ) );
 
 	if ( FAILED( shGetMyDocResult ) )
@@ -1359,7 +1415,9 @@ BOOL CUIforETWDlg::OnInitDialog()
 	std::wstring defaultTraceDir = documents + std::wstring(L"\\etwtraces\\");
 	traceDir_ = GetDirectory(L"etwtracedir", defaultTraceDir);
 
-	const bool copyToDirResult = copyWpaProfileToExecutableDirectory( documents, std::move( GetExeDir( ) ) );
+	const bool copyToDirResult =
+		copyWpaProfileToExecutableDirectory( documents, std::move( GetExeDir( ) ) );
+	
 	if ( !copyToDirResult )
 	{
 		//TODO: properly handle error!
@@ -1405,7 +1463,9 @@ BOOL CUIforETWDlg::OnInitDialog()
 
 
 	
-	const bool addInputTracingStringsResult = addbtInputTracingStrings( &btInputTracing_ );
+	const bool addInputTracingStringsResult =
+		addbtInputTracingStrings( &btInputTracing_ );
+	
 	if ( !addInputTracingStringsResult )
 	{
 		outputPrintf( L"Failed to add strings to btInputTracing_!\r\n" );
@@ -1413,8 +1473,11 @@ BOOL CUIforETWDlg::OnInitDialog()
 	}
 	
 
-	static_assert( std::is_convertible<decltype( InputTracing_ ), int>::value, "Bad argument to set CComboBox selection to (on next line)! We need to be able to convert to an int!" );
-	const bool setBtInputTracingSelectionResult = setCComboBoxSelection( &btInputTracing_, InputTracing_ );
+	static_assert( std::is_convertible<decltype( InputTracing_ ), int>::value,
+				   "Bad argument to set CComboBox selection to (on next line)! We need to be able to convert to an int!" );
+	const bool setBtInputTracingSelectionResult =
+		setCComboBoxSelection( &btInputTracing_, InputTracing_ );
+	
 	if ( !setBtInputTracingSelectionResult )
 	{
 		outputPrintf( L"Failed to set btInputTracing_ selection to index: %i\r\n", InputTracing_ );
@@ -1422,7 +1485,9 @@ BOOL CUIforETWDlg::OnInitDialog()
 
 	}
 
-	const bool addTracingModeStringsResult = addbtTracingModeStrings( &btTracingMode_ );
+	const bool addTracingModeStringsResult =
+		addbtTracingModeStrings( &btTracingMode_ );
+	
 	if ( !addTracingModeStringsResult )
 	{
 		outputPrintf( L"Failed to add strings to btTracingMode_!\r\n" );
@@ -1433,8 +1498,11 @@ BOOL CUIforETWDlg::OnInitDialog()
 	
 	//btTracingMode_.SetCurSel(tracingMode_);
 	
-	static_assert( std::is_convertible<decltype( tracingMode_ ), int>::value, "Bad argument to set CComboBox selection to (on next line)! We need to be able to convert to an int!" );
-	const bool setBtTracingModeSelection = setCComboBoxSelection( &btTracingMode_, tracingMode_ );
+	static_assert( std::is_convertible<decltype( tracingMode_ ), int>::value,
+				   "Bad argument to set CComboBox selection to (on next line)! We need to be able to convert to an int!" );
+	const bool setBtTracingModeSelection =
+		setCComboBoxSelection( &btTracingMode_, tracingMode_ );
+	
 	if ( !setBtTracingModeSelection )
 	{
 		outputPrintf( L"Failed to set btTracingMode_ selection to index: %i\r\n", tracingMode_ );
@@ -1501,7 +1569,9 @@ std::wstring CUIforETWDlg::GetDirectory( _In_z_ PCWSTR env, const std::wstring& 
 	if (!doesFileExist)
 	{
 		//(void)_wmkdir(result.c_str());
-		const bool sucessfullyCreatedDirectory = enhancedCreateDirectory( result );
+		const bool sucessfullyCreatedDirectory =
+			enhancedCreateDirectory( result );
+
 		if ( !sucessfullyCreatedDirectory )
 		{
 			if ( IsDebuggerPresent( ) )
@@ -1592,7 +1662,9 @@ void CUIforETWDlg::RegisterProviders()
 				if (!exitCode)
 				{
 					useChromeProviders_ = true;
-					outputPrintf(L"Chrome providers registered. Chrome providers will be recorded.\n");
+					outputPrintf(L"Chrome providers registered. "
+								 L"Chrome providers will be recorded.\n"
+								);
 				}
 			}
 		}
@@ -1760,20 +1832,37 @@ std::wstring CUIforETWDlg::GenerateResultFilename() const
 	{
 		// The filenames are chosen to sort by date, with username as the LSB.
 		//swprintf_s(fileName, L"%04d-%02d-%02d_%02d-%02d-%02d_%s", year + 2000, month, day, hour, min, sec, username);
-		const HRESULT fmtResult = StringCchPrintfW( fileName, filenameBufferSize, L"%04d-%02d-%02d_%02d-%02d-%02d_%s", year + 2000, month, day, hour, min, sec, username );
+		const HRESULT fmtResult =
+			StringCchPrintfW(
+								fileName,
+								filenameBufferSize,
+								L"%04d-%02d-%02d_%02d-%02d-%02d_%s",
+								year + 2000,
+								month,
+								day,
+								hour,
+								min,
+								sec,
+								username
+							);
+		
 		if ( SUCCEEDED( fmtResult ) )
 		{
 			filePart = fileName;
 		}
 		else
 		{
-			outputPrintf( L"CUIforETWDlg::GenerateResultFilename - failed to properly format a file name!\r\n" );
+			outputPrintf( L"CUIforETWDlg::GenerateResultFilename - "
+						  L"failed to properly format a file name!\r\n"
+						);
 			filePart = L"UIforETW";
 		}
 	}
 	else
 	{
-		outputPrintf( L"CUIforETWDlg::GenerateResultFilename - failed to properly read time & date strings!\r\n" );
+		outputPrintf( L"CUIforETWDlg::GenerateResultFilename - "
+					  L"failed to properly read time & date strings!\r\n"
+					);
 		filePart = L"UIforETW";
 	}
 
@@ -1789,7 +1878,11 @@ std::wstring CUIforETWDlg::GenerateResultFilename() const
 	return GetTraceDir() + filePart + L".etl";
 }
 
-_Pre_satisfies_( ( tracingMode_ == kTracingToMemory ) || ( tracingMode_ == kTracingToFile ) || ( tracingMode_ == kHeapTracingToFile ) )
+_Pre_satisfies_( 
+				( tracingMode_ == kTracingToMemory   ) ||
+				( tracingMode_ == kTracingToFile     ) ||
+				( tracingMode_ == kHeapTracingToFile )
+			   )
 void CUIforETWDlg::OnBnClickedStarttracing()
 {
 	RegisterProviders();
@@ -1811,10 +1904,14 @@ void CUIforETWDlg::OnBnClickedStarttracing()
 		abort( );
 	}
 
-	const std::wstring kernelStackWalk = getKernelStackWalk( bSampledStacks_, bCswitchStacks_ );
-	const std::wstring kernelFile = getKernelFile( tracingMode_, GetKernelFile( ) );
+	const std::wstring kernelStackWalk =
+		getKernelStackWalk( bSampledStacks_, bCswitchStacks_ );
+	
+	const std::wstring kernelFile =
+		getKernelFile( tracingMode_, GetKernelFile( ) );
 
-	const std::wstring kernelArgs = getKernelArgs( kernelStackWalk, kernelFile, GetKernelLogger( ) );
+	const std::wstring kernelArgs =
+		getKernelArgs( kernelStackWalk, kernelFile, GetKernelLogger( ) );
 
 	std::wstring userProviders = getBaseUserProviders( );
 
@@ -1857,10 +1954,14 @@ void CUIforETWDlg::OnBnClickedStarttracing()
 
 	{
 		ChildProcess child(GetXperfPath());
-		if (tracingMode_ == kHeapTracingToFile)
-			child.Run(bShowCommands_, L"xperf.exe" + kernelArgs + userArgs + heapArgs);
+		if ( tracingMode_ == kHeapTracingToFile )
+		{
+			child.Run( bShowCommands_, L"xperf.exe" + kernelArgs + userArgs + heapArgs );
+		}
 		else
-			child.Run(bShowCommands_, L"xperf.exe" + kernelArgs + userArgs);
+		{
+			child.Run( bShowCommands_, L"xperf.exe" + kernelArgs + userArgs );
+		}
 
 		DWORD exitCode = child.GetExitCode();
 		if (exitCode)
@@ -2412,7 +2513,9 @@ BOOL CUIforETWDlg::PreTranslateMessage(MSG* pMsg)
 
 void CUIforETWDlg::SetHeapTracing(bool forceOff)
 {
-	std::wstring targetKey = L"Software\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options";
+	std::wstring targetKey = L"Software\\Microsoft\\Windows NT\\CurrentVersion"
+							 L"\\Image File Execution Options";
+
 	DWORD tracingFlags = tracingMode_ == kHeapTracingToFile ? 1 : 0;
 	if (forceOff)
 		tracingFlags = 0;
@@ -2427,19 +2530,28 @@ void CUIforETWDlg::OnCbnSelchangeTracingmode()
 	switch (tracingMode_)
 	{
 	case kTracingToMemory:
-		outputPrintf(L"Traces will be recorded to in-memory circular buffers. Tracing can be enabled "
-			L"indefinitely long, and will record the last ~10-60 seconds.\n");
+		outputPrintf(
+						L"Traces will be recorded to in-memory circular buffers. "
+						L"Tracing can be enabled indefinitely long, "
+						L"and will record the last ~10-60 seconds.\n"
+					);
 		break;
 	case kTracingToFile:
 		outputPrintf(L"Traces will be recorded to disk to allow arbitrarily long recordings.\n");
 		break;
 	case kHeapTracingToFile:
-		outputPrintf(L"Heap traces will be recorded to disk for %s. Note that only %s processes "
-			L"started after this is selected will be traced. Note that %s processes started now "
-			L"may run slightly slower even if not being traced.\n"
-			L"To keep trace sizes manageable you may want to turn off context switch and CPU "
-			L"sampling call stacks.\n", heapTracingExe_.c_str(),
-			heapTracingExe_.c_str(), heapTracingExe_.c_str());
+		outputPrintf(
+						L"Heap traces will be recorded to disk for %s. "
+						L"Note that only %s processes "
+						L"started after this is selected will be traced. "
+						L"Note that %s processes started now "
+						L"may run slightly slower even if not being traced.\n"
+						L"To keep trace sizes manageable you may want to turn "
+						L"off context switch and CPU sampling call stacks.\n",
+						heapTracingExe_.c_str(),
+						heapTracingExe_.c_str(),
+						heapTracingExe_.c_str()
+					);
 		break;
 	}
 	SetHeapTracing(false);
@@ -2606,8 +2718,10 @@ void CUIforETWDlg::CopyTraceName()
 		// If the shift key is held down, just put the file path in the clipboard.
 		// If not, put the entire path in the clipboard. This is an undocumented
 		// but very handy option.
-		if (GetKeyState(VK_SHIFT) >= 0)
-			tracePath = GetTraceDir() + tracePath;
+		if ( GetKeyState( VK_SHIFT ) >= 0 )
+		{
+			tracePath = GetTraceDir( ) + tracePath;
+		}
 		SetClipboardText(L"\"" + tracePath + L"\"");
 	}
 }
@@ -2754,7 +2868,7 @@ void CUIforETWDlg::PreprocessTrace(const std::wstring& traceFilename)
 				const int scanToStringResult = swscanf_s(pidstr + 1, L"%lu", &pid);
 				if ( scanToStringResult == 0 )
 				{
-					ATLTRACE2( atlTraceGeneral, 0, L"No fields assigned from pidstr+1 (%s)!!\r\n", ( pidstr+1 ) );
+					ATLTRACE2( ATL::atlTraceGeneral, 0, L"No fields assigned from pidstr+1 (%s)!!\r\n", ( pidstr+1 ) );
 					//0 is an invalid process ID!
 					//http://blogs.msdn.com/b/oldnewthing/archive/2004/02/23/78395.aspx
 					pidsByType[type].push_back( 0 );
@@ -2762,7 +2876,7 @@ void CUIforETWDlg::PreprocessTrace(const std::wstring& traceFilename)
 				}
 				if ( scanToStringResult == EOF )
 				{
-					ATLTRACE2( atlTraceGeneral, 0, L"EOF hit before assigning fields from pidstr+1 (%s)!!\r\n", ( pidstr+1 ) );
+					ATLTRACE2( ATL::atlTraceGeneral, 0, L"EOF hit before assigning fields from pidstr+1 (%s)!!\r\n", ( pidstr+1 ) );
 					//0 is an invalid process ID!
 					//http://blogs.msdn.com/b/oldnewthing/archive/2004/02/23/78395.aspx
 					pidsByType[type].push_back( 0 );
@@ -2776,7 +2890,7 @@ void CUIforETWDlg::PreprocessTrace(const std::wstring& traceFilename)
 			}
 		}
 	}
-	//Maybe we should request the unicode version of the APIs (for long path support)?
+	//Maybe we should request the Unicode version of the APIs (for long path support)?
 	const std::wstring fileToOpen = ( traceFilename.substr( 0, traceFilename.size( ) - 4 ) + L".txt" );
 
 #pragma warning(suppress : 4996)
@@ -2803,7 +2917,7 @@ void CUIforETWDlg::PreprocessTrace(const std::wstring& traceFilename)
 		const int closeResult = fclose( pFile );
 		if ( closeResult != 0 )
 		{
-			ATLTRACE( atlTraceGeneral, 0, L"DOUBLE FAULT: serious error occurred! Failed to write to file, then failed to close it!\r\n" );
+			ATLTRACE( ATL::atlTraceGeneral, 0, L"DOUBLE FAULT: serious error occurred! Failed to write to file, then failed to close it!\r\n" );
 			std::terminate( );
 		}
 		throw std::runtime_error( "Failed to write 'PIDs by process type' to file!" );
@@ -2816,7 +2930,7 @@ void CUIforETWDlg::PreprocessTrace(const std::wstring& traceFilename)
 			const int closeResult = fclose( pFile );
 			if ( closeResult != 0 )
 			{
-				ATLTRACE( atlTraceGeneral, 0, L"DOUBLE FAULT: serious error occurred! Failed to write to file, then failed to close it!\r\n" );
+				ATLTRACE( ATL::atlTraceGeneral, 0, L"DOUBLE FAULT: serious error occurred! Failed to write to file, then failed to close it!\r\n" );
 				std::terminate( );
 			}
 			throw std::runtime_error( "Failed to write types.first to file!" );
@@ -2830,7 +2944,7 @@ void CUIforETWDlg::PreprocessTrace(const std::wstring& traceFilename)
 				const int closeResult = fclose( pFile );
 				if ( closeResult != 0 )
 				{
-					ATLTRACE( atlTraceGeneral, 0, L"DOUBLE FAULT: serious error occurred! Failed to write to file, then failed to close it!\r\n" );
+					ATLTRACE( ATL::atlTraceGeneral, 0, L"DOUBLE FAULT: serious error occurred! Failed to write to file, then failed to close it!\r\n" );
 					std::terminate( );
 				}
 				throw std::runtime_error( "Failed to write types.second.pid to file!" );
@@ -2843,7 +2957,7 @@ void CUIforETWDlg::PreprocessTrace(const std::wstring& traceFilename)
 			const int closeResult = fclose( pFile );
 			if ( closeResult != 0 )
 			{
-				ATLTRACE( atlTraceGeneral, 0, L"DOUBLE FAULT: serious error occurred! Failed to write to file, then failed to close it!\r\n" );
+				ATLTRACE( ATL::atlTraceGeneral, 0, L"DOUBLE FAULT: serious error occurred! Failed to write to file, then failed to close it!\r\n" );
 				std::terminate( );
 			}
 			throw std::runtime_error( "Failed to new line to end of file!" );
@@ -2879,7 +2993,7 @@ void CUIforETWDlg::StartRenameTrace(bool fullRename)
 	std::wstring traceName = traces_[curSel];
 
 	// If the trace name starts with the default date/time pattern
-	// then just allow editing the suffix. Othewise allow editing
+	// then just allow editing the suffix. Otherwise allow editing
 	// the entire name.
 	validRenameDate_ = false;
 	if (traceName.size() >= kPrefixLength && !fullRename)

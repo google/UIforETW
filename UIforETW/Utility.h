@@ -16,9 +16,9 @@ limitations under the License.
 
 #pragma once
 
-#include "stdafx.h"
-//#include <vector>
-//#include <string>
+//#include "stdafx.h"
+#include <vector>
+#include <string>
 #include <chrono>
 
 
@@ -130,12 +130,7 @@ std::wstring FindPython(); // Returns a full path to python.exe or nothing.
 class ElapsedTimer
 {
 public:
-	double ElapsedSeconds() const
-	{
-		const auto duration = std::chrono::steady_clock::now() - start_;
-		const auto microseconds = std::chrono::duration_cast<std::chrono::microseconds>(duration);
-		return microseconds.count() / 1e6;
-	}
+	double ElapsedSeconds( ) const;
 private:
 	std::chrono::steady_clock::time_point start_ = std::chrono::steady_clock::now();
 };

@@ -27,6 +27,7 @@ limitations under the License.
 #define _ATL_ENABLE_PTM_WARNING                 //force the use of ANSI C++ standard-compliant syntax for pointer to member functions.
                                                 //Using this macro will cause the C4867 compiler error to be generated when non-standard syntax is used to initialize a pointer to a member function.
 
+#define _ATL_NO_AUTOMATIC_NAMESPACE 1
 
 #include <afxwin.h>         // MFC core and standard components. I get ~1 billion error messages if this isn't first.
 #include "targetver.h"
@@ -46,6 +47,7 @@ limitations under the License.
 
 
 #include <atlwin.h>             //ATL stuff
+//#include <atlsync.h>
 
 #include <sal.h>
 
@@ -54,7 +56,9 @@ void outputPrintf(_Printf_format_string_ PCWSTR pFormat, ...);
 
 
 #include <VersionHelpers.h>
+
 #include <Strsafe.h>
+#include <exception>
 
 #include <inttypes.h> // Needed for int64_t and friends
 #include <ciso646>
