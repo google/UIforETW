@@ -21,7 +21,7 @@ limitations under the License.
 
 // CSettings dialog
 
-class CSettings : public CDialogEx
+class CSettings final : public CDialogEx
 {
 	DECLARE_DYNAMIC(CSettings)
 
@@ -55,8 +55,8 @@ protected:
 
 	CToolTipCtrl toolTip_;
 
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
-	virtual BOOL OnInitDialog();
+	virtual void DoDataExchange(CDataExchange* pDX) override;    // DDX/DDV support
+	virtual BOOL OnInitDialog() override;
 
 	const std::wstring exeDir_;
 	const std::wstring wptDir_;
