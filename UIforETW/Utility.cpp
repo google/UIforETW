@@ -46,6 +46,13 @@ LONG regCloseKey( _In_ _Pre_valid_ _Post_ptr_invalid_ HKEY hKey )
 	return ::RegCloseKey( hKey );
 
 }
+
+BOOL closeHandle( _In_ _Pre_valid_ _Post_ptr_invalid_ HANDLE handle )
+{
+
+	return ::CloseHandle( handle );
+}
+
 }
 
 namespace ErrorHandling {
@@ -487,10 +494,10 @@ int64_t GetFileSize(const std::wstring& path)
 
 	if (GetFileSizeEx(hFile, &result))
 	{
-		CloseHandle(hFile);
+		handle_close::closeHandle(hFile);
 		return result.QuadPart;
 	}
-	CloseHandle(hFile);
+	handle_close::closeHandle(hFile);
 	return 0;
 }
 

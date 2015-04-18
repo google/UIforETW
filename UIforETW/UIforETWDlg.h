@@ -131,7 +131,7 @@ private:
 	// Keyboard accelerators that are active only when the trace list is active.
 	HACCEL hTracesAccelTable_ = NULL;
 
-	void SetSamplingSpeed();
+	void SetSamplingSpeed( ) const;
 
 	// Stop tracing (if tracing to a file or if bSaveTrace is
 	// false), saving the trace as well if bSaveTrace is true.
@@ -166,7 +166,7 @@ private:
 	std::wstring GetDirectory(_In_z_ PCWSTR env, const std::wstring& default);
 	void CUIforETWDlg::UpdateTraceList();
 	void RegisterProviders();
-	void DisablePagingExecutive();
+	//void DisablePagingExecutive( ) const;
 
 	CToolTipCtrl toolTip_;
 

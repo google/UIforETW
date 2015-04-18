@@ -17,6 +17,7 @@ limitations under the License.
 #include "stdafx.h"
 #include "DirectoryMonitor.h"
 #include <assert.h>
+#include "Utility.h"
 
 DirectoryMonitor::DirectoryMonitor(CWnd* pMainWindow)
 	: mainWindow_(pMainWindow)
@@ -85,7 +86,7 @@ DirectoryMonitor::~DirectoryMonitor()
 	{
 		SetEvent(hShutdownRequest_);
 		WaitForSingleObject(hThread_, INFINITE);
-		CloseHandle(hThread_);
-		CloseHandle(hShutdownRequest_);
+		handle_close::closeHandle(hThread_);
+		handle_close::closeHandle(hShutdownRequest_);
 	}
 }

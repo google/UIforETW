@@ -169,12 +169,12 @@ bool addStringToCComboBox( _Inout_ CComboBox* const comboBox, _In_z_ PCWSTR cons
 	const int addStringResult = comboBox->AddString( stringToAdd );
 	if ( addStringResult == CB_ERR )
 	{
-		ATLTRACE2( atlTraceGeneral, 0, L"Unexpected error adding string `%s`!!\r\n", stringToAdd );
+		outputPrintf( L"Unexpected error adding string `%s`!!\r\n", stringToAdd );
 		return false;
 	}
 	if ( addStringResult == CB_ERRSPACE )
 	{
-		ATLTRACE2( atlTraceGeneral, 0, L"Not enough space available to store string `%s`!!\r\n", stringToAdd );
+		outputPrintf( L"Not enough space available to store string `%s`!!\r\n", stringToAdd );
 		return false;
 	}
 	ATLTRACE2( atlTraceGeneral, 2, L"Successfully added string `%s` to CComboBox\r\n", stringToAdd );
@@ -267,7 +267,6 @@ bool addSingleToolToToolTip(
 	const BOOL addToolTipResult = toolTip->AddTool( btToAdd, toolTipMessageToAdd );
 	if ( addToolTipResult != TRUE )
 	{
-		ATLTRACE2( atlTraceGeneral, 0, L"Failed to add a message to a tooltip!!\r\nThe tooltip message:\r\n\t`%s`\r\n", toolTipMessageToAdd );
 		outputPrintf( L"Failed to add a message to a tooltip!!\r\nThe tooltip message:\r\n\t`%s`\r\n", toolTipMessageToAdd );
 		return false;
 	}
@@ -429,7 +428,7 @@ CRect GetWindowRectFromHwnd( _In_ const HWND hwnd )
 		const DWORD err = GetLastError( );
 
 		//TODO: format error code!
-		ATLTRACE2( atlTraceGeneral, 0, L"GetWindowRect failed!! Error code: %u\r\n", err );
+		outputPrintf( L"GetWindowRect failed!! Error code: %u\r\n", err );
 		
 		exit(10);
 	}
@@ -445,7 +444,7 @@ void SetSaveTraceBuffersWindowText( _In_ const HWND hWnd )
 		const DWORD err = GetLastError( );
 
 		//TODO: format error code!
-		ATLTRACE2( atlTraceGeneral, 0, L"::SetWindowTextW( btSaveTraceBuffers_.m_hWnd, L\"Sa&ve Trace Buffers\" failed!!! Error code: %u\r\n", err );
+		outputPrintf( L"::SetWindowTextW( btSaveTraceBuffers_.m_hWnd, L\"Sa&ve Trace Buffers\" failed!!! Error code: %u\r\n", err );
 		exit(10);
 	}
 
@@ -476,12 +475,12 @@ bool appendAboutBoxToSystemMenu( _In_ const CWnd& window )
 	ASSERT(bNameValid);
 	if ( bNameValid == 0 )
 	{
-		ATLTRACE2( atlTraceGeneral, 0, L"Failed to load about box menu string!!\r\n" );
+		outputPrintf( L"Failed to load about box menu string!!\r\n" );
 		return false;
 	}
 	if ( strAboutMenu.IsEmpty( ) )
 	{
-		ATLTRACE2( atlTraceGeneral, 0, L"About box string is empty?!?!\r\n" );
+		outputPrintf( L"About box string is empty?!?!\r\n" );
 		return false;
 	}
 
@@ -490,13 +489,13 @@ bool appendAboutBoxToSystemMenu( _In_ const CWnd& window )
 	const BOOL appendSeparatorResult = pSysMenu->AppendMenu(MF_SEPARATOR);
 	if ( appendSeparatorResult == 0 )
 	{
-		ATLTRACE2( atlTraceGeneral, 0, L"Failed to append separator to menu!\r\n" );
+		outputPrintf( L"Failed to append separator to menu!\r\n" );
 		return false;
 	}
 	const BOOL appendAboutBoxResult = pSysMenu->AppendMenu(MF_STRING, IDM_ABOUTBOX, strAboutMenu);
 	if ( appendAboutBoxResult == 0 )
 	{
-		ATLTRACE2( atlTraceGeneral, 0, L"Failed to append about box string to menu!\r\n" );
+		outputPrintf( L"Failed to append about box string to menu!\r\n" );
 		return false;
 	}
 
@@ -578,11 +577,15 @@ bool setEnvironmentVariable( _In_z_ PCSTR const variableName, _In_z_ PCSTR const
 	if ( setSymbolPathResult == 0 )
 	{
 		const DWORD err = GetLastError( );
-		ATLTRACE2( atlTraceGeneral, 0, L"Failed to set symbol path!\r\n\tAttempted to set environment variable: `%S`\r\n\tValue that we attempted to set the variable to: `%S`\r\n\tError code: %u\r\n", variableName, value, err );
+		outputPrintf( L"Failed to set an environment variable!\r\n\t"
+					  L"Attempted to set environment variable: `%S`\r\n\t"
+					  L"Value that we attempted to set the variable to: `%S`\r\n\t"
+					  L"Error code: %u\r\n", variableName, value, err
+					);
 		return false;
 	}
+	ATLTRACE2( atlTraceGeneral, 1, L"Successfully set an environment variable.\r\n\tvariable name: %S\r\n\tvalue set:       %S\r\n", variableName, value );
 	return true;
-
 }
 
 _Success_( return )
@@ -598,6 +601,7 @@ bool setChromiumSymbolPath( _In_ const bool bChromeDeveloper )
 
 	if ( !setSymbolPathResult )
 	{
+		outputPrintf( L"Failed to set chromium symbol path!\r\n" );
 		return false;
 	}
 
@@ -613,18 +617,24 @@ bool setChromiumSymbolPath( _In_ const bool bChromeDeveloper )
 
 std::wstring getRawDirectoryFromEnvironmentVariable( _In_z_ PCWSTR env )
 {
-	rsize_t returnValue = 0;
-	const errno_t getEnvironmentVariableLengthResult = _wgetenv_s( &returnValue, NULL, 0, env );
+	rsize_t returnValue_temp = 0;
+	//_wgetenv_s can be a bit weird.
+	//The parameter is documented as (returning):
+	//The buffer size that's required, or 0 if the variable is not found.
+	const errno_t getEnvironmentVariableLengthResult = _wgetenv_s( &returnValue_temp, NULL, 0, env );
+	const rsize_t returnValue = returnValue_temp;
 	if ( getEnvironmentVariableLengthResult != 0 )
 	{
-		//Failure!
-#ifndef DEBUG
-#error fix this!
-#endif
+		outputPrintf( L"Failed to get value (expected a directory)"
+					  L"of environment variable `%s`!!\r\n", env
+					);
+		return L"";
 	}
 	if ( returnValue == 0 )
 	{
-		//Not found!
+		outputPrintf( L"Environment variable `%s` not found "
+					  L"(expected a directory)!!\r\n", env
+					);
 		return L"";
 	}
 
@@ -635,26 +645,32 @@ std::wstring getRawDirectoryFromEnvironmentVariable( _In_z_ PCWSTR env )
 	
 	if ( ( returnValue + 1 ) > bufferSize )
 	{
+		rsize_t dynReturnValue = 0;
 		std::unique_ptr<wchar_t[ ]> dynamicBuffer = std::make_unique<wchar_t[ ]>( returnValue + 1 );
-		const errno_t getEnvResult = _wgetenv_s( &returnValue, dynamicBuffer.get( ), ( returnValue + 1 ), env );
+		const errno_t getEnvResult = _wgetenv_s( &dynReturnValue, dynamicBuffer.get( ), ( returnValue + 1 ), env );
+		ATLASSERT( wcslen( dynamicBuffer.get( ) ) == dynReturnValue );
+
 		if ( getEnvResult != 0 )
 		{
-			//Failure!
-#ifndef DEBUG
-#error fix this!
-#endif
+
+			outputPrintf( L"Failed to get value (expected a directory)"
+						  L"of environment variable `%s`!!\r\n", env
+						);
+			return L"";
 		}
 		return dynamicBuffer.get( );
 	}
 
+	rsize_t stackbufferReturnValue = 0;
 	wchar_t environmentVariableBuffer[ bufferSize ] = { 0 };
-	const errno_t getEnvResult = _wgetenv_s( &returnValue, environmentVariableBuffer, env );
+	const errno_t getEnvResult = _wgetenv_s( &stackbufferReturnValue, environmentVariableBuffer, env );
+	ATLASSERT( wcslen( environmentVariableBuffer ) == stackbufferReturnValue );
 	if ( getEnvResult != 0 )
 	{
-		//Failure!
-#ifndef DEBUG
-#error fix this!
-#endif
+		outputPrintf( L"Failed to get value (expected a directory)"
+					  L"of environment variable `%s`!!\r\n", env
+					);
+		return L"";
 	}
 	return environmentVariableBuffer;
 }
@@ -1002,6 +1018,18 @@ std::wstring getHeapStackWalk( _In_ const bool bHeapStacks )
 }
 
 
+// Tell Windows to keep 64-bit kernel metadata in memory so that
+// stack walking will work. Just do it -- don't ask.
+void DisablePagingExecutive( )
+{
+	if (Is64BitWindows())
+	{
+		PCWSTR const keyName = L"SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Memory Management";
+		SetRegistryDWORD(HKEY_LOCAL_MACHINE, keyName, L"DisablePagingExecutive", 1);
+	}
+}
+
+
 }// namespace {
 
 
@@ -1307,7 +1335,7 @@ BOOL CUIforETWDlg::OnInitDialog()
 
 	if ( FAILED( shGetMyDocResult ) )
 	{
-		ATLTRACE2( atlTraceGeneral, 0, L"Failed to find the My Documents directory!\r\n" );
+		outputPrintf( L"Failed to find the My Documents directory!\r\n" );
 		exit(10);
 	}
 
@@ -1367,7 +1395,7 @@ BOOL CUIforETWDlg::OnInitDialog()
 	const bool addInputTracingStringsResult = addbtInputTracingStrings( &btInputTracing_ );
 	if ( !addInputTracingStringsResult )
 	{
-		ATLTRACE2( atlTraceGeneral, 0, L"Failed to add strings to btInputTracing_!\r\n" );
+		outputPrintf( L"Failed to add strings to btInputTracing_!\r\n" );
 		exit(10);
 	}
 	
@@ -1376,7 +1404,7 @@ BOOL CUIforETWDlg::OnInitDialog()
 	const bool setBtInputTracingSelectionResult = setCComboBoxSelection( &btInputTracing_, InputTracing_ );
 	if ( !setBtInputTracingSelectionResult )
 	{
-		ATLTRACE( atlTraceGeneral, 0, L"Failed to set btInputTracing_ selection to index: %i\r\n", InputTracing_ );
+		outputPrintf( L"Failed to set btInputTracing_ selection to index: %i\r\n", InputTracing_ );
 		exit(10);
 
 	}
@@ -1384,7 +1412,7 @@ BOOL CUIforETWDlg::OnInitDialog()
 	const bool addTracingModeStringsResult = addbtTracingModeStrings( &btTracingMode_ );
 	if ( !addTracingModeStringsResult )
 	{
-		ATLTRACE2( atlTraceGeneral, 0, L"Failed to add strings to btTracingMode_!\r\n" );
+		outputPrintf( L"Failed to add strings to btTracingMode_!\r\n" );
 		exit(10);
 	}
 
@@ -1396,7 +1424,7 @@ BOOL CUIforETWDlg::OnInitDialog()
 	const bool setBtTracingModeSelection = setCComboBoxSelection( &btTracingMode_, tracingMode_ );
 	if ( !setBtTracingModeSelection )
 	{
-		ATLTRACE2( atlTraceGeneral, 0, L"Failed to set btTracingMode_ selection to index: %i\r\n", tracingMode_ );
+		outputPrintf( L"Failed to set btTracingMode_ selection to index: %i\r\n", tracingMode_ );
 		exit(10);
 	}
 	UpdateEnabling();
@@ -1431,7 +1459,7 @@ BOOL CUIforETWDlg::OnInitDialog()
 							 );
 		if ( !initializeToolTipResult )
 		{
-			ATLTRACE2( atlTraceGeneral, 0, L"Failed to initialize tool tips!" );
+			outputPrintf( L"Failed to initialize tool tips!" );
 			exit(10);
 		}
 	}
@@ -1492,18 +1520,21 @@ void CUIforETWDlg::RegisterProviders()
 	std::wstring dllSource = GetExeDir() + L"ETWProviders.dll";
 #pragma warning(suppress:4996)
 	const wchar_t* temp = _wgetenv(L"temp");
-	if (!temp)
+	if ( !temp )
+	{
 		return;
+	}
+
 	std::wstring dllDest = temp;
 	dllDest += L"\\ETWProviders.dll";
-	if (!CopyFile(dllSource.c_str(), dllDest.c_str(), FALSE))
+	if (!CopyFileW(dllSource.c_str(), dllDest.c_str(), FALSE))
 	{
 		outputPrintf(L"Registering of ETW providers failed due to copy error.\n");
 		return;
 	}
-	wchar_t systemDir[MAX_PATH];
-	systemDir[0] = 0;
-	GetSystemDirectory(systemDir, ARRAYSIZE(systemDir));
+
+	wchar_t systemDir[ MAX_PATH ] = { 0 };
+	GetSystemDirectoryW(systemDir, ARRAYSIZE(systemDir));
 	std::wstring wevtPath = systemDir + std::wstring(L"\\wevtutil.exe");
 
 	// Register ETWProviders.dll
@@ -1521,10 +1552,12 @@ void CUIforETWDlg::RegisterProviders()
 		std::wstring manifestPath = GetExeDir() + L"chrome_events_win.man";
 		std::wstring dllSuffix = L"chrome.dll";
 		// Make sure we have a trailing backslash in the path.
-		if (chromeDllPath_.back() != L'\\')
+		if ( chromeDllPath_.back( ) != L'\\' )
+		{
 			chromeDllPath_ += L'\\';
+		}
 		std::wstring chromeDllFullPath = chromeDllPath_ + dllSuffix;
-		if (!PathFileExists(chromeDllFullPath.c_str()))
+		if (!PathFileExistsW(chromeDllFullPath.c_str()))
 		{
 			outputPrintf(L"Couldn't find %s.\n", chromeDllFullPath.c_str());
 			outputPrintf(L"Chrome providers will not be recorded.\n");
@@ -1554,16 +1587,6 @@ void CUIforETWDlg::RegisterProviders()
 }
 
 
-// Tell Windows to keep 64-bit kernel metadata in memory so that
-// stack walking will work. Just do it -- don't ask.
-void CUIforETWDlg::DisablePagingExecutive()
-{
-	if (Is64BitWindows())
-	{
-		PCWSTR const keyName = L"SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Memory Management";
-		SetRegistryDWORD(HKEY_LOCAL_MACHINE, keyName, L"DisablePagingExecutive", 1);
-	}
-}
 
 void CUIforETWDlg::UpdateEnabling()
 {
@@ -1594,7 +1617,7 @@ void CUIforETWDlg::OnSysCommand(UINT nID, LPARAM lParam)
 
 // If you add a minimize button to your dialog, you will need the code below
 // to draw the icon. For MFC applications using the document/view model,
-// this is automatically done for you by the framework.
+// this is automatically done (badly) for you by the framework.
 
 void CUIforETWDlg::OnPaint()
 {
@@ -1917,8 +1940,10 @@ void CUIforETWDlg::StopTracingAndMaybeRecord(bool bSaveTrace)
 		}
 	}
 	double saveTime = saveTimer.ElapsedSeconds();
-	if (bShowCommands_)
-		outputPrintf(L"Trace save took %1.1f s\n", saveTime);
+	if ( bShowCommands_ )
+	{
+		outputPrintf( L"Trace save took %1.1f s\n", saveTime );
+	}
 
 	double mergeTime = 0.0;
 	if (bSaveTrace)
@@ -1942,18 +1967,24 @@ void CUIforETWDlg::StopTracingAndMaybeRecord(bool bSaveTrace)
 			merge.Run(bShowCommands_, L"xperf.exe" + args);
 		}
 		mergeTime = mergeTimer.ElapsedSeconds();
-		if (bShowCommands_)
-			outputPrintf(L"Trace merge took %1.1f s\n", mergeTime);
+		if ( bShowCommands_ )
+		{
+			outputPrintf( L"Trace merge took %1.1f s\n", mergeTime );
+		}
 	}
 
-	if (moveSuccess)
-		MoveFile(compatFileTemp, compatFile);
+	if ( moveSuccess )
+	{
+		MoveFile( compatFileTemp, compatFile );
+	}
 
 	// Delete the temporary files.
 	DeleteFile(GetKernelFile().c_str());
 	DeleteFile(GetUserFile().c_str());
-	if (tracingMode_ == kHeapTracingToFile)
-		DeleteFile(GetHeapFile().c_str());
+	if ( tracingMode_ == kHeapTracingToFile )
+	{
+		DeleteFile( GetHeapFile( ).c_str( ) );
+	}
 
 	if (!bSaveTrace || tracingMode_ != kTracingToMemory)
 	{
@@ -1963,13 +1994,17 @@ void CUIforETWDlg::StopTracingAndMaybeRecord(bool bSaveTrace)
 
 	if (bSaveTrace)
 	{
-		if (bChromeDeveloper_)
-			StripChromeSymbols(traceFilename);
+		if ( bChromeDeveloper_ )
+		{
+			StripChromeSymbols( traceFilename );
+		}
 		
 		PreprocessTrace(traceFilename);
 
-		if (bAutoViewTraces_)
-			LaunchTraceViewer(traceFilename);
+		if ( bAutoViewTraces_ )
+		{
+			LaunchTraceViewer( traceFilename );
+		}
 		// Record the name so that it gets selected.
 		lastTraceFilename_ = CrackFilePart(traceFilename);
 
@@ -2012,13 +2047,14 @@ void CUIforETWDlg::OnBnClickedStoptracing()
 
 void CUIforETWDlg::LaunchTraceViewer(const std::wstring traceFilename, const std::wstring viewer)
 {
-	if (!PathFileExists(traceFilename.c_str()))
+	if (!PathFileExistsW(traceFilename.c_str()))
 	{
 		std::wstring zipPath = traceFilename.substr(0, traceFilename.size() - 4) + L".zip";
-		if (PathFileExists(zipPath.c_str()))
+		if (PathFileExistsW(zipPath.c_str()))
 		{
 			AfxMessageBox(L"Viewing of zipped ETL files is not yet supported.\n"
-				L"Please manually unzip the trace file.");
+						  L"Please manually unzip the trace file."
+						 );
 		}
 		else
 		{
@@ -2037,12 +2073,12 @@ void CUIforETWDlg::LaunchTraceViewer(const std::wstring traceFilename, const std
 	wcscpy_s(&argsCopy[0], argsCopy.size(), args.c_str());
 	STARTUPINFO startupInfo = {};
 	PROCESS_INFORMATION processInfo = {};
-	BOOL result = CreateProcess(viewerPath.c_str(), &argsCopy[0], nullptr, nullptr, FALSE, 0, nullptr, nullptr, &startupInfo, &processInfo);
+	BOOL result = CreateProcessW(viewerPath.c_str(), &argsCopy[0], nullptr, nullptr, FALSE, 0, nullptr, nullptr, &startupInfo, &processInfo);
 	if (result)
 	{
 		// Close the handles to avoid leaks.
-		CloseHandle(processInfo.hProcess);
-		CloseHandle(processInfo.hThread);
+		handle_close::closeHandle(processInfo.hProcess);
+		handle_close::closeHandle(processInfo.hThread);
 	}
 	else
 	{
@@ -2074,7 +2110,7 @@ void CUIforETWDlg::OnBnClickedShowcommands()
 }
 
 
-void CUIforETWDlg::SetSamplingSpeed()
+void CUIforETWDlg::SetSamplingSpeed( ) const
 {
 	ChildProcess child(GetXperfPath());
 	std::wstring profInt = bFastSampling_ ? L"1221" : L"9001";
@@ -2107,7 +2143,7 @@ void CUIforETWDlg::OnBnClickedGPUtracing()
 
 void CUIforETWDlg::OnCbnSelchangeInputtracing()
 {
-	InputTracing_ = (KeyLoggerState)btInputTracing_.GetCurSel();
+	InputTracing_ = static_cast<KeyLoggerState>( btInputTracing_.GetCurSel( ) );
 	switch (InputTracing_)
 	{
 	case kKeyLoggerOff:
@@ -2133,9 +2169,9 @@ void CUIforETWDlg::UpdateTraceList()
 	lastTraceFilename_.clear();
 
 	int curSel = btTraces_.GetCurSel();
-	if (selectedTraceName.empty() && curSel >= 0 && curSel < (int)traces_.size())
+	if (selectedTraceName.empty() && curSel >= 0 && curSel < static_cast<int>( traces_.size() ))
 	{
-		selectedTraceName = traces_[curSel];
+		selectedTraceName = traces_.at( curSel );
 	}
 
 	// Note that these will also pull in files like *.etlabc and *.zipabc.
@@ -2167,7 +2203,7 @@ void CUIforETWDlg::UpdateTraceList()
 		btTraces_.SetRedraw(FALSE);
 		// Erase all entries and replace them.
 		btTraces_.ResetContent();
-		for (int curIndex = 0; curIndex < (int)traces_.size(); ++curIndex)
+		for (int curIndex = 0; curIndex < static_cast<int>( traces_.size() ); ++curIndex)
 		{
 			const auto& name = traces_[curIndex];
 			btTraces_.AddString(name.c_str());
@@ -2179,8 +2215,10 @@ void CUIforETWDlg::UpdateTraceList()
 				curSel = curIndex;
 			}
 		}
-		if (curSel >= (int)traces_.size())
-			curSel = (int)traces_.size() - 1;
+		if ( curSel >= static_cast<int>( traces_.size( ) ) )
+		{
+			curSel = static_cast<int>( traces_.size( ) ) - 1;
+		}
 		btTraces_.SetCurSel(curSel);
 		btTraces_.SetRedraw(TRUE);
 	}
@@ -2203,8 +2241,11 @@ void CUIforETWDlg::OnLbnDblclkTracelist()
 {
 	int selIndex = btTraces_.GetCurSel();
 	// This check shouldn't be necessary, but who knows?
-	if (selIndex < 0 || selIndex >= (int)traces_.size())
+	//That comment IS WRONG! CListBox::GetCurSel MAY return -1! (LB_ERR, when no item is selected)
+	if ( selIndex < 0 || selIndex >= static_cast< int >( traces_.size( ) ) )
+	{
 		return;
+	}
 	std::wstring tracename = GetTraceDir() + traces_[selIndex] + L".etl";
 	LaunchTraceViewer(tracename);
 }
@@ -2270,7 +2311,7 @@ void CUIforETWDlg::UpdateNotesState()
 	SaveNotesIfNeeded();
 
 	int curSel = btTraces_.GetCurSel();
-	if (curSel >= 0 && curSel < (int)traces_.size())
+	if (curSel >= 0 && curSel < static_cast<int>( traces_.size() ) )
 	{
 		SmartEnableWindow(btTraceNotes_, true);
 		std::wstring traceName = traces_[curSel];
@@ -2892,8 +2933,10 @@ void CUIforETWDlg::FinishTraceRename()
 	std::wstring newText = GetEditControlText(btTraceNameEdit_);
 	std::wstring newTraceName = newText;
 	
-	if (validRenameDate_)
-		newTraceName = preRenameTraceName_.substr(0, kPrefixLength) + newText;
+	if ( validRenameDate_ )
+	{
+		newTraceName = preRenameTraceName_.substr( 0, kPrefixLength ) + newText;
+	}
 	
 	btTraceNameEdit_.ShowWindow(SW_HIDE);
 
