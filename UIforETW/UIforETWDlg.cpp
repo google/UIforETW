@@ -666,7 +666,7 @@ void CUIforETWDlg::OnBnClickedStarttracing()
 	else
 		assert(0);
 
-	std::wstring kernelProviders = L" Latency+POWER+DISPATCHER+FILE_IO+FILE_IO_INIT+VIRT_ALLOC";
+	std::wstring kernelProviders = L" Latency+POWER+DISPATCHER+FILE_IO+FILE_IO_INIT+VIRT_ALLOC+MEMINFO+MEMINFO_WS";
 	std::wstring kernelStackWalk = L"";
 	if (bSampledStacks_ && bCswitchStacks_)
 		kernelStackWalk = L" -stackwalk PROFILE+CSWITCH+READYTHREAD";
