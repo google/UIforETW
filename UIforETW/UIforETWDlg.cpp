@@ -1186,8 +1186,11 @@ CUIforETWDlg::~CUIforETWDlg()
 // closes should go here.
 void CUIforETWDlg::ShutdownTasks()
 {
-	if (bShutdownCompleted_)
+	if ( bShutdownCompleted_ )
+	{
 		return;
+	}
+
 	bShutdownCompleted_ = true;
 	// Save any in-progress trace-notes edits.
 	SaveNotesIfNeeded();
