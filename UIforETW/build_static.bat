@@ -25,3 +25,6 @@ rmdir Release /s/q
 devenv /rebuild "release|Win32" UIforETWStatic.sln
 del UIforETWStatic.vcxproj
 del UIforETWStatic.sln
+
+@rem Clean up the build directory at the end to avoid subsequent build warnings.
+rmdir Release /s/q

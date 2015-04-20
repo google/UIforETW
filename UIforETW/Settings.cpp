@@ -75,6 +75,7 @@ BOOL CSettings::OnInitDialog()
 	btExtraProviders_.EnableWindow(FALSE);
 	btExtraStackwalks_.EnableWindow(FALSE);
 	btBufferSizes_.EnableWindow(FALSE);
+	btChromeDllPath_.EnableWindow(bChromeDeveloper_);
 
 	if (toolTip_.Create(this))
 	{
@@ -97,8 +98,8 @@ BOOL CSettings::OnInitDialog()
 					L"immediately after a trace is recorded.");
 		toolTip_.AddTool(&btHeapStacks_, L"Check this to record call stacks on HeapAlloc, HeapRealloc, "
 					L"and similar calls, when doing heap traces.");
-    toolTip_.AddTool(&btChromeDllPath_, L"Specify the path where chrome.dll resides. This is used "
-					L"to register the Chrome providers if the Chrome developper option is set.");
+		toolTip_.AddTool(&btChromeDllPath_, L"Specify the path where chrome.dll resides. This is used "
+					L"to register the Chrome providers if the Chrome developer option is set.");
 	}
 
 	return TRUE;  // return TRUE  unless you set the focus to a control
@@ -183,6 +184,7 @@ void CSettings::OnBnClickedCopysymboldlls()
 void CSettings::OnBnClickedChromedeveloper()
 {
 	bChromeDeveloper_ = !bChromeDeveloper_;
+	btChromeDllPath_.EnableWindow(bChromeDeveloper_);
 }
 
 

@@ -1398,13 +1398,9 @@ BOOL CUIforETWDlg::OnInitDialog()
 	initialWidth_ = windowRect.Width();
 	lastWidth_ = windowRect.Width( );
 
-	initialHeight_ = windowRect.Height();
-	lastHeight_ = windowRect.Height( );
-	
-	// 0x41 is 'C', compatible with wprui
-	//const DWORD c = 'C';
-	//static_assert( 'C' == 0x41, "" );
-	if (!RegisterHotKey(m_hWnd, kRecordTraceHotKey, MOD_WIN + MOD_CONTROL, 0x43))
+	// Win+Ctrl+C is used to trigger recording of traces. This is compatible with
+	// wprui. If this is changed then be sure to change the button text.
+	if (!RegisterHotKey(*this, kRecordTraceHotKey, MOD_WIN + MOD_CONTROL, 'C'))
 	{
 		AfxMessageBox(L"Couldn't register hot key.");
 
@@ -2927,7 +2923,7 @@ void CUIforETWDlg::StripChromeSymbols(const std::wstring& traceFilename)
 	std::wstring pythonPath = FindPython();
 	if (!pythonPath.empty())
 	{
-		outputPrintf(L"Stripping chrome symbols - this may take a while...\n");
+		outputPrintf(L"Stripping Chrome symbols - this may take a while...\n");
 		ElapsedTimer stripTimer;
 		{
 			ChildProcess child(pythonPath);
