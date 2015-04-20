@@ -122,6 +122,7 @@ enum WindowsVersion
 	kWindowsVersion10,
 };
 
+
 bool Is64BitWindows();
 WindowsVersion GetWindowsVersion();
 bool IsWindowsServer();
