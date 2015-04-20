@@ -486,7 +486,7 @@ void CUIforETWDlg::RegisterProviders()
 		child.Run(bShowCommands_, L"wevtutil.exe" + args);
 	}
 
-	// Register chrome.dll if the Chrome Developper option is set.
+	// Register chrome.dll if the Chrome Developer option is set.
 	if (bChromeDeveloper_)
 	{
 		std::wstring manifestPath = GetExeDir() + L"chrome_events_win.man";
@@ -666,7 +666,7 @@ void CUIforETWDlg::OnBnClickedStarttracing()
 	else
 		assert(0);
 
-	std::wstring kernelProviders = L" Latency+POWER+DISPATCHER+FILE_IO+FILE_IO_INIT+VIRT_ALLOC";
+	std::wstring kernelProviders = L" Latency+POWER+DISPATCHER+FILE_IO+FILE_IO_INIT+VIRT_ALLOC+MEMINFO+MEMINFO_WS";
 	std::wstring kernelStackWalk = L"";
 	if (bSampledStacks_ && bCswitchStacks_)
 		kernelStackWalk = L" -stackwalk PROFILE+CSWITCH+READYTHREAD";
@@ -1514,7 +1514,7 @@ void CUIforETWDlg::StripChromeSymbols(const std::wstring& traceFilename)
 	std::wstring pythonPath = FindPython();
 	if (!pythonPath.empty())
 	{
-		outputPrintf(L"Stripping chrome symbols - this may take a while...\n");
+		outputPrintf(L"Stripping Chrome symbols - this may take a while...\n");
 		ElapsedTimer stripTimer;
 		{
 			ChildProcess child(pythonPath);
