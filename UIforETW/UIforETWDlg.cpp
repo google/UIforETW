@@ -47,23 +47,30 @@ _Null_terminated_ const wchar_t StartEtwTracingString[ ] =
 	L"Start ETW tracing.";
 
 _Null_terminated_ const wchar_t btCompressToolTipString[ ] =
-	L"Only uncheck this if you record traces on Windows 8 and above and want to analyze "
-	L"them on Windows 7 and below.\n"
-	L"Enable ETW trace compression. On Windows 8 and above this compresses traces "
-	L"as they are saved, making them 5-10x smaller. However compressed traces cannot be loaded on "
+	L"Only uncheck this if you record traces on Windows 8 and above "
+	L"and want to analyze them on Windows 7 and below.\n"
+	L"Enable ETW trace compression. "
+	L"On Windows 8 and above this compresses traces "
+	L"as they are saved, making them 5-10x smaller. "
+	L"However compressed traces cannot be loaded on "
 	L"Windows 7 or earlier. On Windows 7 this setting has no effect.";
 
 _Null_terminated_ const wchar_t btCswitchStacksString[ ] = 
 	L"This enables recording of call stacks on context switches, from both "
-	L"the thread being switched in and the readying thread. This should only be disabled if the performance "
-	L"of functions like WaitForSingleObject and SetEvent appears to be distorted, which can happen when the "
+	L"the thread being switched in and the readying thread. "
+	L"This should only be disabled if the performance "
+	L"of functions like WaitForSingleObject and "
+	L"SetEvent appears to be distorted, which can happen when the "
 	L"context-switch rate is very high.";
 
 _Null_terminated_ const wchar_t InputTipString[ ] =
-	L"Input tracing inserts custom ETW events into traces which can be helpful when "
-	L"investigating performance problems that are correlated with user input. The default setting of "
-	L"'private' records alphabetic keys as 'A' and numeric keys as '0'. The 'full' setting records "
-	L"alphanumeric details. Both 'private' and 'full' record mouse movement and button clicks. The "
+	L"Input tracing inserts custom ETW events into "
+	L"traces which can be helpful when "
+	L"investigating performance problems that are correlated with user input. "
+	L"The default setting of "
+	L"'private' records alphabetic keys as 'A' and numeric keys as '0'. "
+	L"The 'full' setting records alphanumeric details. "
+	L"Both 'private' and 'full' record mouse movement and button clicks. The "
 	L"'off' setting records no input.";
 
 _Null_terminated_ const wchar_t SampledStacksString[ ] = 
@@ -72,8 +79,10 @@ _Null_terminated_ const wchar_t SampledStacksString[ ] =
 
 _Null_terminated_ const wchar_t SampleRateString[ ] = 
 	L"Checking this changes the CPU sampling frequency from the default of "
-	L"~1 KHz to the maximum speed of ~8 KHz. This increases the data rate and thus the size of traces "
-	L"but can make investigating brief CPU-bound performance problems (such as a single long frame) "
+	L"~1 KHz to the maximum speed of ~8 KHz. "
+	L"This increases the data rate and thus the size of traces "
+	L"but can make investigating brief CPU-bound "
+	L"performance problems (such as a single long frame) "
 	L"more practical.";
 
 _Null_terminated_ const wchar_t GPUTracingString[ ] =
@@ -82,7 +91,8 @@ _Null_terminated_ const wchar_t GPUTracingString[ ] =
 
 _Null_terminated_ const wchar_t ShowCommandsString[ ] =
 	L"This tells UIforETW to display the commands being "
-	L"executed. This can be helpful for diagnostic purposes but is not normally needed.";
+	L"executed. This can be helpful for diagnostic purposes "
+	L"but is not normally needed.";
 
 _Null_terminated_ const wchar_t TracingModeString[ ] =
 	L"Select whether to trace straight to disk or to in-memory circular buffers.";
@@ -124,26 +134,71 @@ bool handle_vprintfFailure( _In_ const HRESULT fmtResult, _In_ const rsize_t buf
 #endif
 	if ( fmtResult == STRSAFE_E_INSUFFICIENT_BUFFER )
 	{
-		ATLTRACE2( ATL::atlTraceGeneral, 0, L"CUIforETWDlg::vprintf FAILED TO format args to buffer!\r\n\tthe buffer ( size: %I64u ) was too small)\r\n", static_cast<uint64_t>( bufferCount ) );
-		MessageBoxW( NULL, L"CUIforETWDlg::vprintf FAILED TO format args to buffer! the buffer was too small)", L"Serious error!", MB_OK );
+		ATLTRACE2( 
+					ATL::atlTraceGeneral, 
+					0, 
+					L"CUIforETWDlg::vprintf FAILED TO format args to buffer!"
+					L"\r\n\tthe buffer ( size: %I64u ) was too small)\r\n",
+					static_cast<uint64_t>( bufferCount )
+				 );
+		MessageBoxW( 
+						NULL,
+						L"CUIforETWDlg::vprintf FAILED TO format args to buffer! "
+						L"the buffer was too small)",
+						L"Serious error!",
+						MB_OK
+				   );
 		return true;
 	}
 	if ( fmtResult == STRSAFE_E_INVALID_PARAMETER )
 	{
-		ATLTRACE2( ATL::atlTraceGeneral, 0, L"CUIforETWDlg::vprintf FAILED TO format args to buffer! An invalid parameter was passed to StringCchVPrintf!\r\n" );
-		MessageBoxW( NULL, L"CUIforETWDlg::vprintf FAILED TO format args to buffer! An invalid parameter was passed to StringCchVPrintf!", L"Fatal error!", MB_OK );
+		ATLTRACE2( 
+					ATL::atlTraceGeneral, 
+					0, 
+					L"CUIforETWDlg::vprintf FAILED TO format args to buffer! "
+					L"An invalid parameter was passed to StringCchVPrintf!\r\n"
+				 );
+		MessageBoxW( 
+						NULL, 
+						L"CUIforETWDlg::vprintf FAILED TO format args to buffer! "
+						L"An invalid parameter was passed to StringCchVPrintf!",
+						L"Fatal error!",
+						MB_OK
+				   );
 		std::terminate( );
 		//return;
 	}
 	if ( fmtResult == STRSAFE_E_END_OF_FILE )
 	{
-		ATLTRACE2( ATL::atlTraceGeneral, 0, L"CUIforETWDlg::vprintf FAILED TO format args to buffer! An invalid parameter was passed to StringCchVPrintf!\r\n" );
-		MessageBoxW( NULL, L"CUIforETWDlg::vprintf FAILED TO format args to buffer! StringCchVPrintf reached end of file!!", L"nonsensical error!", MB_OK );
+		ATLTRACE2( 
+					ATL::atlTraceGeneral,
+					0,
+					L"CUIforETWDlg::vprintf FAILED TO format args to buffer! "
+					L"An invalid parameter was passed to StringCchVPrintf!\r\n"
+				 );
+		MessageBoxW( 
+						NULL,
+						L"CUIforETWDlg::vprintf FAILED TO format args to buffer! "
+						L"StringCchVPrintf reached end of file!!",
+						L"nonsensical error!",
+						MB_OK 
+				   );
 		std::terminate( );
 	}
 	//how should we handle this correctly?
-	ATLTRACE2( ATL::atlTraceGeneral, 0, L"CUIforETWDlg::vprintf FAILED TO format args to buffer! An expected error was encountered!\r\n" );
-	MessageBoxW( NULL, L"CUIforETWDlg::vprintf FAILED TO format args to buffer! This error was unexpected!!", L"Fatal error!", MB_OK );
+	ATLTRACE2(
+				ATL::atlTraceGeneral,
+				0,
+				L"CUIforETWDlg::vprintf FAILED TO format args to buffer! "
+				L"An expected error was encountered!\r\n"
+			 );
+	MessageBoxW( 
+					NULL,
+					L"CUIforETWDlg::vprintf FAILED TO format args to buffer! "
+					L"This error was unexpected!!",
+					L"Fatal error!",
+					MB_OK
+			   );
 	if ( IsDebuggerPresent( ) )
 	{
 		_CrtDbgBreak( );
@@ -315,16 +370,12 @@ bool initializeToolTip(
 	toolTip->SetMaxTipWidth(400);
 	toolTip->Activate(TRUE);
 
-	//toolTip->AddTool( btStartTracing, L"Start ETW tracing.");
-
 	const bool addStartETWTracingToolTip =
 		addSingleToolToToolTip( toolTip, btStartTracing, StartEtwTracingString );
 	if ( !addStartETWTracingToolTip )
 	{
 		return false;
 	}
-
-	//toolTip->AddTool( btCompress, btCompressToolTipString );
 	
 	const bool addBtCompressTollTip =
 		addSingleToolToToolTip( toolTip, btCompress, btCompressToolTipString );
@@ -332,8 +383,6 @@ bool initializeToolTip(
 	{
 		return false;
 	}
-
-	//toolTip->AddTool( btCswitchStacks, btCswitchStacksString );
 	
 	const bool addBtCswitchStacksString =
 		addSingleToolToToolTip( toolTip, btCswitchStacks, btCswitchStacksString );
@@ -342,17 +391,12 @@ bool initializeToolTip(
 		return false;
 	}
 	
-	//toolTip->AddTool( btSampledStacks, );
-	
 	const bool addBtSampledStacksString =
 		addSingleToolToToolTip( toolTip, btSampledStacks, SampledStacksString );
 	if ( !addBtSampledStacksString )
 	{
 		return false;
 	}
-
-
-	//toolTip->AddTool( btFastSampling, SampleRateString);
 	
 	const bool addToolString =
 		addSingleToolToToolTip( toolTip, btFastSampling, SampleRateString );
@@ -361,17 +405,12 @@ bool initializeToolTip(
 		return false;
 	}
 
-	//toolTip->AddTool( btGPUTracing, GPUTracingString );
-
 	const bool addGPUTracing =
 		addSingleToolToToolTip( toolTip, btGPUTracing, GPUTracingString );
 	if ( !addGPUTracing )
 	{
 		return false;
 	}
-
-
-	//toolTip->AddTool( btShowCommands, ShowCommandsString );
 
 	const bool addShowCommands =
 		addSingleToolToToolTip( toolTip, btShowCommands, ShowCommandsString );
@@ -380,8 +419,6 @@ bool initializeToolTip(
 		return false;
 	}
 
-	
-	//toolTip->AddTool( btInputTracingLabel, InputTipString);
 	const bool addTracingLabel =
 		addSingleToolToToolTip( toolTip, btInputTracingLabel, InputTipString);
 	if ( !addTracingLabel )
@@ -389,7 +426,6 @@ bool initializeToolTip(
 		return false;
 	}
 	
-	//toolTip->AddTool( btInputTracing, InputTipString);
 	const bool addInputTracing =
 		addSingleToolToToolTip( toolTip, btInputTracing, InputTipString );
 	if ( !addInputTracing )
@@ -397,7 +433,6 @@ bool initializeToolTip(
 		return false;
 	}
 
-	//toolTip->AddTool( btTracingMode, TracingModeString);
 	const bool addTracingMode =
 		addSingleToolToToolTip( toolTip, btTracingMode, TracingModeString);
 	if ( !addTracingMode )
@@ -405,8 +440,6 @@ bool initializeToolTip(
 		return false;
 	}
 
-
-	//toolTip->AddTool( btTraces, TracesString );
 	const bool addTraces =
 		addSingleToolToToolTip( toolTip, btTraces, TracesString );
 	if ( !addTraces )
@@ -414,8 +447,6 @@ bool initializeToolTip(
 		return false;
 	}
 
-	
-	//toolTip->AddTool( btTraceNotes, TraceNotesString);
 	const bool addTraceNotes =
 		addSingleToolToToolTip( toolTip, btTraceNotes, TraceNotesString);
 	if ( !addTraceNotes )
@@ -1488,8 +1519,7 @@ BOOL CUIforETWDlg::OnInitDialog()
 	if ( !setBtInputTracingSelectionResult )
 	{
 		outputPrintf( L"Failed to set btInputTracing_ selection to index: %i\r\n", InputTracing_ );
-		exit(10);
-
+		exit( 10 );
 	}
 
 	const bool addTracingModeStringsResult =
@@ -2045,7 +2075,15 @@ void CUIforETWDlg::StopTracingAndMaybeRecord(bool bSaveTrace)
 		{
 			// If we are in memory tracing mode then don't actually stop tracing,
 			// just flush the buffers to disk.
-			std::wstring args = L" -flush " + GetKernelLogger() + L" -f \"" + GetKernelFile() + L"\" -flush UIforETWSession -f \"" + GetUserFile() + L"\"";
+			std::wstring args =
+				L" -flush "                        +
+				GetKernelLogger()                  +
+				L" -f \""                          +
+				GetKernelFile()                    +
+				L"\" -flush UIforETWSession -f \"" +
+				GetUserFile()                      +
+				L"\"";
+
 			child.Run(bShowCommands_, L"xperf.exe" + args);
 		}
 		else
@@ -2075,7 +2113,13 @@ void CUIforETWDlg::StopTracingAndMaybeRecord(bool bSaveTrace)
 			// Separate merge step to allow compression on Windows 8+
 			// https://randomascii.wordpress.com/2015/03/02/etw-trace-compression-and-xperf-syntax-refresher/
 			ChildProcess merge(GetXperfPath());
-			std::wstring args = L" -merge \"" + GetKernelFile() + L"\" \"" + GetUserFile() + L"\"";
+			std::wstring args =
+				L" -merge \""   +
+				GetKernelFile() +
+				L"\" \""        +
+				GetUserFile()   +
+				L"\"";
+			
 			if ( tracingMode_ == kHeapTracingToFile )
 			{
 				args += L" \"" + GetHeapFile( ) + L"\"";
@@ -2133,17 +2177,25 @@ void CUIforETWDlg::StopTracingAndMaybeRecord(bool bSaveTrace)
 		{
 			// Some machines (one so far?) can take 5-10 minutes to do the trace
 			// saving stage.
-			outputPrintf(L"Saving the trace took %1.1f s, which is unusually long. Please "
-				L"try metatrace.bat, and share your results on "
-				L"https://groups.google.com/forum/#!forum/uiforetw.\n", saveTime);
+			outputPrintf(
+							L"Saving the trace took %1.1f s, "
+							L"which is unusually long. Please "
+							L"try metatrace.bat, and share your results on "
+							L"https://groups.google.com/forum/#!forum/uiforetw.\n",
+							saveTime
+						);
 		}
 		if (mergeTime > 100.0)
 		{
 			// See the Amcache.hve comments above for details or to instrument.
-			outputPrintf(L"Merging the trace took %1.1fs, which is unusually long. This may "
-				L"mean that renaming of amcache.hve failed. Please try metatrace.bat "
-				L"and share this on "
-				L"https://groups.google.com/forum/#!forum/uiforetw\n", mergeTime);
+			outputPrintf(
+							L"Merging the trace took %1.1fs, "
+							L"which is unusually long. "
+							L"This may mean that renaming of amcache.hve failed. "
+							L"Please try metatrace.bat and share this on "
+							L"https://groups.google.com/forum/#!forum/uiforetw\n",
+							mergeTime
+						);
 		}
 
 		outputPrintf(L"Finished recording trace.\n");
@@ -2187,14 +2239,30 @@ void CUIforETWDlg::LaunchTraceViewer(const std::wstring traceFilename, const std
 	std::wstring viewerPath = GetWPTDir() + viewer;
 	std::wstring viewerName = GetFilePart(viewer);
 
-	const std::wstring args = std::wstring(viewerName + L" \"") + traceFilename.c_str() + L"\"";
+	const std::wstring args = 
+		std::wstring( viewerName + L" \"" ) +
+		traceFilename.c_str()               +
+		L"\"";
 
 	// Wacky CreateProcess rules say args has to be writable!
 	std::vector<wchar_t> argsCopy(args.size() + 1);
 	wcscpy_s(&argsCopy[0], argsCopy.size(), args.c_str());
+
+
 	STARTUPINFO startupInfo = {};
 	PROCESS_INFORMATION processInfo = {};
-	BOOL result = CreateProcessW(viewerPath.c_str(), &argsCopy[0], nullptr, nullptr, FALSE, 0, nullptr, nullptr, &startupInfo, &processInfo);
+	const BOOL result = CreateProcessW(
+										viewerPath.c_str(), 
+										&argsCopy[0], 
+										nullptr, 
+										nullptr, 
+										FALSE, 
+										0, 
+										nullptr, 
+										nullptr, 
+										&startupInfo, 
+										&processInfo
+									  );
 	if (result)
 	{
 		// Close the handles to avoid leaks.
@@ -2245,11 +2313,15 @@ void CUIforETWDlg::OnBnClickedFastsampling()
 	const wchar_t* message = nullptr;
 	if (bFastSampling_)
 	{
-		message = L"Setting CPU sampling speed to 8 KHz, for finer resolution.";
+		message =
+			L"Setting CPU sampling speed to 8 KHz, "
+			L"for finer resolution.";
 	}
 	else
 	{
-		message = L"Setting CPU sampling speed to 1 KHz, for lower overhead.";
+		message =
+			L"Setting CPU sampling speed to 1 KHz, "
+			L"for lower overhead.";
 	}
 	outputPrintf(L"%s\n", message);
 	SetSamplingSpeed();
@@ -2271,10 +2343,18 @@ void CUIforETWDlg::OnCbnSelchangeInputtracing()
 		outputPrintf(L"Key logging disabled.\n");
 		break;
 	case kKeyLoggerAnonymized:
-		outputPrintf(L"Key logging enabled. Number and letter keys will be recorded generically.\n");
+		outputPrintf(
+						L"Key logging enabled. "
+						L"Number and letter keys will be recorded generically."
+						L"\n"
+					);
 		break;
 	case kKeyLoggerFull:
-		outputPrintf(L"Key logging enabled. Full keyboard information recorded - beware of private information being recorded.\n");
+		outputPrintf(
+						L"Key logging enabled. "
+						L"Full keyboard information recorded - "
+						L"beware of private information being recorded.\n"
+					);
 		break;
 	default:
 		assert(0);
@@ -2302,8 +2382,10 @@ void CUIforETWDlg::UpdateTraceList()
 	// Why can't I use += to concatenate these?
 	tempTraces.insert(tempTraces.end(), tempZips.begin(), tempZips.end());
 	std::sort(tempTraces.begin(), tempTraces.end());
+
 	// Function to stop the temporary traces from showing up.
 	auto ifInvalid = [](const std::wstring& name) { return name == L"kernel.etl" || name == L"user.etl" || name == L"heap.etl"; };
+	
 	tempTraces.erase(std::remove_if(tempTraces.begin(), tempTraces.end(), ifInvalid), tempTraces.end());
 	for (auto& name : tempTraces)
 	{
@@ -2618,20 +2700,42 @@ void CUIforETWDlg::OnContextMenu(CWnd* pWnd, CPoint point)
 			};
 
 			for (auto id : disableList)
-				pContextMenu->EnableMenuItem(id, MF_BYCOMMAND | MF_GRAYED);
+			{
+				pContextMenu->EnableMenuItem(
+												id, 
+												( MF_BYCOMMAND bitor MF_GRAYED )
+											);
+			}
 		}
 
 		if (GetWindowsVersion() < kWindowsVersion8)
 		{
 			// Disable ETW trace compress options on Windows 7 and below
 			// since they don't work there.
-			pContextMenu->EnableMenuItem(ID_TRACES_COMPRESSTRACE, MF_BYCOMMAND | MF_GRAYED);
-			pContextMenu->EnableMenuItem(ID_TRACES_COMPRESSTRACES, MF_BYCOMMAND | MF_GRAYED);
+			pContextMenu->EnableMenuItem(
+											ID_TRACES_COMPRESSTRACE,
+											( MF_BYCOMMAND bitor MF_GRAYED )
+										);
+			
+			pContextMenu->EnableMenuItem(
+											ID_TRACES_COMPRESSTRACES,
+											( MF_BYCOMMAND bitor MF_GRAYED )
+										);
 		}
 
-		int selection = pContextMenu->TrackPopupMenu(TPM_LEFTALIGN | TPM_LEFTBUTTON |
-			TPM_RIGHTBUTTON | TPM_RETURNCMD | TPM_NONOTIFY,
-			point.x, point.y, pWnd, NULL);
+		int selection = pContextMenu->TrackPopupMenu(
+														( 
+															TPM_LEFTALIGN   bitor
+															TPM_LEFTBUTTON  bitor
+															TPM_RIGHTBUTTON bitor
+															TPM_RETURNCMD   bitor
+															TPM_NONOTIFY
+														),
+														point.x,
+														point.y,
+														pWnd,
+														NULL
+													);
 
 		switch (selection)
 		{
@@ -2654,7 +2758,10 @@ void CUIforETWDlg::OnContextMenu(CWnd* pWnd, CPoint point)
 				AfxMessageBox(L"Not implemented yet.");
 				break;
 			case ID_TRACES_COMPRESSTRACES:
-				outputPrintf(L"\nCompressing all traces - this may take a while:\n");
+				outputPrintf(
+								L"\nCompressing all traces - "
+								L"this may take a while:\n"
+							);
 				for (auto traceName : traces_)
 				{
 					CompressTrace(GetTraceDir() + traceName + L".etl");
@@ -2665,7 +2772,14 @@ void CUIforETWDlg::OnContextMenu(CWnd* pWnd, CPoint point)
 				AfxMessageBox(L"Not implemented yet.");
 				break;
 			case ID_TRACES_BROWSEFOLDER:
-				ShellExecute(NULL, L"open", GetTraceDir().c_str(), NULL, GetTraceDir().c_str(), SW_SHOW);
+				ShellExecuteW(
+								NULL,
+								L"open",
+								GetTraceDir().c_str(),
+								NULL,
+								GetTraceDir().c_str(),
+								SW_SHOW
+							 );
 				break;
 			case ID_TRACES_STRIPCHROMESYMBOLS:
 				outputPrintf(L"\n");
@@ -2690,9 +2804,20 @@ void CUIforETWDlg::DeleteTrace()
 
 	if (selIndex >= 0)
 	{
-		std::wstring traceFile = traces_[selIndex];
+		const std::wstring traceFile = traces_[selIndex];
+
+		//?
 		std::wstring tracePath = GetTraceDir() + traceFile + L".etl";
-		if (AfxMessageBox((L"Are you sure you want to delete " + traceFile + L"?").c_str(), MB_YESNO) == IDYES)
+		
+		std::wstring messageBoxString =
+			( L"Are you sure you want to delete " + traceFile + L"?" );
+		const int mbResult =
+			AfxMessageBox(
+							messageBoxString.c_str( ),
+							MB_YESNO
+						);
+
+		if ( mbResult == IDYES)
 		{
 			std::wstring pattern = GetTraceDir() + traceFile + L".*";
 			if (DeleteFiles(*this, GetFileList(pattern, true)))
@@ -2753,7 +2878,13 @@ void CUIforETWDlg::CompressTrace(const std::wstring& tracePath)
 	DWORD exitCode = 0;
 	{
 		ChildProcess child(GetXperfPath());
-		std::wstring args = L" -merge \"" + tracePath + L"\" \"" + compressedPath + L"\" -compress";
+		std::wstring args =
+							L" -merge \""  +
+							tracePath      +
+							L"\" \""       +
+							compressedPath +
+							L"\" -compress";
+
 		child.Run(bShowCommands_, L"xperf.exe" + args);
 		exitCode = child.GetExitCode();
 	}
@@ -2771,8 +2902,12 @@ void CUIforETWDlg::CompressTrace(const std::wstring& tracePath)
 	{
 		DeleteOneFile(*this, tracePath);
 		MoveFile(compressedPath.c_str(), tracePath.c_str());
-		outputPrintf(L"%s was compressed from %1.1f MB to %1.1f MB.\n",
-			tracePath.c_str(), originalSize / 1000000.0, compressedSize / 1000000.0);
+		outputPrintf(
+						L"%s was compressed from %1.1f MB to %1.1f MB.\n",
+						tracePath.c_str(),
+						originalSize / 1000000.0,
+						compressedSize / 1000000.0
+					);
 	}
 	else
 	{
@@ -2798,11 +2933,19 @@ void CUIforETWDlg::StripChromeSymbols(const std::wstring& traceFilename)
 			ChildProcess child(pythonPath);
 			// Must pass -u to disable Python's output buffering when printing to
 			// a pipe, in order to get timely feedback.
-			std::wstring args = L" -u \"" + GetExeDir() + L"StripChromeSymbols.py\" \"" + traceFilename + L"\"";
+			std::wstring args =
+				L" -u \""                     +
+				GetExeDir()                   +
+				L"StripChromeSymbols.py\" \"" +
+				traceFilename                 +
+				L"\"";
+			
 			child.Run(bShowCommands_, L"python.exe" + args);
 		}
-		if (bShowCommands_)
-			outputPrintf(L"Stripping Chrome symbols took %1.1f s\n", stripTimer.ElapsedSeconds());
+		if ( bShowCommands_ )
+		{
+			outputPrintf( L"Stripping Chrome symbols took %1.1f s\n", stripTimer.ElapsedSeconds( ) );
+		}
 	}
 	else
 	{

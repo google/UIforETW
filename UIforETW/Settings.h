@@ -55,7 +55,7 @@ protected:
 
 	CToolTipCtrl toolTip_;
 
-	virtual void DoDataExchange(CDataExchange* pDX) override;    // DDX/DDV support
+	virtual void DoDataExchange(CDataExchange* pDX) override;// DDX/DDV support
 	virtual BOOL OnInitDialog() override;
 
 	const std::wstring exeDir_;
