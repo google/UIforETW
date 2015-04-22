@@ -20,16 +20,12 @@ class CATLAboutDlg final : public ATL::CDialogImpl< CATLAboutDlg >
 {
 public:
 	enum { IDD = IDD_ABOUTBOX };
-	
 	BEGIN_MSG_MAP( CATLAboutDlg )
 		COMMAND_HANDLER(IDOK, BN_CLICKED, OnBnClickedOk)
 	END_MSG_MAP()
-
 	LRESULT OnBnClickedOk( WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/ )
 	{
-
 		EndDialog( 1 );
 		return 1;
 	}
-
 };

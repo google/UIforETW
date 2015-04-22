@@ -170,7 +170,7 @@ bool ChildProcess::Run(bool showCommand, std::wstring args)
 		return false;
 	}
 
-	const BOOL success = CreateProcessW(exePath_.c_str(), &argsCopy[0], NULL, NULL,
+	const BOOL success = CreateProcessW(exePath_.c_str(	), &argsCopy[0], NULL, NULL,
 		TRUE, flags, NULL, NULL, &startupInfo, &processInfo);
 	if (success)
 	{
