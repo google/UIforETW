@@ -359,9 +359,9 @@ bool setCComboBoxSelection( _Inout_ CComboBox* const comboBoxToSet, _In_ _In_ran
 	{
 		
 		outputPrintf( 
-					 L"Failed to set selection (for a comboBox)\r\n"
-					 L"\tIndex that we attempted to set the selection to: %i\r\n"
-					 L"\tCue banner of CComboBox: %s\r\n",
+					 L"Failed to set selection (for a comboBox)\n"
+					 L"\tIndex that we attempted to set the selection to: %i\n"
+					 L"\tCue banner of CComboBox: %s\n",
 					 selectionToSet,
 					 comboBoxToSet->GetCueBanner( ).GetString( ) //Grr. I hate CString.
 					);
@@ -502,12 +502,12 @@ bool appendAboutBoxToSystemMenu( _In_ const CWnd& window )
 	ASSERT(bNameValid);
 	if ( bNameValid == 0 )
 	{
-		outputPrintf( L"Failed to load about box menu string!!\r\n" );
+		outputPrintf( L"Failed to load about box menu string!!\n" );
 		return false;
 	}
 	if ( strAboutMenu.IsEmpty( ) )
 	{
-		outputPrintf( L"About box string is empty?!?!\r\n" );
+		outputPrintf( L"About box string is empty?!?!\n" );
 		return false;
 	}
 
@@ -516,13 +516,13 @@ bool appendAboutBoxToSystemMenu( _In_ const CWnd& window )
 	const BOOL appendSeparatorResult = pSysMenu->AppendMenu(MF_SEPARATOR);
 	if ( appendSeparatorResult == 0 )
 	{
-		outputPrintf( L"Failed to append separator to menu!\r\n" );
+		outputPrintf( L"Failed to append separator to menu!\n" );
 		return false;
 	}
 	const BOOL appendAboutBoxResult = pSysMenu->AppendMenu(MF_STRING, IDM_ABOUTBOX, strAboutMenu);
 	if ( appendAboutBoxResult == 0 )
 	{
-		outputPrintf( L"Failed to append about box string to menu!\r\n" );
+		outputPrintf( L"Failed to append about box string to menu!\n" );
 		return false;
 	}
 
@@ -615,9 +615,9 @@ bool setEnvironmentVariable( _In_z_ PCSTR const variableName, _In_z_ PCSTR const
 	if ( setSymbolPathResult == 0 )
 	{
 		const DWORD err = GetLastError( );
-		outputPrintf( L"Failed to set an environment variable!\r\n\t"
-					  L"Attempted to set environment variable: `%S`\r\n\t"
-					  L"Value that we attempted to set the variable to: `%S`\r\n",
+		outputPrintf( L"Failed to set an environment variable!\n\t"
+					  L"Attempted to set environment variable: `%S`\n\t"
+					  L"Value that we attempted to set the variable to: `%S`\n",
 					  variableName, value
 					);
 		ErrorHandling::outputPrintfErrorDebug( err );
@@ -654,7 +654,7 @@ bool setChromiumSymbolPath( _In_ const bool bChromeDeveloper )
 
 	if ( !setSymbolPathResult )
 	{
-		outputPrintf( L"Failed to set chromium symbol path!\r\n" );
+		outputPrintf( L"Failed to set chromium symbol path!\n" );
 		return false;
 	}
 
@@ -731,7 +731,7 @@ std::wstring getRawDirectoryFromEnvironmentVariable( _In_z_ PCWSTR env )
 		ATLASSERT( getEnvResult != ERANGE );
 		ATLASSERT( getEnvResult != EINVAL );
 		outputPrintf( L"Failed to get value (expected a directory)"
-					  L"of environment variable `%s`!!\r\n", env
+					  L"of environment variable `%s`!!\n", env
 					);
 		return L"";
 	}
@@ -843,7 +843,7 @@ bool isValidDirectory( _In_ std::wstring path )
 		{
 			outputPrintf( L"Oops! %s is NOT a valid directory, "
 						  L"it's a network share! GetFileAttributes "
-						  L"needs a subfolder of it!\r\n", longPath.c_str( )
+						  L"needs a subfolder of it!\n", longPath.c_str( )
 						);
 		}
 		return false;
@@ -1016,6 +1016,11 @@ void CUIforETWDlg::vprintf(PCWSTR pFormat, va_list args)
 		{
 			output_ += pBuf[ 0 ];
 		}
+	}
+
+	if ( output_.find( L"\r\r\n" ) != std::string::npos )
+	{
+		_CrtDbgBreak( );
 	}
 
 	ATLASSERT( output_.find( L"\r\r\n" ) == std::string::npos );
@@ -1306,7 +1311,7 @@ BOOL CUIforETWDlg::OnInitDialog()
 
 	if ( FAILED( shGetMyDocResult ) )
 	{
-		outputPrintf( L"Failed to find the My Documents directory!\r\n" );
+		outputPrintf( L"Failed to find the My Documents directory!\n" );
 		exit(10);
 	}
 
@@ -1371,7 +1376,7 @@ BOOL CUIforETWDlg::OnInitDialog()
 	
 	if ( !setBtInputTracingSelectionResult )
 	{
-		outputPrintf( L"Failed to set btInputTracing_ selection to index: %i\r\n", InputTracing_ );
+		outputPrintf( L"Failed to set btInputTracing_ selection to index: %i\n", InputTracing_ );
 		exit( 10 );
 	}
 
@@ -1388,7 +1393,7 @@ BOOL CUIforETWDlg::OnInitDialog()
 	
 	if ( !setBtTracingModeSelection )
 	{
-		outputPrintf( L"Failed to set btTracingMode_ selection to index: %i\r\n", tracingMode_ );
+		outputPrintf( L"Failed to set btTracingMode_ selection to index: %i\n", tracingMode_ );
 		exit(10);
 	}
 	UpdateEnabling();
@@ -1626,7 +1631,7 @@ std::wstring CUIforETWDlg::GetExeDir() const
 		//Don't need to check for Windows XP? (ETW is Vista+)?
 		const DWORD lastErr = GetLastError( );
 		ATLASSERT( lastErr == ERROR_INSUFFICIENT_BUFFER );
-		outputPrintf( L"CUIforETWDlg::GetExeDir failed! (buffer too small!)\r\n" );
+		outputPrintf( L"CUIforETWDlg::GetExeDir failed! (buffer too small!)\n" );
 		ErrorHandling::DisplayWindowsMessageBoxWithErrorMessage( lastErr );
 		exit( 10 );
 	}
@@ -1708,7 +1713,7 @@ std::wstring CUIforETWDlg::GenerateResultFilename() const
 		else
 		{
 			outputPrintf( L"CUIforETWDlg::GenerateResultFilename - "
-						  L"failed to properly format a file name!\r\n"
+						  L"failed to properly format a file name!\n"
 						);
 			filePart = L"UIforETW";
 		}
@@ -1716,7 +1721,7 @@ std::wstring CUIforETWDlg::GenerateResultFilename() const
 	else
 	{
 		outputPrintf( L"CUIforETWDlg::GenerateResultFilename - "
-					  L"failed to properly read time & date strings!\r\n"
+					  L"failed to properly read time & date strings!\n"
 					);
 		filePart = L"UIforETW";
 	}
@@ -1873,7 +1878,7 @@ void CUIforETWDlg::StopTracingAndMaybeRecord(bool bSaveTrace)
 		if ( deleteResult == 0 )
 		{
 			const DWORD lastErr = GetLastError( );
-			outputPrintf( L"FAILED to delete `%s`!! Error code: %u\r\n", compatFileTemp.c_str( ), lastErr );
+			outputPrintf( L"FAILED to delete `%s`!! Error code: %u\n", compatFileTemp.c_str( ), lastErr );
 			ErrorHandling::DisplayWindowsMessageBoxWithErrorMessage( lastErr );
 		}
 	}

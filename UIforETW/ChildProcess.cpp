@@ -166,7 +166,7 @@ bool ChildProcess::Run(bool showCommand, std::wstring args)
 			std::terminate( );
 		}
 		ATLASSERT( strCpyResult == STRSAFE_E_INSUFFICIENT_BUFFER );
-		outputPrintf( L"Failed to copy arguments into writable buffer!\r\n" );
+		outputPrintf( L"Failed to copy arguments into writable buffer!\n" );
 		return false;
 	}
 

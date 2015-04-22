@@ -43,27 +43,27 @@ void handleMultiByteToWideCharFailure( const DWORD error )
 {
 	if ( error == ERROR_INSUFFICIENT_BUFFER )
 	{
-		outputPrintf( L"MultiByteToWideChar failed!!: ERROR_INSUFFICIENT_BUFFER\r\n" );
+		outputPrintf( L"MultiByteToWideChar failed!!: ERROR_INSUFFICIENT_BUFFER\n" );
 		return;
 	}
 	if ( error == ERROR_NO_UNICODE_TRANSLATION )
 	{
-		outputPrintf( L"MultiByteToWideChar failed!!: ERROR_NO_UNICODE_TRANSLATION\r\n" );
+		outputPrintf( L"MultiByteToWideChar failed!!: ERROR_NO_UNICODE_TRANSLATION\n" );
 		return;
 	}
 	if ( error == ERROR_INVALID_FLAGS )
 	{
-		outputPrintf( L"MultiByteToWideChar failed!!: ERROR_INVALID_FLAGS\r\n" );
+		outputPrintf( L"MultiByteToWideChar failed!!: ERROR_INVALID_FLAGS\n" );
 		MessageBoxW( NULL, L"MultiByteToWideChar failed!!: ERROR_INVALID_FLAGS - this indicates a logic error!", L"Fatal error!", MB_OK );
 		std::terminate( );
 	}
 	if ( error == ERROR_INVALID_PARAMETER )
 	{
-		outputPrintf( L"MultiByteToWideChar failed!!: ERROR_INVALID_PARAMETER\r\n" );
+		outputPrintf( L"MultiByteToWideChar failed!!: ERROR_INVALID_PARAMETER\n" );
 		MessageBoxW( NULL, L"MultiByteToWideChar failed!!: ERROR_INVALID_PARAMETER - this indicates a logic error!", L"Fatal error!", MB_OK );
 		std::terminate( );
 	}
-	outputPrintf( L"MultiByteToWideChar failed!!: (unexpected error!)\r\n" );
+	outputPrintf( L"MultiByteToWideChar failed!!: (unexpected error!)\n" );
 	MessageBoxW( NULL, L"MultiByteToWideChar failed!!: (unexpected error!) - this indicates a logic error!", L"Fatal error!", MB_OK );
 	std::terminate( );
 }
@@ -597,7 +597,7 @@ void SetClipboardText(const std::wstring& text)
 	if ( cb == 0 )
 	{
 		const DWORD lastErr = GetLastError( );
-		outputPrintf( L"Failed to open clipboard!!\r\n\tError code: %u\r\n", lastErr );
+		outputPrintf( L"Failed to open clipboard!!\n\tError code: %u\n", lastErr );
 		return;
 	}
 
@@ -609,7 +609,7 @@ void SetClipboardText(const std::wstring& text)
 		//TODO: check this instead of VERIFYing
 		VERIFY( CloseClipboard( ) );
 		const DWORD lastErr = GetLastError( );
-		outputPrintf( L"Failed to empty clipboard!!\r\n\tError code: %u\r\n", lastErr );
+		outputPrintf( L"Failed to empty clipboard!!\n\tError code: %u\n", lastErr );
 		return;
 	}
 
@@ -623,7 +623,7 @@ void SetClipboardText(const std::wstring& text)
 		//TODO: check this instead of VERIFYing
 		VERIFY( CloseClipboard( ) );
 		const DWORD lastErr = GetLastError( );
-		outputPrintf( L"GlobalAlloc failed!!\r\n\tError code: %u\r\n", lastErr );
+		outputPrintf( L"GlobalAlloc failed!!\n\tError code: %u\n", lastErr );
 		return;
 	}
 	
@@ -638,7 +638,7 @@ void SetClipboardText(const std::wstring& text)
 		//TODO: check this instead of VERIFYing
 		VERIFY( CloseClipboard( ) );
 		const DWORD lastErr = GetLastError( );
-		outputPrintf( L"GlobalLock failed!!\r\n\tError code: %u\r\n", lastErr );
+		outputPrintf( L"GlobalLock failed!!\n\tError code: %u\n", lastErr );
 		return;
 	}
 
