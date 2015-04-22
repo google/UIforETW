@@ -70,10 +70,8 @@ void outputPrintf(_Printf_format_string_ PCWSTR pFormat, ...);
 
 // Using #define NOMINMAX would be nice but gdiplustypes.h *depends*
 // on min/max macros, so the best I can do is to undefine them here.
-#pragma message( "UNDEFINING `min`...")
 #undef min
 
-#pragma message( "UNDEFINING `max`...")
 #undef max
 
 // Send this when the list of traces needs to be updated.
