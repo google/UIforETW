@@ -206,7 +206,36 @@ GetLastErrorAsFormattedMessage(
 	}
 	return E_FAIL;
 }
+
+void outputErrorDebug( const DWORD lastErr )
+{
+	const rsize_t bufferSize = 512u;
+	wchar_t errBuffer[ bufferSize ] = { 0 };
+	const HRESULT errFmt = ErrorHandling::GetLastErrorAsFormattedMessage( errBuffer, lastErr );
+	if ( FAILED( errFmt ) )
+	{
+		std::terminate( );
+		return;
+	}
+	OutputDebugStringA( "UIforETW:\tError message: " );
+	OutputDebugStringW( errBuffer );
+	OutputDebugStringA( "\r\n" );
 }
+
+void outputPrintfErrorDebug( const DWORD lastErr )
+{
+	const rsize_t bufferSize = 512u;
+	wchar_t errBuffer[ bufferSize ] = { 0 };
+	const HRESULT errFmt = ErrorHandling::GetLastErrorAsFormattedMessage( errBuffer, lastErr );
+	if ( FAILED( errFmt ) )
+	{
+		std::terminate( );
+		return;
+	}
+	outputPrintf( L"Error message: %s\n", errBuffer );
+}
+
+} //namespace ErrorHandling 
 
 
 std::vector<std::wstring> split(const std::wstring& s, char c)

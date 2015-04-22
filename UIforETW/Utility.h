@@ -57,6 +57,10 @@ GetLastErrorAsFormattedMessage(
 	return GetLastErrorAsFormattedMessage( psz_formatted_error, strSize, error );
 }
 
+void outputErrorDebug( const DWORD lastErr );
+
+void outputPrintfErrorDebug( const DWORD lastErr );
+
 }
 
 
