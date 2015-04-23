@@ -29,14 +29,13 @@ ChildProcess::ChildProcess(std::wstring exePath)
 	// Create the pipe here so that it is guaranteed to be created before
 	// we try starting the process.
 	hPipe_ = CreateNamedPipe(kPipeName,
-		PIPE_ACCESS_DUPLEX,
-		( PIPE_TYPE_BYTE | PIPE_READMODE_BYTE | PIPE_WAIT ),
+		PIPE_ACCESS_DUPLEX | PIPE_TYPE_BYTE | PIPE_READMODE_BYTE,
+		PIPE_WAIT,
 		1,
 		1024 * 16,
 		1024 * 16,
 		NMPWAIT_USE_DEFAULT_WAIT,
 		NULL);
-	ATLENSURE( hPipe_ != INVALID_HANDLE_VALUE );
 	hChildThread_ = CreateThread(0, 0, ListenerThreadStatic, this, 0, 0);
 
 	hOutputAvailable_ = CreateEvent(nullptr, FALSE, FALSE, nullptr);
@@ -88,7 +87,6 @@ DWORD ChildProcess::ListenerThread()
 	// wait for someone to connect to the pipe
 	if (ConnectNamedPipe(hPipe_, NULL) || GetLastError() == ERROR_PIPE_CONNECTED)
 	{
-		OutputDebugStringA( "UIforETW: someone connected to pipe!\n" );
 		// Acquire the lock while writing to processOutput_
 		char buffer[1024];
 		DWORD dwRead;
@@ -143,7 +141,7 @@ bool ChildProcess::Run(bool showCommand, std::wstring args)
 	// Wacky CreateProcess rules say args has to be writable!
 	std::vector<wchar_t> argsCopy(args.size() + 1);
 	wcscpy_s(&argsCopy[0], argsCopy.size(), args.c_str());
-	BOOL success = CreateProcessW(exePath_.c_str(), &argsCopy[0], NULL, NULL,
+	BOOL success = CreateProcess(exePath_.c_str(), &argsCopy[0], NULL, NULL,
 		TRUE, flags, NULL, NULL, &startupInfo, &processInfo);
 	if (success)
 	{
