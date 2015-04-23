@@ -60,12 +60,22 @@ def run_process_command( command ):
   even though they're still considered legacy functions!
   """
   if sys.version_info.major == 2:
-    return commands.getoutput( command )
+    return os.popen( command ).readlines( )
   assert( sys.version_info.major == 3)
   return subprocess.getoutput( command )
 
-def main():
+def test_run_command( ):
+  command = "echo \"text n crap\""
+  if sys.version_info.major == 2:
+    return os.popen( command ).readlines( )
+  assert( sys.version_info.major == 3)
+  return subprocess.getoutput( command )
 
+
+
+def main():
+  print( "testing running command" )
+  print( test_run_command( ) )
   if len(sys.argv) < 2:
     print( "Usage: %s trace.etl" % sys.argv[0] )
     sys.exit(0)
@@ -125,9 +135,6 @@ def main():
   print( "> %s" % command )
   foundUncached = False
   command_output = run_process_command( command )
-  print( "command output" )
-  print( command_output )
-  print( "end output" )
   for line in command_output:
     if line.count("chrome.dll") > 0 or line.count("chrome_child.dll") > 0:
       match = pdbRe.match(line)
