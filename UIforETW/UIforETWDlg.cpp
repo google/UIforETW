@@ -1511,8 +1511,7 @@ void CUIforETWDlg::StripChromeSymbols(const std::wstring& traceFilename)
 	// conversion times for the full private symbols.
 	// https://randomascii.wordpress.com/2014/11/04/slow-symbol-loading-in-microsofts-profiler-take-two/
 	// Call Python script here, or recreate it in C++.
-	//std::wstring pythonPath = FindPython();
-	std::wstring pythonPath = L"C:\\python27\\python.exe";
+	std::wstring pythonPath = FindPython();
 	if (!pythonPath.empty())
 	{
 		outputPrintf(L"Stripping Chrome symbols - this may take a while...\n");
