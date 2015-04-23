@@ -41,28 +41,11 @@ and pdbcopy.exe are not found then this script will exit early.
 """
 from __future__ import print_function
 
-
 import os
 import sys
 import re
 import tempfile
 import shutil
-
-if sys.version_info.major == 2:
-  import commands
-else:
-  import subprocess
-
-def run_process_command( command ):
-  """
-  The commands was deprecated in 2.6, and REMOVED in 3.
-  The getoutput function was moved to subprocess, which is a much better idea,
-  even though they're still considered legacy functions!
-  """
-  if sys.version_info.major == 2:
-    return commands.getoutput( command )
-  assert( sys.version_info.major == 3)
-  return subprocess.getoutput( command )
 
 def main():
 
@@ -98,12 +81,6 @@ def main():
     sys.exit(0)
 
   tracename = sys.argv[1]
-  
-  if not os.path.exists( tracename ):
-    print( "etl file NOT found - path: %s" % tracename )
-    raise IOError( "invalid path to etl file!" )
-  
-  
   # Each symbol file that we pdbcopy gets copied to a separate directory so
   # that we can support decoding symbols for multiple chrome versions without
   # filename collisions.
@@ -124,11 +101,7 @@ def main():
   command = 'xperf -i "%s" -tle -tti -a symcache -dbgid' % tracename
   print( "> %s" % command )
   foundUncached = False
-  command_output = run_process_command( command )
-  print( "command output" )
-  print( command_output )
-  print( "end output" )
-  for line in command_output:
+  for line in os.popen(command).readlines():
     if line.count("chrome.dll") > 0 or line.count("chrome_child.dll") > 0:
       match = pdbRe.match(line)
       if match:
