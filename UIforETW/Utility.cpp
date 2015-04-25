@@ -395,7 +395,19 @@ bool IsWindowsServer()
 std::wstring FindPython()
 {
 #pragma warning(suppress:4996)
-	const wchar_t* path = _wgetenv(L"path");
+	PCWSTR const pytwoseven = _wgetenv( L"python27" );
+	
+	//Some people, like me, (Alexander Riccio) have an environment variable 
+	//that specifically points to Python 2.7.
+	//As a workaround for issue #13, we'll use that version of Python.
+	//See the issue: https://github.com/google/UIforETW/issues/13
+	if ( pytwoseven )
+	{
+		return pytwoseven;
+	}
+
+#pragma warning(suppress:4996)	
+    const wchar_t* path = _wgetenv(L"path");
 	if (path)
 	{
 		std::vector<std::wstring> pathParts = split(path, ';');
