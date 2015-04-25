@@ -1293,7 +1293,7 @@ BOOL CUIforETWDlg::OnInitDialog()
 	wptDir_ = progFilesx86Dir;
 	wptDir_ += L"\\Windows Kits\\8.1\\Windows Performance Toolkit\\";
 	CoTaskMemFree(progFilesx86Dir);
-	const std::wstring xperfPath( GetXperfPath( ) );
+	const std::wstring xperfPath( wptDir_ );
 
 	if (!isValidPathToFSObject(xperfPath.c_str()))
 	{
@@ -1874,6 +1874,7 @@ void CUIforETWDlg::StopTracingAndMaybeRecord(bool bSaveTrace)
 		// been left behind by a previous failed tracing attempt.
 		// Note that this has to be done before the -flush step -- it makes both it
 		// and the -merge step painfully slow.
+		//If [DeleteFile] succeeds, the return value is nonzero.
 		const BOOL deleteResult = DeleteFileW( compatFileTemp.c_str( ) );
 		if ( deleteResult == 0 )
 		{
@@ -1962,8 +1963,10 @@ void CUIforETWDlg::StopTracingAndMaybeRecord(bool bSaveTrace)
 		}
 	}
 
-	if (moveSuccess)
-		MoveFile(compatFileTemp.c_str(), compatFile.c_str());
+	if ( moveSuccess )
+	{
+		MoveFile( compatFileTemp, compatFile );
+	}
 
 	// Delete the temporary files.
 	DeleteFile(GetKernelFile().c_str());
@@ -2009,20 +2012,12 @@ void CUIforETWDlg::StopTracingAndMaybeRecord(bool bSaveTrace)
 		if (mergeTime > 100.0)
 		{
 			// See the Amcache.hve comments above for details or to instrument.
-			if (moveSuccess)
-			{
-				outputPrintf(L"Merging the trace took %1.1fs, which is unusually long. This is surprising "
-					L"because renaming of amcache.hve to avoid this worked. Please try metatrace.bat "
-					L"and share this on "
-					L"https://groups.google.com/forum/#!forum/uiforetw\n", mergeTime);
-			}
-			else
-			{
-				outputPrintf(L"Merging the trace took %1.1fs, which is unusually long. This is probably "
-					L"be because renaming of amcache.hve failed. Please try metatrace.bat "
-					L"and share this on "
-					L"https://groups.google.com/forum/#!forum/uiforetw\n", mergeTime);
-			}
+			//Why don't we know if amcache.hve failed??!?
+			outputPrintf(
+				L"Merging the trace took %1.1fs, which is unusually long. "
+				L"This may mean that renaming of amcache.hve failed. "
+				L"Please try metatrace.bat and share this on "
+				L"https://groups.google.com/forum/#!forum/uiforetw\n", mergeTime );
 		}
 
 		outputPrintf(L"Finished recording trace.\n");
