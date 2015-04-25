@@ -20,17 +20,17 @@ limitations under the License.
 #define VC_EXTRALEAN            // Exclude rarely-used stuff from Windows headers
 #endif
 
-
 #define _ATL_NO_AUTOMATIC_NAMESPACE 1
 
+#include <afxwin.h>         // MFC core and standard components //THIS NEEDS TO BE THE VERY FIRST INCLUDE!
+#include "targetver.h"
 
 #define _ATL_CSTRING_EXPLICIT_CONSTRUCTORS      // some CString constructors will be explicit
 
 // turns off MFC's hiding of some common and often safely ignored warning messages
 #define _AFX_ALL_WARNINGS
 
-
-#include <afxwin.h>         // MFC core and standard components //I get ~1 billion error messages if this isn't first.
+#include <afxext.h>         // MFC extensions
 
 
 #include "targetver.h"
