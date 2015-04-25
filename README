@@ -2,6 +2,11 @@ This directory contains resources associated with using ETW/xperf.
 Most of these resources are associated with blog posts on:
 https://randomascii.wordpress.com/category/xperf/
 
+For specific details on this project see this post which includes
+some documentation and an explanation for why this project was
+created:
+https://randomascii.wordpress.com/2015/04/14/uiforetw-windows-performance-made-easier/
+
 The core project is UIforETW which is a graphical user interface for
 recording and managing ETW traces. It makes it much easier to control
 how traces are recorded than using batch files or Microsoft's wprui.
