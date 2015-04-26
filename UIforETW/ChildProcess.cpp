@@ -17,7 +17,7 @@ limitations under the License.
 #include "stdafx.h"
 #include "ChildProcess.h"
 #include "Utility.h"
-
+#include "alias.h"
 #include <vector>
 
 static const wchar_t* kPipeName = L"\\\\.\\PIPE\\UIforETWPipe";
@@ -155,17 +155,12 @@ bool ChildProcess::Run(bool showCommand, std::wstring args)
 	const HRESULT strCpyResult = StringCchCopyNW( &argsCopy[ 0 ], argsCopy.size( ), args.c_str( ), args.length( ) );
 	if ( FAILED( strCpyResult ) )
 	{
-		if ( strCpyResult == STRSAFE_E_END_OF_FILE )
-		{
-			std::terminate( );
-		}
-		if ( strCpyResult == STRSAFE_E_INVALID_PARAMETER )
-		{
-			std::terminate( );
-		}
 		ATLASSERT( strCpyResult == STRSAFE_E_INSUFFICIENT_BUFFER );
 		outputPrintf( L"Failed to copy arguments into writable buffer!\n" );
-		return false;
+		debug::Alias( &argsCopy );
+		debug::Alias( &args );
+		debug::Alias( &strCpyResult );
+		std::terminate( );
 	}
 
 	const BOOL success = CreateProcessW(exePath_.c_str(	), &argsCopy[0], NULL, NULL,

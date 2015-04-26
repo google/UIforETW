@@ -280,16 +280,15 @@ void addStringToCComboBox( _Inout_ CComboBox* const comboBox, _In_z_ PCWSTR cons
 	const int addStringResult = comboBox->AddString( stringToAdd );
 	if ( addStringResult == CB_ERR )
 	{
-		OutputDebugStringA( "UIforETW: Unexpected error adding string `" );
-		OutputDebugStringW( stringToAdd );
-		OutputDebugStringA( "`!!\r\n" );
+		MessageBoxW( NULL, stringToAdd, L"Unexpected (fatal) error adding string to comboBox!", MB_OK );
+		debug::Alias( &stringToAdd );
+		debug::Alias( &comboBox );
+		debug::Alias( &addStringResult );
 		std::terminate( );
 	}
 	if ( addStringResult == CB_ERRSPACE )
 	{
-		OutputDebugStringA( "UIforETW: Not enough space available to store string `" );
-		OutputDebugStringW( stringToAdd );
-		OutputDebugStringA( "`!!\r\n" );
+		MessageBoxW( NULL, stringToAdd, L"Not enough space available to store string!", MB_OK );
 		std::terminate( );
 	}
 	OutputDebugStringA( "UIforETW: successfully added string `" );
@@ -1023,6 +1022,12 @@ void CUIforETWDlg::vprintf(PCWSTR pFormat, va_list args)
 
 	for (PCWSTR pBuf = buffer; *pBuf; ++pBuf)
 	{
+		ATLASSERT( pBuf < ( buffer + bufferCount ) );
+		if ( pBuf >= ( buffer + bufferCount ) )
+		{
+			std::terminate( );
+		}
+
 		// Need \r\n as a line separator.
 		if (pBuf[0] == '\n')
 		{
