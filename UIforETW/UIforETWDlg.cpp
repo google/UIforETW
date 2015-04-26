@@ -1290,13 +1290,29 @@ void CUIforETWDlg::OnBnClickedSettings()
 	dlgAbout.bHeapStacks_ = bHeapStacks_;
 	if (dlgAbout.DoModal() == IDOK)
 	{
-		heapTracingExe_ = dlgAbout.heapTracingExe_;
-		chromeDllPath_ = dlgAbout.chromeDllPath_;
+		// If the heap tracing executable name has changed then clear and
+		// then (potentially) reset the registry key, otherwise the other
+		// executable may end up with heap tracing enabled indefinitely.
+		if (heapTracingExe_ != dlgAbout.heapTracingExe_)
+		{
+			// Force heap tracing off
+			SetHeapTracing(true);
+			heapTracingExe_ = dlgAbout.heapTracingExe_;
+			// Potentially re-enable heap tracing with the new name.
+			SetHeapTracing(false);
+		}
+
+		// Update the symbol path if the chrome developer flag has changed.
+		// This will be a NOP if the user set _NT_SYMBOL_PATH outside of
+		// UIforETW.
 		if (bChromeDeveloper_ != dlgAbout.bChromeDeveloper_)
 		{
 			bChromeDeveloper_ = dlgAbout.bChromeDeveloper_;
 			SetSymbolPath();
 		}
+
+		// Copy over the remaining settings.
+		chromeDllPath_ = dlgAbout.chromeDllPath_;
 		bAutoViewTraces_ = dlgAbout.bAutoViewTraces_;
 		bHeapStacks_ = dlgAbout.bHeapStacks_;
 	}
