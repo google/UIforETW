@@ -1277,10 +1277,16 @@ BOOL CUIforETWDlg::OnInitDialog()
 	checkETWCompatibility( );
 
 
-	wchar_t* windowsDir = nullptr;
+	PWSTR windowsDir = nullptr;
 	VERIFY(SUCCEEDED(SHGetKnownFolderPath(FOLDERID_Windows, 0, NULL, &windowsDir)));
-	windowsDir_ = windowsDir;
+	
+	windowsDir_ = L"\\\\?\\";
+	windowsDir_ += windowsDir;
+	
+	//BUGBUG: WTF??? Why not L'\\';??
 	windowsDir_ += '\\';
+
+
 	CoTaskMemFree(windowsDir);
 	// ANSI string, not unicode.
 	systemDrive_ = static_cast<char>(windowsDir_[0]);
@@ -1290,7 +1296,8 @@ BOOL CUIforETWDlg::OnInitDialog()
 	// ProgramFilesX86, on 32-bit and 64-bit operating systems.
 	wchar_t* progFilesx86Dir = nullptr;
 	VERIFY(SUCCEEDED(SHGetKnownFolderPath(FOLDERID_ProgramFilesX86, 0, NULL, &progFilesx86Dir)));
-	wptDir_ = progFilesx86Dir;
+	wptDir_ = L"\\\\?\\";
+	wptDir_ += progFilesx86Dir;
 	wptDir_ += L"\\Windows Kits\\8.1\\Windows Performance Toolkit\\";
 	CoTaskMemFree(progFilesx86Dir);
 	const std::wstring xperfPath( wptDir_ );
@@ -1965,7 +1972,7 @@ void CUIforETWDlg::StopTracingAndMaybeRecord(bool bSaveTrace)
 
 	if ( moveSuccess )
 	{
-		MoveFile( compatFileTemp, compatFile );
+		MoveFile( compatFileTemp.c_str( ), compatFile.c_str( ) );
 	}
 
 	// Delete the temporary files.
