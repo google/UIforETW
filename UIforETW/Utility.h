@@ -31,10 +31,7 @@ limitations under the License.
 namespace ErrorHandling {
 void DisplayWindowsMessageBoxWithErrorMessage( DWORD error );
 
-//On returning E_FAIL, call GetLastError for details. That's not my idea!
-_Success_( SUCCEEDED( return ) )
-HRESULT 
-GetLastErrorAsFormattedMessage( 
+void GetLastErrorAsFormattedMessage( 
 								ETWUI_WRITES_TO_STACK( strSize )
 									PWSTR psz_formatted_error,
 								_In_range_( 128, 32767 )
@@ -45,9 +42,7 @@ GetLastErrorAsFormattedMessage(
 
 //On returning E_FAIL, call GetLastError for details. That's not my idea!
 template<rsize_t strSize>
-_Success_( SUCCEEDED( return ) )
-HRESULT 
-GetLastErrorAsFormattedMessage( 
+void GetLastErrorAsFormattedMessage( 
 								ETWUI_WRITES_TO_STACK( strSize )
 									wchar_t (&psz_formatted_error)[strSize],
 								DWORD error = GetLastError( )

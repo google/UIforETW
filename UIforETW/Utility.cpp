@@ -17,8 +17,7 @@ limitations under the License.
 #include "stdafx.h"
 #include "Utility.h"
 #include <fstream>
-#include <Strsafe.h>
-
+#include "alias.h"
 
 namespace {
 
@@ -101,32 +100,8 @@ void DisplayWindowsMessageBoxWithErrorMessage( const DWORD error )
 	const rsize_t errorMessageBufferSize = 512u;
 	wchar_t errorMessageBuffer[ errorMessageBufferSize ] = { 0 };
 	
-	const HRESULT errorMessageFormatBuffer =
-		GetLastErrorAsFormattedMessage( errorMessageBuffer, error );
+	GetLastErrorAsFormattedMessage( errorMessageBuffer, error );
 
-	if ( FAILED( errorMessageFormatBuffer ) )
-	{
-		const int messageBoxResult =
-			::MessageBoxW( 
-							NULL, 
-							L"DOUBLE FAULT! We tried to display "
-							L"an error message, but failed to format "
-							L"it correctly!",
-							L"UIforETW FATAL ERROR!",
-							( MB_OK bitor MB_ICONERROR )
-						);
-
-		if ( messageBoxResult == 0 )
-		{
-			OutputDebugStringA( 
-								"UIforETW triple faulted in "
-								"DisplayWindowsMessageBoxWithErrorMessage. "
-								"We have no choice but to crash & burn.\r\n"
-							  );
-			std::terminate( );
-		}
-		return;
-	}
 	const int messageBoxResult =
 		::MessageBoxW(
 						NULL,
@@ -142,19 +117,15 @@ void DisplayWindowsMessageBoxWithErrorMessage( const DWORD error )
 							"but failed to display it in a message box. "
 							"There's nothing we can do, except crash & burn\r\n"
 						  );
+		debug::Alias( &messageBoxResult );
+		debug::Alias( &error );
+		debug::Alias( &errorMessageBuffer );
 		std::terminate( );
 	}
 }
 
 
-//Sorry, this is ugly, but that's the 80-column limit in action.
-static_assert( !SUCCEEDED( E_FAIL ), 
-			   "CStyle_GetLastErrorAsFormattedMessage doesn't return a valid error code!" );
-static_assert( SUCCEEDED( S_OK ), 
-			   "CStyle_GetLastErrorAsFormattedMessage doesn't return a valid success code!" );
-_Success_( SUCCEEDED( return ) )
-HRESULT 
-GetLastErrorAsFormattedMessage( 
+void GetLastErrorAsFormattedMessage( 
 								ETWUI_WRITES_TO_STACK( strSize )
 									PWSTR psz_formatted_error,
 								_In_range_( 128, 32767 )
@@ -173,50 +144,27 @@ GetLastErrorAsFormattedMessage(
 									);
 	if ( ret != 0 )
 	{
-		return S_OK;
+		return;
 	}
 	const DWORD error_err = GetLastError( );
 	ATLTRACE2( 
-				ATL::atlTraceGeneral,
-				0,
 				L"FormatMessageW failed with error code: `%lu`!!\r\n", 
 				error_err
 			 );
 	
-	const rsize_t err_msg_buff_size = 128;
-	_Null_terminated_ char err_msg_buff[ err_msg_buff_size ] = { 0 };
-	
-	const HRESULT output_error_message_format_result =
-		StringCchPrintfA( 
-							err_msg_buff,
-							err_msg_buff_size,
-							"UIforETW: FormatMessageW failed with error code: "
-							"`%lu`!!\r\n",
-							error_err
-						);
-
-	if ( SUCCEEDED( output_error_message_format_result ) )
-	{
-		OutputDebugStringA( err_msg_buff );
-	}
-	if ( strSize > 8 )
-	{
-		write_BAD_FMT( psz_formatted_error );
-		return E_FAIL;
-	}
-	return E_FAIL;
+	debug::Alias( &error_err );
+	debug::Alias( &ret );
+	debug::Alias( &error );
+	debug::Alias( &strSize );
+	debug::Alias( &psz_formatted_error );
+	std::terminate( );
 }
 
 void outputErrorDebug( const DWORD lastErr )
 {
 	const rsize_t bufferSize = 512u;
 	wchar_t errBuffer[ bufferSize ] = { 0 };
-	const HRESULT errFmt = ErrorHandling::GetLastErrorAsFormattedMessage( errBuffer, lastErr );
-	if ( FAILED( errFmt ) )
-	{
-		std::terminate( );
-		return;
-	}
+	ErrorHandling::GetLastErrorAsFormattedMessage( errBuffer, lastErr );
 	OutputDebugStringA( "UIforETW:\tError message: " );
 	OutputDebugStringW( errBuffer );
 	OutputDebugStringA( "\r\n" );
@@ -226,12 +174,7 @@ void outputPrintfErrorDebug( const DWORD lastErr )
 {
 	const rsize_t bufferSize = 512u;
 	wchar_t errBuffer[ bufferSize ] = { 0 };
-	const HRESULT errFmt = ErrorHandling::GetLastErrorAsFormattedMessage( errBuffer, lastErr );
-	if ( FAILED( errFmt ) )
-	{
-		std::terminate( );
-		return;
-	}
+	ErrorHandling::GetLastErrorAsFormattedMessage( errBuffer, lastErr );
 	outputPrintf( L"Error message: %s\n", errBuffer );
 }
 
