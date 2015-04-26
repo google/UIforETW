@@ -666,7 +666,7 @@ void CUIforETWDlg::OnBnClickedStarttracing()
 	else
 		assert(0);
 
-	std::wstring kernelProviders = L" Latency+POWER+DISPATCHER+FILE_IO+FILE_IO_INIT+VIRT_ALLOC+MEMINFO+MEMINFO_WS";
+	std::wstring kernelProviders = L" Latency+POWER+DISPATCHER+FILE_IO+FILE_IO_INIT+VIRT_ALLOC+MEMINFO";
 	std::wstring kernelStackWalk;
 	// Record CPU sampling call stacks, from the PROFILE provider
 	if (bSampledStacks_)
