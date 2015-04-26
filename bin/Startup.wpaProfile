@@ -1051,12 +1051,12 @@
                 <HdvColumnViewModelPreset Guid="fe123e27-eca6-461a-9a1b-b98056a84feb" Name="Type" IsVisible="True" SortPriority="5" Width="50" />
                 <HdvColumnViewModelPreset Guid="0e8ea5da-f511-49fb-9f64-bde5bb6d3f95" Name="ImpactingType" SortPriority="11" Width="100" />
                 <HdvColumnViewModelPreset Guid="d75f9647-91de-4814-82e1-77a5d6213876" Name="Allocation Nature" SortPriority="3" Width="80" />
-                <HdvColumnViewModelPreset Guid="759dc840-5079-49db-bae0-3c54e553b7fd" Name="Stack Tag" SortPriority="12" Width="200">
+                <HdvColumnViewModelPreset Guid="759dc840-5079-49db-bae0-3c54e553b7fd" Name="Stack" SortPriority="12" Width="200">
                   <HdvColumnViewModelPreset.Parameter>
                     <PresetStackOptions Mode="StackTag" xmlns="clr-namespace:Microsoft.Performance.Shell.Stacks;assembly=Microsoft.Performance.Shell" />
                   </HdvColumnViewModelPreset.Parameter>
                 </HdvColumnViewModelPreset>
-                <HdvColumnViewModelPreset Guid="759dc840-5079-49db-bae0-3c54e553b7fd" Name="Stack (Frame Tags)" SortPriority="13" Width="200">
+                <HdvColumnViewModelPreset Guid="759dc840-5079-49db-bae0-3c54e553b7fd" Name="Stack" SortPriority="13" Width="200">
                   <HdvColumnViewModelPreset.Parameter>
                     <PresetStackOptions Mode="FrameTags" xmlns="clr-namespace:Microsoft.Performance.Shell.Stacks;assembly=Microsoft.Performance.Shell" />
                   </HdvColumnViewModelPreset.Parameter>
@@ -1094,7 +1094,78 @@
           <HdvViewModelPresetCollection.UserPresets />
         </HdvViewModelPresetCollection>
         <HdvViewModelPresetCollection Name="e6a4a964-3a87-46ef-9762-f9d9b9208051">
-          <HdvViewModelPresetCollection.UserPresets />
+          <HdvViewModelPresetCollection.UserPresets>
+            <HdvViewModelPreset Name="Randomascii Outstanding Size by Process, Type, Stack" AggregationOverTime="OutstandingPeak" GraphColumnCount="27" KeyColumnCount="9" LeftFrozenColumnCount="10" RightFrozenColumnCount="26" InitialFilterQuery="" InitialSelectionQuery="" InitialExpansionQuery="" GraphFilterColumnGuid="3e80b2ba-b36a-4ff1-9c2c-d2542002a6d6">
+              <HdvViewModelPreset.ColumnMetadataEntries>
+                <ColumnMetadataEntry Guid="e35ae2d1-6370-4e17-a79d-eada8afa60f6" Name="Commit Time" ColumnMetadata="StartTime" />
+                <ColumnMetadataEntry Guid="093b4056-cb58-4209-90b9-29cdbb8ca214" Name="Decommit Time" ColumnMetadata="EndTime" />
+              </HdvViewModelPreset.ColumnMetadataEntries>
+              <HdvViewModelPreset.HighlightEntries />
+              <HdvViewModelPreset.ConfigurableColumns>
+                <HdvColumnViewModelPreset Guid="744222db-e5a0-4e6d-b34e-9a9796f3ce38" Name="Process Name" IsVisible="True" SortPriority="18" Width="143" />
+                <HdvColumnViewModelPreset Guid="cfe19628-6612-4e45-ad6e-84b7423c8132" Name="Process" IsVisible="True" SortPriority="17" Width="140" />
+                <HdvColumnViewModelPreset Guid="f3e2404e-9274-48de-ba7a-81b10ac0d8e3" Name="Type" IsVisible="True" SortPriority="8" Width="50" />
+                <HdvColumnViewModelPreset Guid="9298a5c9-42e9-42d0-b069-f211906a4078" Name="Commit Stack" IsVisible="True" SortPriority="13" Width="420">
+                  <HdvColumnViewModelPreset.Parameter>
+                    <PresetStackOptions xmlns="clr-namespace:Microsoft.Performance.Shell.Stacks;assembly=Microsoft.Performance.Shell" />
+                  </HdvColumnViewModelPreset.Parameter>
+                </HdvColumnViewModelPreset>
+                <HdvColumnViewModelPreset Guid="8e0f7d59-37d1-4191-9c30-625cbacbc04f" Name="Impacting Type" SortPriority="2" Width="100" />
+                <HdvColumnViewModelPreset Guid="9fb42912-dd33-4802-9b59-4d37b43e3c3c" Name="Commit Nature" SortPriority="3" Width="50" />
+                <HdvColumnViewModelPreset Guid="ae3e0b03-508c-48bf-a974-d6d1934258c2" Name="Impacting Stack Tag" SortPriority="4" Width="160">
+                  <HdvColumnViewModelPreset.Parameter>
+                    <PresetStackOptions Mode="StackTag" xmlns="clr-namespace:Microsoft.Performance.Shell.Stacks;assembly=Microsoft.Performance.Shell" />
+                  </HdvColumnViewModelPreset.Parameter>
+                </HdvColumnViewModelPreset>
+                <HdvColumnViewModelPreset Guid="ae3e0b03-508c-48bf-a974-d6d1934258c2" Name="Impacting Stack (Frame Tags)" SortPriority="5" Width="160">
+                  <HdvColumnViewModelPreset.Parameter>
+                    <PresetStackOptions Mode="FrameTags" xmlns="clr-namespace:Microsoft.Performance.Shell.Stacks;assembly=Microsoft.Performance.Shell" />
+                  </HdvColumnViewModelPreset.Parameter>
+                </HdvColumnViewModelPreset>
+                <HdvColumnViewModelPreset Guid="ae3e0b03-508c-48bf-a974-d6d1934258c2" Name="ImpactingStack" SortPriority="6" Width="160">
+                  <HdvColumnViewModelPreset.Parameter>
+                    <PresetStackOptions xmlns="clr-namespace:Microsoft.Performance.Shell.Stacks;assembly=Microsoft.Performance.Shell" />
+                  </HdvColumnViewModelPreset.Parameter>
+                </HdvColumnViewModelPreset>
+                <HdvColumnViewModelPreset Guid="cb796d44-2927-5ac1-d231-4b71904c18f5" Name="Thread Name" SortPriority="7" Width="80" />
+                <HdvColumnViewModelPreset Guid="82ddfdff-ee93-5f35-08ac-4705069618dc" Name="Thread Activity Tag" SortPriority="9" Width="80" />
+                <HdvColumnViewModelPreset Guid="2818954f-2d30-5569-4510-dade0a5a605c" Name="Annotation" SortPriority="10" Width="80" />
+                <HdvColumnViewModelPreset Guid="9298a5c9-42e9-42d0-b069-f211906a4078" Name="Commit Stack Tag" SortPriority="11" Width="120">
+                  <HdvColumnViewModelPreset.Parameter>
+                    <PresetStackOptions Mode="StackTag" xmlns="clr-namespace:Microsoft.Performance.Shell.Stacks;assembly=Microsoft.Performance.Shell" />
+                  </HdvColumnViewModelPreset.Parameter>
+                </HdvColumnViewModelPreset>
+                <HdvColumnViewModelPreset Guid="9298a5c9-42e9-42d0-b069-f211906a4078" Name="Commit Stack (Frame Tags)" SortPriority="12" Width="120">
+                  <HdvColumnViewModelPreset.Parameter>
+                    <PresetStackOptions Mode="FrameTags" xmlns="clr-namespace:Microsoft.Performance.Shell.Stacks;assembly=Microsoft.Performance.Shell" />
+                  </HdvColumnViewModelPreset.Parameter>
+                </HdvColumnViewModelPreset>
+                <HdvColumnViewModelPreset Guid="7f60a51c-b867-4365-9201-6465fc23a978" Name="Decommit Stack Tag" SortPriority="14" Width="120">
+                  <HdvColumnViewModelPreset.Parameter>
+                    <PresetStackOptions Mode="StackTag" xmlns="clr-namespace:Microsoft.Performance.Shell.Stacks;assembly=Microsoft.Performance.Shell" />
+                  </HdvColumnViewModelPreset.Parameter>
+                </HdvColumnViewModelPreset>
+                <HdvColumnViewModelPreset Guid="7f60a51c-b867-4365-9201-6465fc23a978" Name="Decommit Stack (Frame Tags)" SortPriority="15" Width="120">
+                  <HdvColumnViewModelPreset.Parameter>
+                    <PresetStackOptions Mode="FrameTags" xmlns="clr-namespace:Microsoft.Performance.Shell.Stacks;assembly=Microsoft.Performance.Shell" />
+                  </HdvColumnViewModelPreset.Parameter>
+                </HdvColumnViewModelPreset>
+                <HdvColumnViewModelPreset Guid="7f60a51c-b867-4365-9201-6465fc23a978" Name="Decommit Stack" SortPriority="16" Width="120">
+                  <HdvColumnViewModelPreset.Parameter>
+                    <PresetStackOptions xmlns="clr-namespace:Microsoft.Performance.Shell.Stacks;assembly=Microsoft.Performance.Shell" />
+                  </HdvColumnViewModelPreset.Parameter>
+                </HdvColumnViewModelPreset>
+                <HdvColumnViewModelPreset Guid="e35ae2d1-6370-4e17-a79d-eada8afa60f6" Name="Commit Time" SortPriority="20" Width="100" CellFormat="sN" />
+                <HdvColumnViewModelPreset Guid="093b4056-cb58-4209-90b9-29cdbb8ca214" Name="Decommit Time" SortPriority="21" Width="100" CellFormat="sN" />
+                <HdvColumnViewModelPreset Guid="801c4ec2-9d52-42fb-b3bb-a06e4d5a70a5" Name="Address" SortPriority="22" Width="120" />
+                <HdvColumnViewModelPreset Guid="02a075ed-f8f0-4ff4-b474-f44059bf7a29" Name="Committing ThreadId" SortPriority="23" TextAlignment="Right" Width="60" />
+                <HdvColumnViewModelPreset Guid="cbe54a29-9309-4fc4-b16c-9934f5d8b25f" Name="Decommitting ThreadId" SortPriority="24" TextAlignment="Right" Width="60" />
+                <HdvColumnViewModelPreset Guid="3e80b2ba-b36a-4ff1-9c2c-d2542002a6d6" Name="Count" AggregationMode="Sum" IsVisible="True" SortPriority="19" TextAlignment="Right" Width="60" />
+                <HdvColumnViewModelPreset Guid="191711d7-f84c-4936-93b7-e2793639cdd1" Name="Impacting Size" AggregationMode="Sum" IsVisible="True" SortOrder="Descending" TextAlignment="Right" Width="120" />
+                <HdvColumnViewModelPreset Guid="355d0688-9ebd-41af-b2c4-0dc0f4294eaa" Name="Size" AggregationMode="Sum" IsVisible="True" SortOrder="Descending" SortPriority="1" TextAlignment="Right" Width="120" />
+              </HdvViewModelPreset.ConfigurableColumns>
+            </HdvViewModelPreset>
+          </HdvViewModelPresetCollection.UserPresets>
         </HdvViewModelPresetCollection>
         <HdvViewModelPresetCollection Name="4e358366-366b-4ec0-8fc8-0f5f1d38b397">
           <HdvViewModelPresetCollection.UserPresets />
