@@ -135,6 +135,9 @@ private:
 
 	void SetSamplingSpeed( ) const;
 
+
+	void initializeToolTip( );
+
 	// Stop tracing (if tracing to a file or if bSaveTrace is
 	// false), saving the trace as well if bSaveTrace is true.
 	void StopTracingAndMaybeRecord(bool bSaveTrace);

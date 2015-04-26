@@ -240,39 +240,6 @@ bool isValidPathToFSObject( _In_ std::wstring path )
 	return enhancedExistCheckGetFileAttributes( longPath );
 }
 
-
-void handle_vprintfFailure( _In_ const HRESULT fmtResult, _In_ const rsize_t bufferCount )
-{
-	debug::Alias( &bufferCount );
-
-	if ( fmtResult == STRSAFE_E_INSUFFICIENT_BUFFER )
-	{
-
-		OutputDebugStringA( "CUIforETWDlg::vprintf FAILED TO format args to buffer!"
-							"\r\n\tThe buffer was too small!"
-							"\r\n\tThis is a FATAL error!\r\n");
-		std::terminate( );
-	}
-	if ( fmtResult == STRSAFE_E_INVALID_PARAMETER )
-	{
-		OutputDebugStringA( "CUIforETWDlg::vprintf FAILED TO format args to buffer!"
-							"\r\n\tAn invalid parameter was passed to StringCchVPrintf!"
-							"\r\n\tThis is a FATAL error!\r\n");
-		std::terminate( );
-	}
-	if ( fmtResult == STRSAFE_E_END_OF_FILE )
-	{
-		OutputDebugStringA( "CUIforETWDlg::vprintf FAILED TO format args to buffer!"
-							"\r\n\tStringCchVPrintf reached end of file!"
-							"\r\n\tThis is a nonsensical and FATAL error!\r\n");
-		std::terminate( );
-	}
-	OutputDebugStringA( "CUIforETWDlg::vprintf FAILED TO format args to buffer!"
-						"\r\n\tStringCchVPrintf hit an unexpected error!"
-						"\r\n\tSomething is FATALLY wrong!\r\n");
-	std::terminate( );
-}
-
 bool copyWpaProfileToExecutableDirectory( _In_ const std::wstring& documents, _In_ const std::wstring exeDir )
 {
 	ATLASSERT( documents.length( ) > 0 );
@@ -392,39 +359,6 @@ void addSingleToolToToolTip(
 	std::terminate( );
 }
 
-void initializeToolTip(
-						_Out_ CToolTipCtrl* const toolTip,
-						_In_  CButton*      const btStartTracing,
-						_In_  CButton*      const btCompress,
-						_In_  CButton*      const btCswitchStacks,
-						_In_  CButton*      const btSampledStacks,
-						_In_  CButton*      const btFastSampling,
-						_In_  CButton*      const btGPUTracing,
-						_In_  CButton*      const btShowCommands,
-						_In_  CStatic*      const btInputTracingLabel,
-						_In_  CComboBox*    const btInputTracing,
-						_In_  CComboBox*    const btTracingMode,
-						_In_  CListBox*     const btTraces,
-						_In_  CEdit*        const btTraceNotes
-					  )
-{
-	
-	toolTip->SetMaxTipWidth(400);
-	toolTip->Activate(TRUE);
-
-	addSingleToolToToolTip( toolTip, btStartTracing, StartEtwTracingString );
-	addSingleToolToToolTip( toolTip, btCompress, btCompressToolTipString );
-	addSingleToolToToolTip( toolTip, btCswitchStacks, btCswitchStacksString );
-	addSingleToolToToolTip( toolTip, btSampledStacks, SampledStacksString );
-	addSingleToolToToolTip( toolTip, btFastSampling, SampleRateString );
-	addSingleToolToToolTip( toolTip, btGPUTracing, GPUTracingString );
-	addSingleToolToToolTip( toolTip, btShowCommands, ShowCommandsString );
-	addSingleToolToToolTip( toolTip, btInputTracingLabel, InputTipString);
-	addSingleToolToToolTip( toolTip, btInputTracing, InputTipString );
-	addSingleToolToToolTip( toolTip, btTracingMode, TracingModeString);
-	addSingleToolToToolTip( toolTip, btTraces, TracesString );
-	addSingleToolToToolTip( toolTip, btTraceNotes, TraceNotesString);
-}
 
 std::wstring GetPathToWindowsPerformanceToolkit( )
 {
@@ -967,6 +901,99 @@ void DisablePagingExecutive( )
 	}
 }
 
+std::wstring getWindowsDirectory( )
+{
+	PWSTR windowsDir = nullptr;
+
+	const HRESULT windowsDirectoryResult =
+		SHGetKnownFolderPath( FOLDERID_Windows, 0, NULL, &windowsDir );
+	if ( FAILED( windowsDirectoryResult ) )
+	{
+		debug::Alias( &windowsDir );
+		debug::Alias( &FOLDERID_Windows );
+		const HRESULT efail = E_FAIL;
+		const HRESULT invArg = E_INVALIDARG;
+		debug::Alias( &efail );
+		debug::Alias( &invArg );
+		std::terminate( );
+	}
+	
+	std::wstring windowsDirectory( L"\\\\?\\" + std::wstring( windowsDir ) );
+	
+
+	//Fun fact:
+	//CoTaskMemFree is annotated with:
+	//__drv_freesMem(Mem)
+	//Where Mem is windowsDir
+	CoTaskMemFree(windowsDir);
+
+	//BUGBUG: WTF??? Why not L'\\';??
+	windowsDirectory += '\\';
+	
+	return windowsDirectory;
+}
+
+std::wstring getWPTDir( )
+{
+	// The WPT 8.1 installer is always a 32-bit installer, so we look for it in
+	// ProgramFilesX86, on 32-bit and 64-bit operating systems.
+	PWSTR progFilesx86Dir = nullptr;
+
+	const HRESULT progFilesResult =
+		SHGetKnownFolderPath( FOLDERID_ProgramFilesX86, 0, NULL, &progFilesx86Dir );
+	if ( FAILED( progFilesResult ) )
+	{
+		debug::Alias( &progFilesx86Dir );
+		debug::Alias( &FOLDERID_Windows );
+		const HRESULT efail = E_FAIL;
+		const HRESULT invArg = E_INVALIDARG;
+		debug::Alias( &efail );
+		debug::Alias( &invArg );
+		std::terminate( );
+	}
+
+	std::wstring wptDir( L"\\\\?\\" + std::wstring( progFilesx86Dir ) );
+	CoTaskMemFree(progFilesx86Dir);
+	wptDir += L"\\Windows Kits\\8.1\\Windows Performance Toolkit\\";
+
+	if (!isValidPathToFSObject(wptDir))
+	{
+		AfxMessageBox( ( wptDir + L" does not exist. Please install WPT 8.1. Exiting." ).c_str( ) );
+		exit(10);
+	}
+
+
+	return wptDir;
+}
+
+
+std::wstring getDocumentsPath( )
+{
+	PWSTR documents_temp = nullptr;
+
+	//We want to CREATE IT if it doesn't exist??!?
+	const HRESULT shGetMyDocResult =
+		SHGetKnownFolderPath( FOLDERID_Documents, 0, NULL, &documents_temp );
+
+	if ( FAILED( shGetMyDocResult ) )
+	{
+		debug::Alias( &documents_temp );
+		debug::Alias( &FOLDERID_Windows );
+		const HRESULT efail = E_FAIL;
+		const HRESULT invArg = E_INVALIDARG;
+		debug::Alias( &efail );
+		debug::Alias( &invArg );
+		std::terminate( );
+	}
+
+	
+	//request Unicode (long-path compatible) versions of APIs
+	const std::wstring documents( L"\\\\?\\" + std::wstring( documents_temp ) );
+	CoTaskMemFree( documents_temp );
+	
+	return documents;
+}
+
 
 }// namespace {
 
@@ -986,19 +1013,13 @@ void CUIforETWDlg::vprintf(PCWSTR pFormat, va_list args)
 {
 	const rsize_t bufferCount = 5000u;
 	
-	wchar_t buffer[ bufferCount ];
+	wchar_t buffer[ bufferCount ] = { 0 };
 
-	const HRESULT printFormattedArgsToBuffer =
-		StringCchVPrintfW( buffer, bufferCount, pFormat, args );
-	ASSERT( SUCCEEDED( printFormattedArgsToBuffer ) );
-	if ( FAILED( printFormattedArgsToBuffer ) )
-	{
-		//how should we handle this correctly?
-		//returns true if we can continue!
-		handle_vprintfFailure( printFormattedArgsToBuffer, bufferCount );
-		return;
-	}
 
+	//Is it just me, or is msft missing a va_end in the
+	//_vsnwprintf_s documentation example?
+	//https://msdn.microsoft.com/en-us/library/d3xd30zz.aspx
+	_vsnwprintf_s( buffer, _TRUNCATE, pFormat, args );
 
 	for (PCWSTR pBuf = buffer; *pBuf; ++pBuf)
 	{
@@ -1018,13 +1039,6 @@ void CUIforETWDlg::vprintf(PCWSTR pFormat, va_list args)
 		}
 	}
 
-	if ( output_.find( L"\r\r\n" ) != std::string::npos )
-	{
-		_CrtDbgBreak( );
-	}
-
-	ATLASSERT( output_.find( L"\r\r\n" ) == std::string::npos );
-
 	//This is why I hate MFC, they've overloaded a function with a macro-defined name!
 	//And CWnd::SetDlgItemText doesn't even check the return value of SetDlgItemText
 	SetDlgItemText(IDC_OUTPUT, output_.c_str());
@@ -1041,7 +1055,7 @@ void CUIforETWDlg::vprintf(PCWSTR pFormat, va_list args)
 	// frosted, a ghost window will be displayed, and none of our updates
 	// will be visible.
 	MSG msg;
-	PeekMessage(&msg, *this, 0, 0, PM_NOREMOVE);
+	PeekMessageW(&msg, *this, 0, 0, PM_NOREMOVE);
 }
 
 
@@ -1277,54 +1291,20 @@ BOOL CUIforETWDlg::OnInitDialog()
 	checkETWCompatibility( );
 
 
-	PWSTR windowsDir = nullptr;
-	VERIFY(SUCCEEDED(SHGetKnownFolderPath(FOLDERID_Windows, 0, NULL, &windowsDir)));
-	
-	windowsDir_ = L"\\\\?\\";
-	windowsDir_ += windowsDir;
-	
-	//BUGBUG: WTF??? Why not L'\\';??
-	windowsDir_ += '\\';
 
+	windowsDir_ = getWindowsDirectory( );
 
-	CoTaskMemFree(windowsDir);
+	
 	// ANSI string, not unicode.
 	systemDrive_ = static_cast<char>(windowsDir_[0]);
 	systemDrive_ += ":\\";
 
-	// The WPT 8.1 installer is always a 32-bit installer, so we look for it in
-	// ProgramFilesX86, on 32-bit and 64-bit operating systems.
-	PWSTR progFilesx86Dir = nullptr;
-	VERIFY(SUCCEEDED(SHGetKnownFolderPath(FOLDERID_ProgramFilesX86, 0, NULL, &progFilesx86Dir)));
-	wptDir_ = L"\\\\?\\";
-	wptDir_ += progFilesx86Dir;
-	wptDir_ += L"\\Windows Kits\\8.1\\Windows Performance Toolkit\\";
-	CoTaskMemFree(progFilesx86Dir);
-	const std::wstring xperfPath( wptDir_ );
 
-	if (!isValidPathToFSObject(xperfPath.c_str()))
-	{
-		AfxMessageBox( ( xperfPath + L" does not exist. Please install WPT 8.1. Exiting." ).c_str( ) );
-		exit(10);
-	}
+	wptDir_ = getWPTDir( );
 
-	_Null_terminated_ wchar_t documents_temp[ MAX_PATH ] = { 0 };
 
-	//We want to CREATE IT if it doesn't exist??!?
-	const HRESULT shGetMyDocResult =
-		SHGetFolderPath( 0, CSIDL_MYDOCUMENTS, NULL, SHGFP_TYPE_CURRENT, documents_temp );
-	
-	ASSERT( SUCCEEDED( shGetMyDocResult ) );
+	std::wstring documents = getDocumentsPath( );
 
-	if ( FAILED( shGetMyDocResult ) )
-	{
-		outputPrintf( L"Failed to find the My Documents directory!\n" );
-		exit(10);
-	}
-
-	
-	//request Unicode (long-path compatible) versions of APIs
-	const std::wstring documents( L"\\\\?\\" + std::wstring( documents_temp ) );
 
 	std::wstring defaultTraceDir = documents + std::wstring(L"\\etwtraces\\");
 	traceDir_ = GetDirectory(L"etwtracedir", defaultTraceDir);
@@ -1417,21 +1397,7 @@ BOOL CUIforETWDlg::OnInitDialog()
 
 	if (toolTipCreateResult)
 	{
-		initializeToolTip(
-			&toolTip_,
-			&btStartTracing_,
-			&btCompress_,
-			&btCswitchStacks_,
-			&btSampledStacks_,
-			&btFastSampling_,
-			&btGPUTracing_,
-			&btShowCommands_,
-			&btInputTracingLabel_,
-			&btInputTracing_,
-			&btTracingMode_,
-			&btTraces_,
-			&btTraceNotes_
-			);
+		initializeToolTip( );
 	}
 
 	SetHeapTracing(false);
@@ -1440,6 +1406,27 @@ BOOL CUIforETWDlg::OnInitDialog()
 
 	return TRUE; // return TRUE unless you set the focus to a control
 }
+
+void CUIforETWDlg::initializeToolTip( )
+{
+	
+	toolTip_.SetMaxTipWidth(400);
+	toolTip_.Activate(TRUE);
+
+	addSingleToolToToolTip( &toolTip_, &btStartTracing_, StartEtwTracingString );
+	addSingleToolToToolTip( &toolTip_, &btCompress_, btCompressToolTipString );
+	addSingleToolToToolTip( &toolTip_, &btCswitchStacks_, btCswitchStacksString );
+	addSingleToolToToolTip( &toolTip_, &btSampledStacks_, SampledStacksString );
+	addSingleToolToToolTip( &toolTip_, &btFastSampling_, SampleRateString );
+	addSingleToolToToolTip( &toolTip_, &btGPUTracing_, GPUTracingString );
+	addSingleToolToToolTip( &toolTip_, &btShowCommands_, ShowCommandsString );
+	addSingleToolToToolTip( &toolTip_, &btInputTracingLabel_, InputTipString);
+	addSingleToolToToolTip( &toolTip_, &btInputTracing_, InputTipString );
+	addSingleToolToToolTip( &toolTip_, &btTracingMode_, TracingModeString);
+	addSingleToolToToolTip( &toolTip_, &btTraces_, TracesString );
+	addSingleToolToToolTip( &toolTip_, &btTraceNotes_, TraceNotesString);
+}
+
 
 std::wstring CUIforETWDlg::GetDirectory( _In_z_ PCWSTR env, const std::wstring& default)
 {
