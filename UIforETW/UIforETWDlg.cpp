@@ -667,13 +667,21 @@ void CUIforETWDlg::OnBnClickedStarttracing()
 		assert(0);
 
 	std::wstring kernelProviders = L" Latency+POWER+DISPATCHER+FILE_IO+FILE_IO_INIT+VIRT_ALLOC+MEMINFO+MEMINFO_WS";
-	std::wstring kernelStackWalk = L"";
-	if (bSampledStacks_ && bCswitchStacks_)
-		kernelStackWalk = L" -stackwalk PROFILE+CSWITCH+READYTHREAD";
-	else if (bSampledStacks_)
-		kernelStackWalk = L" -stackwalk PROFILE";
-	else if (bCswitchStacks_)
-		kernelStackWalk = L" -stackwalk CSWITCH+READYTHREAD";
+	std::wstring kernelStackWalk;
+	// Record CPU sampling call stacks, from the PROFILE provider
+	if (bSampledStacks_)
+		kernelStackWalk += L"+PROFILE";
+	// Record context-switch (switch in) and readying-thread (SetEvent, etc.)
+	// call stacks from DISPATCHER provider.
+	if (bCswitchStacks_)
+		kernelStackWalk += L"+CSWITCH+READYTHREAD";
+	// Record VirtualAlloc call stacks from the VIRT_ALLOC provider. Could
+	// also record VirtualFree.
+	if (tracingMode_ == kHeapTracingToFile)
+		kernelStackWalk += L"+VirtualAlloc";
+	// Set up a -stackwalk configuration, removing the leading '+' sign.
+	if (!kernelStackWalk.empty())
+		kernelStackWalk = L" -stackwalk " + kernelStackWalk.substr(1);
 	// Buffer sizes are in KB, so 1024 is actually 1 MB
 	// Make this configurable.
 	std::wstring kernelBuffers = L" -buffersize 1024 -minbuffers 600 -maxbuffers 600";
