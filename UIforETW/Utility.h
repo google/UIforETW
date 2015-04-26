@@ -34,9 +34,8 @@ void DisplayWindowsMessageBoxWithErrorMessage( DWORD error );
 void GetLastErrorAsFormattedMessage( 
 								ETWUI_WRITES_TO_STACK( strSize )
 									PWSTR psz_formatted_error,
-								_In_range_( 128, 32767 )
 									rsize_t strSize,
-								DWORD error = GetLastError( )
+									DWORD error = GetLastError( )
 							  );
 
 
@@ -45,26 +44,25 @@ template<rsize_t strSize>
 void GetLastErrorAsFormattedMessage( 
 								ETWUI_WRITES_TO_STACK( strSize )
 									wchar_t (&psz_formatted_error)[strSize],
-								DWORD error = GetLastError( )
+									DWORD error = GetLastError( )
 							  )
 {
 	static_assert( ( 128 <= strSize ) && ( strSize <= 32767 ), "Unsupported range!" );
 	return GetLastErrorAsFormattedMessage( psz_formatted_error, strSize, error );
 }
 
-void outputErrorDebug( DWORD lastErr );
+void outputErrorDebug( DWORD lastErr = GetLastError( ) );
 
-void outputPrintfErrorDebug( DWORD lastErr );
+void outputPrintfErrorDebug( DWORD lastErr = GetLastError( ) );
 
 }
 
 
 namespace handle_close {
 
-LONG regCloseKey( _In_ _Pre_valid_ _Post_ptr_invalid_ HKEY hKey );
+void regCloseKey( _In_ _Pre_valid_ _Post_ptr_invalid_ HKEY hKey );
 
-_Success_( return )
-BOOL closeHandle( _In_ _Pre_valid_ _Post_ptr_invalid_ HANDLE handle );
+void closeHandle( _In_ _Pre_valid_ _Post_ptr_invalid_ HANDLE handle );
 }
 
 

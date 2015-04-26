@@ -21,22 +21,6 @@ limitations under the License.
 
 namespace {
 
-void write_BAD_FMT(
-					_Out_writes_z_( 8 )
-					_Pre_writable_size_( 8 )
-					_Post_readable_size_( 8 )
-						PWSTR pszFMT
-				  )
-{
-	pszFMT[ 0 ] = 'B';
-	pszFMT[ 1 ] = 'A';
-	pszFMT[ 2 ] = 'D';
-	pszFMT[ 3 ] = '_';
-	pszFMT[ 4 ] = 'F';
-	pszFMT[ 5 ] = 'M';
-	pszFMT[ 6 ] = 'T';
-	pszFMT[ 7 ] = 0;
-}
 
 void handleMultiByteToWideCharFailure( const DWORD error )
 {
@@ -71,25 +55,44 @@ void handleMultiByteToWideCharFailure( const DWORD error )
 
 namespace handle_close {
 
-LONG regCloseKey( _In_ _Pre_valid_ _Post_ptr_invalid_ HKEY hKey )
+
+//Die if we fail to close registry key
+void regCloseKey( _In_ _Pre_valid_ _Post_ptr_invalid_ HKEY hKey )
 {
 	//If [RegCloseKey] succeeds, the return value is ERROR_SUCCESS.
 	//If the function fails, the return value is a nonzero error code 
 	//defined in Winerror.h. 
 	//You can use the FormatMessage function with the 
 	//FORMAT_MESSAGE_FROM_SYSTEM flag to get a generic description of the error.
-	return ::RegCloseKey( hKey );
+	const LONG result = ::RegCloseKey( hKey );
+	if ( result == ERROR_SUCCESS )
+	{
+		return;
+	}
+	debug::Alias( &result );
+	debug::Alias( &hKey );
+
+	const DWORD lastErr = GetLastError( );
+	ErrorHandling::outputErrorDebug( lastErr );
+	std::terminate( );
 }
 
-_Success_( return )
-BOOL closeHandle( _In_ _Pre_valid_ _Post_ptr_invalid_ HANDLE handle )
+void closeHandle( _In_ _Pre_valid_ _Post_ptr_invalid_ HANDLE handle )
 {
 	//If [CloseHandle] succeeds, the return value is nonzero.
 	//If [CloseHandle] fails, the return value is zero.
 	//To get extended error information, call GetLastError.
 	const BOOL result = ::CloseHandle( handle );
 	ATLASSERT( result != 0 );
-	return result;
+	
+	if ( result != 0 )
+	{
+		return;
+	}
+
+	const DWORD lastErr = GetLastError( );
+	ErrorHandling::outputErrorDebug( lastErr );
+	std::terminate( );
 }
 
 }
@@ -128,7 +131,6 @@ void DisplayWindowsMessageBoxWithErrorMessage( const DWORD error )
 void GetLastErrorAsFormattedMessage( 
 								ETWUI_WRITES_TO_STACK( strSize )
 									PWSTR psz_formatted_error,
-								_In_range_( 128, 32767 )
 									const rsize_t strSize,
 									const DWORD error
 							  )
@@ -303,36 +305,35 @@ void SetRegistryDWORD(HKEY root, const std::wstring& subkey, const std::wstring&
 	//  You can use the FormatMessage function with the 
 	//    FORMAT_MESSAGE_FROM_SYSTEM flag to get a generic description of the error.
 	const LONG openResult = RegOpenKeyExW(root, subkey.c_str(), 0, KEY_ALL_ACCESS, &key);
-	if (openResult == ERROR_SUCCESS)
+	if ( openResult != ERROR_SUCCESS )
 	{
-		//RegSetValueEx has the exact same return behavior as RegOpenKeyEx
-		const LONG setValueResult =
-			RegSetValueExW(
-							key, 
-							valueName.c_str(),
-							0,
-							REG_DWORD,
-							reinterpret_cast<const BYTE*>(&value),
-							sizeof(value)
-						  );
+		outputPrintf( L"Failed to open registry key `%s`\n", subkey.c_str( ) );
+		ErrorHandling::outputPrintfErrorDebug( );
+		return;
+	}
+	//RegSetValueEx has the exact same return behavior as RegOpenKeyEx
+	const LONG setValueResult =
+		RegSetValueExW(
+						key, 
+						valueName.c_str(),
+						0,
+						REG_DWORD,
+						reinterpret_cast<const BYTE*>(&value),
+						sizeof(value)
+						);
 
-		if ( setValueResult != ERROR_SUCCESS )
-		{
-			//TODO: how to best handle?
-			throw std::runtime_error( "Failed to write value to registry!!!" );
-		}
-		const LONG closeResult = handle_close::regCloseKey( key );
-		if ( closeResult != ERROR_SUCCESS )
-		{
-			//TODO: how to best handle?
-			throw std::runtime_error( "Failed to close registry key!!!!" );
-		}
+	if ( setValueResult != ERROR_SUCCESS )
+	{
+		//TODO: how to best handle?
+		throw std::runtime_error( "Failed to write value to registry!!!" );
+	}
+	handle_close::regCloseKey( key );
 
 		
-		//SAL catches this :)
-		//handle_close::regCloseKey( key );
+	//SAL catches this :)
+	//handle_close::regCloseKey( key );
 
-	}
+
 }
 
 void CreateRegistryKey(HKEY root, const std::wstring& subkey, const std::wstring& newKey)
@@ -341,23 +342,28 @@ void CreateRegistryKey(HKEY root, const std::wstring& subkey, const std::wstring
 	const LONG openResult =
 		RegOpenKeyExW(root, subkey.c_str(), 0, KEY_ALL_ACCESS, &key);
 	
-	if (openResult == ERROR_SUCCESS)
+	if ( openResult != ERROR_SUCCESS )
 	{
-		HKEY resultKey;
-		const LONG createResult =
-			RegCreateKey(key, newKey.c_str(), &resultKey);
-		if (createResult == ERROR_SUCCESS)
-		{
-			RegCloseKey(resultKey);
-		}
-		RegCloseKey(key);
+		outputPrintf( L"Failed to open registry key `%s`\n", subkey.c_str( ) );
+		ErrorHandling::outputPrintfErrorDebug( );
+		return;
 	}
+
+	HKEY resultKey;
+	const LONG createResult =
+		RegCreateKeyW(key, newKey.c_str(), &resultKey);
+	if (createResult == ERROR_SUCCESS)
+	{
+		RegCloseKey(resultKey);
+	}
+	RegCloseKey(key);
+
 }
 
 std::wstring GetEditControlText(HWND hEdit)
 {
 	std::wstring result;
-	int length = GetWindowTextLength(hEdit);
+	const int length = GetWindowTextLength(hEdit);
 	std::vector<wchar_t> buffer(length + 1);
 	GetWindowTextW(hEdit, &buffer[0], buffer.size());
 	// Double-verify that the buffer is null-terminated.
@@ -369,7 +375,7 @@ std::wstring AnsiToUnicode(const std::string& text)
 {
 	// Determine number of wide characters to be allocated for the
 	// Unicode string.
-	const size_t cCharacters = text.size() + 1;
+	const rsize_t cCharacters = text.size() + 1;
 
 	std::vector<wchar_t> buffer(cCharacters);
 
@@ -407,7 +413,7 @@ static bool ControlOK(HWND win)
 	return true;
 }
 
-static HWND GetNextDlgItem(HWND win, bool Wrap)
+static HWND GetNextDlgItem(HWND win, const bool Wrap)
 {
 	HWND next = GetWindow(win, GW_HWNDNEXT);
 	while (next != win && !ControlOK(next))
@@ -428,13 +434,13 @@ static HWND GetNextDlgItem(HWND win, bool Wrap)
 			}
 		}
 	}
-	assert(!Wrap || next);
+	ATLASSERT(!Wrap || next);
 	return next;
 }
 
 void SmartEnableWindow(_In_ const HWND Win, _In_ const BOOL Enable)
 {
-	assert(Win);
+	ATLASSERT(Win);
 	if (!Enable)
 	{
 		HWND hasfocus = GetFocus();
@@ -508,6 +514,7 @@ int DeleteOneFile(HWND hwnd, const std::wstring& path)
 int DeleteFiles(HWND hwnd, const std::vector<std::wstring>& paths)
 {
 	std::vector<wchar_t> fileNames;
+	fileNames.reserve( paths.size( ) );
 	for (auto& path : paths)
 	{
 		// Push the file name and its NULL terminator onto the vector.
@@ -527,7 +534,7 @@ int DeleteFiles(HWND hwnd, const std::vector<std::wstring>& paths)
 		( FOF_ALLOWUNDO bitor FOF_FILESONLY bitor FOF_NOCONFIRMATION ),
 	};
 	// Delete using the recycle bin.
-	int result = SHFileOperation(&fileOp);
+	const int result = SHFileOperation(&fileOp);
 
 	return result;
 }
