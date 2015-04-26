@@ -71,10 +71,9 @@ bool ChildProcess::IsStillRunning()
 
 std::wstring ChildProcess::RemoveOutputText()
 {
-	outputLock_.Enter( );
+	CSingleLock lockGuard( &outputLock_ );
 	std::wstring result = processOutput_;
 	processOutput_ = L"";
-	outputLock_.Leave( );
 	return result;
 }
 
@@ -96,11 +95,10 @@ DWORD ChildProcess::ListenerThread()
 		{
 			if (dwRead > 0)
 			{
-				outputLock_.Enter( );
+				CSingleLock lockGuard( &outputLock_ );
 				buffer[dwRead] = 0;
 				OutputDebugStringA(buffer);
 				processOutput_ += AnsiToUnicode(buffer);
-				outputLock_.Leave( );
 			}
 			SetEvent(hOutputAvailable_);
 		}

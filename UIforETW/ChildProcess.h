@@ -18,7 +18,7 @@ limitations under the License.
 
 //#include "stdafx.h"
 #include <string>
-#include <atlsync.h>
+//#include <atlsync.h>
 
 // This class encapsulates running a child thread and reading
 // its output. Typical usage is:
@@ -66,8 +66,11 @@ private:
 
 	// The processOutput_ string is written to by the listener thread.
 	// Don't modify processOutput_ without acquiring the lock.
-	ATL::CCriticalSection outputLock_;
-	_Guarded_by_( outputLock_ ) std::wstring processOutput_;
+	CCriticalSection outputLock_;
+	
+	//This annotation is commented out because /analyze doesn't
+	//properly understand it.
+	/*_Guarded_by_( outputLock_ )*/ std::wstring processOutput_;
 
 	// Output handles for the child process -- connected to the pipe.
 	HANDLE hStdOutput_ = INVALID_HANDLE_VALUE;

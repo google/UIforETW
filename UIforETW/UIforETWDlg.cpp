@@ -1294,7 +1294,7 @@ BOOL CUIforETWDlg::OnInitDialog()
 
 	// The WPT 8.1 installer is always a 32-bit installer, so we look for it in
 	// ProgramFilesX86, on 32-bit and 64-bit operating systems.
-	wchar_t* progFilesx86Dir = nullptr;
+	PWSTR progFilesx86Dir = nullptr;
 	VERIFY(SUCCEEDED(SHGetKnownFolderPath(FOLDERID_ProgramFilesX86, 0, NULL, &progFilesx86Dir)));
 	wptDir_ = L"\\\\?\\";
 	wptDir_ += progFilesx86Dir;

@@ -29,7 +29,7 @@ limitations under the License.
 								_Pre_writable_size_( strSize ) \
 
 namespace ErrorHandling {
-void DisplayWindowsMessageBoxWithErrorMessage( const DWORD error );
+void DisplayWindowsMessageBoxWithErrorMessage( DWORD error );
 
 //On returning E_FAIL, call GetLastError for details. That's not my idea!
 _Success_( SUCCEEDED( return ) )
@@ -38,8 +38,8 @@ GetLastErrorAsFormattedMessage(
 								ETWUI_WRITES_TO_STACK( strSize )
 									PWSTR psz_formatted_error,
 								_In_range_( 128, 32767 )
-									const rsize_t strSize,
-								const DWORD error = GetLastError( )
+									rsize_t strSize,
+								DWORD error = GetLastError( )
 							  );
 
 
@@ -50,16 +50,16 @@ HRESULT
 GetLastErrorAsFormattedMessage( 
 								ETWUI_WRITES_TO_STACK( strSize )
 									wchar_t (&psz_formatted_error)[strSize],
-								const DWORD error = GetLastError( )
+								DWORD error = GetLastError( )
 							  )
 {
 	static_assert( ( 128 <= strSize ) && ( strSize <= 32767 ), "Unsupported range!" );
 	return GetLastErrorAsFormattedMessage( psz_formatted_error, strSize, error );
 }
 
-void outputErrorDebug( const DWORD lastErr );
+void outputErrorDebug( DWORD lastErr );
 
-void outputPrintfErrorDebug( const DWORD lastErr );
+void outputPrintfErrorDebug( DWORD lastErr );
 
 }
 
@@ -84,7 +84,7 @@ std::wstring LoadFileAsText(const std::wstring& fileName);
 // Write a wstring as UTF-16.
 void WriteTextAsFile(const std::wstring& fileName, const std::wstring& text);
 
-void SetRegistryDWORD(HKEY root, const std::wstring& subkey, const std::wstring& valueName, const DWORD value);
+void SetRegistryDWORD(HKEY root, const std::wstring& subkey, const std::wstring& valueName, DWORD value);
 void CreateRegistryKey(HKEY root, const std::wstring& subkey, const std::wstring& newKey);
 
 std::wstring GetEditControlText(HWND hwnd);
