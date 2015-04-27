@@ -349,7 +349,7 @@ void addSingleToolToToolTip(
 	{
 		return;
 	}
-	OutputDebugStringA( "Failed to add a message to a tooltip!!\r\n" );
+	OutputDebugStringA( "UIforETW: Failed to add a message to a tooltip!!\r\n" );
 	OutputDebugStringA( "The tooltip message:\r\n\t`" );
 	OutputDebugStringW( toolTipMessageToAdd );
 	OutputDebugStringA( "`\r\n" );
@@ -371,7 +371,7 @@ CRect GetWindowRectFromHwnd( _In_ const HWND hwnd )
 		
 		ErrorHandling::outputErrorDebug( err );
 
-		exit(10);
+		std::terminate( );
 	}
 
 	return CRect( windowRect_temp );
@@ -389,7 +389,7 @@ void SetSaveTraceBuffersWindowText( _In_ const HWND hWnd )
 					  L"L\"Sa&ve Trace Buffers\" failed!!!\n"
 					);
 		ErrorHandling::outputErrorDebug( err );
-		exit(10);
+		std::terminate( );
 	}
 
 }
@@ -1212,7 +1212,7 @@ bool CUIforETWDlg::SetSymbolPath()
 
 	if (sizeRequired != 0)
 	{
-		OutputDebugStringA( "_NT_SYMCACHE_PATH was found! "
+		OutputDebugStringA( "UIforETW: _NT_SYMCACHE_PATH was found! "
 			"No work necessary!\r\n" );
 		return true;
 	}
@@ -1582,19 +1582,12 @@ std::wstring CUIforETWDlg::GetExeDir() const
 	//        the function returns nSize, 
 	//        the function sets the last error to ERROR_INSUFFICIENT_BUFFER.
 	//        the string is truncated to nSize characters including the terminating null character,
-	if (moduleFileNameResult >= bufferSize)
+	if ((moduleFileNameResult >= bufferSize) || ( moduleFileNameResult == 0))
 	{
-		const DWORD lastErr = GetLastError( );
-		ATLASSERT( lastErr == ERROR_INSUFFICIENT_BUFFER );
-		outputPrintf( L"CUIforETWDlg::GetExeDir failed! (buffer too small!)\n" );
-		ErrorHandling::DisplayWindowsMessageBoxWithErrorMessage( lastErr );
-		exit( 10 );
-	}
-	if (moduleFileNameResult == 0)
-	{
-		const DWORD lastErr = GetLastError( );
-		ErrorHandling::DisplayWindowsMessageBoxWithErrorMessage( lastErr );
-		exit( 10 );
+		ErrorHandling::outputErrorDebug( );
+		debug::Alias( &moduleFileNameResult );
+		debug::Alias( &bufferSize );
+		std::terminate( );
 	}
 	//Huh?
 	PWSTR lastSlash = wcsrchr(exePath, '\\');
@@ -1837,9 +1830,8 @@ void CUIforETWDlg::StopTracingAndMaybeRecord(bool bSaveTrace)
 		const BOOL deleteResult = DeleteFileW( compatFileTemp.c_str( ) );
 		if (deleteResult == 0)
 		{
-			const DWORD lastErr = GetLastError( );
-			outputPrintf( L"FAILED to delete `%s`!! Error code: %u\n", compatFileTemp.c_str( ), lastErr );
-			ErrorHandling::DisplayWindowsMessageBoxWithErrorMessage( lastErr );
+			outputPrintf( L"FAILED to delete `%s`!!\n", compatFileTemp.c_str( ) );
+			ErrorHandling::outputPrintfErrorDebug( );
 		}
 	}
 
@@ -1847,8 +1839,8 @@ void CUIforETWDlg::StopTracingAndMaybeRecord(bool bSaveTrace)
 	const BOOL moveSuccess = MoveFileW(compatFile.c_str( ), compatFileTemp.c_str( ));
 	if (bShowCommands_ && !moveSuccess)
 	{
-		const DWORD lastErr = GetLastError( );
-		outputPrintf( L"FAILED to rename/move `Amcache.hve`, Error code: %u\n", lastErr );
+		outputPrintf( L"FAILED to rename/move `Amcache.hve`!\n" );
+		ErrorHandling::outputPrintfErrorDebug( );
 	}
 
 	ElapsedTimer saveTimer;
@@ -1995,7 +1987,7 @@ void CUIforETWDlg::OnBnClickedSavetracebuffers()
 
 void CUIforETWDlg::OnBnClickedStoptracing()
 {
-	OutputDebugStringA( "\"Stop Tracing\" clicked!\r\n" );
+	OutputDebugStringA( "UIforETW: \"Stop Tracing\" clicked!\r\n" );
 	StopTracingAndMaybeRecord(false);
 }
 

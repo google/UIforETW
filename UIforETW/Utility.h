@@ -29,8 +29,6 @@ limitations under the License.
 
 namespace ErrorHandling {
 
-void DisplayWindowsMessageBoxWithErrorMessage( DWORD error );
-
 template<rsize_t strSize>
 void GetLastErrorAsFormattedMessage( ETWUI_WRITES_TO_STACK( strSize )
 									 wchar_t( &psz_formatted_error )[ strSize ],
