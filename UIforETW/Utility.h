@@ -23,30 +23,23 @@ limitations under the License.
 
 //Annotation macro that describes the behavior of a buffer-writing function
 //It's kinda ugly, sorry, but it works well.
-#define ETWUI_WRITES_TO_STACK( strSize ) \
-								_Out_writes_z_( strSize ) \
+#define ETWUI_WRITES_TO_STACK( strSize )                       \
+								_Out_writes_z_( strSize )      \
 								_Pre_writable_size_( strSize ) \
 
 namespace ErrorHandling {
+
 void DisplayWindowsMessageBoxWithErrorMessage( DWORD error );
 
-void GetLastErrorAsFormattedMessage( 
-								ETWUI_WRITES_TO_STACK( strSize )
-									PWSTR psz_formatted_error,
-									rsize_t strSize,
-									DWORD error = GetLastError( )
-							  );
+void GetLastErrorAsFormattedMessage( ETWUI_WRITES_TO_STACK( strSize )
+									PWSTR psz_formatted_error, rsize_t strSize,
+									DWORD error = GetLastError( ) );
 
-
-//On returning E_FAIL, call GetLastError for details. That's not my idea!
 template<rsize_t strSize>
-void GetLastErrorAsFormattedMessage( 
-								ETWUI_WRITES_TO_STACK( strSize )
+void GetLastErrorAsFormattedMessage( ETWUI_WRITES_TO_STACK( strSize )
 									wchar_t (&psz_formatted_error)[strSize],
-									DWORD error = GetLastError( )
-							  )
+									DWORD error = GetLastError( ) )
 {
-	static_assert( ( 128 <= strSize ) && ( strSize <= 32767 ), "Unsupported range!" );
 	return GetLastErrorAsFormattedMessage( psz_formatted_error, strSize, error );
 }
 
