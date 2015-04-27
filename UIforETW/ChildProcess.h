@@ -16,9 +16,7 @@ limitations under the License.
 
 #pragma once
 
-//#include "stdafx.h"
 #include <string>
-//#include <atlsync.h>
 
 // This class encapsulates running a child thread and reading
 // its output. Typical usage is:

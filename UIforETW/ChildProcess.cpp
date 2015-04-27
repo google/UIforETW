@@ -252,8 +252,6 @@ void ChildProcess::WaitForCompletion(bool printOutput)
 		// the last of the child-process output.
 		std::wstring output = RemoveOutputText();
 		if ( !output.empty( ) )
-		{
 			outputPrintf( L"%s", output.c_str( ) );
-		}
 	}
 }
