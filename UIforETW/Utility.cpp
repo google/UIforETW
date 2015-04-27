@@ -21,37 +21,6 @@ limitations under the License.
 
 namespace {
 
-
-_declspec( noreturn ) void terminateOnMultiByteToWideCharFailure(  )
-{
-	const DWORD error = GetLastError( );
-	if (error == ERROR_INSUFFICIENT_BUFFER)
-	{
-		OutputDebugStringW( L"MultiByteToWideChar failed!!: ERROR_INSUFFICIENT_BUFFER\r\n" );
-		std::terminate( );
-	}
-	if (error == ERROR_NO_UNICODE_TRANSLATION)
-	{
-		OutputDebugStringW( L"MultiByteToWideChar failed!!: ERROR_NO_UNICODE_TRANSLATION\r\n" );
-		std::terminate( );
-	}
-	if (error == ERROR_INVALID_FLAGS)
-	{
-		OutputDebugStringW( L"MultiByteToWideChar failed!!: ERROR_INVALID_FLAGS\r\n" );
-		MessageBoxW( NULL, L"MultiByteToWideChar failed!!: ERROR_INVALID_FLAGS - this indicates a logic error!", L"Fatal error!", MB_OK );
-		std::terminate( );
-	}
-	if (error == ERROR_INVALID_PARAMETER)
-	{
-		OutputDebugStringW( L"MultiByteToWideChar failed!!: ERROR_INVALID_PARAMETER\r\n" );
-		MessageBoxW( NULL, L"MultiByteToWideChar failed!!: ERROR_INVALID_PARAMETER - this indicates a logic error!", L"Fatal error!", MB_OK );
-		std::terminate( );
-	}
-	OutputDebugStringW( L"MultiByteToWideChar failed!!: (unexpected error!)\r\n" );
-	MessageBoxW( NULL, L"MultiByteToWideChar failed!!: (unexpected error!) - this indicates a logic error!", L"Fatal error!", MB_OK );
-	std::terminate( );
-}
-
 }
 
 namespace handle_close {
@@ -377,7 +346,7 @@ std::wstring AnsiToUnicode(const std::string& text)
 		return result;
 	}
 
-	terminateOnMultiByteToWideCharFailure( );
+	std::terminate( );
 }
 
 // Get the next/previous dialog item (next/prev in window order and tab order) allowing
