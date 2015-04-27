@@ -28,7 +28,7 @@ ChildProcess::ChildProcess(std::wstring exePath)
 	// Create the pipe here so that it is guaranteed to be created before
 	// we try starting the process.
 	hPipe_ = CreateNamedPipeW(kPipeName,
-		(PIPE_ACCESS_DUPLEX bitor PIPE_TYPE_BYTE bitor PIPE_READMODE_BYTE),
+		(PIPE_ACCESS_DUPLEX | PIPE_TYPE_BYTE | PIPE_READMODE_BYTE),
 		PIPE_WAIT,
 		1,
 		1024 * 16,
