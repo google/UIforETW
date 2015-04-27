@@ -16,8 +16,7 @@ limitations under the License.
 
 #pragma once
 
-#include "stdafx.h"
-//#include <string>
+#include <string>
 
 class DirectoryMonitor final
 {
