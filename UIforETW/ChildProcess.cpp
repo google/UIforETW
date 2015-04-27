@@ -71,7 +71,7 @@ bool ChildProcess::IsStillRunning()
 
 std::wstring ChildProcess::RemoveOutputText()
 {
-	CSingleLock locker( &outputLock_ );
+	CSingleLock locker(&outputLock_);
 	std::wstring result = processOutput_;
 	processOutput_ = L"";
 	return result;
@@ -89,13 +89,18 @@ DWORD ChildProcess::ListenerThread()
 	if (ConnectNamedPipe(hPipe_, NULL) || GetLastError() == ERROR_PIPE_CONNECTED)
 	{
 		// Acquire the lock while writing to processOutput_
-		char buffer[1024];
+		const rsize_t bufferSize = 1024u;
+		char buffer[bufferSize];
 		DWORD dwRead;
 		while (ReadFile(hPipe_, buffer, sizeof(buffer) - 1, &dwRead, NULL) != FALSE)
 		{
+			if (dwRead >= bufferSize)
+			{
+				std::terminate( );
+			}
 			if (dwRead > 0)
 			{
-				CSingleLock locker( &outputLock_ );
+				CSingleLock locker(&outputLock_);
 				buffer[dwRead] = 0;
 				OutputDebugStringA(buffer);
 				processOutput_ += AnsiToUnicode(buffer);
@@ -156,16 +161,6 @@ bool ChildProcess::Run(bool showCommand, std::wstring args)
 	{
 		std::terminate( );
 	}
-	//const HRESULT strCpyResult = StringCchCopyNW( &argsCopy[ 0 ], argsCopy.size( ), args.c_str( ), args.length( ) );
-	//if (FAILED( strCpyResult ))
-	//{
-	//	ATLASSERT( strCpyResult == STRSAFE_E_INSUFFICIENT_BUFFER );
-	//	outputPrintf( L"Failed to copy arguments into writable buffer!\n" );
-	//	debug::Alias( &argsCopy );
-	//	debug::Alias( &args );
-	//	debug::Alias( &strCpyResult );
-	//	std::terminate( );
-	//}
 
 	const BOOL success = CreateProcessW(exePath_.c_str(	), &argsCopy[0], NULL, NULL,
 		TRUE, flags, NULL, NULL, &startupInfo, &processInfo);

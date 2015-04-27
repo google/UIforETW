@@ -16,9 +16,8 @@ limitations under the License.
 
 #pragma once
 
-#include "stdafx.h"
-//#include <string>
-//#include <vector>
+#include <string>
+#include <vector>
 #include <memory>
 #include "KeyLoggerThread.h"
 #include "DirectoryMonitor.h"
@@ -135,7 +134,6 @@ private:
 
 	void SetSamplingSpeed( ) const;
 
-
 	void initializeToolTip( );
 
 	// Stop tracing (if tracing to a file or if bSaveTrace is
@@ -166,12 +164,12 @@ private:
 
 	_Success_( return )
 	bool SetSymbolPath();
+
 	// Call this to retrieve a directory from an environment variable, or use
 	// a default, and make sure it exists.
 	std::wstring GetDirectory(_In_z_ PCWSTR env, const std::wstring& default);
 	void CUIforETWDlg::UpdateTraceList();
 	void RegisterProviders();
-	//void DisablePagingExecutive( ) const;
 
 	CToolTipCtrl toolTip_;
 

@@ -106,7 +106,7 @@
       <AdditionalIncludeDirectories>..\include</AdditionalIncludeDirectories>
       <ErrorReporting>Send</ErrorReporting>
       <EnablePREfast>true</EnablePREfast>
-      <AdditionalOptions>/Bt+ /Qvec-report:2 /Qpar-report:2</AdditionalOptions>
+      <AdditionalOptions>/Bt+</AdditionalOptions>
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
       <StringPooling>true</StringPooling>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
@@ -120,7 +120,7 @@
       <UACExecutionLevel>RequireAdministrator</UACExecutionLevel>
       <AdditionalLibraryDirectories>..\lib</AdditionalLibraryDirectories>
       <AdditionalDependencies>ETWProviders.lib</AdditionalDependencies>
-      <AdditionalOptions>/time+ /cgthreads:8</AdditionalOptions>
+      <AdditionalOptions>/cgthreads:8</AdditionalOptions>
       <LargeAddressAware>true</LargeAddressAware>
     </Link>
     <Midl>

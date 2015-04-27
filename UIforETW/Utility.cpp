@@ -22,31 +22,32 @@ limitations under the License.
 namespace {
 
 
-void handleMultiByteToWideCharFailure( const DWORD error )
+_declspec( noreturn ) void terminateOnMultiByteToWideCharFailure(  )
 {
+	const DWORD error = GetLastError( );
 	if (error == ERROR_INSUFFICIENT_BUFFER)
 	{
-		outputPrintf( L"MultiByteToWideChar failed!!: ERROR_INSUFFICIENT_BUFFER\n" );
-		return;
+		OutputDebugStringW( L"MultiByteToWideChar failed!!: ERROR_INSUFFICIENT_BUFFER\r\n" );
+		std::terminate( );
 	}
 	if (error == ERROR_NO_UNICODE_TRANSLATION)
 	{
-		outputPrintf( L"MultiByteToWideChar failed!!: ERROR_NO_UNICODE_TRANSLATION\n" );
-		return;
+		OutputDebugStringW( L"MultiByteToWideChar failed!!: ERROR_NO_UNICODE_TRANSLATION\r\n" );
+		std::terminate( );
 	}
 	if (error == ERROR_INVALID_FLAGS)
 	{
-		outputPrintf( L"MultiByteToWideChar failed!!: ERROR_INVALID_FLAGS\n" );
+		OutputDebugStringW( L"MultiByteToWideChar failed!!: ERROR_INVALID_FLAGS\r\n" );
 		MessageBoxW( NULL, L"MultiByteToWideChar failed!!: ERROR_INVALID_FLAGS - this indicates a logic error!", L"Fatal error!", MB_OK );
 		std::terminate( );
 	}
 	if (error == ERROR_INVALID_PARAMETER)
 	{
-		outputPrintf( L"MultiByteToWideChar failed!!: ERROR_INVALID_PARAMETER\n" );
+		OutputDebugStringW( L"MultiByteToWideChar failed!!: ERROR_INVALID_PARAMETER\r\n" );
 		MessageBoxW( NULL, L"MultiByteToWideChar failed!!: ERROR_INVALID_PARAMETER - this indicates a logic error!", L"Fatal error!", MB_OK );
 		std::terminate( );
 	}
-	outputPrintf( L"MultiByteToWideChar failed!!: (unexpected error!)\n" );
+	OutputDebugStringW( L"MultiByteToWideChar failed!!: (unexpected error!)\r\n" );
 	MessageBoxW( NULL, L"MultiByteToWideChar failed!!: (unexpected error!) - this indicates a logic error!", L"Fatal error!", MB_OK );
 	std::terminate( );
 }
@@ -129,30 +130,24 @@ void DisplayWindowsMessageBoxWithErrorMessage( const DWORD error )
 
 
 template<rsize_t strSize>
-void GetLastErrorAsFormattedMessage( 
-								ETWUI_WRITES_TO_STACK( strSize )
-									wchar_t (&psz_formatted_error)[strSize],
-									const DWORD error
-							  )
+void GetLastErrorAsFormattedMessage( ETWUI_WRITES_TO_STACK( strSize )
+									 wchar_t (&psz_formatted_error)[strSize],
+									 const DWORD error )
 {
+	static_assert( strSize < DWORD_MAX, "static cast to DWORD will FAIL!" );
+
 	const DWORD ret = FormatMessageW( 
-										(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS), 
-										NULL, 
-										error, 
-										MAKELANGID( LANG_NEUTRAL, SUBLANG_DEFAULT ), 
-										psz_formatted_error, 
-										static_cast<DWORD>( strSize ), 
-										NULL 
-									);
+		(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS), NULL, 
+		error, MAKELANGID( LANG_NEUTRAL, SUBLANG_DEFAULT ), 
+		psz_formatted_error, static_cast<DWORD>( strSize ), NULL );
+
 	if ( ret != 0 )
 	{
 		return;
 	}
 	const DWORD error_err = GetLastError( );
-	ATLTRACE2( 
-				L"FormatMessageW failed with error code: `%lu`!!\r\n", 
-				error_err
-			 );
+	ATLTRACE2( L"FormatMessageW failed with error code: `%lu`!!\r\n", 
+				error_err );
 	
 	debug::Alias( &error_err );
 	debug::Alias( &ret );
@@ -231,9 +226,7 @@ std::wstring LoadFileAsText(const std::wstring& fileName)
 	std::ifstream f;
 	f.open(fileName, std::ios_base::binary);
 	if (!f)
-	{
 		return L"";
-	}
 
 	// Find the file length.
 	f.seekg(0, std::ios_base::end);
@@ -248,9 +241,7 @@ std::wstring LoadFileAsText(const std::wstring& fileName)
 	std::vector<char> data(length + 2);
 	f.read(&data[0], length);
 	if (!f)
-	{
 		return L"";
-	}
 
 	// Add a multi-byte null terminator.
 	data[length] = 0;
@@ -287,13 +278,13 @@ void SetRegistryDWORD(HKEY root, const std::wstring& subkey, const std::wstring&
 	//    https://msdn.microsoft.com/en-us/library/windows/desktop/ms724872.aspx
 	if (subkey.length( ) >= 255)
 	{
-		//TODO: how to best handle?
-		throw std::logic_error( "Key too long!" );
+		OutputDebugStringA( "Key too long!\r\n" );
+		std::terminate( );
 	}
 	if (valueName.length( ) >= 16383)
 	{
-		//TODO: how to best handle?
-		throw std::logic_error("Value too long!");
+		OutputDebugStringA("Value too long!\r\n");
+		std::terminate( );
 	}
 
 
@@ -312,14 +303,8 @@ void SetRegistryDWORD(HKEY root, const std::wstring& subkey, const std::wstring&
 	}
 	//RegSetValueEx has the exact same return behavior as RegOpenKeyEx
 	const LONG setValueResult =
-		RegSetValueExW(
-						key, 
-						valueName.c_str(),
-						0,
-						REG_DWORD,
-						reinterpret_cast<const BYTE*>(&value),
-						sizeof(value)
-						);
+		RegSetValueExW( key, valueName.c_str(), 0, REG_DWORD,
+						reinterpret_cast<const BYTE*>(&value), sizeof(value) );
 
 	if (setValueResult != ERROR_SUCCESS)
 	{
@@ -380,7 +365,11 @@ std::wstring AnsiToUnicode(const std::string& text)
 
 	// Convert to Unicode.
 	std::wstring result;
-	if (MultiByteToWideChar(CP_ACP, 0, text.c_str(), cCharacters, &buffer[0], cCharacters))
+	
+	const int mbToWcResult = MultiByteToWideChar( CP_ACP, 0, text.c_str( ), 
+												  cCharacters, &buffer[0], 
+												  cCharacters );
+	if (mbToWcResult)
 	{
 		// Double-verify that the buffer is null-terminated.
 		buffer[buffer.size() - 1] = 0;
@@ -388,9 +377,7 @@ std::wstring AnsiToUnicode(const std::string& text)
 		return result;
 	}
 
-	const DWORD lastErr = GetLastError( );
-	handleMultiByteToWideCharFailure( lastErr );
-	return result;
+	terminateOnMultiByteToWideCharFailure( );
 }
 
 // Get the next/previous dialog item (next/prev in window order and tab order) allowing
@@ -610,15 +597,9 @@ void SetClipboardText(const std::wstring& text)
 int64_t GetFileSize(const std::wstring& path)
 {
 	LARGE_INTEGER result;
-	HANDLE hFile = CreateFileW(
-								path.c_str(),
-								GENERIC_READ,
-								(FILE_SHARE_READ | FILE_SHARE_WRITE),
-								NULL,
-								OPEN_EXISTING,
-								FILE_ATTRIBUTE_NORMAL,
-								NULL
-							 );
+	HANDLE hFile = CreateFileW( path.c_str(), GENERIC_READ,
+								(FILE_SHARE_READ | FILE_SHARE_WRITE), NULL,
+								OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL );
 
 	if (hFile == INVALID_HANDLE_VALUE)
 		return 0;
@@ -671,15 +652,6 @@ WindowsVersion GetWindowsVersion()
 	return kWindowsVersionXP;
 }
 
-//bool IsWindowsServer()
-//{
-//	OSVERSIONINFOEXW osvi = { sizeof(osvi), 0, 0, 0, 0, { 0 }, 0, 0, 0, VER_NT_WORKSTATION };
-//	DWORDLONG        const dwlConditionMask = VerSetConditionMask(0, VER_PRODUCT_TYPE, VER_EQUAL);
-//
-//	bool result = !VerifyVersionInfoW(&osvi, VER_PRODUCT_TYPE, dwlConditionMask);
-//	return result;
-//}
-
 double ElapsedTimer::ElapsedSeconds() const
 {
 	const auto duration = std::chrono::steady_clock::now() - start_;
@@ -703,7 +675,7 @@ std::wstring FindPython()
 	std::vector<std::wstring> pathParts = split(path, ';');
 	for (auto part : pathParts)
 	{
-		std::wstring pythonPath = part + L"\\python.exe";
+		const std::wstring pythonPath( part + L"\\python.exe" );
 		if (PathFileExistsW(pythonPath.c_str()))
 		{
 			return pythonPath;

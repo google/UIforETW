@@ -70,7 +70,8 @@ private:
 	
 	//This annotation is commented out because /analyze doesn't
 	//properly understand it.
-	/*_Guarded_by_( outputLock_ )*/ std::wstring processOutput_;
+	/*_Guarded_by_( outputLock_ )*/
+	std::wstring processOutput_;
 
 	// Output handles for the child process -- connected to the pipe.
 	HANDLE hStdOutput_ = INVALID_HANDLE_VALUE;
