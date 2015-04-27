@@ -16,7 +16,6 @@ limitations under the License.
 
 #pragma once
 
-//#include "stdafx.h"
 #include <vector>
 #include <string>
 #include <chrono>
@@ -85,7 +84,7 @@ std::wstring AnsiToUnicode(const std::string& text);
 // This function checks to see whether a control has focus before
 // disabling it. If it does have focus then it moves the focus, to
 // avoid breaking keyboard mnemonics.
-void SmartEnableWindow(_In_ const HWND Win, _In_ const BOOL Enable);
+void SmartEnableWindow(_In_ HWND Win, _In_ BOOL Enable);
 
 // Return the string after the final '\' or after the final '.' in
 // the file part of a path. If the last character is '\' then GetFilePart

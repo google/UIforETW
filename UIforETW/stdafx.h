@@ -32,12 +32,6 @@ limitations under the License.
 #include <afxwin.h>         // MFC core and standard components. I get ~1 billion error messages if this isn't first.
 #include "targetver.h"
 #include <afxext.h>         // MFC extensions
-//#include <afxdisp.h>        // MFC Automation classes
-
-
-#ifndef _AFX_NO_OLE_SUPPORT
-//#include <afxdtctl.h>           // MFC support for Internet Explorer 4 Common Controls
-#endif
 
 #ifndef _AFX_NO_AFXCMN_SUPPORT
 #include <afxcmn.h>             // MFC support for Windows Common Controls
@@ -47,7 +41,6 @@ limitations under the License.
 
 
 #include <atlwin.h>             //ATL stuff
-//#include <atlsync.h>
 
 #include <sal.h>
 

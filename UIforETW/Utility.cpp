@@ -24,23 +24,23 @@ namespace {
 
 void handleMultiByteToWideCharFailure( const DWORD error )
 {
-	if ( error == ERROR_INSUFFICIENT_BUFFER )
+	if (error == ERROR_INSUFFICIENT_BUFFER)
 	{
 		outputPrintf( L"MultiByteToWideChar failed!!: ERROR_INSUFFICIENT_BUFFER\n" );
 		return;
 	}
-	if ( error == ERROR_NO_UNICODE_TRANSLATION )
+	if (error == ERROR_NO_UNICODE_TRANSLATION)
 	{
 		outputPrintf( L"MultiByteToWideChar failed!!: ERROR_NO_UNICODE_TRANSLATION\n" );
 		return;
 	}
-	if ( error == ERROR_INVALID_FLAGS )
+	if (error == ERROR_INVALID_FLAGS)
 	{
 		outputPrintf( L"MultiByteToWideChar failed!!: ERROR_INVALID_FLAGS\n" );
 		MessageBoxW( NULL, L"MultiByteToWideChar failed!!: ERROR_INVALID_FLAGS - this indicates a logic error!", L"Fatal error!", MB_OK );
 		std::terminate( );
 	}
-	if ( error == ERROR_INVALID_PARAMETER )
+	if (error == ERROR_INVALID_PARAMETER)
 	{
 		outputPrintf( L"MultiByteToWideChar failed!!: ERROR_INVALID_PARAMETER\n" );
 		MessageBoxW( NULL, L"MultiByteToWideChar failed!!: ERROR_INVALID_PARAMETER - this indicates a logic error!", L"Fatal error!", MB_OK );
@@ -110,7 +110,7 @@ void DisplayWindowsMessageBoxWithErrorMessage( const DWORD error )
 						NULL,
 						errorMessageBuffer,
 						L"UIforETW",
-						( MB_OK bitor MB_ICONERROR )
+						(MB_OK bitor MB_ICONERROR)
 					 );
 	
 	if ( messageBoxResult == 0 )
@@ -136,7 +136,7 @@ void GetLastErrorAsFormattedMessage(
 							  )
 {
 	const DWORD ret = FormatMessageW( 
-										( FORMAT_MESSAGE_FROM_SYSTEM bitor FORMAT_MESSAGE_IGNORE_INSERTS ), 
+										(FORMAT_MESSAGE_FROM_SYSTEM bitor FORMAT_MESSAGE_IGNORE_INSERTS), 
 										NULL, 
 										error, 
 										MAKELANGID( LANG_NEUTRAL, SUBLANG_DEFAULT ), 
@@ -208,7 +208,7 @@ std::vector<std::wstring> GetFileList(const std::wstring& pattern, bool fullPath
 	if (fullPaths)
 		directory = GetDirPart(pattern);
 	WIN32_FIND_DATA findData;
-	HANDLE hFindFile = FindFirstFileEx(pattern.c_str(), FindExInfoStandard,
+	HANDLE hFindFile = FindFirstFileExW(pattern.c_str(), FindExInfoStandard,
 				&findData, FindExSearchNameMatch, NULL, 0);
 
 	std::vector<std::wstring> result;
@@ -217,7 +217,7 @@ std::vector<std::wstring> GetFileList(const std::wstring& pattern, bool fullPath
 		do
 		{
 			result.push_back(directory + findData.cFileName);
-		} while (FindNextFile(hFindFile, &findData));
+		} while (FindNextFileW(hFindFile, &findData));
 
 		FindClose(hFindFile);
 	}
@@ -231,7 +231,7 @@ std::wstring LoadFileAsText(const std::wstring& fileName)
 {
 	std::ifstream f;
 	f.open(fileName, std::ios_base::binary);
-	if ( !f )
+	if (!f)
 	{
 		return L"";
 	}
@@ -248,7 +248,7 @@ std::wstring LoadFileAsText(const std::wstring& fileName)
 	// Allocate a buffer and read the file.
 	std::vector<char> data(length + 2);
 	f.read(&data[0], length);
-	if ( !f )
+	if (!f)
 	{
 		return L"";
 	}
@@ -286,15 +286,15 @@ void SetRegistryDWORD(HKEY root, const std::wstring& subkey, const std::wstring&
 
 	//See Registry Element Size Limits:
 	//    https://msdn.microsoft.com/en-us/library/windows/desktop/ms724872.aspx
-	if ( subkey.length( ) >= 255 )
+	if (subkey.length( ) >= 255)
 	{
 		//TODO: how to best handle?
 		throw std::logic_error( "Key too long!" );
 	}
-	if ( valueName.length( ) >= 16383 )
+	if (valueName.length( ) >= 16383)
 	{
 		//TODO: how to best handle?
-		throw std::logic_error( "Value too long!" );
+		throw std::logic_error("Value too long!");
 	}
 
 
@@ -305,7 +305,7 @@ void SetRegistryDWORD(HKEY root, const std::wstring& subkey, const std::wstring&
 	//  You can use the FormatMessage function with the 
 	//    FORMAT_MESSAGE_FROM_SYSTEM flag to get a generic description of the error.
 	const LONG openResult = RegOpenKeyExW(root, subkey.c_str(), 0, KEY_ALL_ACCESS, &key);
-	if ( openResult != ERROR_SUCCESS )
+	if (openResult != ERROR_SUCCESS)
 	{
 		outputPrintf( L"Failed to open registry key `%s`\n", subkey.c_str( ) );
 		ErrorHandling::outputPrintfErrorDebug( );
@@ -322,7 +322,7 @@ void SetRegistryDWORD(HKEY root, const std::wstring& subkey, const std::wstring&
 						sizeof(value)
 						);
 
-	if ( setValueResult != ERROR_SUCCESS )
+	if (setValueResult != ERROR_SUCCESS)
 	{
 		//TODO: how to best handle?
 		throw std::runtime_error( "Failed to write value to registry!!!" );
@@ -418,13 +418,13 @@ static HWND GetNextDlgItem(HWND win, const bool Wrap)
 	HWND next = GetWindow(win, GW_HWNDNEXT);
 	while (next != win && !ControlOK(next))
 	{
-		if ( next )
+		if (next)
 		{
 			next = GetWindow( next, GW_HWNDNEXT );
 		}
 		else
 		{
-			if ( Wrap )
+			if (Wrap)
 			{
 				next = GetWindow( win, GW_HWNDFIRST );
 			}
@@ -448,7 +448,7 @@ void SmartEnableWindow(_In_ const HWND Win, _In_ const BOOL Enable)
 		HWND focuscopy;
 		for ( focuscopy = hasfocus; focuscopy; focuscopy = ( GetParent ) ( focuscopy ) )
 		{
-			if ( focuscopy == Win )
+			if (focuscopy == Win)
 			{
 				FocusProblem = true;
 			}
@@ -456,7 +456,7 @@ void SmartEnableWindow(_In_ const HWND Win, _In_ const BOOL Enable)
 		if (FocusProblem)
 		{
 			HWND nextctrl = GetNextDlgItem(Win, true);
-			if ( nextctrl )
+			if (nextctrl)
 			{
 				SetFocus( nextctrl );
 			}
@@ -531,7 +531,7 @@ int DeleteFiles(HWND hwnd, const std::vector<std::wstring>& paths)
 		FO_DELETE,
 		&fileNames[0],
 		NULL,
-		( FOF_ALLOWUNDO bitor FOF_FILESONLY bitor FOF_NOCONFIRMATION ),
+		(FOF_ALLOWUNDO bitor FOF_FILESONLY bitor FOF_NOCONFIRMATION),
 	};
 	// Delete using the recycle bin.
 	const int result = SHFileOperation(&fileOp);
@@ -544,22 +544,24 @@ void SetClipboardText(const std::wstring& text)
 	//If [OpenClipboard] fails, the return value is zero. 
 	//To get extended error information, call GetLastError.
 	const BOOL cb = OpenClipboard( GetDesktopWindow( ) );
-	if ( cb == 0 )
+	if (cb == 0)
 	{
 		const DWORD lastErr = GetLastError( );
 		outputPrintf( L"Failed to open clipboard!!\n\tError code: %u\n", lastErr );
+		ErrorHandling::outputPrintfErrorDebug( lastErr );
 		return;
 	}
 
 	//If [EmptyClipboard] fails, the return value is zero. 
 	//To get extended error information, call GetLastError.
 	const BOOL emptyRes = EmptyClipboard( );
-	if ( emptyRes == 0 )
+	if (emptyRes == 0)
 	{
 		//TODO: check this instead of VERIFYing
 		VERIFY( CloseClipboard( ) );
 		const DWORD lastErr = GetLastError( );
 		outputPrintf( L"Failed to empty clipboard!!\n\tError code: %u\n", lastErr );
+		ErrorHandling::outputPrintfErrorDebug( lastErr );
 		return;
 	}
 
@@ -568,19 +570,20 @@ void SetClipboardText(const std::wstring& text)
 	//If [GlobalAlloc] fails, the return value is NULL. 
 	//To get extended error information, call GetLastError.
 	const HANDLE hmem = GlobalAlloc( GMEM_MOVEABLE, length );
-	if ( hmem == NULL )
+	if (hmem == NULL)
 	{
 		//TODO: check this instead of VERIFYing
 		VERIFY( CloseClipboard( ) );
 		const DWORD lastErr = GetLastError( );
 		outputPrintf( L"GlobalAlloc failed!!\n\tError code: %u\n", lastErr );
+		ErrorHandling::outputPrintfErrorDebug( lastErr );
 		return;
 	}
 	
 	//If [GlobalLock] fails, the return value is NULL. 
 	//To get extended error information, call GetLastError.
 	void* const ptr = GlobalLock(hmem);
-	if ( ptr == NULL )
+	if (ptr == NULL)
 	{
 		//If [GlobalFree] succeeds, the return value is NULL.
 		GlobalFree( hmem );
@@ -589,6 +592,7 @@ void SetClipboardText(const std::wstring& text)
 		VERIFY( CloseClipboard( ) );
 		const DWORD lastErr = GetLastError( );
 		outputPrintf( L"GlobalLock failed!!\n\tError code: %u\n", lastErr );
+		ErrorHandling::outputPrintfErrorDebug( lastErr );
 		return;
 	}
 
@@ -610,7 +614,7 @@ int64_t GetFileSize(const std::wstring& path)
 	HANDLE hFile = CreateFileW(
 								path.c_str(),
 								GENERIC_READ,
-								( FILE_SHARE_READ bitor FILE_SHARE_WRITE ),
+								(FILE_SHARE_READ bitor FILE_SHARE_WRITE),
 								NULL,
 								OPEN_EXISTING,
 								FILE_ATTRIBUTE_NORMAL,
@@ -690,8 +694,8 @@ double ElapsedTimer::ElapsedSeconds() const
 std::wstring FindPython()
 {
 #pragma warning(suppress:4996)
-	const wchar_t* path = _wgetenv(L"path");
-	if ( !path )
+	PCWSTR path = _wgetenv(L"path");
+	if (!path)
 	{
 		// No python found.
 		return L"";

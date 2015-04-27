@@ -28,7 +28,7 @@ ChildProcess::ChildProcess(std::wstring exePath)
 	// Create the pipe here so that it is guaranteed to be created before
 	// we try starting the process.
 	hPipe_ = CreateNamedPipeW(kPipeName,
-		( PIPE_ACCESS_DUPLEX bitor PIPE_TYPE_BYTE bitor PIPE_READMODE_BYTE ),
+		(PIPE_ACCESS_DUPLEX bitor PIPE_TYPE_BYTE bitor PIPE_READMODE_BYTE),
 		PIPE_WAIT,
 		1,
 		1024 * 16,
@@ -45,7 +45,7 @@ ChildProcess::~ChildProcess()
 	if (hProcess_)
 	{
 		const DWORD exitCode = GetExitCode();
-		if ( exitCode )
+		if (exitCode)
 		{
 			outputPrintf( L"Process exit code was %08x (%lu)\n", exitCode, exitCode );
 		}
@@ -119,7 +119,7 @@ bool ChildProcess::Run(bool showCommand, std::wstring args)
 {
 	ATLASSERT(!hProcess_);
 
-	if ( showCommand )
+	if (showCommand)
 	{
 		outputPrintf( L"%s\n", args.c_str( ) );
 	}
@@ -128,14 +128,14 @@ bool ChildProcess::Run(bool showCommand, std::wstring args)
 
 	hStdOutput_ = CreateFileW(kPipeName, GENERIC_WRITE, 0, &security,
 		OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, INVALID_HANDLE_VALUE);
-	if ( hStdOutput_ == INVALID_HANDLE_VALUE )
+	if (hStdOutput_ == INVALID_HANDLE_VALUE)
 	{
 		return false;
 	}
 
 	const HANDLE currentProcess = GetCurrentProcess( );
-	if ( !DuplicateHandle( currentProcess, hStdOutput_, currentProcess,
-		&hStdError_, 0, TRUE, DUPLICATE_SAME_ACCESS ) )
+	if (!DuplicateHandle( currentProcess, hStdOutput_, currentProcess,
+		&hStdError_, 0, TRUE, DUPLICATE_SAME_ACCESS ))
 	{
 		return false;
 	}
@@ -153,7 +153,7 @@ bool ChildProcess::Run(bool showCommand, std::wstring args)
 
 	//wcscpy_s(&argsCopy[0], argsCopy.size(), args.c_str());
 	const HRESULT strCpyResult = StringCchCopyNW( &argsCopy[ 0 ], argsCopy.size( ), args.c_str( ), args.length( ) );
-	if ( FAILED( strCpyResult ) )
+	if (FAILED( strCpyResult ))
 	{
 		ATLASSERT( strCpyResult == STRSAFE_E_INSUFFICIENT_BUFFER );
 		outputPrintf( L"Failed to copy arguments into writable buffer!\n" );
