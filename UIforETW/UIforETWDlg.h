@@ -133,7 +133,6 @@ private:
 	HACCEL hTracesAccelTable_ = NULL;
 
 	void SetSamplingSpeed( ) const;
-
 	void initializeToolTip( );
 
 	// Stop tracing (if tracing to a file or if bSaveTrace is

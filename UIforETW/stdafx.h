@@ -39,9 +39,7 @@ limitations under the License.
 
 #include <afxcontrolbars.h>     // MFC support for ribbons and control bars
 
-
 #include <atlwin.h>             //ATL stuff
-
 #include <sal.h>
 
 // Global function for printing to the dialog output window.
@@ -50,16 +48,11 @@ void outputPrintf(_Printf_format_string_ PCWSTR pFormat, ...);
 
 #include <VersionHelpers.h>
 
-//#include <Strsafe.h>
 #include <exception>
-
-#include <inttypes.h> // Needed for int64_t and friends
-#include <ciso646>
-#include <assert.h>
-
 #include <string>
 #include <vector>
 
+#include <inttypes.h> // Needed for int64_t and friends
 
 // Using #define NOMINMAX would be nice but gdiplustypes.h *depends*
 // on min/max macros, so the best I can do is to undefine them here.

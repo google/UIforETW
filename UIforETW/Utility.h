@@ -35,21 +35,16 @@ template<rsize_t strSize>
 void GetLastErrorAsFormattedMessage( ETWUI_WRITES_TO_STACK( strSize )
 									 wchar_t( &psz_formatted_error )[ strSize ],
 									 DWORD error = GetLastError( ) );
-
 void outputErrorDebug( DWORD lastErr = GetLastError( ) );
-
 void outputPrintfErrorDebug( DWORD lastErr = GetLastError( ) );
-
 }
 
 
 namespace handle_close {
 
 void regCloseKey( _In_ _Pre_valid_ _Post_ptr_invalid_ HKEY hKey );
-
 void closeHandle( _In_ _Pre_valid_ _Post_ptr_invalid_ HANDLE handle );
 }
-
 
 
 std::vector<std::wstring> split(const std::wstring& s, char c);

@@ -769,7 +769,7 @@ bool isValidDirectory( _In_ std::wstring path )
 		return false;
 	}
 
-	if (( pathAttributes bitand FILE_ATTRIBUTE_DIRECTORY ) == 0)
+	if (( pathAttributes & FILE_ATTRIBUTE_DIRECTORY ) == 0)
 	{
 		return false;
 	}
@@ -2128,7 +2128,7 @@ void CUIforETWDlg::OnCbnSelchangeInputtracing()
 			L"beware of private information being recorded.\n" );
 		break;
 	default:
-		assert(0);
+		ATLASSERT( false );
 		InputTracing_ = kKeyLoggerOff;
 		break;
 	}
