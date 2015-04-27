@@ -50,7 +50,7 @@ void outputPrintf(_Printf_format_string_ PCWSTR pFormat, ...);
 
 #include <VersionHelpers.h>
 
-#include <Strsafe.h>
+//#include <Strsafe.h>
 #include <exception>
 
 #include <inttypes.h> // Needed for int64_t and friends

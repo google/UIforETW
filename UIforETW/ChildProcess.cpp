@@ -151,17 +151,21 @@ bool ChildProcess::Run(bool showCommand, std::wstring args)
 	// Wacky CreateProcess rules say args has to be writable!
 	std::vector<wchar_t> argsCopy(args.size() + 1);
 
-	//wcscpy_s(&argsCopy[0], argsCopy.size(), args.c_str());
-	const HRESULT strCpyResult = StringCchCopyNW( &argsCopy[ 0 ], argsCopy.size( ), args.c_str( ), args.length( ) );
-	if (FAILED( strCpyResult ))
+	const int res = wcscpy_s( &argsCopy[ 0 ], argsCopy.size( ), args.c_str( ) );
+	if ( res != 0 )
 	{
-		ATLASSERT( strCpyResult == STRSAFE_E_INSUFFICIENT_BUFFER );
-		outputPrintf( L"Failed to copy arguments into writable buffer!\n" );
-		debug::Alias( &argsCopy );
-		debug::Alias( &args );
-		debug::Alias( &strCpyResult );
 		std::terminate( );
 	}
+	//const HRESULT strCpyResult = StringCchCopyNW( &argsCopy[ 0 ], argsCopy.size( ), args.c_str( ), args.length( ) );
+	//if (FAILED( strCpyResult ))
+	//{
+	//	ATLASSERT( strCpyResult == STRSAFE_E_INSUFFICIENT_BUFFER );
+	//	outputPrintf( L"Failed to copy arguments into writable buffer!\n" );
+	//	debug::Alias( &argsCopy );
+	//	debug::Alias( &args );
+	//	debug::Alias( &strCpyResult );
+	//	std::terminate( );
+	//}
 
 	const BOOL success = CreateProcessW(exePath_.c_str(	), &argsCopy[0], NULL, NULL,
 		TRUE, flags, NULL, NULL, &startupInfo, &processInfo);

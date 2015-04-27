@@ -25,7 +25,7 @@ limitations under the License.
 #include "Utility.h"
 #include "alias.h"
 
-#include <Strsafe.h>
+//#include <Strsafe.h>
 #include <algorithm>
 #include <direct.h>
 #include <ETWProviders\etwprof.h>
@@ -2801,9 +2801,6 @@ void CUIforETWDlg::PreprocessTrace(const std::wstring& traceFilename)
 		const int closeResult = fclose( pFile );
 		if (closeResult != 0)
 		{
-			OutputDebugStringA(
-				"DOUBLE FAULT: serious error occurred! "
-				"Failed to write to file, then failed to close it!\r\n" );
 			std::terminate( );
 		}
 		throw std::runtime_error( "Failed to write 'PIDs by process type' to file!" );
@@ -2816,9 +2813,6 @@ void CUIforETWDlg::PreprocessTrace(const std::wstring& traceFilename)
 			const int closeResult = fclose( pFile );
 			if (closeResult != 0)
 			{
-				OutputDebugStringA(
-					"DOUBLE FAULT: serious error occurred! "
-					"Failed to write to file, then failed to close it!\r\n" );
 				std::terminate( );
 			}
 			throw std::runtime_error( "Failed to write types.first to file!" );
@@ -2832,9 +2826,6 @@ void CUIforETWDlg::PreprocessTrace(const std::wstring& traceFilename)
 				const int closeResult = fclose( pFile );
 				if (closeResult != 0)
 				{
-					OutputDebugStringA(
-						"DOUBLE FAULT: serious error occurred! "
-						"Failed to write to file, then failed to close it!\r\n" );
 					std::terminate( );
 				}
 				throw std::runtime_error( "Failed to write types.second.pid to file!" );
@@ -2847,9 +2838,6 @@ void CUIforETWDlg::PreprocessTrace(const std::wstring& traceFilename)
 			const int closeResult = fclose( pFile );
 			if (closeResult != 0)
 			{
-				OutputDebugStringA(
-					"DOUBLE FAULT: serious error occurred! "
-					"Failed to write to file, then failed to close it!\r\n" );
 				std::terminate( );
 			}
 			throw std::runtime_error( "Failed to new line to end of file!" );
