@@ -128,10 +128,10 @@ void DisplayWindowsMessageBoxWithErrorMessage( const DWORD error )
 }
 
 
+template<rsize_t strSize>
 void GetLastErrorAsFormattedMessage( 
 								ETWUI_WRITES_TO_STACK( strSize )
-									PWSTR psz_formatted_error,
-									const rsize_t strSize,
+									wchar_t (&psz_formatted_error)[strSize],
 									const DWORD error
 							  )
 {
@@ -157,7 +157,6 @@ void GetLastErrorAsFormattedMessage(
 	debug::Alias( &error_err );
 	debug::Alias( &ret );
 	debug::Alias( &error );
-	debug::Alias( &strSize );
 	debug::Alias( &psz_formatted_error );
 	std::terminate( );
 }

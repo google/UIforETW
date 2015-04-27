@@ -31,17 +31,10 @@ namespace ErrorHandling {
 
 void DisplayWindowsMessageBoxWithErrorMessage( DWORD error );
 
-void GetLastErrorAsFormattedMessage( ETWUI_WRITES_TO_STACK( strSize )
-									PWSTR psz_formatted_error, rsize_t strSize,
-									DWORD error = GetLastError( ) );
-
 template<rsize_t strSize>
 void GetLastErrorAsFormattedMessage( ETWUI_WRITES_TO_STACK( strSize )
-									wchar_t (&psz_formatted_error)[strSize],
-									DWORD error = GetLastError( ) )
-{
-	return GetLastErrorAsFormattedMessage( psz_formatted_error, strSize, error );
-}
+									 wchar_t( &psz_formatted_error )[ strSize ],
+									 DWORD error = GetLastError( ) );
 
 void outputErrorDebug( DWORD lastErr = GetLastError( ) );
 
@@ -60,6 +53,7 @@ void closeHandle( _In_ _Pre_valid_ _Post_ptr_invalid_ HANDLE handle );
 
 
 std::vector<std::wstring> split(const std::wstring& s, char c);
+
 // If fullPaths == true then the names returned will be full Paths to the files. Otherwise
 // they will just be the file portions.
 std::vector<std::wstring> GetFileList(const std::wstring& pattern, bool fullPaths = false);

@@ -155,7 +155,6 @@
     <ClInclude Include="UIforETWDlg.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="About.cpp" />
     <ClCompile Include="alias.cpp" />
     <ClCompile Include="ChildProcess.cpp" />
     <ClCompile Include="DirectoryMonitor.cpp" />
