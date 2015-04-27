@@ -110,7 +110,7 @@ void DisplayWindowsMessageBoxWithErrorMessage( const DWORD error )
 						NULL,
 						errorMessageBuffer,
 						L"UIforETW",
-						(MB_OK bitor MB_ICONERROR)
+						(MB_OK | MB_ICONERROR)
 					 );
 	
 	if ( messageBoxResult == 0 )
@@ -136,7 +136,7 @@ void GetLastErrorAsFormattedMessage(
 							  )
 {
 	const DWORD ret = FormatMessageW( 
-										(FORMAT_MESSAGE_FROM_SYSTEM bitor FORMAT_MESSAGE_IGNORE_INSERTS), 
+										(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS), 
 										NULL, 
 										error, 
 										MAKELANGID( LANG_NEUTRAL, SUBLANG_DEFAULT ), 
@@ -530,7 +530,7 @@ int DeleteFiles(HWND hwnd, const std::vector<std::wstring>& paths)
 		FO_DELETE,
 		&fileNames[0],
 		NULL,
-		(FOF_ALLOWUNDO bitor FOF_FILESONLY bitor FOF_NOCONFIRMATION),
+		(FOF_ALLOWUNDO | FOF_FILESONLY | FOF_NOCONFIRMATION),
 	};
 	// Delete using the recycle bin.
 	const int result = SHFileOperation(&fileOp);
@@ -613,7 +613,7 @@ int64_t GetFileSize(const std::wstring& path)
 	HANDLE hFile = CreateFileW(
 								path.c_str(),
 								GENERIC_READ,
-								(FILE_SHARE_READ bitor FILE_SHARE_WRITE),
+								(FILE_SHARE_READ | FILE_SHARE_WRITE),
 								NULL,
 								OPEN_EXISTING,
 								FILE_ATTRIBUTE_NORMAL,

@@ -2475,7 +2475,7 @@ void CUIforETWDlg::OnContextMenu(CWnd* pWnd, CPoint point)
 		for (auto id : disableList)
 		{
 			pContextMenu->EnableMenuItem(
-				id, ( MF_BYCOMMAND bitor MF_GRAYED ) );
+				id, ( MF_BYCOMMAND | MF_GRAYED ) );
 		}
 	}
 
@@ -2485,16 +2485,16 @@ void CUIforETWDlg::OnContextMenu(CWnd* pWnd, CPoint point)
 		// since they don't work there.
 		pContextMenu->EnableMenuItem(
 			ID_TRACES_COMPRESSTRACE,
-			( MF_BYCOMMAND bitor MF_GRAYED ) );
+			( MF_BYCOMMAND | MF_GRAYED ) );
 			
 		pContextMenu->EnableMenuItem(
 			ID_TRACES_COMPRESSTRACES,
-			( MF_BYCOMMAND bitor MF_GRAYED ) );
+			( MF_BYCOMMAND | MF_GRAYED ) );
 	}
 
 	int selection = pContextMenu->TrackPopupMenu(
-		( TPM_LEFTALIGN bitor TPM_LEFTBUTTON  bitor TPM_RIGHTBUTTON bitor
-		TPM_RETURNCMD bitor TPM_NONOTIFY ), point.x, point.y, pWnd, NULL );
+		( TPM_LEFTALIGN | TPM_LEFTBUTTON  | TPM_RIGHTBUTTON |
+		TPM_RETURNCMD | TPM_NONOTIFY ), point.x, point.y, pWnd, NULL );
 
 	switch (selection)
 	{
