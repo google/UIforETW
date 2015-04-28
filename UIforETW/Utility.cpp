@@ -430,19 +430,13 @@ static HWND GetNextDlgItem(HWND win, const bool Wrap)
 	while (next != win && !ControlOK(next))
 	{
 		if (next)
-		{
 			next = GetWindow( next, GW_HWNDNEXT );
-		}
 		else
 		{
 			if (Wrap)
-			{
 				next = GetWindow( win, GW_HWNDFIRST );
-			}
 			else
-			{
 				return 0;
-			}
 		}
 	}
 	ATLASSERT(!Wrap || next);
@@ -466,7 +460,7 @@ void SmartEnableWindow(_In_ const HWND Win, _In_ const BOOL Enable)
 		{
 			HWND nextctrl = GetNextDlgItem(Win, true);
 			if (nextctrl)
-				SetFocus( nextctrl );
+				SetFocus(nextctrl);
 		}
 	}
 	::EnableWindow(Win, Enable);
@@ -509,8 +503,9 @@ std::wstring CrackFilePart(const std::wstring& path)
 	const std::wstring extension = GetFileExt(filePart);
 
 	if (!extension.empty())
+	{	
 		filePart = filePart.substr(0, filePart.size() - extension.size());
-
+	}
 	return filePart;
 }
 
