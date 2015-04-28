@@ -125,7 +125,7 @@ bool ChildProcess::Run(bool showCommand, std::wstring args)
 	ATLASSERT(!hProcess_);
 
 	if (showCommand)
-		outputPrintf( L"%s\n", args.c_str( ) );
+		outputPrintf(L"%s\n", args.c_str());
 
 	SECURITY_ATTRIBUTES security = { sizeof(security), 0, TRUE };
 
@@ -133,8 +133,7 @@ bool ChildProcess::Run(bool showCommand, std::wstring args)
 		OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, INVALID_HANDLE_VALUE);
 	if (hStdOutput_ == INVALID_HANDLE_VALUE)
 		return false;
-
-	if (!DuplicateHandle(GetCurrentProcess( ), hStdOutput_, GetCurrentProcess( ),
+	if (!DuplicateHandle(GetCurrentProcess(), hStdOutput_, GetCurrentProcess(),
 		&hStdError_, 0, TRUE, DUPLICATE_SAME_ACCESS ))
 		return false;
 
@@ -146,15 +145,14 @@ bool ChildProcess::Run(bool showCommand, std::wstring args)
 
 	PROCESS_INFORMATION processInfo = {};
 	DWORD flags = CREATE_NO_WINDOW;
-
 	// Wacky CreateProcess rules say args has to be writable!
 	std::vector<wchar_t> argsCopy(args.size() + 1);
 
-	const int res = wcscpy_s( &argsCopy[ 0 ], argsCopy.size( ), args.c_str( ) );
+	const int res = wcscpy_s(&argsCopy[0], argsCopy.size(), args.c_str());
 	if ( res != 0 )
 		std::terminate( );
 
-	const BOOL success = CreateProcess(exePath_.c_str(	), &argsCopy[0], NULL, NULL,
+	const BOOL success = CreateProcess(exePath_.c_str(), &argsCopy[0], NULL, NULL,
 		TRUE, flags, NULL, NULL, &startupInfo, &processInfo);
 	if (success)
 	{
@@ -243,7 +241,7 @@ void ChildProcess::WaitForCompletion(bool printOutput)
 		// Now that the child thread has exited we can finally read
 		// the last of the child-process output.
 		std::wstring output = RemoveOutputText();
-		if ( !output.empty( ) )
-			outputPrintf( L"%s", output.c_str( ) );
+		if (!output.empty())
+			outputPrintf(L"%s", output.c_str());
 	}
 }

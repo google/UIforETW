@@ -66,9 +66,9 @@
       <MinimalRebuild>false</MinimalRebuild>
       <TreatWarningAsError>true</TreatWarningAsError>
       <AdditionalIncludeDirectories>..\include</AdditionalIncludeDirectories>
-      <ErrorReporting>Send</ErrorReporting>
       <EnablePREfast>true</EnablePREfast>
-      <AdditionalOptions>/Bt+</AdditionalOptions>
+      <AdditionalOptions>
+      </AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -76,7 +76,8 @@
       <UACExecutionLevel>RequireAdministrator</UACExecutionLevel>
       <AdditionalLibraryDirectories>..\lib</AdditionalLibraryDirectories>
       <AdditionalDependencies>ETWProviders.lib</AdditionalDependencies>
-      <AdditionalOptions>/time+</AdditionalOptions>
+      <AdditionalOptions>
+      </AdditionalOptions>
     </Link>
     <Midl>
       <MkTypLibCompatible>false</MkTypLibCompatible>
@@ -104,13 +105,12 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <TreatWarningAsError>true</TreatWarningAsError>
       <AdditionalIncludeDirectories>..\include</AdditionalIncludeDirectories>
-      <ErrorReporting>Send</ErrorReporting>
       <EnablePREfast>true</EnablePREfast>
-      <AdditionalOptions>/Bt+</AdditionalOptions>
+      <AdditionalOptions>
+      </AdditionalOptions>
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
       <StringPooling>true</StringPooling>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
-      <AssemblerOutput>NoListing</AssemblerOutput>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -120,7 +120,8 @@
       <UACExecutionLevel>RequireAdministrator</UACExecutionLevel>
       <AdditionalLibraryDirectories>..\lib</AdditionalLibraryDirectories>
       <AdditionalDependencies>ETWProviders.lib</AdditionalDependencies>
-      <AdditionalOptions>/cgthreads:8</AdditionalOptions>
+      <AdditionalOptions>
+      </AdditionalOptions>
       <LargeAddressAware>true</LargeAddressAware>
     </Link>
     <Midl>

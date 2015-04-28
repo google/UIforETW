@@ -132,8 +132,8 @@ private:
 	// Keyboard accelerators that are active only when the trace list is active.
 	HACCEL hTracesAccelTable_ = NULL;
 
-	void SetSamplingSpeed( ) const;
-	void initializeToolTip( );
+	void SetSamplingSpeed() const;
+	void initializeToolTip();
 
 	// Stop tracing (if tracing to a file or if bSaveTrace is
 	// false), saving the trace as well if bSaveTrace is true.
