@@ -363,9 +363,8 @@ void CreateRegistryKey(HKEY root, const std::wstring& subkey, const std::wstring
 	const LONG createResult =
 		RegCreateKeyW(key, newKey.c_str(), &resultKey);
 	if (createResult == ERROR_SUCCESS)
-	{
 		RegCloseKey(resultKey);
-	}
+
 	RegCloseKey(key);
 
 }
@@ -458,20 +457,16 @@ void SmartEnableWindow(_In_ const HWND Win, _In_ const BOOL Enable)
 		HWND hasfocus = GetFocus();
 		bool FocusProblem = false;
 		HWND focuscopy;
-		for ( focuscopy = hasfocus; focuscopy; focuscopy = ( GetParent ) ( focuscopy ) )
+		for (focuscopy = hasfocus; focuscopy; focuscopy = (GetParent)(focuscopy))
 		{
 			if (focuscopy == Win)
-			{
 				FocusProblem = true;
-			}
 		}
 		if (FocusProblem)
 		{
 			HWND nextctrl = GetNextDlgItem(Win, true);
 			if (nextctrl)
-			{
 				SetFocus( nextctrl );
-			}
 		}
 	}
 	::EnableWindow(Win, Enable);
@@ -512,10 +507,9 @@ std::wstring CrackFilePart(const std::wstring& path)
 	ATLASSERT( path.length( ) > 0 );
 	std::wstring filePart = GetFilePart(path);
 	const std::wstring extension = GetFileExt(filePart);
+
 	if (!extension.empty())
-	{
 		filePart = filePart.substr(0, filePart.size() - extension.size());
-	}
 
 	return filePart;
 }

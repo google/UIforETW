@@ -20,9 +20,11 @@ limitations under the License.
 #define VC_EXTRALEAN            // Exclude rarely-used stuff from Windows headers
 #endif
 
-#define _AFX_ALL_WARNINGS // turns off MFC's hiding of some common and often safely ignored warning messages
-
 #define _ATL_CSTRING_EXPLICIT_CONSTRUCTORS      // some CString constructors will be explicit
+
+// turns off MFC's hiding of some common and often safely ignored warning messages
+#define _AFX_ALL_WARNINGS
+
 
 #define _ATL_ENABLE_PTM_WARNING                 //force the use of ANSI C++ standard-compliant syntax for pointer to member functions.
                                                 //Using this macro will cause the C4867 compiler error to be generated when non-standard syntax is used to initialize a pointer to a member function.

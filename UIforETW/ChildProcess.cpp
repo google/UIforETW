@@ -125,24 +125,19 @@ bool ChildProcess::Run(bool showCommand, std::wstring args)
 	ATLASSERT(!hProcess_);
 
 	if (showCommand)
-	{
 		outputPrintf( L"%s\n", args.c_str( ) );
-	}
 
 	SECURITY_ATTRIBUTES security = { sizeof(security), 0, TRUE };
 
 	hStdOutput_ = CreateFile(kPipeName, GENERIC_WRITE, 0, &security,
 		OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, INVALID_HANDLE_VALUE);
 	if (hStdOutput_ == INVALID_HANDLE_VALUE)
-	{
 		return false;
-	}
 
 	if (!DuplicateHandle(GetCurrentProcess( ), hStdOutput_, GetCurrentProcess( ),
 		&hStdError_, 0, TRUE, DUPLICATE_SAME_ACCESS ))
-	{
 		return false;
-	}
+
 	STARTUPINFO startupInfo = {};
 	startupInfo.hStdOutput = hStdOutput_;
 	startupInfo.hStdError = hStdError_;
@@ -157,9 +152,7 @@ bool ChildProcess::Run(bool showCommand, std::wstring args)
 
 	const int res = wcscpy_s( &argsCopy[ 0 ], argsCopy.size( ), args.c_str( ) );
 	if ( res != 0 )
-	{
 		std::terminate( );
-	}
 
 	const BOOL success = CreateProcess(exePath_.c_str(	), &argsCopy[0], NULL, NULL,
 		TRUE, flags, NULL, NULL, &startupInfo, &processInfo);
