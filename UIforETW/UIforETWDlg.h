@@ -161,8 +161,7 @@ private:
 	int lastWidth_ = 0;
 	int lastHeight_ = 0;
 
-	_Success_( return )
-	bool SetSymbolPath();
+	void SetSymbolPath();
 	// Call this to retrieve a directory from an environment variable, or use
 	// a default, and make sure it exists.
 	std::wstring GetDirectory(_In_z_ PCWSTR env, const std::wstring& default);

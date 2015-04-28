@@ -25,7 +25,6 @@ limitations under the License.
 #include "Utility.h"
 #include "alias.h"
 
-//#include <Strsafe.h>
 #include <algorithm>
 #include <direct.h>
 #include <ETWProviders\etwprof.h>
@@ -1122,8 +1121,7 @@ BEGIN_MESSAGE_MAP(CUIforETWDlg, CDialogEx)
 END_MESSAGE_MAP()
 
 
-_Success_( return )
-bool CUIforETWDlg::SetSymbolPath()
+void CUIforETWDlg::SetSymbolPath()
 {
 	// Make sure that the symbol paths are set.
 	// See:
@@ -1138,7 +1136,7 @@ bool CUIforETWDlg::SetSymbolPath()
 			setChromiumSymbolPath( bChromeDeveloper_, systemDrive_ );
 		if (!setChromiumSymbolPathResult)
 		{
-			return false;
+			return;
 		}
 	}
 	
@@ -1152,23 +1150,17 @@ bool CUIforETWDlg::SetSymbolPath()
 	if (getSymCachePathResult != 0)
 	{
 		//getenv_s failed!
-		return false;
+		return;
 	}
 
 	if (sizeRequired != 0)
 	{
 		OutputDebugStringA( "UIforETW: _NT_SYMCACHE_PATH was found! "
 			"No work necessary!\r\n" );
-		return true;
+		return;
 	}
 
-	const bool SetSymbolCachePathresult =
-		setEnvironmentVariable( NtSymCacheEnvironmentVariableName, DefaultSymbolCachePath );
-
-	if (!SetSymbolCachePathresult)
-		return false;
-
-	return true;
+	setEnvironmentVariable( NtSymCacheEnvironmentVariableName, DefaultSymbolCachePath );
 }
 
 
@@ -1642,11 +1634,11 @@ void CUIforETWDlg::OnBnClickedStarttracing()
 		DWORD exitCode = child.GetExitCode();
 		if (exitCode)
 		{
-			outputPrintf( L"Error starting tracing. Try stopping tracing and then starting it again?\n" );
+			outputPrintf(L"Error starting tracing. Try stopping tracing and then starting it again?\n");
 		}
 		else
 		{
-			outputPrintf( L"Tracing is started.\n" );
+			outputPrintf(L"Tracing is started.\n");
 		}
 	}
 
