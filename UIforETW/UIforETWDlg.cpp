@@ -925,11 +925,9 @@ void CUIforETWDlg::vprintf(PCWSTR pFormat, va_list args)
 		ATLASSERT(pBuf < (buffer + ARRAYSIZE(buffer)));
 		if (pBuf >= (buffer + ARRAYSIZE(buffer)))
 			std::terminate();
-
 		// Need \r\n as a line separator.
 		if (pBuf[0] == '\n')
 		{
-
 			// Don't add a line separator at the very beginning.
 			if (!output_.empty())
 				output_ += L"\r\n";
@@ -1104,7 +1102,7 @@ void CUIforETWDlg::SetSymbolPath()
 	{
 		bManageSymbolPath_ = true;
 		const bool setChromiumSymbolPathResult =
-			setChromiumSymbolPath( bChromeDeveloper_, systemDrive_ );
+			setChromiumSymbolPath(bChromeDeveloper_, systemDrive_);
 		if (!setChromiumSymbolPathResult)
 		{
 			return;
@@ -1116,7 +1114,7 @@ void CUIforETWDlg::SetSymbolPath()
 	//The buffer size that's required, or 0 if the variable is not found.
 	//[getenv_s returns] zero if successful; otherwise, an error code on failure.
 	const errno_t getSymCachePathResult =
-		getenv_s( &sizeRequired, NULL, 0, NtSymCacheEnvironmentVariableName );
+		getenv_s(&sizeRequired, NULL, 0, NtSymCacheEnvironmentVariableName);
 	
 	if (getSymCachePathResult != 0)
 	{
@@ -1126,12 +1124,12 @@ void CUIforETWDlg::SetSymbolPath()
 
 	if (sizeRequired != 0)
 	{
-		OutputDebugStringA( "UIforETW: _NT_SYMCACHE_PATH was found! "
-			"No work necessary!\r\n" );
+		OutputDebugStringA("UIforETW: _NT_SYMCACHE_PATH was found! "
+						   "No work necessary!\r\n");
 		return;
 	}
 
-	setEnvironmentVariable( NtSymCacheEnvironmentVariableName, DefaultSymbolCachePath );
+	setEnvironmentVariable(NtSymCacheEnvironmentVariableName, DefaultSymbolCachePath);
 }
 
 
@@ -1139,60 +1137,60 @@ BOOL CUIforETWDlg::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
 
-	ATLTRACE2( L"Initializing dialog box!\r\n" );
+	ATLTRACE2(L"Initializing dialog box!\r\n");
 
-	const HINSTANCE instanceHandle = AfxGetInstanceHandle( );
+	const HINSTANCE instanceHandle = AfxGetInstanceHandle();
 
-	hAccelTable_       = loadAcceleratorsForF2andESC( instanceHandle );
-	hRenameAccelTable_ = loadAcceleratorsForExitingRenaming( instanceHandle );
-	hNotesAccelTable_  = loadAcceleratorsForEditingTraceNotes( instanceHandle );
-	hTracesAccelTable_ = loadAcceleratorsForActiveTraceList( instanceHandle );
+	hAccelTable_       = loadAcceleratorsForF2andESC(instanceHandle);
+	hRenameAccelTable_ = loadAcceleratorsForExitingRenaming(instanceHandle);
+	hNotesAccelTable_  = loadAcceleratorsForEditingTraceNotes(instanceHandle);
+	hTracesAccelTable_ = loadAcceleratorsForActiveTraceList(instanceHandle);
 
-	CRect windowRect = GetWindowRectFromHwnd( m_hWnd );
+	CRect windowRect = GetWindowRectFromHwnd(m_hWnd);
 
 	initialWidth_ = windowRect.Width();
-	lastWidth_    = windowRect.Width( );
+	lastWidth_    = windowRect.Width();
 
 	initialHeight_ = windowRect.Height();
-	lastHeight_ = windowRect.Height( );
+	lastHeight_ = windowRect.Height();
 
 	// Win+Ctrl+C is used to trigger recording of traces. This is compatible with
 	// wprui. If this is changed then be sure to change the button text.
 	if (!RegisterHotKey(*this, kRecordTraceHotKey, MOD_WIN + MOD_CONTROL, 'C'))
 	{
 		AfxMessageBox(L"Couldn't register hot key.");
-		SetSaveTraceBuffersWindowText( btSaveTraceBuffers_.m_hWnd );
+		SetSaveTraceBuffersWindowText(btSaveTraceBuffers_.m_hWnd);
 	}
 
 
-	const bool appendAboutBoxResult = appendAboutBoxToSystemMenu( *this );
+	const bool appendAboutBoxResult = appendAboutBoxToSystemMenu(*this);
 	if (!appendAboutBoxResult)
 	{
 		AfxMessageBox(L"Couldn't append about box!");
-		exit( 10 );
+		exit(10);
 	}
 
-	checkETWCompatibility( );
+	checkETWCompatibility();
 
-	windowsDir_ = getWindowsDirectory( );
+	windowsDir_ = getWindowsDirectory();
 
 	// ANSI string, not unicode.
 	systemDrive_ = static_cast<char>(windowsDir_[0]);
 	systemDrive_ += ":\\";
 
-	wptDir_ = getWPTDir( );
+	wptDir_ = getWPTDir();
 
-	std::wstring documents = getDocumentsPath( );
+	std::wstring documents = getDocumentsPath();
 
 	std::wstring defaultTraceDir = documents + std::wstring(L"\\etwtraces\\");
 	traceDir_ = GetDirectory(L"etwtracedir", defaultTraceDir);
 
 	const bool copyToDirResult =
-		copyWpaProfileToExecutableDirectory( documents, GetExeDir( ) );
+		copyWpaProfileToExecutableDirectory(documents, GetExeDir());
 	
 	if (!copyToDirResult)
 	{
-		std::terminate( );
+		std::terminate();
 	}
 
 	tempTraceDir_ = GetDirectory(L"temp", traceDir_);
@@ -1208,14 +1206,14 @@ BOOL CUIforETWDlg::OnInitDialog()
 	SetIcon(m_hIcon, TRUE);			// Set big icon
 	SetIcon(m_hIcon, FALSE);		// Set small icon
 
-	if (IsWindows8OrGreater( ))
+	if (IsWindows8OrGreater())
 	{
 		bCompress_ = false; // ETW trace compression requires Windows 8.0
 		SmartEnableWindow(btCompress_, false);
 	}
 
-	CheckDialogButtons( this, bCompress_, bCswitchStacks_, bSampledStacks_, 
-						bFastSampling_, bGPUTracing_, bShowCommands_ );
+	CheckDialogButtons(this, bCompress_, bCswitchStacks_, bSampledStacks_, 
+						bFastSampling_, bGPUTracing_, bShowCommands_);
 
 
 
@@ -1224,21 +1222,21 @@ BOOL CUIforETWDlg::OnInitDialog()
 	if (bFastSampling_)
 		SetSamplingSpeed();
 
-	addbtInputTracingStrings( &btInputTracing_ );
+	addbtInputTracingStrings(&btInputTracing_);
 
 	const bool setBtInputTracingSelectionResult =
-		setCComboBoxSelection( &btInputTracing_, InputTracing_ );
+		setCComboBoxSelection(&btInputTracing_, InputTracing_);
 	
 	if (!setBtInputTracingSelectionResult)
 	{
-		outputPrintf( L"Failed to set btInputTracing_ selection to index: %i\n", InputTracing_ );
-		exit( 10 );
+		outputPrintf(L"Failed to set btInputTracing_ selection to index: %i\n", InputTracing_);
+		exit(10);
 	}
 
-	addbtTracingModeStrings( &btTracingMode_ );
+	addbtTracingModeStrings(&btTracingMode_);
 
 	const bool setBtTracingModeSelection =
-		setCComboBoxSelection( &btTracingMode_, tracingMode_ );
+		setCComboBoxSelection(&btTracingMode_, tracingMode_);
 	
 	if (!setBtTracingModeSelection)
 	{
@@ -1255,10 +1253,10 @@ BOOL CUIforETWDlg::OnInitDialog()
 
 	UpdateTraceList();
 
-	const BOOL toolTipCreateResult = toolTip_.Create( this );
+	const BOOL toolTipCreateResult = toolTip_.Create(this);
 
 	if (toolTipCreateResult)
-		initializeToolTip( );
+		initializeToolTip();
 
 	SetHeapTracing(false);
 	// Start the input logging thread with the current settings.
@@ -1273,18 +1271,18 @@ void CUIforETWDlg::initializeToolTip( )
 	toolTip_.SetMaxTipWidth(400);
 	toolTip_.Activate(TRUE);
 
-	addSingleToolToToolTip( &toolTip_, &btStartTracing_, StartEtwTracingString );
-	addSingleToolToToolTip( &toolTip_, &btCompress_, btCompressToolTipString );
-	addSingleToolToToolTip( &toolTip_, &btCswitchStacks_, btCswitchStacksString );
-	addSingleToolToToolTip( &toolTip_, &btSampledStacks_, SampledStacksString );
-	addSingleToolToToolTip( &toolTip_, &btFastSampling_, SampleRateString );
-	addSingleToolToToolTip( &toolTip_, &btGPUTracing_, GPUTracingString );
-	addSingleToolToToolTip( &toolTip_, &btShowCommands_, ShowCommandsString );
-	addSingleToolToToolTip( &toolTip_, &btInputTracingLabel_, InputTipString);
-	addSingleToolToToolTip( &toolTip_, &btInputTracing_, InputTipString );
-	addSingleToolToToolTip( &toolTip_, &btTracingMode_, TracingModeString);
-	addSingleToolToToolTip( &toolTip_, &btTraces_, TracesString );
-	addSingleToolToToolTip( &toolTip_, &btTraceNotes_, TraceNotesString);
+	addSingleToolToToolTip(&toolTip_, &btStartTracing_, StartEtwTracingString);
+	addSingleToolToToolTip(&toolTip_, &btCompress_, btCompressToolTipString);
+	addSingleToolToToolTip(&toolTip_, &btCswitchStacks_, btCswitchStacksString);
+	addSingleToolToToolTip(&toolTip_, &btSampledStacks_, SampledStacksString);
+	addSingleToolToToolTip(&toolTip_, &btFastSampling_, SampleRateString);
+	addSingleToolToToolTip(&toolTip_, &btGPUTracing_, GPUTracingString);
+	addSingleToolToToolTip(&toolTip_, &btShowCommands_, ShowCommandsString);
+	addSingleToolToToolTip(&toolTip_, &btInputTracingLabel_, InputTipString);
+	addSingleToolToToolTip(&toolTip_, &btInputTracing_, InputTipString);
+	addSingleToolToToolTip(&toolTip_, &btTracingMode_, TracingModeString);
+	addSingleToolToToolTip(&toolTip_, &btTraces_, TracesString);
+	addSingleToolToToolTip(&toolTip_, &btTraceNotes_, TraceNotesString);
 }
 
 
@@ -1292,23 +1290,23 @@ std::wstring CUIforETWDlg::GetDirectory( _In_z_ PCWSTR env, const std::wstring& 
 {
 	// Get a directory (from an environment variable, if set) and make sure it exists.
 
-	std::wstring result = getTraceDirFromEnvironmentVariable( env, default );
-	const bool doesFileExist = isValidPathToFSObject( result );
+	std::wstring result = getTraceDirFromEnvironmentVariable(env, default);
+	const bool doesFileExist = isValidPathToFSObject(result);
 	if (!doesFileExist)
 	{
 		const bool sucessfullyCreatedDirectory =
-			enhancedCreateDirectory( result );
+			enhancedCreateDirectory(result);
 		if (!sucessfullyCreatedDirectory)
 		{
-			AfxMessageBox( L"CUIforETWDlg::GetDirectory attempted to create a directory, but unexpectedly failed!" );
-			std::terminate( );
+			AfxMessageBox(L"CUIforETWDlg::GetDirectory attempted to create a directory, but unexpectedly failed!");
+			std::terminate();
 		}
-		ATLASSERT( isValidDirectory( result ) );
+		ATLASSERT(isValidDirectory(result));
 	}
-	if (!isValidDirectory( result ))
+	if (!isValidDirectory(result))
 	{
 		AfxMessageBox((result + L" is not a directory. Exiting.").c_str());
-		std::terminate( );
+		std::terminate();
 	}
 	return result;
 }
@@ -1376,8 +1374,7 @@ void CUIforETWDlg::RegisterProviders()
 				{
 					useChromeProviders_ = true;
 					outputPrintf(L"Chrome providers registered. "
-								 L"Chrome providers will be recorded.\n"
-								);
+								 L"Chrome providers will be recorded.\n");
 				}
 			}
 		}
@@ -1463,9 +1460,9 @@ std::wstring CUIforETWDlg::GetExeDir() const
 	//        the string is truncated to nSize characters including the terminating null character,
 	if ((moduleFileNameResult >= MAX_PATH) || ( moduleFileNameResult == 0))
 	{
-		ErrorHandling::outputErrorDebug( );
-		debug::Alias( &moduleFileNameResult );
-		std::terminate( );
+		ErrorHandling::outputErrorDebug();
+		debug::Alias(&moduleFileNameResult);
+		std::terminate();
 	}
 	//Huh?
 	PWSTR lastSlash = wcsrchr(exePath, '\\');
@@ -1494,7 +1491,7 @@ std::wstring CUIforETWDlg::GenerateResultFilename() const
 	size_t usernameReturnValue = 0;
 	
 	//[_wgetenv_s returns] Zero if successful.
-	const errno_t getUsernameResult = _wgetenv_s( &usernameReturnValue, usernameBuffer, L"USERNAME" );
+	const errno_t getUsernameResult = _wgetenv_s(&usernameReturnValue, usernameBuffer, L"USERNAME");
 	if (getUsernameResult == 0)
 		username_temp = usernameBuffer;
 
@@ -1508,9 +1505,9 @@ std::wstring CUIforETWDlg::GenerateResultFilename() const
 
 //Eww.
 #pragma warning(suppress: 6054)
-	const bool validTimeStr = ( 3 == sscanf_s( time, "%d:%d:%d", &hour, &min, &sec ) );
+	const bool validTimeStr = (3 == sscanf_s(time, "%d:%d:%d", &hour, &min, &sec));
 #pragma warning(suppress: 6054)
-	const bool validDateStr = ( 3 == sscanf_s( date, "%d/%d/%d", &month, &day, &year ) );
+	const bool validDateStr = (3 == sscanf_s(date, "%d/%d/%d", &month, &day, &year));
 
 	std::wstring filePart;
 
@@ -1519,7 +1516,7 @@ std::wstring CUIforETWDlg::GenerateResultFilename() const
 		// The filenames are chosen to sort by date, with username as the LSB.
 		const int res = swprintf_s(fileName, L"%04d-%02d-%02d_%02d-%02d-%02d_%s", year + 2000, month, day, hour, min, sec, username);
 		if (res == -1)
-			std::terminate( );
+			std::terminate();
 	}
 	else
 	{
@@ -1553,18 +1550,18 @@ void CUIforETWDlg::OnBnClickedStarttracing()
 	else if (tracingMode_ == kHeapTracingToFile)
 		outputPrintf(L"\nStarting heap tracing to disk of %s...\n", heapTracingExe_.c_str());
 	else
-		std::terminate( );
+		std::terminate();
 
 	const std::wstring kernelStackWalk =
-		getKernelStackWalk( bSampledStacks_, bCswitchStacks_ );
+		getKernelStackWalk(bSampledStacks_, bCswitchStacks_);
 	
 	const std::wstring kernelFile =
-		getKernelFile( tracingMode_, GetKernelFile( ) );
+		getKernelFile(tracingMode_, GetKernelFile());
 
 	const std::wstring kernelArgs =
-		getKernelArgs( kernelStackWalk, kernelFile, GetKernelLogger( ) );
+		getKernelArgs(kernelStackWalk, kernelFile, GetKernelLogger());
 
-	std::wstring userProviders = getBaseUserProviders( );
+	std::wstring userProviders = getBaseUserProviders();
 
 	// DWM providers can be helpful also. Uncomment to enable.
 	//userProviders += L"+Microsoft-Windows-Dwm-Dwm";
@@ -1576,10 +1573,10 @@ void CUIforETWDlg::OnBnClickedStarttracing()
 		userProviders += L"+Chrome";
 
 	if (bGPUTracing_)
-		addGPUTracingProviders( &userProviders );
+		addGPUTracingProviders(&userProviders);
 
 	
-	std::wstring userBuffers = getUserBuffers( bGPUTracing_ );
+	std::wstring userBuffers = getUserBuffers(bGPUTracing_);
 
 	std::wstring userFile = L" -f \"" + GetUserFile() + L"\"";
 	if (tracingMode_ == kTracingToMemory)
@@ -1591,8 +1588,8 @@ void CUIforETWDlg::OnBnClickedStarttracing()
 	// Buffer sizes need to be huge for some programs - should be configurable.
 	std::wstring heapBuffers = L" -buffersize 1024 -minbuffers 1000";
 	std::wstring heapFile = L" -f \"" + GetHeapFile() + L"\"";
-	std::wstring heapStackWalk = getHeapStackWalk( bHeapStacks_ );
-	std::wstring heapArgs = getHeapArgs( heapStackWalk, heapBuffers, heapFile );
+	std::wstring heapStackWalk = getHeapStackWalk(bHeapStacks_);
+	std::wstring heapArgs = getHeapArgs(heapStackWalk, heapBuffers, heapFile);
 	
 
 	{
@@ -1642,7 +1639,7 @@ void CUIforETWDlg::StopTracingAndMaybeRecord(bool bSaveTrace)
 	const std::wstring compatFile = windowsDir_ + L"AppCompat\\Programs\\Amcache.hve";
 	const std::wstring compatFileTemp = windowsDir_ + L"AppCompat\\Programs\\Amcache_temp.hve";
 
-	const bool isExistingTempFile = isValidPathToFSObject( compatFileTemp );
+	const bool isExistingTempFile = isValidPathToFSObject(compatFileTemp);
 	if (isExistingTempFile)
 	{
 		// Delete any previously existing Amcache_temp.hve file that might have
@@ -1650,20 +1647,20 @@ void CUIforETWDlg::StopTracingAndMaybeRecord(bool bSaveTrace)
 		// Note that this has to be done before the -flush step -- it makes both it
 		// and the -merge step painfully slow.
 		//If [DeleteFile] succeeds, the return value is nonzero.
-		const BOOL deleteResult = DeleteFile( compatFileTemp.c_str( ) );
+		const BOOL deleteResult = DeleteFile(compatFileTemp.c_str());
 		if (deleteResult == 0)
 		{
-			outputPrintf( L"FAILED to delete `%s`!!\n", compatFileTemp.c_str( ) );
-			ErrorHandling::outputPrintfErrorDebug( );
+			outputPrintf(L"FAILED to delete `%s`!!\n", compatFileTemp.c_str());
+			ErrorHandling::outputPrintfErrorDebug();
 		}
 	}
 
-	ATLASSERT( isValidPathToFSObject( compatFile ) );
-	const BOOL moveSuccess = MoveFile(compatFile.c_str( ), compatFileTemp.c_str( ));
+	ATLASSERT(isValidPathToFSObject(compatFile));
+	const BOOL moveSuccess = MoveFile(compatFile.c_str(), compatFileTemp.c_str());
 	if (bShowCommands_ && !moveSuccess)
 	{
-		outputPrintf( L"FAILED to rename/move `Amcache.hve`!\n" );
-		ErrorHandling::outputPrintfErrorDebug( );
+		outputPrintf(L"FAILED to rename/move `Amcache.hve`!\n");
+		ErrorHandling::outputPrintfErrorDebug();
 	}
 
 	ElapsedTimer saveTimer;
@@ -1763,7 +1760,7 @@ void CUIforETWDlg::StopTracingAndMaybeRecord(bool bSaveTrace)
 				L"which is unusually long. Please "
 				L"try metatrace.bat, and share your results on "
 				L"https://groups.google.com/forum/#!forum/uiforetw.\n",
-				saveTime );
+				saveTime);
 		}
 		if (mergeTime > 100.0)
 		{
@@ -1773,7 +1770,7 @@ void CUIforETWDlg::StopTracingAndMaybeRecord(bool bSaveTrace)
 				L"Merging the trace took %1.1fs, which is unusually long. "
 				L"This may mean that renaming of amcache.hve failed. "
 				L"Please try metatrace.bat and share this on "
-				L"https://groups.google.com/forum/#!forum/uiforetw\n", mergeTime );
+				L"https://groups.google.com/forum/#!forum/uiforetw\n", mergeTime);
 		}
 
 		outputPrintf(L"Finished recording trace.\n");
@@ -1790,7 +1787,7 @@ void CUIforETWDlg::OnBnClickedSavetracebuffers()
 
 void CUIforETWDlg::OnBnClickedStoptracing()
 {
-	OutputDebugStringA( "UIforETW: \"Stop Tracing\" clicked!\r\n" );
+	OutputDebugStringA("UIforETW: \"Stop Tracing\" clicked!\r\n");
 	StopTracingAndMaybeRecord(false);
 }
 
@@ -1802,13 +1799,12 @@ void CUIforETWDlg::LaunchTraceViewer(const std::wstring traceFilename, const std
 		if (isValidPathToFSObject(zipPath))
 		{
 			AfxMessageBox(L"Viewing of zipped ETL files is not yet supported.\n"
-						  L"Please manually unzip the trace file."
-						 );
+						  L"Please manually unzip the trace file.");
 		}
 		else
 		{
 			AfxMessageBox(L"That trace file does not exist.");
-			OutputDebugStringA( "UIforETW: User tried to open non existent trace file" );
+			OutputDebugStringA("UIforETW: User tried to open non existent trace file");
 		}
 		return;
 	}
@@ -1826,7 +1822,7 @@ void CUIforETWDlg::LaunchTraceViewer(const std::wstring traceFilename, const std
 	wcscpy_s(&argsCopy[0], argsCopy.size(), args.c_str());
 	STARTUPINFO startupInfo = {};
 	PROCESS_INFORMATION processInfo = {};
-	const BOOL result = CreateProcess(viewerPath.c_str(), &argsCopy[0], nullptr, nullptr, FALSE, 0, nullptr, nullptr, &startupInfo, &processInfo );
+	const BOOL result = CreateProcess(viewerPath.c_str(), &argsCopy[0], nullptr, nullptr, FALSE, 0, nullptr, nullptr, &startupInfo, &processInfo);
 
 	if (result)
 	{
@@ -1836,7 +1832,7 @@ void CUIforETWDlg::LaunchTraceViewer(const std::wstring traceFilename, const std
 	}
 	else
 	{
-		AfxMessageBox( L"Failed to start trace viewer." );
+		AfxMessageBox(L"Failed to start trace viewer.");
 	}
 }
 
@@ -1932,7 +1928,7 @@ void CUIforETWDlg::UpdateTraceList()
 	lastTraceFilename_.clear();
 
 	int curSel = btTraces_.GetCurSel();
-	if (selectedTraceName.empty() && curSel >= 0 && curSel < static_cast< int >( traces_.size() ))
+	if (selectedTraceName.empty() && curSel >= 0 && curSel < static_cast<int>(traces_.size()))
 	{
 		selectedTraceName = traces_.at( curSel );
 	}
@@ -2032,7 +2028,7 @@ void CUIforETWDlg::OnSize(UINT nType, int /*cx*/, int /*cy*/)
 		int yDelta = windowRect.Height() - lastHeight_;
 		lastHeight_ += yDelta;
 
-		const UINT flags = ( SWP_NOMOVE | SWP_NOOWNERZORDER | SWP_NOZORDER | SWP_NOACTIVATE );
+		const UINT flags = (SWP_NOMOVE | SWP_NOOWNERZORDER | SWP_NOZORDER | SWP_NOACTIVATE);
 
 		// Resize the trace list and notes control.
 		CRect listRect;
@@ -2067,7 +2063,7 @@ void CUIforETWDlg::UpdateNotesState()
 	SaveNotesIfNeeded();
 
 	int curSel = btTraces_.GetCurSel();
-	if (curSel >= 0 && curSel < static_cast<int>( traces_.size() ))
+	if (curSel >= 0 && curSel < static_cast<int>(traces_.size()))
 	{
 		SmartEnableWindow(btTraceNotes_, true);
 		std::wstring traceName = traces_[curSel];
@@ -2253,8 +2249,7 @@ void CUIforETWDlg::OnContextMenu(CWnd* pWnd, CPoint point)
 
 		for (auto id : disableList)
 		{
-			pContextMenu->EnableMenuItem(
-				id, ( MF_BYCOMMAND | MF_GRAYED ) );
+			pContextMenu->EnableMenuItem(id, (MF_BYCOMMAND | MF_GRAYED));
 		}
 	}
 
@@ -2262,18 +2257,16 @@ void CUIforETWDlg::OnContextMenu(CWnd* pWnd, CPoint point)
 	{
 		// Disable ETW trace compress options on Windows 7 and below
 		// since they don't work there.
-		pContextMenu->EnableMenuItem(
-			ID_TRACES_COMPRESSTRACE,
-			( MF_BYCOMMAND | MF_GRAYED ) );
+		pContextMenu->EnableMenuItem(ID_TRACES_COMPRESSTRACE,
+									 (MF_BYCOMMAND | MF_GRAYED));
 			
-		pContextMenu->EnableMenuItem(
-			ID_TRACES_COMPRESSTRACES,
-			( MF_BYCOMMAND | MF_GRAYED ) );
+		pContextMenu->EnableMenuItem(ID_TRACES_COMPRESSTRACES,
+									 (MF_BYCOMMAND | MF_GRAYED));
 	}
 
 	int selection = pContextMenu->TrackPopupMenu(
 		( TPM_LEFTALIGN | TPM_LEFTBUTTON  | TPM_RIGHTBUTTON |
-		TPM_RETURNCMD | TPM_NONOTIFY ), point.x, point.y, pWnd, NULL );
+		TPM_RETURNCMD | TPM_NONOTIFY ), point.x, point.y, pWnd, NULL);
 
 	switch (selection)
 	{
@@ -2331,7 +2324,7 @@ void CUIforETWDlg::DeleteTrace()
 	if (selIndex == LB_ERR)
 		return;
 
-	const std::wstring traceFile = traces_.at( selIndex );
+	const std::wstring traceFile = traces_.at(selIndex);
 
 	//?
 	std::wstring tracePath = GetTraceDir() + traceFile + L".etl";
@@ -2339,7 +2332,7 @@ void CUIforETWDlg::DeleteTrace()
 	std::wstring messageBoxString =
 		( L"Are you sure you want to delete " + traceFile + L"?" );
 	const int mbResult =
-		AfxMessageBox( messageBoxString.c_str( ), MB_YESNO );
+		AfxMessageBox(messageBoxString.c_str(), MB_YESNO);
 
 	if (mbResult == IDYES)
 	{
@@ -2359,12 +2352,12 @@ void CUIforETWDlg::CopyTraceName()
 	if (selIndex == LB_ERR)
 		return;
 
-	std::wstring tracePath = traces_.at( selIndex ) + L".etl";
+	std::wstring tracePath = traces_.at(selIndex) + L".etl";
 	// If the shift key is held down, just put the file path in the clipboard.
 	// If not, put the entire path in the clipboard. This is an undocumented
 	// but very handy option.
 	if (GetKeyState( VK_SHIFT ) >= 0)
-		tracePath = GetTraceDir( ) + tracePath;
+		tracePath = GetTraceDir() + tracePath;
 	SetClipboardText(L"\"" + tracePath + L"\"");
 }
 
@@ -2420,7 +2413,7 @@ void CUIforETWDlg::CompressTrace(const std::wstring& tracePath)
 		MoveFile(compressedPath.c_str(), tracePath.c_str());
 		outputPrintf(L"%s was compressed from %1.1f MB to %1.1f MB.\n",
 					 tracePath.c_str(), ( originalSize / 1000000.0 ),
-					 ( compressedSize / 1000000.0 ) );
+					 ( compressedSize / 1000000.0 ));
 	}
 	else
 	{
@@ -2460,7 +2453,7 @@ void CUIforETWDlg::StripChromeSymbols(const std::wstring& traceFilename)
 		child.Run(bShowCommands_, L"python.exe" + args);
 	}
 	if (bShowCommands_)
-		outputPrintf( L"Stripping Chrome symbols took %1.1f s\n", stripTimer.ElapsedSeconds( ) );
+		outputPrintf(L"Stripping Chrome symbols took %1.1f s\n", stripTimer.ElapsedSeconds());
 }
 
 void CUIforETWDlg::PreprocessTrace(const std::wstring& traceFilename)
@@ -2514,18 +2507,18 @@ void CUIforETWDlg::PreprocessTrace(const std::wstring& traceFilename)
 				const int scanToStringResult = swscanf_s(pidstr + 1, L"%lu", &pid);
 				if (scanToStringResult == 0)
 				{
-					ATLTRACE2( L"No fields assigned from pidstr+1 (%s)!!\r\n", ( pidstr+1 ) );
+					ATLTRACE2(L"No fields assigned from pidstr+1 (%s)!!\r\n", (pidstr + 1));
 					//0 is an invalid process ID!
 					//http://blogs.msdn.com/b/oldnewthing/archive/2004/02/23/78395.aspx
-					pidsByType[type].push_back( 0 );
+					pidsByType[type].push_back(0);
 					continue;
 				}
 				if (scanToStringResult == EOF)
 				{
-					ATLTRACE2( L"EOF hit before assigning fields from pidstr+1 (%s)!!\r\n", ( pidstr+1 ) );
+					ATLTRACE2(L"EOF hit before assigning fields from pidstr+1 (%s)!!\r\n", (pidstr + 1));
 					//0 is an invalid process ID!
 					//http://blogs.msdn.com/b/oldnewthing/archive/2004/02/23/78395.aspx
-					pidsByType[type].push_back( 0 );
+					pidsByType[type].push_back(0);
 					continue;
 				}
 				static_assert( EOF == -1, "swscanf_s might return a value that's not handled!" );
@@ -2535,25 +2528,25 @@ void CUIforETWDlg::PreprocessTrace(const std::wstring& traceFilename)
 		}
 	}
 	//Maybe we should request the Unicode version of the APIs (for long path support)?
-	const std::wstring fileToOpen = ( traceFilename.substr( 0, traceFilename.size( ) - 4 ) + L".txt" );
+	const std::wstring fileToOpen = (traceFilename.substr(0, traceFilename.size() - 4) + L".txt");
 
 	FILE* pFile = NULL;
 
 	//[_wfopen_s returns] zero if successful; an error code on failure.
-	const errno_t fileOpenResult = _wfopen_s( &pFile, fileToOpen.c_str( ), L"a" );
+	const errno_t fileOpenResult = _wfopen_s(&pFile, fileToOpen.c_str(), L"a");
 	if ((fileOpenResult != 0) || ( pFile == NULL ))
 		throw std::runtime_error( "Failed to open a file for preprocessing!" );
 
-	checked_CRT::fPutWS( L"Chrome PIDs by process type:\n", pFile );
+	checked_CRT::fPutWS(L"Chrome PIDs by process type:\n", pFile);
 
 	for (const auto& types : pidsByType)
 	{
 		const int firstTypesResult = fwprintf_s(pFile, L"%-10s:", types.first.c_str());
 		if (firstTypesResult < 0)
 		{
-			handle_close::fClose( pFile );
-			OutputDebugStringA( "UIforETW: Failed to write types.first to file!\r\n" );
-			std::terminate( );
+			handle_close::fClose(pFile);
+			OutputDebugStringA("UIforETW: Failed to write types.first to file!\r\n");
+			std::terminate();
 		}
 
 		for (const auto& pid : types.second)
@@ -2561,14 +2554,14 @@ void CUIforETWDlg::PreprocessTrace(const std::wstring& traceFilename)
 			const int secondTypesResult = fwprintf_s(pFile, L" %lu", pid);
 			if (secondTypesResult < 0)
 			{
-				handle_close::fClose( pFile );
-				OutputDebugStringA( "UIforETW: Failed to write types.second.pid to file!\r\n" );
-				std::terminate( );
+				handle_close::fClose(pFile);
+				OutputDebugStringA("UIforETW: Failed to write types.second.pid to file!\r\n");
+				std::terminate();
 			}
 		}
-		checked_CRT::fPutWS( L"\n", pFile );
+		checked_CRT::fPutWS(L"\n", pFile);
 	}
-	handle_close::fClose( pFile );
+	handle_close::fClose(pFile);
 #endif
 
 }
@@ -2579,11 +2572,11 @@ void CUIforETWDlg::StartRenameTrace(bool fullRename)
 	SaveNotesIfNeeded();
 	const int curSel = btTraces_.GetCurSel();
 
-	ATLASSERT( traces_.size( ) < INT_MAX );
+	ATLASSERT( traces_.size() < INT_MAX );
 	if (curSel < 0)
 		return;
 
-	if (curSel >= static_cast< int >( traces_.size( ) ))
+	if (curSel >= static_cast<int>(traces_.size()))
 		return;
 
 	std::wstring traceName = traces_[curSel];
@@ -2597,8 +2590,8 @@ void CUIforETWDlg::StartRenameTrace(bool fullRename)
 		validRenameDate_ = true;
 		for (size_t i = 0; i < kPrefixLength; ++i)
 		{
-			wchar_t c = traceName[i];
-			if (( c != '-' ) && ( c != '_' ) && ( c != '.' ) && ( !iswdigit( c ) ))
+			const wchar_t c = traceName[i];
+			if ((c != '-') && (c != '_') && (c != '.') && (!iswdigit( c )))
 				validRenameDate_ = false;
 		}
 	}
@@ -2668,7 +2661,7 @@ void CUIforETWDlg::FinishTraceRename()
 	{
 		auto oldNames = GetFileList(GetTraceDir() + preRenameTraceName_ + L".*");
 		std::vector<std::pair<std::wstring, std::wstring>> renamed;
-		renamed.reserve( oldNames.size( ) );
+		renamed.reserve(oldNames.size());
 		std::wstring failedSource;
 		for (auto& oldName : oldNames)
 		{
