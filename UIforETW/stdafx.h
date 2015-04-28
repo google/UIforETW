@@ -50,13 +50,9 @@ void outputPrintf(_Printf_format_string_ PCWSTR pFormat, ...);
 #include <inttypes.h>
 
 #include <VersionHelpers.h>
-
 #include <exception>
 #include <string>
 #include <vector>
-
-
-
 // Using #define NOMINMAX would be nice but gdiplustypes.h *depends*
 // on min/max macros, so the best I can do is to undefine them here.
 #undef min

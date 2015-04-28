@@ -531,9 +531,9 @@ bool setEnvironmentVariable( _In_z_ PCSTR const variableName, _In_z_ PCSTR const
 }
 
 _Success_( return )
-bool setChromiumSymbolPath( _In_ const bool bChromeDeveloper )
+bool setChromiumSymbolPath( _In_ const bool bChromeDeveloper, std::string systemDrive )
 {
-	const std::string symbolPath = getChromiumSymbolPath( bChromeDeveloper );
+	const std::string symbolPath = getChromiumSymbolPath( bChromeDeveloper, systemDrive );
 
 	outputPrintf( L"Setting _NT_SYMBOL_PATH to %S (Microsoft%s). "
 					L"Set _NT_SYMBOL_PATH yourself or toggle"
@@ -946,7 +946,7 @@ void outputPrintf(_Printf_format_string_ PCWSTR pFormat, ...)
 }
 
 void CUIforETWDlg::vprintf(PCWSTR pFormat, va_list args)
-{	
+{
 	wchar_t buffer[5000];
 	_vsnwprintf_s(buffer, _TRUNCATE, pFormat, args);
 
@@ -1017,13 +1017,14 @@ void CUIforETWDlg::ShutdownTasks()
 {
 	if (bShutdownCompleted_)
 		return;
-
 	bShutdownCompleted_ = true;
 	// Save any in-progress trace-notes edits.
 	SaveNotesIfNeeded();
 	// Stop ETW tracing when we shut down.
 	if (bIsTracing_)
-		StopTracingAndMaybeRecord(false);
+	{
+		StopTracingAndMaybeRecord( false );
+	}
 
 	// Forcibly clear the heap tracing registry keys.
 	SetHeapTracing(true);
@@ -1134,7 +1135,7 @@ bool CUIforETWDlg::SetSymbolPath()
 	{
 		bManageSymbolPath_ = true;
 		const bool setChromiumSymbolPathResult =
-			setChromiumSymbolPath( bChromeDeveloper_ );
+			setChromiumSymbolPath( bChromeDeveloper_, systemDrive_ );
 		if (!setChromiumSymbolPathResult)
 		{
 			return false;
@@ -1197,7 +1198,6 @@ BOOL CUIforETWDlg::OnInitDialog()
 	if (!RegisterHotKey(*this, kRecordTraceHotKey, MOD_WIN + MOD_CONTROL, 'C'))
 	{
 		AfxMessageBox(L"Couldn't register hot key.");
-
 		SetSaveTraceBuffersWindowText( btSaveTraceBuffers_.m_hWnd );
 	}
 
@@ -1211,21 +1211,15 @@ BOOL CUIforETWDlg::OnInitDialog()
 
 	checkETWCompatibility( );
 
-
-
 	windowsDir_ = getWindowsDirectory( );
 
-	
 	// ANSI string, not unicode.
 	systemDrive_ = static_cast<char>(windowsDir_[0]);
 	systemDrive_ += ":\\";
 
-
 	wptDir_ = getWPTDir( );
 
-
 	std::wstring documents = getDocumentsPath( );
-
 
 	std::wstring defaultTraceDir = documents + std::wstring(L"\\etwtraces\\");
 	traceDir_ = GetDirectory(L"etwtracedir", defaultTraceDir);
@@ -1235,8 +1229,7 @@ BOOL CUIforETWDlg::OnInitDialog()
 	
 	if (!copyToDirResult)
 	{
-		//TODO: properly handle error!
-		exit(10);
+		std::terminate( );
 	}
 
 	tempTraceDir_ = GetDirectory(L"temp", traceDir_);
@@ -1245,7 +1238,6 @@ BOOL CUIforETWDlg::OnInitDialog()
 
 	btTraceNameEdit_.GetWindowRect(&traceNameEditRect_);
 
-	//This MFC function (ScreenToClient) doesn't properly check return codes for internal calls.
 	ScreenToClient(&traceNameEditRect_);
 
 	// Set the icon for this dialog. The framework does this automatically
@@ -1259,11 +1251,8 @@ BOOL CUIforETWDlg::OnInitDialog()
 		SmartEnableWindow(btCompress_, false);
 	}
 
-	CheckDialogButtons(
-		this,
-		bCompress_, bCswitchStacks_,
-		bSampledStacks_, bFastSampling_,
-		bGPUTracing_, bShowCommands_ );
+	CheckDialogButtons( this, bCompress_, bCswitchStacks_, bSampledStacks_, 
+						bFastSampling_, bGPUTracing_, bShowCommands_ );
 
 
 
@@ -1272,8 +1261,6 @@ BOOL CUIforETWDlg::OnInitDialog()
 	if (bFastSampling_)
 		SetSamplingSpeed();
 
-
-	
 	addbtInputTracingStrings( &btInputTracing_ );
 
 	const bool setBtInputTracingSelectionResult =
@@ -1343,28 +1330,23 @@ std::wstring CUIforETWDlg::GetDirectory( _In_z_ PCWSTR env, const std::wstring& 
 	// Get a directory (from an environment variable, if set) and make sure it exists.
 
 	std::wstring result = getTraceDirFromEnvironmentVariable( env, default );
-
 	const bool doesFileExist = isValidPathToFSObject( result );
-
 	if (!doesFileExist)
 	{
 		const bool sucessfullyCreatedDirectory =
 			enhancedCreateDirectory( result );
-
 		if (!sucessfullyCreatedDirectory)
 		{
 			AfxMessageBox( L"CUIforETWDlg::GetDirectory attempted to create a directory, but unexpectedly failed!" );
-			exit(10);
+			std::terminate( );
 		}
 		ATLASSERT( isValidDirectory( result ) );
 	}
-
 	if (!isValidDirectory( result ))
 	{
 		AfxMessageBox((result + L" is not a directory. Exiting.").c_str());
-		exit(10);
+		std::terminate( );
 	}
-
 	return result;
 }
 
@@ -1506,8 +1488,7 @@ HCURSOR CUIforETWDlg::OnQueryDragIcon()
 std::wstring CUIforETWDlg::GetExeDir() const
 {
 	//Maybe we can get away with the MAX_PATH limit here?
-	//TODO: rewrite to support longer paths!
-	wchar_t exePath[ MAX_PATH ] = { 0 };
+	wchar_t exePath[MAX_PATH];
 	//If [GetModuleFileName] succeeds, the return value is the length of the string that is copied to the buffer, in characters, not including the terminating null character.
 	//If [GetModuleFileName] fails, the return value is 0 (zero).
 	//To get extended error information, call GetLastError.
@@ -1542,12 +1523,8 @@ std::wstring CUIforETWDlg::GenerateResultFilename() const
 	_strtime_s(time);
 	char date[10];
 	_strdate_s(date);
-	int hour = 0;
-	int min = 0;
-	int sec = 0;
-	int year = 0;
-	int month = 0;
-	int day = 0;
+	int hour, min, sec;
+	int year, month, day;
 
 	PCWSTR username_temp = NULL;
 	wchar_t usernameBuffer[MAX_PATH] = { 0 };
@@ -1566,7 +1543,10 @@ std::wstring CUIforETWDlg::GenerateResultFilename() const
 	//Anything else is wrong!
 	wchar_t fileName[MAX_PATH];
 
+//Eww.
+#pragma warning(suppress: 6054)
 	const bool validTimeStr = ( 3 == sscanf_s( time, "%d:%d:%d", &hour, &min, &sec ) );
+#pragma warning(suppress: 6054)
 	const bool validDateStr = ( 3 == sscanf_s( date, "%d/%d/%d", &month, &day, &year ) );
 
 	std::wstring filePart;
@@ -1584,8 +1564,6 @@ std::wstring CUIforETWDlg::GenerateResultFilename() const
 					  L"failed to properly read time & date strings!\n" );
 		filePart = L"UIforETW";
 	}
-
-	//filePart = fileName;
 
 	if (tracingMode_ == kHeapTracingToFile)
 	{
@@ -1612,10 +1590,7 @@ void CUIforETWDlg::OnBnClickedStarttracing()
 	else if (tracingMode_ == kHeapTracingToFile)
 		outputPrintf(L"\nStarting heap tracing to disk of %s...\n", heapTracingExe_.c_str());
 	else
-	{
-		ATLASSERT( 0 );
-		abort( );
-	}
+		std::terminate( );
 
 	const std::wstring kernelStackWalk =
 		getKernelStackWalk( bSampledStacks_, bCswitchStacks_ );
@@ -1646,7 +1621,6 @@ void CUIforETWDlg::OnBnClickedStarttracing()
 	std::wstring userFile = L" -f \"" + GetUserFile() + L"\"";
 	if (tracingMode_ == kTracingToMemory)
 		userFile = L" -buffering";
-
 	std::wstring userArgs = L" -start UIforETWSession -on " + userProviders + userBuffers + userFile;
 
 	// Heap tracing settings -- only used for heap tracing.
@@ -1654,9 +1628,7 @@ void CUIforETWDlg::OnBnClickedStarttracing()
 	// Buffer sizes need to be huge for some programs - should be configurable.
 	std::wstring heapBuffers = L" -buffersize 1024 -minbuffers 1000";
 	std::wstring heapFile = L" -f \"" + GetHeapFile() + L"\"";
-
 	std::wstring heapStackWalk = getHeapStackWalk( bHeapStacks_ );
-
 	std::wstring heapArgs = getHeapArgs( heapStackWalk, heapBuffers, heapFile );
 	
 
@@ -1669,9 +1641,13 @@ void CUIforETWDlg::OnBnClickedStarttracing()
 
 		DWORD exitCode = child.GetExitCode();
 		if (exitCode)
-			outputPrintf(L"Error starting tracing. Try stopping tracing and then starting it again?\n");
+		{
+			outputPrintf( L"Error starting tracing. Try stopping tracing and then starting it again?\n" );
+		}
 		else
-			outputPrintf(L"Tracing is started.\n");
+		{
+			outputPrintf( L"Tracing is started.\n" );
+		}
 	}
 
 	{
@@ -1755,7 +1731,6 @@ void CUIforETWDlg::StopTracingAndMaybeRecord(bool bSaveTrace)
 		}
 	}
 	double saveTime = saveTimer.ElapsedSeconds();
-
 	if (bShowCommands_)
 		outputPrintf(L"Trace save took %1.1f s\n", saveTime);
 
@@ -1793,8 +1768,8 @@ void CUIforETWDlg::StopTracingAndMaybeRecord(bool bSaveTrace)
 	// Delete the temporary files.
 	DeleteFile(GetKernelFile().c_str());
 	DeleteFile(GetUserFile().c_str());
-	if ( tracingMode_ == kHeapTracingToFile )
-		DeleteFile( GetHeapFile().c_str() );
+	if (tracingMode_ == kHeapTracingToFile)
+		DeleteFile(GetHeapFile().c_str());
 
 
 	if (!bSaveTrace || tracingMode_ != kTracingToMemory)
@@ -1806,12 +1781,12 @@ void CUIforETWDlg::StopTracingAndMaybeRecord(bool bSaveTrace)
 	if (bSaveTrace)
 	{
 		if (bChromeDeveloper_)
-			StripChromeSymbols( traceFilename );
+			StripChromeSymbols(traceFilename);
 		
 		PreprocessTrace(traceFilename);
 
 		if (bAutoViewTraces_)
-			LaunchTraceViewer( traceFilename );
+			LaunchTraceViewer(traceFilename);
 
 		// Record the name so that it gets selected.
 		lastTraceFilename_ = CrackFilePart(traceFilename);
@@ -1886,13 +1861,9 @@ void CUIforETWDlg::LaunchTraceViewer(const std::wstring traceFilename, const std
 	// Wacky CreateProcess rules say args has to be writable!
 	std::vector<wchar_t> argsCopy(args.size() + 1);
 	wcscpy_s(&argsCopy[0], argsCopy.size(), args.c_str());
-
-
 	STARTUPINFO startupInfo = {};
 	PROCESS_INFORMATION processInfo = {};
-	const BOOL result = CreateProcessW(
-		viewerPath.c_str(), &argsCopy[0], nullptr, nullptr, FALSE, 0, nullptr, 
-		nullptr, &startupInfo, &processInfo );
+	const BOOL result = CreateProcess(viewerPath.c_str(), &argsCopy[0], nullptr, nullptr, FALSE, 0, nullptr, nullptr, &startupInfo, &processInfo );
 
 	if (result)
 	{
@@ -1901,7 +1872,9 @@ void CUIforETWDlg::LaunchTraceViewer(const std::wstring traceFilename, const std
 		handle_close::closeHandle(processInfo.hThread);
 	}
 	else
-		AfxMessageBox(L"Failed to start trace viewer.");
+	{
+		AfxMessageBox( L"Failed to start trace viewer." );
+	}
 }
 
 void CUIforETWDlg::OnBnClickedCompresstrace()
@@ -1996,9 +1969,10 @@ void CUIforETWDlg::UpdateTraceList()
 	lastTraceFilename_.clear();
 
 	int curSel = btTraces_.GetCurSel();
-	if (selectedTraceName.empty() && curSel >= 0 && curSel < static_cast<int>( traces_.size() ))
+	if (selectedTraceName.empty() && curSel >= 0 && curSel < static_cast< int >( traces_.size() ))
+	{
 		selectedTraceName = traces_.at( curSel );
-
+	}
 	// Note that these will also pull in files like *.etlabc and *.zipabc.
 	// I don't want that. Filter them out later?
 	auto tempTraces = GetFileList(GetTraceDir() + L"\\*.etl");
@@ -2006,10 +1980,8 @@ void CUIforETWDlg::UpdateTraceList()
 	// Why can't I use += to concatenate these?
 	tempTraces.insert(tempTraces.end(), tempZips.begin(), tempZips.end());
 	std::sort(tempTraces.begin(), tempTraces.end());
-
 	// Function to stop the temporary traces from showing up.
 	auto ifInvalid = [](const std::wstring& name) { return name == L"kernel.etl" || name == L"user.etl" || name == L"heap.etl"; };
-	
 	tempTraces.erase(std::remove_if(tempTraces.begin(), tempTraces.end(), ifInvalid), tempTraces.end());
 	for (auto& name : tempTraces)
 	{
@@ -2069,7 +2041,6 @@ void CUIforETWDlg::OnLbnDblclkTracelist()
 	//That comment IS WRONG! CListBox::GetCurSel MAY return -1! (LB_ERR, when no item is selected)
 	if (selIndex < 0 || selIndex >= static_cast< int >(traces_.size()))
 		return;
-
 	std::wstring tracename = GetTraceDir() + traces_[selIndex] + L".etl";
 	LaunchTraceViewer(tracename);
 }
@@ -2228,26 +2199,24 @@ void CUIforETWDlg::OnCbnSelchangeTracingmode()
 	switch (tracingMode_)
 	{
 	case kTracingToMemory:
-		outputPrintf(
-			L"Traces will be recorded to in-memory circular buffers. "
-			L"Tracing can be enabled indefinitely long, "
-			L"and will record the last ~10-60 seconds.\n" );
+		outputPrintf(L"Traces will be recorded to in-memory circular buffers. "
+			         L"Tracing can be enabled indefinitely long, "
+			         L"and will record the last ~10-60 seconds.\n" );
 		break;
 	case kTracingToFile:
 		outputPrintf(L"Traces will be recorded to disk to "
 					 L"allow arbitrarily long recordings.\n");
 		break;
 	case kHeapTracingToFile:
-		outputPrintf(
-			L"Heap traces will be recorded to disk for %s. "
-			L"Note that only %s processes "
-			L"started after this is selected will be traced. "
-			L"Note that %s processes started now "
-			L"may run slightly slower even if not being traced.\n"
-			L"To keep trace sizes manageable you may want to turn "
-			L"off context switch and CPU sampling call stacks.\n",
-			heapTracingExe_.c_str(), heapTracingExe_.c_str(),
-			heapTracingExe_.c_str() );
+		outputPrintf(L"Heap traces will be recorded to disk for %s. "
+					 L"Note that only %s processes "
+					 L"started after this is selected will be traced. "
+					 L"Note that %s processes started now "
+					 L"may run slightly slower even if not being traced.\n"
+					 L"To keep trace sizes manageable you may want to turn "
+					 L"off context switch and CPU sampling call stacks.\n",
+					 heapTracingExe_.c_str(), heapTracingExe_.c_str(),
+					 heapTracingExe_.c_str() );
 		break;
 	}
 	SetHeapTracing(false);
@@ -2418,7 +2387,6 @@ void CUIforETWDlg::DeleteTrace()
 		// Record that the trace notes don't need saving, even if they have changed.
 		traceNoteFilename_ = L"";
 	}
-
 }
 
 
@@ -2464,8 +2432,7 @@ void CUIforETWDlg::CompressTrace(const std::wstring& tracePath)
 	DWORD exitCode = 0;
 	{
 		ChildProcess child(GetXperfPath());
-		std::wstring args =
-							L" -merge \""  +
+		std::wstring args = L" -merge \""  +
 							tracePath      +
 							L"\" \""       +
 							compressedPath +
@@ -2488,10 +2455,9 @@ void CUIforETWDlg::CompressTrace(const std::wstring& tracePath)
 	{
 		DeleteOneFile(*this, tracePath);
 		MoveFile(compressedPath.c_str(), tracePath.c_str());
-		outputPrintf(
-			L"%s was compressed from %1.1f MB to %1.1f MB.\n",
-			tracePath.c_str(), ( originalSize / 1000000.0 ),
-			( compressedSize / 1000000.0 ) );
+		outputPrintf(L"%s was compressed from %1.1f MB to %1.1f MB.\n",
+					 tracePath.c_str(), ( originalSize / 1000000.0 ),
+					 ( compressedSize / 1000000.0 ) );
 	}
 	else
 	{
@@ -2729,13 +2695,10 @@ void CUIforETWDlg::FinishTraceRename()
 	// Make sure this doesn't get double-called.
 	if (!btTraceNameEdit_.IsWindowVisible())
 		return;
-
 	std::wstring newText = GetEditControlText(btTraceNameEdit_);
 	std::wstring newTraceName = newText;
-	
 	if (validRenameDate_)
 		newTraceName = preRenameTraceName_.substr(0, kPrefixLength) + newText;
-	
 	btTraceNameEdit_.ShowWindow(SW_HIDE);
 
 	if (newTraceName != preRenameTraceName_)
@@ -2743,7 +2706,6 @@ void CUIforETWDlg::FinishTraceRename()
 		auto oldNames = GetFileList(GetTraceDir() + preRenameTraceName_ + L".*");
 		std::vector<std::pair<std::wstring, std::wstring>> renamed;
 		renamed.reserve( oldNames.size( ) );
-
 		std::wstring failedSource;
 		for (auto& oldName : oldNames)
 		{
@@ -2755,7 +2717,7 @@ void CUIforETWDlg::FinishTraceRename()
 				failedSource = oldName;
 				break;
 			}
-			renamed.emplace_back(std::make_pair(oldName, newName));
+			renamed.push_back(std::make_pair(oldName, newName));
 		}
 		// If any of the renaming steps fail then undo the renames that
 		// succeeded. This should usually fail. If not, there isn't much that
@@ -2770,7 +2732,9 @@ void CUIforETWDlg::FinishTraceRename()
 		else
 		{
 			for (auto& renamePair : renamed)
+			{
 				(void)MoveFile((GetTraceDir() + renamePair.second).c_str(), (GetTraceDir() + renamePair.first).c_str());
+			}
 			AfxMessageBox((L"Error renaming file '" + failedSource + L"'.").c_str());
 		}
 	}
