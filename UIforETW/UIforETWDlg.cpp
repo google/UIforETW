@@ -142,24 +142,24 @@ void handleUnexpectedCreateDirectory( _In_ const std::wstring& path, _In_ const 
 //Seems to generate better code when passed a PCWSTR for path.
 void dieUnexpectedErrorPathFileExists( _In_z_ PCWSTR const path, _In_ const DWORD lastErr )
 {
-	OutputDebugStringA( "UIforETW: Encountered an unexpected error after calling PathFileExists!\r\n" );
-	OutputDebugStringA( "\tPath that we were checking: \r\n\t" );
-	OutputDebugStringW( path );
-	OutputDebugStringA( "\r\n" );
-	ErrorHandling::outputErrorDebug( lastErr );
-	std::terminate( );
+	OutputDebugStringA("UIforETW: Encountered an unexpected error after calling PathFileExists!\r\n");
+	OutputDebugStringA("\tPath that we were checking: \r\n\t");
+	OutputDebugStringW(path);
+	OutputDebugStringA("\r\n");
+	ErrorHandling::outputErrorDebug(lastErr);
+	std::terminate();
 }
 
 //Compiler didn't eliminate code for std::wstring
 //Seems to generate better code when passed a PCWSTR for path.
 void dieUnexpectedErrorGetFileAttributes( _In_z_ PCWSTR const path, _In_ const DWORD lastErr )
 {
-	OutputDebugStringA( "UIforETW: Encountered an unexpected error after calling GetFileAttributes!\r\n" );
-	OutputDebugStringA( "\tPath that we were checking: \r\n\t" );
-	OutputDebugStringW( path );
-	OutputDebugStringA( "\r\n" );
-	ErrorHandling::outputErrorDebug( lastErr );
-	std::terminate( );
+	OutputDebugStringA("UIforETW: Encountered an unexpected error after calling GetFileAttributes!\r\n");
+	OutputDebugStringA("\tPath that we were checking: \r\n\t");
+	OutputDebugStringW(path);
+	OutputDebugStringA("\r\n");
+	ErrorHandling::outputErrorDebug(lastErr);
+	std::terminate();
 }
 
 //Compiler generates much better code when path is passed by reference.
@@ -167,11 +167,11 @@ bool enhancedFileExists( _In_ const std::wstring& path )
 {
 	//[PathFileExists returns] TRUE if the file exists; otherwise, FALSE.
 	//Call GetLastError for extended error information.
-	const BOOL fileExists = PathFileExistsW( path.c_str( ) );
+	const BOOL fileExists = PathFileExistsW(path.c_str());
 	if (fileExists == TRUE)
 		return true;
 
-	const DWORD lastErr = GetLastError( );
+	const DWORD lastErr = GetLastError();
 
 	if (lastErr == ERROR_FILE_NOT_FOUND)
 		return false;
@@ -179,7 +179,7 @@ bool enhancedFileExists( _In_ const std::wstring& path )
 	if (lastErr == ERROR_PATH_NOT_FOUND)
 		return false;
 
-	dieUnexpectedErrorPathFileExists( path.c_str( ), lastErr );
+	dieUnexpectedErrorPathFileExists(path.c_str(), lastErr);
 	//doesn't exist?
 	return false;
 }
@@ -194,7 +194,7 @@ bool enhancedExistCheckGetFileAttributes( _In_ const std::wstring path )
 	//    http://mfctips.com/2012/03/26/best-way-to-check-if-file-or-directory-exists/
 	//    http://mfctips.com/2013/01/10/getfileattributes-lies/
 
-	const DWORD longPathAttributes = GetFileAttributesW( path.c_str( ) );
+	const DWORD longPathAttributes = GetFileAttributesW(path.c_str());
 
 	if (longPathAttributes != INVALID_FILE_ATTRIBUTES)
 		return true;
@@ -206,7 +206,7 @@ bool enhancedExistCheckGetFileAttributes( _In_ const std::wstring path )
 	if (lastErr == ERROR_PATH_NOT_FOUND)
 		return false;
 
-	dieUnexpectedErrorGetFileAttributes( path.c_str( ), lastErr );
+	dieUnexpectedErrorGetFileAttributes(path.c_str(), lastErr);
 	//doesn't exist?
 	return false;
 
@@ -215,33 +215,33 @@ bool enhancedExistCheckGetFileAttributes( _In_ const std::wstring path )
 bool isValidPathToFSObject( _In_ std::wstring path )
 {
 	//PathFileExists expects a path thats no longer than MAX_PATH
-	if (path.size( ) < MAX_PATH)
-		return enhancedFileExists( path );
+	if (path.size() < MAX_PATH)
+		return enhancedFileExists(path);
 
 	//TODO: what if network path?
 	//should we check if just starts with L"\\\\"?
 	if (path.compare( 0, 4, L"\\\\?\\" ) != 0)
-		path = ( L"\\\\?\\" + path );
+		path = (L"\\\\?\\" + path);
 
 	const std::wstring& longPath = path;
 
-	return enhancedExistCheckGetFileAttributes( longPath );
+	return enhancedExistCheckGetFileAttributes(longPath);
 }
 
 bool copyWpaProfileToExecutableDirectory( _In_ const std::wstring& documents, _In_ const std::wstring exeDir )
 {
-	ATLASSERT( documents.length( ) > 0 );
-	ATLASSERT( documents.back( ) != L'\\' );
+	ATLASSERT(documents.length() > 0);
+	ATLASSERT(documents.back() != L'\\');
 
 	const std::wstring wpaStartup =
 		documents + std::wstring(L"\\WPA Files\\Startup.wpaProfile");
-	if (isValidPathToFSObject( wpaStartup ))
+	if (isValidPathToFSObject(wpaStartup))
 		return true;
 
-	ATLASSERT( exeDir.length( ) > 0 );
-	ATLASSERT( exeDir.back( ) == L'\\' );
+	ATLASSERT(exeDir.length() > 0);
+	ATLASSERT(exeDir.back() == L'\\');
 	// Auto-copy a startup profile if there isn't one.
-	const std::wstring sourceFile( exeDir + L"Startup.wpaProfile" );
+	const std::wstring sourceFile(exeDir + L"Startup.wpaProfile");
 
 	//If [CopyFile] succeeds, the return value is nonzero.
 	//If [CopyFile] fails, the return value is zero.
@@ -262,35 +262,35 @@ void addStringToCComboBox( _Inout_ CComboBox* const comboBox, _In_z_ PCWSTR cons
 {
 	//CComboBox::AddString calls SendMessage, to send a CB_ADDSTRING message.
 	//CB_ADDSTRING returns CB_ERR or CB_ERRSPACE on failure.
-	const int addStringResult = comboBox->AddString( stringToAdd );
+	const int addStringResult = comboBox->AddString(stringToAdd);
 	if (addStringResult == CB_ERR)
 	{
-		MessageBoxW( NULL, stringToAdd, L"Unexpected (fatal) error adding string to comboBox!", MB_OK );
-		debug::Alias( &stringToAdd );
-		std::terminate( );
+		MessageBoxW(NULL, stringToAdd, L"Unexpected (fatal) error adding string to comboBox!", MB_OK);
+		debug::Alias(&stringToAdd);
+		std::terminate();
 	}
-	if ( addStringResult == CB_ERRSPACE )
+	if (addStringResult == CB_ERRSPACE)
 	{
-		MessageBoxW( NULL, stringToAdd, L"Not enough space available to store string!", MB_OK );
-		std::terminate( );
+		MessageBoxW(NULL, stringToAdd, L"Not enough space available to store string!", MB_OK);
+		std::terminate();
 	}
-	OutputDebugStringA( "UIforETW: successfully added string `" );
-	OutputDebugStringW( stringToAdd );
-	OutputDebugStringA( "` to CComboBox...\r\n" );
+	OutputDebugStringA("UIforETW: successfully added string `");
+	OutputDebugStringW(stringToAdd);
+	OutputDebugStringA("` to CComboBox...\r\n");
 }
 
 void addbtInputTracingStrings( _Inout_ CComboBox* const btInputTracing )
 {
-	addStringToCComboBox( btInputTracing, L"Off" );
-	addStringToCComboBox( btInputTracing, L"Private");
-	addStringToCComboBox( btInputTracing, L"Full");
+	addStringToCComboBox(btInputTracing, L"Off");
+	addStringToCComboBox(btInputTracing, L"Private");
+	addStringToCComboBox(btInputTracing, L"Full");
 }
 
 void addbtTracingModeStrings( _Inout_ CComboBox* const btTracingMode )
 {
-	addStringToCComboBox( btTracingMode, L"Circular buffer tracing");
-	addStringToCComboBox( btTracingMode, L"Tracing to file");
-	addStringToCComboBox( btTracingMode, L"Heap tracing to file");
+	addStringToCComboBox(btTracingMode, L"Circular buffer tracing");
+	addStringToCComboBox(btTracingMode, L"Tracing to file");
+	addStringToCComboBox(btTracingMode, L"Heap tracing to file");
 }
 
 _Success_( return )
@@ -303,72 +303,64 @@ bool setCComboBoxSelection( _Inout_ CComboBox* const comboBoxToSet, _In_ _In_ran
 	//CB_SETCURSEL, on failure, returns CB_ERR.
 	//The documentation suggests that -1 might be a valid argument for clearing the selection,
 	//however, it also says that if passed -1, it will return CB_ERR.
-	const int setSelectionResult = comboBoxToSet->SetCurSel( selectionToSet );
+	const int setSelectionResult = comboBoxToSet->SetCurSel(selectionToSet);
 	if (setSelectionResult == CB_ERR)
 	{
 		
-		outputPrintf( 
-					 L"Failed to set selection (for a comboBox)\n"
+		outputPrintf(L"Failed to set selection (for a comboBox)\n"
 					 L"\tIndex that we attempted to set the selection to: %i\n"
 					 L"\tCue banner of CComboBox: %s\n",
-					 selectionToSet,
-					 comboBoxToSet->GetCueBanner( ).GetString( ) //Grr. I hate CString.
-					);
+					 selectionToSet, comboBoxToSet->GetCueBanner().GetString());//Grr. I hate CString.
 		return false;
 	}
 	return true;
 }
 
 template<class DerivedButton>
-void addSingleToolToToolTip( 
-							_Inout_ CToolTipCtrl*  const toolTip,
+void addSingleToolToToolTip(_Inout_ CToolTipCtrl*  const toolTip,
 							_Inout_ DerivedButton* const btToAdd,
-							_In_z_  PCWSTR         const toolTipMessageToAdd
-						   )
+							_In_z_  PCWSTR         const toolTipMessageToAdd )
 {
 	static_assert( std::is_base_of<CWnd, DerivedButton>::value,
 				   "Cannot add a non-CWnd-derived class as a tooltip!" );
 
-	const BOOL addToolTipResult = toolTip->AddTool( btToAdd, toolTipMessageToAdd );
+	const BOOL addToolTipResult = toolTip->AddTool(btToAdd, toolTipMessageToAdd);
 	
 	if (addToolTipResult == TRUE)
 		return;
 	
-	OutputDebugStringA( "UIforETW: Failed to add a message to a tooltip!!\r\n" );
-	OutputDebugStringA( "The tooltip message:\r\n\t`" );
-	OutputDebugStringW( toolTipMessageToAdd );
-	OutputDebugStringA( "`\r\n" );
-	std::terminate( );
+	OutputDebugStringA("UIforETW: Failed to add a message to a tooltip!!\r\n");
+	OutputDebugStringA("The tooltip message:\r\n\t`");
+	OutputDebugStringW(toolTipMessageToAdd);
+	OutputDebugStringA("`\r\n");
+	std::terminate();
 }
 
 
 CRect GetWindowRectFromHwnd( _In_ const HWND hwnd )
 {
 	RECT windowRect_temp;
-	ASSERT( ::IsWindow( hwnd ) );
-	const BOOL getWindowRectResult = ::GetWindowRect( hwnd, &windowRect_temp );
+	ASSERT(::IsWindow(hwnd));
+	const BOOL getWindowRectResult = ::GetWindowRect(hwnd, &windowRect_temp);
 	if (getWindowRectResult == 0)
 	{
-		outputPrintf( L"GetWindowRect failed!!\n" );
-		
-		ErrorHandling::outputErrorDebug( );
-
-		std::terminate( );
+		outputPrintf(L"GetWindowRect failed!!\n");
+		ErrorHandling::outputErrorDebug();
+		std::terminate();
 	}
 
-	return CRect( windowRect_temp );
+	return windowRect_temp;
 }
 
 void SetSaveTraceBuffersWindowText( _In_ const HWND hWnd )
 {
-	const BOOL btSaveTbSetTextResult = ::SetWindowTextW( hWnd, L"Sa&ve Trace Buffers");
+	const BOOL btSaveTbSetTextResult = ::SetWindowTextW(hWnd, L"Sa&ve Trace Buffers");
 	if (btSaveTbSetTextResult == 0)
 	{
-		outputPrintf( L"::SetWindowTextW( btSaveTraceBuffers_.m_hWnd, "
-					  L"L\"Sa&ve Trace Buffers\" failed!!!\n"
-					);
-		ErrorHandling::outputErrorDebug( );
-		std::terminate( );
+		outputPrintf(L"::SetWindowTextW( btSaveTraceBuffers_.m_hWnd, "
+					 L"L\"Sa&ve Trace Buffers\" failed!!!\n" );
+		ErrorHandling::outputErrorDebug();
+		std::terminate();
 	}
 
 }
@@ -398,12 +390,12 @@ bool appendAboutBoxToSystemMenu( _In_ const CWnd& window )
 	ATLASSERT(bNameValid);
 	if (bNameValid == 0)
 	{
-		outputPrintf( L"Failed to load about box menu string!!\n" );
+		outputPrintf(L"Failed to load about box menu string!!\n");
 		return false;
 	}
-	if (strAboutMenu.IsEmpty( ))
+	if (strAboutMenu.IsEmpty())
 	{
-		outputPrintf( L"About box string is empty?!?!\n" );
+		outputPrintf(L"About box string is empty?!?!\n");
 		return false;
 	}
 
@@ -412,13 +404,13 @@ bool appendAboutBoxToSystemMenu( _In_ const CWnd& window )
 	const BOOL appendSeparatorResult = pSysMenu->AppendMenu(MF_SEPARATOR);
 	if (appendSeparatorResult == 0)
 	{
-		outputPrintf( L"Failed to append separator to menu!\n" );
+		outputPrintf(L"Failed to append separator to menu!\n");
 		return false;
 	}
 	const BOOL appendAboutBoxResult = pSysMenu->AppendMenu(MF_STRING, IDM_ABOUTBOX, strAboutMenu);
 	if (appendAboutBoxResult == 0)
 	{
-		outputPrintf( L"Failed to append about box string to menu!\n" );
+		outputPrintf(L"Failed to append about box string to menu!\n");
 		return false;
 	}
 
@@ -428,7 +420,7 @@ bool appendAboutBoxToSystemMenu( _In_ const CWnd& window )
 
 void checkETWCompatibility( )
 {
-	if (!IsWindowsVistaOrGreater( ))
+	if (!IsWindowsVistaOrGreater())
 	{
 		AfxMessageBox(L"ETW tracing requires Windows Vista or above.");
 		exit(10);
@@ -436,19 +428,16 @@ void checkETWCompatibility( )
 	return;
 }
 
-void CheckDialogButtons( 
-						_In_ CWnd* const dlgToCheck,
-						_In_ const bool bCompress,
+void CheckDialogButtons(_In_ CWnd* const dlgToCheck, _In_ const bool bCompress,
 						_In_ const bool bCswitchStacks,
 						_In_ const bool bSampledStacks,
 						_In_ const bool bFastSampling,
 						_In_ const bool bGPUTracing,
-						_In_ const bool bShowCommands
-					   )
+						_In_ const bool bShowCommands )
 {
 	//This MFC function (CheckDlgButton) doesn't properly check return codes for internal calls.
-	dlgToCheck->CheckDlgButton(IDC_COMPRESSTRACE, bCompress );
-	dlgToCheck->CheckDlgButton(IDC_CONTEXTSWITCHCALLSTACKS, bCswitchStacks );
+	dlgToCheck->CheckDlgButton(IDC_COMPRESSTRACE, bCompress);
+	dlgToCheck->CheckDlgButton(IDC_CONTEXTSWITCHCALLSTACKS, bCswitchStacks);
 	dlgToCheck->CheckDlgButton(IDC_CPUSAMPLINGCALLSTACKS, bSampledStacks);
 	dlgToCheck->CheckDlgButton(IDC_FASTSAMPLING, bFastSampling);
 	dlgToCheck->CheckDlgButton(IDC_GPUTRACING, bGPUTracing);
@@ -457,12 +446,11 @@ void CheckDialogButtons(
 
 HACCEL loadAcceleratorWrapper( _In_ const HINSTANCE instance, _In_z_ PCTSTR acceleratorTableName )
 {
-	const HACCEL hAccel = LoadAccelerators( instance, acceleratorTableName );
+	const HACCEL hAccel = LoadAccelerators(instance, acceleratorTableName);
 	if (hAccel == NULL)
 	{
-		outputPrintf( L"Failed to load accelerators from table: %s\n", acceleratorTableName );
-		const DWORD lastErr = GetLastError( );
-		ErrorHandling::outputPrintfErrorDebug( lastErr );
+		outputPrintf(L"Failed to load accelerators from table: %s\n", acceleratorTableName);
+		ErrorHandling::outputPrintfErrorDebug();
 	}
 	return hAccel;
 }
@@ -470,30 +458,30 @@ HACCEL loadAcceleratorWrapper( _In_ const HINSTANCE instance, _In_z_ PCTSTR acce
 HACCEL loadAcceleratorsForF2andESC( _In_ const HINSTANCE instance )
 {
 	// Load the F2 (rename) and ESC (silently swallow ESC) accelerators
-	return loadAcceleratorWrapper( instance, MAKEINTRESOURCE(IDR_ACCELERATORS));
+	return loadAcceleratorWrapper(instance, MAKEINTRESOURCE(IDR_ACCELERATORS));
 }
 
 HACCEL loadAcceleratorsForExitingRenaming( _In_ const HINSTANCE instance )
 {
 	// Load the Enter accelerator for exiting renaming.
-	return loadAcceleratorWrapper( instance, MAKEINTRESOURCE(IDR_RENAMEACCELERATORS));
+	return loadAcceleratorWrapper(instance, MAKEINTRESOURCE(IDR_RENAMEACCELERATORS));
 }
 
 HACCEL loadAcceleratorsForEditingTraceNotes( _In_ const HINSTANCE instance )
 {
 	// Load the accelerators for when editing trace notes.
-	return loadAcceleratorWrapper( instance, MAKEINTRESOURCE(IDR_NOTESACCELERATORS));
+	return loadAcceleratorWrapper(instance, MAKEINTRESOURCE(IDR_NOTESACCELERATORS));
 }
 
 HACCEL loadAcceleratorsForActiveTraceList( _In_ const HINSTANCE instance )
 {
 	// Load the accelerators for when the trace list is active.
-	return loadAcceleratorWrapper( instance, MAKEINTRESOURCE(IDR_TRACESACCELERATORS));
+	return loadAcceleratorWrapper(instance, MAKEINTRESOURCE(IDR_TRACESACCELERATORS));
 }
 
 std::string getChromiumSymbolPath( _In_ const bool bIsChromeDev, std::string systemDrive )
 {
-	if ( bIsChromeDev )
+	if (bIsChromeDev)
 	{
 		return ( "SRV*" + systemDrive + "http://msdl.microsoft.com/download/symbols;SRV*" + systemDrive + "symbols*https://chromium-browser-symsrv.commondatastorage.googleapis.com" );
 	}
@@ -506,25 +494,23 @@ bool setEnvironmentVariable( _In_z_ PCSTR const variableName, _In_z_ PCSTR const
 	//If [SetEnvironmentVariableA] succeeds, the return value of [SetEnvironmentVariableA] is nonzero.
 	//If the [SetEnvironmentVariableA] fails, the return value of [SetEnvironmentVariableA] is zero.
 	//To get extended error information, call GetLastError.
-	const BOOL setSymbolPathResult = SetEnvironmentVariableA( variableName, value );
+	const BOOL setSymbolPathResult = SetEnvironmentVariableA(variableName, value);
 
 	if (setSymbolPathResult == 0)
 	{
-		const DWORD err = GetLastError( );
-		outputPrintf( L"Failed to set an environment variable!\n\t"
-					  L"Attempted to set environment variable: `%S`\n\t"
-					  L"Value that we attempted to set the variable to: `%S`\n",
-					  variableName, value
-					);
-		ErrorHandling::outputPrintfErrorDebug( err );
+		outputPrintf(L"Failed to set an environment variable!\n\t"
+					 L"Attempted to set environment variable: `%S`\n\t"
+					 L"Value that we attempted to set the variable to: `%S`\n",
+					 variableName, value);
+		ErrorHandling::outputPrintfErrorDebug();
 		return false;
 	}
 
-	OutputDebugStringA( "UIforETW: Successfully set an environment variable.\r\n\t`" );
-	OutputDebugStringA( variableName );
-	OutputDebugStringA( "`\r\n\tto value: `" );
-	OutputDebugStringA( value );
-	OutputDebugStringA( "`\r\n" );
+	OutputDebugStringA("UIforETW: Successfully set an environment variable.\r\n\t`");
+	OutputDebugStringA(variableName);
+	OutputDebugStringA("`\r\n\tto value: `");
+	OutputDebugStringA(value);
+	OutputDebugStringA("`\r\n");
 
 	return true;
 }
@@ -532,25 +518,21 @@ bool setEnvironmentVariable( _In_z_ PCSTR const variableName, _In_z_ PCSTR const
 _Success_( return )
 bool setChromiumSymbolPath( _In_ const bool bChromeDeveloper, std::string systemDrive )
 {
-	const std::string symbolPath = getChromiumSymbolPath( bChromeDeveloper, systemDrive );
+	const std::string symbolPath = getChromiumSymbolPath(bChromeDeveloper, systemDrive);
 
-	outputPrintf( L"Setting _NT_SYMBOL_PATH to %S (Microsoft%s). "
-					L"Set _NT_SYMBOL_PATH yourself or toggle"
-					L"'Chrome developer' if you want different defaults.\n",
-					symbolPath.c_str( ),
-					( bChromeDeveloper ? L" plus Chrome" : L"" )
-				);
+	outputPrintf(L"Setting _NT_SYMBOL_PATH to %S (Microsoft%s). "
+				 L"Set _NT_SYMBOL_PATH yourself or toggle"
+				 L"'Chrome developer' if you want different defaults.\n",
+				symbolPath.c_str(), (bChromeDeveloper ? L" plus Chrome" : L""));
 
 
 	const bool setSymbolPathResult =
-		setEnvironmentVariable( 
-								NtSymbolEnvironmentVariableName,
-								symbolPath.c_str( )
-								);
+		setEnvironmentVariable(NtSymbolEnvironmentVariableName,
+							   symbolPath.c_str());
 
 	if (!setSymbolPathResult)
 	{
-		outputPrintf( L"Failed to set chromium symbol path!\n" );
+		outputPrintf(L"Failed to set chromium symbol path!\n");
 		return false;
 	}
 
@@ -564,23 +546,21 @@ std::wstring getRawDirectoryFromEnvironmentVariable( _In_z_ PCWSTR env )
 	//_wgetenv_s can be a bit weird.
 	//The parameter is documented as (returning):
 	//The buffer size that's required, or 0 if the variable is not found.
-	const errno_t getEnvironmentVariableLengthResult = _wgetenv_s( &returnValue_temp, NULL, 0, env );
+	const errno_t getEnvironmentVariableLengthResult = _wgetenv_s(&returnValue_temp, NULL, 0, env);
 	const rsize_t returnValue = returnValue_temp;
 	if (getEnvironmentVariableLengthResult != 0)
 	{
-		ATLASSERT( getEnvironmentVariableLengthResult != ERANGE );
-		ATLASSERT( getEnvironmentVariableLengthResult != EINVAL );
-		outputPrintf( L"Failed to get value (expected a directory)"
-					  L"of environment variable `%s`!!\n", env
-					);
+		ATLASSERT(getEnvironmentVariableLengthResult != ERANGE);
+		ATLASSERT(getEnvironmentVariableLengthResult != EINVAL);
+		outputPrintf(L"Failed to get value (expected a directory)"
+					 L"of environment variable `%s`!!\n", env);
 		return L"";
 	}
 	if (returnValue == 0)
 	{
 #ifdef DEBUG
-		outputPrintf( L"Environment variable `%s` not found - "
-					  L"(will use default directory).\n", env
-					);
+		outputPrintf(L"Environment variable `%s` not found - "
+					 L"(will use default directory).\n", env);
 #endif
 		return L"";
 	}
@@ -590,45 +570,39 @@ std::wstring getRawDirectoryFromEnvironmentVariable( _In_z_ PCWSTR env )
 	const rsize_t bufferSize = 512u;
 	
 	
-	if (( returnValue + 1 ) > bufferSize)
+	if ((returnValue + 1) > bufferSize)
 	{
 		rsize_t dynReturnValue = 0;
 		std::unique_ptr<wchar_t[ ]> dynamicBuffer =
-			std::make_unique<wchar_t[ ]>( returnValue + 1 );
+			std::make_unique<wchar_t[ ]>(returnValue + 1);
 		
 		const errno_t getEnvResult =
-			_wgetenv_s(
-						&dynReturnValue,
-						dynamicBuffer.get( ),
-						( returnValue + 1 ),
-						env
-					  );
+			_wgetenv_s(&dynReturnValue, dynamicBuffer.get(),
+					   (returnValue + 1), env);
 		
-		ATLASSERT( ( wcslen( dynamicBuffer.get( ) ) + 1 ) == dynReturnValue );
+		ATLASSERT((wcslen(dynamicBuffer.get()) + 1) == dynReturnValue);
 
 		if (getEnvResult != 0)
 		{
-			ATLASSERT( getEnvResult != ERANGE );
-			ATLASSERT( getEnvResult != EINVAL );
-			outputPrintf( L"Failed to get value (expected a directory)"
-						  L"of environment variable `%s`!!\n", env
-						);
+			ATLASSERT(getEnvResult != ERANGE);
+			ATLASSERT(getEnvResult != EINVAL);
+			outputPrintf(L"Failed to get value (expected a directory)"
+						 L"of environment variable `%s`!!\n", env);
 			return L"";
 		}
-		return dynamicBuffer.get( );
+		return dynamicBuffer.get();
 	}
 
 	rsize_t stackbufferReturnValue = 0;
-	wchar_t environmentVariableBuffer[ bufferSize ] = { 0 };
-	const errno_t getEnvResult = _wgetenv_s( &stackbufferReturnValue, environmentVariableBuffer, env );
-	ATLASSERT( ( wcslen( environmentVariableBuffer ) + 1 ) == stackbufferReturnValue );
+	wchar_t environmentVariableBuffer[bufferSize] = { 0 };
+	const errno_t getEnvResult = _wgetenv_s(&stackbufferReturnValue, environmentVariableBuffer, env);
+	ATLASSERT((wcslen(environmentVariableBuffer ) + 1) == stackbufferReturnValue);
 	if (getEnvResult != 0)
 	{
-		ATLASSERT( getEnvResult != ERANGE );
-		ATLASSERT( getEnvResult != EINVAL );
-		outputPrintf( L"Failed to get value (expected a directory)"
-					  L"of environment variable `%s`!!\n", env
-					);
+		ATLASSERT(getEnvResult != ERANGE);
+		ATLASSERT(getEnvResult != EINVAL);
+		outputPrintf(L"Failed to get value (expected a directory)"
+					 L"of environment variable `%s`!!\n", env );
 		return L"";
 	}
 	return environmentVariableBuffer;
@@ -637,15 +611,15 @@ std::wstring getRawDirectoryFromEnvironmentVariable( _In_z_ PCWSTR env )
 std::wstring getTraceDirFromEnvironmentVariable( _In_z_ PCWSTR env, const std::wstring& default )
 {
 	
-	std::wstring rawDirectory = getRawDirectoryFromEnvironmentVariable( env );
+	std::wstring rawDirectory = getRawDirectoryFromEnvironmentVariable(env);
 
 	std::wstring result = default;
 
-	if (!rawDirectory.empty( ))
+	if (!rawDirectory.empty())
 		result = rawDirectory;
 
 	// Make sure the name ends with a backslash.
-	if (( !result.empty( ) ) && ( result[ result.size( ) - 1 ] != '\\' ))
+	if ((!result.empty()) && (result[ result.size( ) - 1 ] != '\\'))
 		result += '\\';
 
 	return result;
@@ -665,7 +639,7 @@ bool enhancedCreateDirectory( _In_ std::wstring pathName )
 	//TODO: what if network path?
 	//should we check if just starts with L"\\\\"?
 	if (pathName.compare( 0, 4, L"\\\\?\\" ) != 0)
-		pathName = ( L"\\\\?\\" + pathName );
+		pathName = (L"\\\\?\\" + pathName);
 
 	const std::wstring& longPath = pathName;
 
@@ -675,19 +649,19 @@ bool enhancedCreateDirectory( _In_ std::wstring pathName )
 	//Possible errors include the following:
 	//    ERROR_ALREADY_EXISTS
 	//    ERROR_PATH_NOT_FOUND
-	const BOOL directoryCreated = CreateDirectoryW( longPath.c_str( ), NULL );
+	const BOOL directoryCreated = CreateDirectoryW(longPath.c_str( ), NULL);
 
 	if (directoryCreated != 0)
 		return true;
 
-	const DWORD lastErr = GetLastError( );
+	const DWORD lastErr = GetLastError();
 	if (lastErr == ERROR_ALREADY_EXISTS)
 		return false;
 
 	if (lastErr == ERROR_PATH_NOT_FOUND)
 		return false;
 
-	handleUnexpectedCreateDirectory( longPath, lastErr );
+	handleUnexpectedCreateDirectory(longPath, lastErr);
 	return false;
 }
 
@@ -698,7 +672,7 @@ bool isValidDirectory( _In_ std::wstring path )
 	{
 		//[PathIsDirectory] returns (BOOL)FILE_ATTRIBUTE_DIRECTORY if the path 
 		//is a valid directory; otherwise, FALSE.
-		const BOOL pathIsDir = PathIsDirectoryW( path.c_str( ) );
+		const BOOL pathIsDir = PathIsDirectoryW(path.c_str());
 		if (pathIsDir == ( (BOOL)( FILE_ATTRIBUTE_DIRECTORY ) ))
 		{
 			return true;
@@ -709,31 +683,30 @@ bool isValidDirectory( _In_ std::wstring path )
 	//TODO: what if network path?
 	//should we check if just starts with L"\\\\"?
 	if (path.compare( 0, 4, L"\\\\?\\" ) != 0)
-		path = ( L"\\\\?\\" + path );
+		path = (L"\\\\?\\" + path);
 
 	const std::wstring& longPath = path;
-	const bool isPathAtAllValid = isValidPathToFSObject( longPath );
+	const bool isPathAtAllValid = isValidPathToFSObject(longPath);
 
 	if (!isPathAtAllValid)
 		return false;
 
 	//If [GetFileAttributes] fails, the return value is INVALID_FILE_ATTRIBUTES.
 	//To get extended error information, call GetLastError.
-	const DWORD pathAttributes = GetFileAttributesW( longPath.c_str( ) );
+	const DWORD pathAttributes = GetFileAttributesW(longPath.c_str());
 	if (pathAttributes == INVALID_FILE_ATTRIBUTES)
 	{
-		const DWORD lastErr = GetLastError( );
+		const DWORD lastErr = GetLastError();
 		if (lastErr == ERROR_BAD_NETPATH)
 		{
-			outputPrintf( L"Oops! %s is NOT a valid directory, "
-						  L"it's a network share! GetFileAttributes "
-						  L"needs a subfolder of it!\n", longPath.c_str( )
-						);
+			outputPrintf(L"Oops! %s is NOT a valid directory, "
+						 L"it's a network share! GetFileAttributes "
+						 L"needs a subfolder of it!\n", longPath.c_str( ));
 		}
 		return false;
 	}
 
-	if (( pathAttributes & FILE_ATTRIBUTE_DIRECTORY ) == 0)
+	if ((pathAttributes & FILE_ATTRIBUTE_DIRECTORY) == 0)
 		return false;
 
 	//all tests passed!
@@ -794,7 +767,7 @@ void addGPUTracingProviders( _Inout_ std::wstring* const userProviders )
 {
 	// Apparently we need a different provider for graphics profiling
 	// on Windows 8 and above.
-	if (IsWindows8OrGreater( ))
+	if (IsWindows8OrGreater())
 	{
 		// This provider is needed for GPU profiling on Windows 8+
 		(*userProviders) += L"+Microsoft-Windows-DxgKrnl:0xFFFF:5";
@@ -853,15 +826,15 @@ std::wstring getWindowsDirectory( )
 	PWSTR windowsDir = nullptr;
 
 	const HRESULT windowsDirectoryResult =
-		SHGetKnownFolderPath( FOLDERID_Windows, 0, NULL, &windowsDir );
-	if (FAILED( windowsDirectoryResult ))
+		SHGetKnownFolderPath(FOLDERID_Windows, 0, NULL, &windowsDir);
+	if (FAILED(windowsDirectoryResult))
 	{
-		debug::Alias( &windowsDir );
-		debug::Alias( &FOLDERID_Windows );
-		std::terminate( );
+		debug::Alias(&windowsDir);
+		debug::Alias(&FOLDERID_Windows);
+		std::terminate();
 	}
 	
-	std::wstring windowsDirectory( L"\\\\?\\" + std::wstring( windowsDir ) );
+	std::wstring windowsDirectory(L"\\\\?\\" + std::wstring(windowsDir));
 	
 
 	//Fun fact:
@@ -883,25 +856,23 @@ std::wstring getWPTDir( )
 	PWSTR progFilesx86Dir = nullptr;
 
 	const HRESULT progFilesResult =
-		SHGetKnownFolderPath( FOLDERID_ProgramFilesX86, 0, NULL, &progFilesx86Dir );
-	if (FAILED( progFilesResult ))
+		SHGetKnownFolderPath(FOLDERID_ProgramFilesX86, 0, NULL, &progFilesx86Dir);
+	if (FAILED(progFilesResult))
 	{
-		debug::Alias( &progFilesx86Dir );
-		debug::Alias( &FOLDERID_Windows );
-		std::terminate( );
+		debug::Alias(&progFilesx86Dir);
+		debug::Alias(&FOLDERID_Windows);
+		std::terminate();
 	}
 
-	std::wstring wptDir( L"\\\\?\\" + std::wstring( progFilesx86Dir ) );
+	std::wstring wptDir(L"\\\\?\\" + std::wstring(progFilesx86Dir));
 	CoTaskMemFree(progFilesx86Dir);
 	wptDir += L"\\Windows Kits\\8.1\\Windows Performance Toolkit\\";
 
 	if (!isValidPathToFSObject(wptDir))
 	{
-		AfxMessageBox( ( wptDir + L" does not exist. Please install WPT 8.1. Exiting." ).c_str( ) );
+		AfxMessageBox((wptDir + L" does not exist. Please install WPT 8.1. Exiting.").c_str());
 		exit(10);
 	}
-
-
 	return wptDir;
 }
 
@@ -912,19 +883,19 @@ std::wstring getDocumentsPath( )
 
 	//We want to CREATE IT if it doesn't exist??!?
 	const HRESULT shGetMyDocResult =
-		SHGetKnownFolderPath( FOLDERID_Documents, 0, NULL, &documents_temp );
+		SHGetKnownFolderPath(FOLDERID_Documents, 0, NULL, &documents_temp);
 
-	if (FAILED( shGetMyDocResult ))
+	if (FAILED(shGetMyDocResult))
 	{
-		debug::Alias( &documents_temp );
-		debug::Alias( &FOLDERID_Windows );
-		std::terminate( );
+		debug::Alias(&documents_temp);
+		debug::Alias(&FOLDERID_Windows);
+		std::terminate();
 	}
 
 	
 	//request Unicode (long-path compatible) versions of APIs
-	const std::wstring documents( L"\\\\?\\" + std::wstring( documents_temp ) );
-	CoTaskMemFree( documents_temp );
+	const std::wstring documents(L"\\\\?\\" + std::wstring(documents_temp));
+	CoTaskMemFree(documents_temp);
 	
 	return documents;
 }
@@ -951,9 +922,9 @@ void CUIforETWDlg::vprintf(PCWSTR pFormat, va_list args)
 
 	for (PCWSTR pBuf = buffer; *pBuf; ++pBuf)
 	{
-		ATLASSERT( pBuf < ( buffer + _countof( buffer ) ) );
-		if ( pBuf >= ( buffer + _countof( buffer ) ) )
-			std::terminate( );
+		ATLASSERT(pBuf < (buffer + ARRAYSIZE(buffer)));
+		if (pBuf >= (buffer + ARRAYSIZE(buffer)))
+			std::terminate();
 
 		// Need \r\n as a line separator.
 		if (pBuf[0] == '\n')
@@ -993,8 +964,8 @@ CUIforETWDlg::CUIforETWDlg(_In_opt_ CWnd* pParent )
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 	if (m_hIcon == NULL)
 	{
-		OutputDebugStringA( "UIforETW: failed to load icon IDR_MAINFRAME!\r\n" );
-		std::terminate( );
+		OutputDebugStringA("UIforETW: failed to load icon IDR_MAINFRAME!\r\n");
+		std::terminate();
 	}
 
 
@@ -1022,7 +993,7 @@ void CUIforETWDlg::ShutdownTasks()
 	// Stop ETW tracing when we shut down.
 	if (bIsTracing_)
 	{
-		StopTracingAndMaybeRecord( false );
+		StopTracingAndMaybeRecord(false);
 	}
 
 	// Forcibly clear the heap tracing registry keys.

@@ -46,9 +46,7 @@ ChildProcess::~ChildProcess()
 	{
 		const DWORD exitCode = GetExitCode();
 		if (exitCode)
-		{
 			outputPrintf( L"Process exit code was %08x (%lu)\n", exitCode, exitCode );
-		}
 		handle_close::closeHandle(hProcess_);
 	}
 	if (hOutputAvailable_)
@@ -95,9 +93,7 @@ DWORD ChildProcess::ListenerThread()
 		while (ReadFile(hPipe_, buffer, sizeof(buffer) - 1, &dwRead, NULL) != FALSE)
 		{
 			if (dwRead >= bufferSize)
-			{
 				std::terminate( );
-			}
 			if (dwRead > 0)
 			{
 				CSingleLock locker(&outputLock_);
