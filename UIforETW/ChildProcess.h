@@ -65,7 +65,6 @@ private:
 	// The processOutput_ string is written to by the listener thread.
 	// Don't modify processOutput_ without acquiring the lock.
 	CCriticalSection outputLock_;
-	
 	//This annotation is commented out because /analyze doesn't
 	//properly understand it.
 	/*_Guarded_by_( outputLock_ )*/

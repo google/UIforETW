@@ -352,7 +352,6 @@ void SetSaveTraceBuffersWindowText( _In_ const HWND hWnd )
 	}
 }
 
-
 bool appendAboutBoxToSystemMenu( _In_ const CWnd& window )
 {
 	// Add "About..." menu item to system menu.
@@ -1062,13 +1061,10 @@ void CUIforETWDlg::SetSymbolPath()
 	//[getenv_s returns] zero if successful; otherwise, an error code on failure.
 	const errno_t getSymCachePathResult =
 		getenv_s(&sizeRequired, NULL, 0, NtSymCacheEnvironmentVariableName);
-	
 	if (getSymCachePathResult != 0)
 	{
-		//getenv_s failed!
 		return;
 	}
-
 	if (sizeRequired != 0)
 	{
 		OutputDebugStringA("UIforETW: _NT_SYMCACHE_PATH was found! "
@@ -1096,9 +1092,8 @@ BOOL CUIforETWDlg::OnInitDialog()
 
 	initialWidth_ = windowRect.Width();
 	lastWidth_    = windowRect.Width();
-
 	initialHeight_ = windowRect.Height();
-	lastHeight_ = windowRect.Height();
+	lastHeight_    = windowRect.Height();
 
 	// Win+Ctrl+C is used to trigger recording of traces. This is compatible with
 	// wprui. If this is changed then be sure to change the button text.
@@ -1117,7 +1112,6 @@ BOOL CUIforETWDlg::OnInitDialog()
 	}
 
 	checkETWCompatibility();
-
 	windowsDir_ = getWindowsDirectory();
 
 	// ANSI string, not unicode.
@@ -1125,26 +1119,19 @@ BOOL CUIforETWDlg::OnInitDialog()
 	systemDrive_ += ":\\";
 
 	wptDir_ = getWPTDir();
-
 	std::wstring documents = getDocumentsPath();
 
 	std::wstring defaultTraceDir = documents + std::wstring(L"\\etwtraces\\");
 	traceDir_ = GetDirectory(L"etwtracedir", defaultTraceDir);
-
 	const bool copyToDirResult =
 		copyWpaProfileToExecutableDirectory(documents, GetExeDir());
-	
 	if (!copyToDirResult)
 	{
 		std::terminate();
 	}
-
 	tempTraceDir_ = GetDirectory(L"temp", traceDir_);
-
 	SetSymbolPath();
-
 	btTraceNameEdit_.GetWindowRect(&traceNameEditRect_);
-
 	ScreenToClient(&traceNameEditRect_);
 
 	// Set the icon for this dialog. The framework does this automatically
@@ -1160,8 +1147,6 @@ BOOL CUIforETWDlg::OnInitDialog()
 
 	CheckDialogButtons(this, bCompress_, bCswitchStacks_, bSampledStacks_, 
 						bFastSampling_, bGPUTracing_, bShowCommands_);
-
-
 
 	// If a fast sampling speed is requested then set it now.
 	//**Note that this assumes that the speed will otherwise be normal**.
@@ -1231,7 +1216,6 @@ void CUIforETWDlg::initializeToolTip( )
 	addSingleToolToToolTip(&toolTip_, &btTraceNotes_, TraceNotesString);
 }
 
-
 std::wstring CUIforETWDlg::GetDirectory( _In_z_ PCWSTR env, const std::wstring& default)
 {
 	// Get a directory (from an environment variable, if set) and make sure it exists.
@@ -1264,7 +1248,6 @@ void CUIforETWDlg::RegisterProviders()
 	PCWSTR temp = _wgetenv(L"temp");
 	if (!temp)
 		return;
-
 	std::wstring dllDest = temp;
 	dllDest += L"\\ETWProviders.dll";
 	if (!CopyFile(dllSource.c_str(), dllDest.c_str(), FALSE))
@@ -1272,7 +1255,6 @@ void CUIforETWDlg::RegisterProviders()
 		outputPrintf(L"Registering of ETW providers failed due to copy error.\n");
 		return;
 	}
-
 	wchar_t systemDir[MAX_PATH];
 	GetSystemDirectory(systemDir, ARRAYSIZE(systemDir));
 	std::wstring wevtPath = systemDir + std::wstring(L"\\wevtutil.exe");
@@ -1399,7 +1381,6 @@ std::wstring CUIforETWDlg::GetExeDir() const
 	//If [GetModuleFileName] fails, the return value is 0 (zero).
 	//To get extended error information, call GetLastError.
 	const DWORD moduleFileNameResult = GetModuleFileNameW(NULL, exePath, ARRAYSIZE(exePath));
-
 	//    If the buffer is too small to hold the module name,
 	//        the function returns nSize, 
 	//        the function sets the last error to ERROR_INSUFFICIENT_BUFFER.
@@ -1434,12 +1415,10 @@ std::wstring CUIforETWDlg::GenerateResultFilename() const
 	PCWSTR username_temp = NULL;
 	wchar_t usernameBuffer[MAX_PATH] = { 0 };
 	size_t usernameReturnValue = 0;
-	
 	//[_wgetenv_s returns] Zero if successful.
 	const errno_t getUsernameResult = _wgetenv_s(&usernameReturnValue, usernameBuffer, L"USERNAME");
 	if (getUsernameResult == 0)
 		username_temp = usernameBuffer;
-
 	PCWSTR const username = username_temp;
 
 	//MAX_PATH is safe here, single file name component is limited to MAX_PATH;
@@ -1455,7 +1434,6 @@ std::wstring CUIforETWDlg::GenerateResultFilename() const
 	const bool validDateStr = (3 == sscanf_s(date, "%d/%d/%d", &month, &day, &year));
 
 	std::wstring filePart;
-
 	if (validTimeStr && validDateStr)
 	{
 		// The filenames are chosen to sort by date, with username as the LSB.
@@ -1480,11 +1458,9 @@ std::wstring CUIforETWDlg::GenerateResultFilename() const
 	return GetTraceDir() + filePart + L".etl";
 }
 
-_Pre_satisfies_( 
-				( tracingMode_ == kTracingToMemory   ) ||
+_Pre_satisfies_(( tracingMode_ == kTracingToMemory   ) ||
 				( tracingMode_ == kTracingToFile     ) ||
-				( tracingMode_ == kHeapTracingToFile )
-			   )
+				( tracingMode_ == kHeapTracingToFile ))
 void CUIforETWDlg::OnBnClickedStarttracing()
 {
 	RegisterProviders();
@@ -1496,16 +1472,12 @@ void CUIforETWDlg::OnBnClickedStarttracing()
 		outputPrintf(L"\nStarting heap tracing to disk of %s...\n", heapTracingExe_.c_str());
 	else
 		std::terminate();
-
 	const std::wstring kernelStackWalk =
 		getKernelStackWalk(bSampledStacks_, bCswitchStacks_);
-	
 	const std::wstring kernelFile =
 		getKernelFile(tracingMode_, GetKernelFile());
-
 	const std::wstring kernelArgs =
 		getKernelArgs(kernelStackWalk, kernelFile, GetKernelLogger());
-
 	std::wstring userProviders = getBaseUserProviders();
 
 	// DWM providers can be helpful also. Uncomment to enable.
@@ -1535,15 +1507,12 @@ void CUIforETWDlg::OnBnClickedStarttracing()
 	std::wstring heapFile = L" -f \"" + GetHeapFile() + L"\"";
 	std::wstring heapStackWalk = getHeapStackWalk(bHeapStacks_);
 	std::wstring heapArgs = getHeapArgs(heapStackWalk, heapBuffers, heapFile);
-	
-
 	{
 		ChildProcess child(GetXperfPath());
 		if (tracingMode_ == kHeapTracingToFile)
 			child.Run(bShowCommands_, L"xperf.exe" + kernelArgs + userArgs + heapArgs);
 		else
 			child.Run(bShowCommands_, L"xperf.exe" + kernelArgs + userArgs);
-
 		DWORD exitCode = child.GetExitCode();
 		if (exitCode)
 		{
@@ -1554,7 +1523,6 @@ void CUIforETWDlg::OnBnClickedStarttracing()
 			outputPrintf(L"Tracing is started.\n");
 		}
 	}
-
 	{
 		// Run -capturestate on the user-mode loggers, for reliable captures.
 		// If this step is skipped then GPU usage data will not be recorded on
@@ -1583,7 +1551,6 @@ void CUIforETWDlg::StopTracingAndMaybeRecord(bool bSaveTrace)
 	// https://randomascii.wordpress.com/2015/03/02/profiling-the-profiler-working-around-a-six-minute-xperf-hang/
 	const std::wstring compatFile = windowsDir_ + L"AppCompat\\Programs\\Amcache.hve";
 	const std::wstring compatFileTemp = windowsDir_ + L"AppCompat\\Programs\\Amcache_temp.hve";
-
 	const bool isExistingTempFile = isValidPathToFSObject(compatFileTemp);
 	if (isExistingTempFile)
 	{
