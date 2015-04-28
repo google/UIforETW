@@ -143,11 +143,9 @@ bool ChildProcess::Run(bool showCommand, std::wstring args)
 	DWORD flags = CREATE_NO_WINDOW;
 	// Wacky CreateProcess rules say args has to be writable!
 	std::vector<wchar_t> argsCopy(args.size() + 1);
-
 	const int res = wcscpy_s(&argsCopy[0], argsCopy.size(), args.c_str());
 	if ( res != 0 )
 		std::terminate( );
-
 	const BOOL success = CreateProcess(exePath_.c_str(), &argsCopy[0], NULL, NULL,
 		TRUE, flags, NULL, NULL, &startupInfo, &processInfo);
 	if (success)

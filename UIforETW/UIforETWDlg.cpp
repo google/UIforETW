@@ -132,9 +132,7 @@ void handleUnexpectedCreateDirectory( _In_ const std::wstring& path, _In_ const 
 						"UIforETW:\tAttempting to create folder:" );
 	OutputDebugStringW( path.c_str( ) );
 	OutputDebugStringA( "\r\n" );
-
 	ErrorHandling::outputErrorDebug( lastErr );
-
 	std::terminate( );
 }
 
@@ -172,10 +170,8 @@ bool enhancedFileExists( _In_ const std::wstring& path )
 		return true;
 
 	const DWORD lastErr = GetLastError();
-
 	if (lastErr == ERROR_FILE_NOT_FOUND)
 		return false;
-
 	if (lastErr == ERROR_PATH_NOT_FOUND)
 		return false;
 
@@ -202,14 +198,11 @@ bool enhancedExistCheckGetFileAttributes( _In_ const std::wstring path )
 	const DWORD lastErr = GetLastError( );
 	if (lastErr == ERROR_FILE_NOT_FOUND)
 		return false;
-
 	if (lastErr == ERROR_PATH_NOT_FOUND)
 		return false;
-
 	dieUnexpectedErrorGetFileAttributes(path.c_str(), lastErr);
 	//doesn't exist?
 	return false;
-
 }
 
 bool isValidPathToFSObject( _In_ std::wstring path )
@@ -224,7 +217,6 @@ bool isValidPathToFSObject( _In_ std::wstring path )
 		path = (L"\\\\?\\" + path);
 
 	const std::wstring& longPath = path;
-
 	return enhancedExistCheckGetFileAttributes(longPath);
 }
 
@@ -255,7 +247,6 @@ bool copyWpaProfileToExecutableDirectory( _In_ const std::wstring& documents, _I
 		return false;
 
 	return true;
-
 }
 
 void addStringToCComboBox( _Inout_ CComboBox* const comboBox, _In_z_ PCWSTR const stringToAdd )
@@ -306,7 +297,6 @@ bool setCComboBoxSelection( _Inout_ CComboBox* const comboBoxToSet, _In_ _In_ran
 	const int setSelectionResult = comboBoxToSet->SetCurSel(selectionToSet);
 	if (setSelectionResult == CB_ERR)
 	{
-		
 		outputPrintf(L"Failed to set selection (for a comboBox)\n"
 					 L"\tIndex that we attempted to set the selection to: %i\n"
 					 L"\tCue banner of CComboBox: %s\n",
@@ -328,7 +318,6 @@ void addSingleToolToToolTip(_Inout_ CToolTipCtrl*  const toolTip,
 	
 	if (addToolTipResult == TRUE)
 		return;
-	
 	OutputDebugStringA("UIforETW: Failed to add a message to a tooltip!!\r\n");
 	OutputDebugStringA("The tooltip message:\r\n\t`");
 	OutputDebugStringW(toolTipMessageToAdd);
@@ -348,7 +337,6 @@ CRect GetWindowRectFromHwnd( _In_ const HWND hwnd )
 		ErrorHandling::outputErrorDebug();
 		std::terminate();
 	}
-
 	return windowRect_temp;
 }
 
@@ -362,7 +350,6 @@ void SetSaveTraceBuffersWindowText( _In_ const HWND hWnd )
 		ErrorHandling::outputErrorDebug();
 		std::terminate();
 	}
-
 }
 
 
@@ -399,7 +386,6 @@ bool appendAboutBoxToSystemMenu( _In_ const CWnd& window )
 		return false;
 	}
 
-
 	//[CWnd::AppendMenu returns] nonzero if the function is successful; otherwise 0.
 	const BOOL appendSeparatorResult = pSysMenu->AppendMenu(MF_SEPARATOR);
 	if (appendSeparatorResult == 0)
@@ -413,9 +399,7 @@ bool appendAboutBoxToSystemMenu( _In_ const CWnd& window )
 		outputPrintf(L"Failed to append about box string to menu!\n");
 		return false;
 	}
-
 	return true;
-
 }
 
 void checkETWCompatibility( )
@@ -505,13 +489,11 @@ bool setEnvironmentVariable( _In_z_ PCSTR const variableName, _In_z_ PCSTR const
 		ErrorHandling::outputPrintfErrorDebug();
 		return false;
 	}
-
 	OutputDebugStringA("UIforETW: Successfully set an environment variable.\r\n\t`");
 	OutputDebugStringA(variableName);
 	OutputDebugStringA("`\r\n\tto value: `");
 	OutputDebugStringA(value);
 	OutputDebugStringA("`\r\n");
-
 	return true;
 }
 
@@ -524,19 +506,14 @@ bool setChromiumSymbolPath( _In_ const bool bChromeDeveloper, std::string system
 				 L"Set _NT_SYMBOL_PATH yourself or toggle"
 				 L"'Chrome developer' if you want different defaults.\n",
 				symbolPath.c_str(), (bChromeDeveloper ? L" plus Chrome" : L""));
-
-
 	const bool setSymbolPathResult =
 		setEnvironmentVariable(NtSymbolEnvironmentVariableName,
 							   symbolPath.c_str());
-
 	if (!setSymbolPathResult)
 	{
 		outputPrintf(L"Failed to set chromium symbol path!\n");
 		return false;
 	}
-
-
 	return true;
 }
 
@@ -568,20 +545,15 @@ std::wstring getRawDirectoryFromEnvironmentVariable( _In_z_ PCWSTR env )
 	// Get a directory (from an environment variable, if set) and make sure it exists.
 	//std::wstring result = default;
 	const rsize_t bufferSize = 512u;
-	
-	
 	if ((returnValue + 1) > bufferSize)
 	{
 		rsize_t dynReturnValue = 0;
 		std::unique_ptr<wchar_t[ ]> dynamicBuffer =
 			std::make_unique<wchar_t[ ]>(returnValue + 1);
-		
 		const errno_t getEnvResult =
 			_wgetenv_s(&dynReturnValue, dynamicBuffer.get(),
 					   (returnValue + 1), env);
-		
 		ATLASSERT((wcslen(dynamicBuffer.get()) + 1) == dynReturnValue);
-
 		if (getEnvResult != 0)
 		{
 			ATLASSERT(getEnvResult != ERANGE);
@@ -610,9 +582,7 @@ std::wstring getRawDirectoryFromEnvironmentVariable( _In_z_ PCWSTR env )
 
 std::wstring getTraceDirFromEnvironmentVariable( _In_z_ PCWSTR env, const std::wstring& default )
 {
-	
 	std::wstring rawDirectory = getRawDirectoryFromEnvironmentVariable(env);
-
 	std::wstring result = default;
 
 	if (!rawDirectory.empty())
@@ -621,9 +591,7 @@ std::wstring getTraceDirFromEnvironmentVariable( _In_z_ PCWSTR env, const std::w
 	// Make sure the name ends with a backslash.
 	if ((!result.empty()) && (result[ result.size( ) - 1 ] != '\\'))
 		result += '\\';
-
 	return result;
-
 }
 
 
@@ -653,11 +621,9 @@ bool enhancedCreateDirectory( _In_ std::wstring pathName )
 
 	if (directoryCreated != 0)
 		return true;
-
 	const DWORD lastErr = GetLastError();
 	if (lastErr == ERROR_ALREADY_EXISTS)
 		return false;
-
 	if (lastErr == ERROR_PATH_NOT_FOUND)
 		return false;
 
@@ -679,7 +645,6 @@ bool isValidDirectory( _In_ std::wstring path )
 		}
 		return false;
 	}
-
 	//TODO: what if network path?
 	//should we check if just starts with L"\\\\"?
 	if (path.compare( 0, 4, L"\\\\?\\" ) != 0)
@@ -690,7 +655,6 @@ bool isValidDirectory( _In_ std::wstring path )
 
 	if (!isPathAtAllValid)
 		return false;
-
 	//If [GetFileAttributes] fails, the return value is INVALID_FILE_ATTRIBUTES.
 	//To get extended error information, call GetLastError.
 	const DWORD pathAttributes = GetFileAttributesW(longPath.c_str());
@@ -705,10 +669,8 @@ bool isValidDirectory( _In_ std::wstring path )
 		}
 		return false;
 	}
-
 	if ((pathAttributes & FILE_ATTRIBUTE_DIRECTORY) == 0)
 		return false;
-
 	//all tests passed!
 	return true;
 }
@@ -727,7 +689,6 @@ std::wstring getKernelStackWalk( _In_ const bool bSampledStacks, _In_ const bool
 	{
 		return L" -stackwalk CSWITCH+READYTHREAD";
 	}
-
 	return L"";
 }
 
@@ -735,7 +696,6 @@ std::wstring getKernelFile( _In_ const TracingMode tracingMode, _In_ const std::
 {
 	if (tracingMode == kTracingToMemory)
 		return L" -buffering";
-
 	return L" -f \"" + kf + L"\"";
 }
 
@@ -747,7 +707,6 @@ std::wstring getKernelArgs( _In_ const std::wstring kernelStackWalk, _In_ const 
 	// Buffer sizes are in KB, so 1024 is actually 1 MB
 	// Make this configurable.
 	const std::wstring kernelBuffers = L" -buffersize 1024 -minbuffers 600 -maxbuffers 600";
-
 	return L" -start " + kernelLogger + L" -on" + kernelProviders + kernelStackWalk + kernelBuffers + kernelFile;
 }
 
@@ -783,7 +742,6 @@ void addGPUTracingProviders( _Inout_ std::wstring* const userProviders )
 		// DirectX logger:
 		(*userProviders) += L"+DX:0x2F";
 	}
-
 }
 
 std::wstring getUserBuffers( _In_ const bool bGPUTracing )
@@ -791,7 +749,6 @@ std::wstring getUserBuffers( _In_ const bool bGPUTracing )
 	// Increase the user buffer sizes when doing graphics tracing.
 	if (bGPUTracing)
 		return L" -buffersize 1024 -minbuffers 200 -maxbuffers 200";
-
 	return L" -buffersize 1024 -minbuffers 100 -maxbuffers 100";
 }
 
@@ -833,9 +790,8 @@ std::wstring getWindowsDirectory( )
 		debug::Alias(&FOLDERID_Windows);
 		std::terminate();
 	}
-	
+
 	std::wstring windowsDirectory(L"\\\\?\\" + std::wstring(windowsDir));
-	
 
 	//Fun fact:
 	//CoTaskMemFree is annotated with:
@@ -843,9 +799,7 @@ std::wstring getWindowsDirectory( )
 	//Where Mem is windowsDir
 	CoTaskMemFree(windowsDir);
 
-	//BUGBUG: WTF??? Why not L'\\';??
 	windowsDirectory += '\\';
-	
 	return windowsDirectory;
 }
 
@@ -884,7 +838,6 @@ std::wstring getDocumentsPath( )
 	//We want to CREATE IT if it doesn't exist??!?
 	const HRESULT shGetMyDocResult =
 		SHGetKnownFolderPath(FOLDERID_Documents, 0, NULL, &documents_temp);
-
 	if (FAILED(shGetMyDocResult))
 	{
 		debug::Alias(&documents_temp);
@@ -892,17 +845,13 @@ std::wstring getDocumentsPath( )
 		std::terminate();
 	}
 
-	
 	//request Unicode (long-path compatible) versions of APIs
 	const std::wstring documents(L"\\\\?\\" + std::wstring(documents_temp));
 	CoTaskMemFree(documents_temp);
-	
 	return documents;
 }
 
-
 }// namespace {
-
 
 // This convenient hack function is so that the ChildProcess code can
 // print to the main output window. This function can only be called
@@ -965,8 +914,6 @@ CUIforETWDlg::CUIforETWDlg(_In_opt_ CWnd* pParent )
 		OutputDebugStringA("UIforETW: failed to load icon IDR_MAINFRAME!\r\n");
 		std::terminate();
 	}
-
-
 	TransferSettings(false);
 }
 
@@ -1128,7 +1075,6 @@ void CUIforETWDlg::SetSymbolPath()
 						   "No work necessary!\r\n");
 		return;
 	}
-
 	setEnvironmentVariable(NtSymCacheEnvironmentVariableName, DefaultSymbolCachePath);
 }
 
@@ -1471,7 +1417,6 @@ std::wstring CUIforETWDlg::GetExeDir() const
 		lastSlash[1] = 0;
 		return exePath;
 	}
-
 	exit(10);
 }
 
