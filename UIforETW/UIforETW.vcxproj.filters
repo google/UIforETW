@@ -71,9 +71,6 @@
     <ClCompile Include="Utility.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="About.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Settings.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
