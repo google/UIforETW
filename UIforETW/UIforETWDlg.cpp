@@ -141,7 +141,7 @@ void handleUnexpectedCreateDirectory( _In_ const std::wstring& path, _In_ const 
 
 //Compiler didn't eliminate code for std::wstring
 //Seems to generate better code when passed a PCWSTR for path.
-void handleUnexpectedErrorPathFileExists( _In_z_ PCWSTR const path, _In_ const DWORD lastErr )
+void dieUnexpectedErrorPathFileExists( _In_z_ PCWSTR const path, _In_ const DWORD lastErr )
 {
 	OutputDebugStringA( "UIforETW: Encountered an unexpected error after calling PathFileExists!\r\n" );
 	OutputDebugStringA( "\tPath that we were checking: \r\n\t" );
@@ -153,7 +153,7 @@ void handleUnexpectedErrorPathFileExists( _In_z_ PCWSTR const path, _In_ const D
 
 //Compiler didn't eliminate code for std::wstring
 //Seems to generate better code when passed a PCWSTR for path.
-void handleUnexpectedErrorGetFileAttributes( _In_z_ PCWSTR const path, _In_ const DWORD lastErr )
+void dieUnexpectedErrorGetFileAttributes( _In_z_ PCWSTR const path, _In_ const DWORD lastErr )
 {
 	OutputDebugStringA( "UIforETW: Encountered an unexpected error after calling GetFileAttributes!\r\n" );
 	OutputDebugStringA( "\tPath that we were checking: \r\n\t" );
@@ -183,7 +183,7 @@ bool enhancedFileExists( _In_ const std::wstring& path )
 		return false;
 	}
 
-	handleUnexpectedErrorPathFileExists( path.c_str( ), lastErr );
+	dieUnexpectedErrorPathFileExists( path.c_str( ), lastErr );
 	//doesn't exist?
 	return false;
 }
@@ -214,7 +214,7 @@ bool enhancedExistCheckGetFileAttributes( _In_ const std::wstring path )
 		return false;
 	}
 
-	handleUnexpectedErrorGetFileAttributes( path.c_str( ), lastErr );
+	dieUnexpectedErrorGetFileAttributes( path.c_str( ), lastErr );
 	//doesn't exist?
 	return false;
 
@@ -2722,7 +2722,8 @@ void CUIforETWDlg::PreprocessTrace(const std::wstring& traceFilename)
 	child.Run(bShowCommands_, L"xperf.exe" + args);
 	std::wstring output = child.GetOutput();
 	std::map<std::wstring, std::vector<DWORD>> pidsByType;
-	for (auto& line : split(output, '\n'))
+	const std::vector<std::wstring> splitOutput = split(output, '\n');
+	for (const auto& line : splitOutput)
 	{
 		if (wcsstr(line.c_str(), L"chrome.exe"))
 		{
@@ -2745,7 +2746,7 @@ void CUIforETWDlg::PreprocessTrace(const std::wstring& traceFilename)
 				const int scanToStringResult = swscanf_s(pidstr + 1, L"%lu", &pid);
 				if (scanToStringResult == 0)
 				{
-					ATLTRACE2( ATL::atlTraceGeneral, 0, L"No fields assigned from pidstr+1 (%s)!!\r\n", ( pidstr+1 ) );
+					ATLTRACE2( L"No fields assigned from pidstr+1 (%s)!!\r\n", ( pidstr+1 ) );
 					//0 is an invalid process ID!
 					//http://blogs.msdn.com/b/oldnewthing/archive/2004/02/23/78395.aspx
 					pidsByType[type].push_back( 0 );
@@ -2753,7 +2754,7 @@ void CUIforETWDlg::PreprocessTrace(const std::wstring& traceFilename)
 				}
 				if (scanToStringResult == EOF)
 				{
-					ATLTRACE2( ATL::atlTraceGeneral, 0, L"EOF hit before assigning fields from pidstr+1 (%s)!!\r\n", ( pidstr+1 ) );
+					ATLTRACE2( L"EOF hit before assigning fields from pidstr+1 (%s)!!\r\n", ( pidstr+1 ) );
 					//0 is an invalid process ID!
 					//http://blogs.msdn.com/b/oldnewthing/archive/2004/02/23/78395.aspx
 					pidsByType[type].push_back( 0 );
@@ -2770,77 +2771,40 @@ void CUIforETWDlg::PreprocessTrace(const std::wstring& traceFilename)
 	//Maybe we should request the Unicode version of the APIs (for long path support)?
 	const std::wstring fileToOpen = ( traceFilename.substr( 0, traceFilename.size( ) - 4 ) + L".txt" );
 
-#pragma warning(suppress : 4996)
-	//FILE* pFile = _wfopen(fileToOpen.c_str(), L"a");
 	FILE* pFile = NULL;
 
 	//[_wfopen_s returns] zero if successful; an error code on failure.
 	const errno_t fileOpenResult = _wfopen_s( &pFile, fileToOpen.c_str( ), L"a" );
-	if (fileOpenResult != 0)
+	if ((fileOpenResult != 0) || ( pFile == NULL ))
 	{
 		throw std::runtime_error( "Failed to open a file for preprocessing!" );
 	}
 
-	if (pFile == NULL)
-	{
-		throw std::runtime_error( "(apparently) Failed to open a file for preprocessing! pFile is NULL!" );
-	}
+	checked_CRT::fPutWS( L"Chrome PIDs by process type:\n", pFile );
 
-
-	const int PIDsByProcessTypeResult = fwprintf_s(pFile, L"Chrome PIDs by process type:\n");
-	if (PIDsByProcessTypeResult < 0)
-	{
-		const int closeResult = fclose( pFile );
-		if (closeResult != 0)
-		{
-			std::terminate( );
-		}
-		throw std::runtime_error( "Failed to write 'PIDs by process type' to file!" );
-	}
-	for (auto& types : pidsByType)
+	for (const auto& types : pidsByType)
 	{
 		const int firstTypesResult = fwprintf_s(pFile, L"%-10s:", types.first.c_str());
 		if (firstTypesResult < 0)
 		{
-			const int closeResult = fclose( pFile );
-			if (closeResult != 0)
-			{
-				std::terminate( );
-			}
-			throw std::runtime_error( "Failed to write types.first to file!" );
+			handle_close::fClose( pFile );
+			OutputDebugStringA( "UIforETW: Failed to write types.first to file!\r\n" );
+			std::terminate( );
 		}
 
-		for (auto& pid : types.second)
+		for (const auto& pid : types.second)
 		{
 			const int secondTypesResult = fwprintf_s(pFile, L" %lu", pid);
 			if (secondTypesResult < 0)
 			{
-				const int closeResult = fclose( pFile );
-				if (closeResult != 0)
-				{
-					std::terminate( );
-				}
-				throw std::runtime_error( "Failed to write types.second.pid to file!" );
-			}
-		}
-
-		const int endOfFileNewLineResult = fwprintf_s(pFile, L"\n");
-		if (endOfFileNewLineResult < 0)
-		{
-			const int closeResult = fclose( pFile );
-			if (closeResult != 0)
-			{
+				handle_close::fClose( pFile );
+				OutputDebugStringA( "UIforETW: Failed to write types.second.pid to file!\r\n" );
 				std::terminate( );
 			}
-			throw std::runtime_error( "Failed to new line to end of file!" );
 		}
+		checked_CRT::fPutWS( L"\n", pFile );
 	}
-	const int fcloseResultFinal = fclose(pFile);
-	if (fcloseResultFinal != 0)
-	{
-		throw std::runtime_error( "Failed to close file, after successfully writing to it!" );
-	}
-
+	handle_close::fClose( pFile );
 #endif
 
 }

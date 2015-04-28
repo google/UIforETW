@@ -42,8 +42,7 @@ void regCloseKey( _In_ _Pre_valid_ _Post_ptr_invalid_ HKEY hKey )
 	debug::Alias( &result );
 	debug::Alias( &hKey );
 
-	const DWORD lastErr = GetLastError( );
-	ErrorHandling::outputErrorDebug( lastErr );
+	ErrorHandling::outputErrorDebug( );
 	std::terminate( );
 }
 
@@ -60,43 +59,90 @@ void closeHandle( _In_ _Pre_valid_ _Post_ptr_invalid_ HANDLE handle )
 		return;
 	}
 
-	const DWORD lastErr = GetLastError( );
-	ErrorHandling::outputErrorDebug( lastErr );
+	ErrorHandling::outputErrorDebug( );
 	std::terminate( );
 }
 
+void fClose( _In_ _Pre_valid_ _Post_ptr_invalid_ FILE* const stream )
+{
+	//fclose returns 0 if the stream is successfully closed. 
+	//[fclose returns] EOF to indicate an error.
+	const int closeResult = fclose( stream );
+	if ( closeResult == 0 )
+	{
+		return;
+	}
+	ATLASSERT( closeResult == EOF );
+	std::terminate( );
 }
+
+} //namespace handle_close
+
+namespace clipboard {
+
+void closeClipboard( )
+{
+	//If [CloseClipboard] succeeds, the return value is nonzero.
+	//If [CloseClipboard] fails, the return value is zero. 
+	//To get extended error information, call GetLastError.
+	const BOOL closeResult = ::CloseClipboard( );
+	if (closeResult != 0)
+	{
+		return;
+	}
+	OutputDebugStringW( L"UIforETW: Failed to close clipboard!!\r\n" );
+	ErrorHandling::outputErrorDebug( );
+	std::terminate( );
+}
+
+void openClipboard( )
+{
+	//If [OpenClipboard] succeeds, the return value is nonzero.
+	//If [OpenClipboard] fails, the return value is zero. 
+	//To get extended error information, call GetLastError.
+	const BOOL openResult = ::OpenClipboard( ::GetDesktopWindow( ) );
+	if (openResult != 0)
+	{
+		return;
+	}
+	OutputDebugStringW( L"UIforETW: Failed to open clipboard!!\r\n" );
+	ErrorHandling::outputErrorDebug( );
+	std::terminate( );
+}
+
+void emptyClipboard( )
+{
+	//If [EmptyClipboard] succeeds, the return value is nonzero.
+	//If [EmptyClipboard] fails, the return value is zero. 
+	//To get extended error information, call GetLastError.
+	const BOOL emptyResult = ::EmptyClipboard( );
+	if (emptyResult != 0)
+	{
+		return;
+	}
+	OutputDebugStringW( L"UIforETW: Failed to empty clipboard!!\r\n" );
+	ErrorHandling::outputErrorDebug( );
+	std::terminate( );
+}
+
+void setClipboardText( _In_ HANDLE textmem )
+{
+	//If [SetClipboardData] succeeds, the return value is the handle to the data.
+	//If [SetClipboardData] fails, the return value is NULL. 
+	//To get extended error information, call GetLastError.
+	const HANDLE setResult = ::SetClipboardData( CF_UNICODETEXT, textmem );
+	if ( setResult != NULL )
+	{
+		return;
+	}
+	OutputDebugStringW( L"UIforETW: Failed to set clipboard text!!\r\n" );
+	ErrorHandling::outputErrorDebug( );
+	std::terminate( );
+}
+
+} //namespace clipboard
 
 namespace ErrorHandling {
-void DisplayWindowsMessageBoxWithErrorMessage( const DWORD error )
-{
-	const rsize_t errorMessageBufferSize = 512u;
-	wchar_t errorMessageBuffer[ errorMessageBufferSize ] = { 0 };
-	
-	GetLastErrorAsFormattedMessage( errorMessageBuffer, error );
-
-	const int messageBoxResult =
-		::MessageBoxW(
-						NULL,
-						errorMessageBuffer,
-						L"UIforETW",
-						(MB_OK | MB_ICONERROR)
-					 );
-	
-	if ( messageBoxResult == 0 )
-	{
-		OutputDebugStringA( 
-							"UIforETW successfully formatted an error message, "
-							"but failed to display it in a message box. "
-							"There's nothing we can do, except crash & burn\r\n"
-						  );
-		debug::Alias( &messageBoxResult );
-		debug::Alias( &error );
-		debug::Alias( &errorMessageBuffer );
-		std::terminate( );
-	}
-}
-
 
 template<rsize_t strSize>
 void GetLastErrorAsFormattedMessage( ETWUI_WRITES_TO_STACK( strSize )
@@ -145,6 +191,25 @@ void outputPrintfErrorDebug( const DWORD lastErr )
 
 } //namespace ErrorHandling 
 
+
+namespace checked_CRT {
+
+void fPutWS( _In_z_ PCWSTR const str, _In_ FILE* stream )
+{
+	//Each of these functions returns a nonnegative value if it is successful. 
+	//On an error, fputs and fputws return EOF. 
+	//If execution is allowed to continue 
+	//(from inv param. handler), fputws returns WEOF.
+	const int putsResult = fputws( str, stream );
+	if ( putsResult >= 0 )
+	{
+		return;
+	}
+	debug::Alias( &putsResult );
+	std::terminate( );
+}
+
+}//namespace checked_CRT
 
 std::vector<std::wstring> split(const std::wstring& s, char c)
 {
@@ -242,20 +307,18 @@ void WriteTextAsFile(const std::wstring& fileName, const std::wstring& text)
 
 void SetRegistryDWORD(HKEY root, const std::wstring& subkey, const std::wstring& valueName, const DWORD value)
 {
-
 	//See Registry Element Size Limits:
 	//    https://msdn.microsoft.com/en-us/library/windows/desktop/ms724872.aspx
 	if (subkey.length( ) >= 255)
 	{
-		OutputDebugStringA( "Key too long!\r\n" );
+		OutputDebugStringA( "UIforETW: Key too long!\r\n" );
 		std::terminate( );
 	}
 	if (valueName.length( ) >= 16383)
 	{
-		OutputDebugStringA("Value too long!\r\n");
+		OutputDebugStringA("UIforETW: Value too long!\r\n");
 		std::terminate( );
 	}
-
 
 	HKEY key;
 	//If [RegOpenKeyEx] succeeds, the return value is ERROR_SUCCESS.
@@ -277,16 +340,10 @@ void SetRegistryDWORD(HKEY root, const std::wstring& subkey, const std::wstring&
 
 	if (setValueResult != ERROR_SUCCESS)
 	{
-		//TODO: how to best handle?
-		throw std::runtime_error( "Failed to write value to registry!!!" );
+		OutputDebugStringA( "UIforETW: Failed to write value to registry!!!\r\n" );
+		std::terminate( );
 	}
 	handle_close::regCloseKey( key );
-
-		
-	//SAL catches this :)
-	//handle_close::regCloseKey( key );
-
-
 }
 
 void CreateRegistryKey(HKEY root, const std::wstring& subkey, const std::wstring& newKey)
@@ -345,7 +402,7 @@ std::wstring AnsiToUnicode(const std::string& text)
 		result = &buffer[0];
 		return result;
 	}
-
+	ErrorHandling::outputErrorDebug( );
 	std::terminate( );
 }
 
@@ -422,6 +479,7 @@ void SmartEnableWindow(_In_ const HWND Win, _In_ const BOOL Enable)
 
 std::wstring GetFilePart(const std::wstring& path)
 {
+	ATLASSERT( path.length( ) > 0 );
 	PCWSTR const pLastSlash = wcsrchr(path.c_str(), '\\');
 	if (pLastSlash)
 		return pLastSlash + 1;
@@ -431,6 +489,7 @@ std::wstring GetFilePart(const std::wstring& path)
 
 std::wstring GetFileExt(const std::wstring& path)
 {
+	ATLASSERT( path.length( ) > 0 );
 	std::wstring filePart = GetFilePart(path);
 	PCWSTR const pLastPeriod = wcsrchr(filePart.c_str(), '.');
 	if (pLastPeriod)
@@ -440,6 +499,7 @@ std::wstring GetFileExt(const std::wstring& path)
 
 std::wstring GetDirPart(const std::wstring& path)
 {
+	ATLASSERT( path.length( ) > 0 );
 	PCWSTR const pLastSlash = wcsrchr(path.c_str(), '\\');
 	if (pLastSlash)
 		return path.substr(0, pLastSlash + 1 - path.c_str());
@@ -449,6 +509,7 @@ std::wstring GetDirPart(const std::wstring& path)
 
 std::wstring CrackFilePart(const std::wstring& path)
 {
+	ATLASSERT( path.length( ) > 0 );
 	std::wstring filePart = GetFilePart(path);
 	const std::wstring extension = GetFileExt(filePart);
 	if (!extension.empty())
@@ -496,42 +557,19 @@ int DeleteFiles(HWND hwnd, const std::vector<std::wstring>& paths)
 
 void SetClipboardText(const std::wstring& text)
 {
-	//If [OpenClipboard] fails, the return value is zero. 
-	//To get extended error information, call GetLastError.
-	const BOOL cb = OpenClipboard( GetDesktopWindow( ) );
-	if (cb == 0)
-	{
-		const DWORD lastErr = GetLastError( );
-		outputPrintf( L"Failed to open clipboard!!\n\tError code: %u\n", lastErr );
-		ErrorHandling::outputPrintfErrorDebug( lastErr );
-		return;
-	}
+	clipboard::openClipboard( );
+	clipboard::emptyClipboard( );
 
-	//If [EmptyClipboard] fails, the return value is zero. 
-	//To get extended error information, call GetLastError.
-	const BOOL emptyRes = EmptyClipboard( );
-	if (emptyRes == 0)
-	{
-		//TODO: check this instead of VERIFYing
-		VERIFY( CloseClipboard( ) );
-		const DWORD lastErr = GetLastError( );
-		outputPrintf( L"Failed to empty clipboard!!\n\tError code: %u\n", lastErr );
-		ErrorHandling::outputPrintfErrorDebug( lastErr );
-		return;
-	}
-
-	const size_t length = (text.size() + 1) * sizeof(wchar_t);
+	const rsize_t length = (text.size() + 1) * sizeof(wchar_t);
 	
 	//If [GlobalAlloc] fails, the return value is NULL. 
 	//To get extended error information, call GetLastError.
-	const HANDLE hmem = GlobalAlloc( GMEM_MOVEABLE, length );
+	const HANDLE hmem = GlobalAlloc(GMEM_MOVEABLE, length);
 	if (hmem == NULL)
 	{
-		//TODO: check this instead of VERIFYing
-		VERIFY( CloseClipboard( ) );
-		const DWORD lastErr = GetLastError( );
-		outputPrintf( L"GlobalAlloc failed!!\n\tError code: %u\n", lastErr );
-		ErrorHandling::outputPrintfErrorDebug( lastErr );
+		clipboard::closeClipboard( );
+		outputPrintf( L"GlobalAlloc failed!!\n" );
+		ErrorHandling::outputPrintfErrorDebug( );
 		return;
 	}
 	
@@ -542,25 +580,18 @@ void SetClipboardText(const std::wstring& text)
 	{
 		//If [GlobalFree] succeeds, the return value is NULL.
 		GlobalFree( hmem );
-
-		//TODO: check this instead of VERIFYing
-		VERIFY( CloseClipboard( ) );
-		const DWORD lastErr = GetLastError( );
-		outputPrintf( L"GlobalLock failed!!\n\tError code: %u\n", lastErr );
-		ErrorHandling::outputPrintfErrorDebug( lastErr );
+		clipboard::closeClipboard( );
+		outputPrintf( L"GlobalLock failed!!\n" );
+		ErrorHandling::outputPrintfErrorDebug( );
 		return;
 	}
-
 	memcpy(ptr, text.c_str(), length);
 
 	//GlobalUnlock has crazy return values!
 	GlobalUnlock(hmem);
 
-	//If [SetClipboardData] fails, the return value is NULL.
-	//To get extended error information, call GetLastError.
-	VERIFY( SetClipboardData( CF_UNICODETEXT, hmem ) );
-
-	VERIFY( CloseClipboard( ) );
+	clipboard::setClipboardText(hmem);
+	clipboard::closeClipboard( );
 }
 
 int64_t GetFileSize(const std::wstring& path)

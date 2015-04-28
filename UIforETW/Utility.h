@@ -39,11 +39,22 @@ void outputPrintfErrorDebug( DWORD lastErr = GetLastError( ) );
 
 
 namespace handle_close {
-
 void regCloseKey( _In_ _Pre_valid_ _Post_ptr_invalid_ HKEY hKey );
 void closeHandle( _In_ _Pre_valid_ _Post_ptr_invalid_ HANDLE handle );
+void fClose( _In_ _Pre_valid_ _Post_ptr_invalid_ FILE* stream );
 }
 
+namespace clipboard {
+void closeClipboard( );
+void openClipboard( );
+void emptyClipboard( );
+void setClipboardText( _In_ HANDLE textmem );
+}
+
+namespace checked_CRT {
+
+void fPutWS( _In_z_ PCWSTR str, _In_ FILE* stream );
+}
 
 std::vector<std::wstring> split(const std::wstring& s, char c);
 
