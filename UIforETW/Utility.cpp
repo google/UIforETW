@@ -236,7 +236,7 @@ std::vector<std::wstring> GetFileList(const std::wstring& pattern, bool fullPath
 	if (fullPaths)
 		directory = GetDirPart(pattern);
 	WIN32_FIND_DATA findData;
-	HANDLE hFindFile = FindFirstFileExW(pattern.c_str(), FindExInfoStandard,
+	HANDLE hFindFile = FindFirstFileEx(pattern.c_str(), FindExInfoStandard,
 				&findData, FindExSearchNameMatch, NULL, 0);
 
 	std::vector<std::wstring> result;
@@ -245,7 +245,7 @@ std::vector<std::wstring> GetFileList(const std::wstring& pattern, bool fullPath
 		do
 		{
 			result.push_back(directory + findData.cFileName);
-		} while (FindNextFileW(hFindFile, &findData));
+		} while (FindNextFile(hFindFile, &findData));
 
 		FindClose(hFindFile);
 	}

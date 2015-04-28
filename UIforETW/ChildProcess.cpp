@@ -27,7 +27,7 @@ ChildProcess::ChildProcess(std::wstring exePath)
 {
 	// Create the pipe here so that it is guaranteed to be created before
 	// we try starting the process.
-	hPipe_ = CreateNamedPipeW(kPipeName,
+	hPipe_ = CreateNamedPipe(kPipeName,
 		(PIPE_ACCESS_DUPLEX | PIPE_TYPE_BYTE | PIPE_READMODE_BYTE),
 		PIPE_WAIT,
 		1,
@@ -37,7 +37,7 @@ ChildProcess::ChildProcess(std::wstring exePath)
 		NULL);
 	hChildThread_ = CreateThread(0, 0, ListenerThreadStatic, this, 0, 0);
 
-	hOutputAvailable_ = CreateEventW(nullptr, FALSE, FALSE, nullptr);
+	hOutputAvailable_ = CreateEvent(nullptr, FALSE, FALSE, nullptr);
 }
 
 ChildProcess::~ChildProcess()
@@ -131,15 +131,14 @@ bool ChildProcess::Run(bool showCommand, std::wstring args)
 
 	SECURITY_ATTRIBUTES security = { sizeof(security), 0, TRUE };
 
-	hStdOutput_ = CreateFileW(kPipeName, GENERIC_WRITE, 0, &security,
+	hStdOutput_ = CreateFile(kPipeName, GENERIC_WRITE, 0, &security,
 		OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, INVALID_HANDLE_VALUE);
 	if (hStdOutput_ == INVALID_HANDLE_VALUE)
 	{
 		return false;
 	}
 
-	const HANDLE currentProcess = GetCurrentProcess( );
-	if (!DuplicateHandle( currentProcess, hStdOutput_, currentProcess,
+	if (!DuplicateHandle(GetCurrentProcess( ), hStdOutput_, GetCurrentProcess( ),
 		&hStdError_, 0, TRUE, DUPLICATE_SAME_ACCESS ))
 	{
 		return false;
@@ -162,7 +161,7 @@ bool ChildProcess::Run(bool showCommand, std::wstring args)
 		std::terminate( );
 	}
 
-	const BOOL success = CreateProcessW(exePath_.c_str(	), &argsCopy[0], NULL, NULL,
+	const BOOL success = CreateProcess(exePath_.c_str(	), &argsCopy[0], NULL, NULL,
 		TRUE, flags, NULL, NULL, &startupInfo, &processInfo);
 	if (success)
 	{
