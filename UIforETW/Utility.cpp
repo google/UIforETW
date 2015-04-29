@@ -666,6 +666,13 @@ std::wstring FindPython()
 	}
 
 #pragma warning(suppress:4996)	
+    const wchar_t* path = _wgetenv(L"path");
+	if (path)
+	{
+		return pytwoseven;
+	}
+
+#pragma warning(suppress:4996)	
 	PCWSTR path = _wgetenv(L"path");
 	if (!path)
 	{

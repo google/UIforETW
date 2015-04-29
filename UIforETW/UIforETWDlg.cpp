@@ -1475,14 +1475,37 @@ void CUIforETWDlg::OnBnClickedStarttracing()
 	else if (tracingMode_ == kHeapTracingToFile)
 		outputPrintf(L"\nStarting heap tracing to disk of %s...\n", heapTracingExe_.c_str());
 	else
-		std::terminate();
-	const std::wstring kernelStackWalk =
-		getKernelStackWalk(bSampledStacks_, bCswitchStacks_);
-	const std::wstring kernelFile =
-		getKernelFile(tracingMode_, GetKernelFile());
-	const std::wstring kernelArgs =
-		getKernelArgs(kernelStackWalk, kernelFile, GetKernelLogger());
-	std::wstring userProviders = getBaseUserProviders();
+		assert(0);
+
+	std::wstring kernelProviders = L" Latency+POWER+DISPATCHER+FILE_IO+FILE_IO_INIT+VIRT_ALLOC+MEMINFO";
+	std::wstring kernelStackWalk;
+	// Record CPU sampling call stacks, from the PROFILE provider
+	if (bSampledStacks_)
+		kernelStackWalk += L"+PROFILE";
+	// Record context-switch (switch in) and readying-thread (SetEvent, etc.)
+	// call stacks from DISPATCHER provider.
+	if (bCswitchStacks_)
+		kernelStackWalk += L"+CSWITCH+READYTHREAD";
+	// Record VirtualAlloc call stacks from the VIRT_ALLOC provider. Could
+	// also record VirtualFree.
+	if (tracingMode_ == kHeapTracingToFile)
+		kernelStackWalk += L"+VirtualAlloc";
+	// Set up a -stackwalk configuration, removing the leading '+' sign.
+	if (!kernelStackWalk.empty())
+		kernelStackWalk = L" -stackwalk " + kernelStackWalk.substr(1);
+	// Buffer sizes are in KB, so 1024 is actually 1 MB
+	// Make this configurable.
+	std::wstring kernelBuffers = L" -buffersize 1024 -minbuffers 600 -maxbuffers 600";
+	std::wstring kernelFile = L" -f \"" + GetKernelFile() + L"\"";
+	if (tracingMode_ == kTracingToMemory)
+		kernelFile = L" -buffering";
+	std::wstring kernelArgs = L" -start " + GetKernelLogger() + L" -on" + kernelProviders + kernelStackWalk + kernelBuffers + kernelFile;
+
+	WindowsVersion winver = GetWindowsVersion();
+	std::wstring userProviders = L"Microsoft-Windows-Win32k";
+	if (winver <= kWindowsVersionVista)
+		userProviders = L"Microsoft-Windows-LUA"; // Because Microsoft-Windows-Win32k doesn't work on Vista.
+	userProviders += L"+Multi-MAIN+Multi-FrameRate+Multi-Input+Multi-Worker";
 
 	// DWM providers can be helpful also. Uncomment to enable.
 	//userProviders += L"+Microsoft-Windows-Dwm-Dwm";
@@ -2109,13 +2132,29 @@ void CUIforETWDlg::OnBnClickedSettings()
 	dlgAbout.bHeapStacks_ = bHeapStacks_;
 	if (dlgAbout.DoModal() == IDOK)
 	{
-		heapTracingExe_ = dlgAbout.heapTracingExe_;
-		chromeDllPath_ = dlgAbout.chromeDllPath_;
+		// If the heap tracing executable name has changed then clear and
+		// then (potentially) reset the registry key, otherwise the other
+		// executable may end up with heap tracing enabled indefinitely.
+		if (heapTracingExe_ != dlgAbout.heapTracingExe_)
+		{
+			// Force heap tracing off
+			SetHeapTracing(true);
+			heapTracingExe_ = dlgAbout.heapTracingExe_;
+			// Potentially re-enable heap tracing with the new name.
+			SetHeapTracing(false);
+		}
+
+		// Update the symbol path if the chrome developer flag has changed.
+		// This will be a NOP if the user set _NT_SYMBOL_PATH outside of
+		// UIforETW.
 		if (bChromeDeveloper_ != dlgAbout.bChromeDeveloper_)
 		{
 			bChromeDeveloper_ = dlgAbout.bChromeDeveloper_;
 			SetSymbolPath();
 		}
+
+		// Copy over the remaining settings.
+		chromeDllPath_ = dlgAbout.chromeDllPath_;
 		bAutoViewTraces_ = dlgAbout.bAutoViewTraces_;
 		bHeapStacks_ = dlgAbout.bHeapStacks_;
 	}
