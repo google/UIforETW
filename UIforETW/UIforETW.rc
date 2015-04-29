@@ -21,6 +21,7 @@
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
 
 #ifdef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
@@ -79,11 +80,11 @@ IDR_MAINFRAME           ICON                    "res\\UIforETW.ico"
 //
 
 IDD_ABOUTBOX DIALOGEX 0, 0, 211, 74
-STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION
 CAPTION "About UI for ETW"
 FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
-    ICON            IDR_MAINFRAME,IDC_STATIC,14,14,21,20
+    ICON            IDR_MAINFRAME,IDC_STATIC,14,14,20,20
     LTEXT           "UI for ETW, Version 1.0 (ish)",IDC_STATIC,42,14,114,8,SS_NOPREFIX
     LTEXT           "Copyright 2015 Google Inc. All Rights Reserved.",IDC_STATIC,42,26,162,8
     DEFPUSHBUTTON   "OK",IDOK,154,53,50,14,WS_GROUP

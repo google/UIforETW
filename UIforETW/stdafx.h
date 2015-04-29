@@ -20,6 +20,8 @@ limitations under the License.
 #define VC_EXTRALEAN            // Exclude rarely-used stuff from Windows headers
 #endif
 
+#define _ATL_NO_AUTOMATIC_NAMESPACE 1
+
 #include <afxwin.h>         // MFC core and standard components //THIS NEEDS TO BE THE VERY FIRST INCLUDE!
 #include "targetver.h"
 
@@ -31,19 +33,19 @@ limitations under the License.
 #include <afxext.h>         // MFC extensions
 
 
-#include <afxdisp.h>        // MFC Automation classes
+#include "targetver.h"
+
+
+#include <afxext.h>         // MFC extensions
 
 #include <assert.h>
 
-#ifndef _AFX_NO_OLE_SUPPORT
-#include <afxdtctl.h>           // MFC support for Internet Explorer 4 Common Controls
-#endif
 #ifndef _AFX_NO_AFXCMN_SUPPORT
 #include <afxcmn.h>             // MFC support for Windows Common Controls
 #endif // _AFX_NO_AFXCMN_SUPPORT
 
 #include <afxcontrolbars.h>     // MFC support for ribbons and control bars
-
+#include <atlwin.h>
 #include <sal.h>
 
 // Global function for printing to the dialog output window.

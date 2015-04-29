@@ -552,7 +552,7 @@ void CUIforETWDlg::OnSysCommand(UINT nID, LPARAM lParam)
 {
 	if ((nID & 0xFFF0) == IDM_ABOUTBOX)
 	{
-		CAboutDlg dlgAbout;
+		CATLAboutDlg dlgAbout;
 		dlgAbout.DoModal();
 	}
 	else
@@ -1204,7 +1204,7 @@ void CUIforETWDlg::OnLbnSelchangeTracelist()
 
 void CUIforETWDlg::OnBnClickedAbout()
 {
-	CAboutDlg dlgAbout;
+	CATLAboutDlg dlgAbout;
 	dlgAbout.DoModal();
 }
 
