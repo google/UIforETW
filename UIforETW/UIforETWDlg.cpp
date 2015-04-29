@@ -1440,6 +1440,7 @@ std::wstring CUIforETWDlg::GenerateResultFilename() const
 		const int res = swprintf_s(fileName, L"%04d-%02d-%02d_%02d-%02d-%02d_%s", year + 2000, month, day, hour, min, sec, username);
 		if (res == -1)
 			std::terminate();
+		filePart = fileName;
 	}
 	else
 	{
@@ -1466,8 +1467,11 @@ void CUIforETWDlg::OnBnClickedStarttracing()
 	RegisterProviders();
 	if (tracingMode_ == kTracingToMemory)
 		outputPrintf(L"\nStarting tracing to in-memory circular buffers...\n");
-	else if (tracingMode_ == kTracingToFile)
-		outputPrintf(L"\nStarting tracing to disk...\n");
+	else if ( tracingMode_ == kTracingToFile )
+	{
+		ATLASSERT( !isValidPathToFSObject( GetUserFile( ) ) );
+		outputPrintf( L"\nStarting tracing to disk...\n" );
+	}
 	else if (tracingMode_ == kHeapTracingToFile)
 		outputPrintf(L"\nStarting heap tracing to disk of %s...\n", heapTracingExe_.c_str());
 	else
@@ -1568,8 +1572,9 @@ void CUIforETWDlg::StopTracingAndMaybeRecord(bool bSaveTrace)
 	}
 
 	ATLASSERT(isValidPathToFSObject(compatFile));
+	ATLASSERT(!isValidPathToFSObject(compatFileTemp));
 	const BOOL moveSuccess = MoveFile(compatFile.c_str(), compatFileTemp.c_str());
-	if (bShowCommands_ && !moveSuccess)
+	if (bShowCommands_ && ( moveSuccess == 0 ))
 	{
 		outputPrintf(L"FAILED to rename/move `Amcache.hve`!\n");
 		ErrorHandling::outputPrintfErrorDebug();
