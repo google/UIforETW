@@ -1277,11 +1277,9 @@ void CUIforETWDlg::OnCbnSelchangeTracingmode()
 		break;
 	case kHeapTracingToFile:
 		outputPrintf(L"Heap traces will be recorded to disk for %s. Note that only %s processes "
-			L"started after this is selected will be traced. Note that %s processes started now "
-			L"may run slightly slower even if not being traced.\n"
+			L"started after this is selected will be traced. \n"
 			L"To keep trace sizes manageable you may want to turn off context switch and CPU "
-			L"sampling call stacks.\n", heapTracingExe_.c_str(),
-			heapTracingExe_.c_str(), heapTracingExe_.c_str());
+			L"sampling call stacks.\n", heapTracingExe_.c_str(), heapTracingExe_.c_str());
 		break;
 	}
 	SetHeapTracing(false);
