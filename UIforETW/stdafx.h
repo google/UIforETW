@@ -16,9 +16,8 @@ limitations under the License.
 
 #pragma once
 
-// ETW is effectively absent from Windows XP. It works pretty badly
-// on Vista as well so this could be moved up to NTDDI_WIN7 if necessary.
-#define _WIN32_WINNT NTDDI_VISTA
+// Include this first so that the requested version is known.
+#include "targetver.h"
 
 #ifndef VC_EXTRALEAN
 #define VC_EXTRALEAN            // Exclude rarely-used stuff from Windows headers
@@ -27,7 +26,6 @@ limitations under the License.
 #define _ATL_NO_AUTOMATIC_NAMESPACE 1
 
 #include <afxwin.h>         // MFC core and standard components //THIS NEEDS TO BE THE VERY FIRST INCLUDE!
-#include "targetver.h"
 
 #define _ATL_CSTRING_EXPLICIT_CONSTRUCTORS      // some CString constructors will be explicit
 
@@ -35,13 +33,6 @@ limitations under the License.
 #define _AFX_ALL_WARNINGS
 
 #include <afxext.h>         // MFC extensions
-
-
-#include "targetver.h"
-
-
-#include <afxext.h>         // MFC extensions
-
 #include <assert.h>
 
 #ifndef _AFX_NO_AFXCMN_SUPPORT
