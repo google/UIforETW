@@ -1402,12 +1402,7 @@ void CUIforETWDlg::OnContextMenu(CWnd* pWnd, CPoint point)
 				AfxMessageBox(L"Not implemented yet.");
 				break;
 			case ID_TRACES_COMPRESSTRACES:
-				outputPrintf(L"\nCompressing all traces - this may take a while:\n");
-				for (auto traceName : traces_)
-				{
-					CompressTrace(GetTraceDir() + traceName + L".etl");
-				}
-				outputPrintf(L"Finished compressing traces.\n");
+				CompressAllTraces();
 				break;
 			case ID_TRACES_ZIPCOMPRESSALLTRACES:
 				AfxMessageBox(L"Not implemented yet.");
@@ -1493,7 +1488,7 @@ void CUIforETWDlg::OnOpenTraceGPUView()
 	}
 }
 
-void CUIforETWDlg::CompressTrace(const std::wstring& tracePath)
+std::pair<uint64_t, uint64_t> CUIforETWDlg::CompressTrace(const std::wstring& tracePath) const
 {
 	std::wstring compressedPath = tracePath + L".compressed";
 	DWORD exitCode = 0;
@@ -1507,7 +1502,7 @@ void CUIforETWDlg::CompressTrace(const std::wstring& tracePath)
 	if (exitCode)
 	{
 		DeleteOneFile(*this, compressedPath);
-		return;
+		return std::pair<uint64_t, uint64_t>();
 	}
 
 	int64_t originalSize = GetFileSize(tracePath);
@@ -1518,13 +1513,42 @@ void CUIforETWDlg::CompressTrace(const std::wstring& tracePath)
 		DeleteOneFile(*this, tracePath);
 		MoveFile(compressedPath.c_str(), tracePath.c_str());
 		outputPrintf(L"%s was compressed from %1.1f MB to %1.1f MB.\n",
-			tracePath.c_str(), originalSize / 1000000.0, compressedSize / 1000000.0);
+			tracePath.c_str(), originalSize / 1e6, compressedSize / 1e6);
 	}
 	else
 	{
 		outputPrintf(L"%s was not compressed.\n", tracePath.c_str());
 		DeleteOneFile(*this, compressedPath);
+		compressedSize = originalSize; // So that callers will know that nothing happened.
 	}
+	return std::pair<uint64_t, uint64_t>(originalSize, compressedSize);
+}
+
+
+void CUIforETWDlg::CompressAllTraces() const
+{
+	outputPrintf(L"\nCompressing all traces - this may take a while:\n");
+	int64_t initialTotalSize = 0;
+	int64_t finalTotalSize = 0;
+	int notCompressedCount = 0;
+	int compressedCount = 0;
+	for (auto traceName : traces_)
+	{
+		auto result = CompressTrace(GetTraceDir() + traceName + L".etl");
+		if (result.first == result.second)
+		{
+			++notCompressedCount;
+		}
+		else
+		{
+			++compressedCount;
+			initialTotalSize += result.first;
+			finalTotalSize += result.second;
+		}
+	}
+	outputPrintf(L"Finished compressing traces.\n");
+	outputPrintf(L"%d traces not compressed. %d traces compressed from %1.1f MB to %1.1f MB.\n",
+		notCompressedCount, compressedCount, initialTotalSize / 1e6, finalTotalSize / 1e6);
 }
 
 

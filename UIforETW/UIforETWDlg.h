@@ -174,7 +174,8 @@ private:
 	bool bChromeDeveloper_ = true;
 	bool bAutoViewTraces_ = false;
 
-	void CompressTrace(const std::wstring& tracePath);
+	std::pair<uint64_t, uint64_t> CompressTrace(const std::wstring& tracePath) const;
+	void CompressAllTraces() const;
 	// Update the enabled/disabled states of buttons.
 	void UpdateEnabling();
 	void UpdateNotesState();
