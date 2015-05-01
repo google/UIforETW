@@ -16,6 +16,10 @@ limitations under the License.
 
 #pragma once
 
+// ETW is effectively absent from Windows XP. It works pretty badly
+// on Vista as well so this could be moved up to NTDDI_WIN7 if necessary.
+#define _WIN32_WINNT NTDDI_VISTA
+
 #ifndef VC_EXTRALEAN
 #define VC_EXTRALEAN            // Exclude rarely-used stuff from Windows headers
 #endif
