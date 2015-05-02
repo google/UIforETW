@@ -204,6 +204,7 @@ BEGIN_MESSAGE_MAP(CUIforETWDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_SETTINGS, &CUIforETWDlg::OnBnClickedSettings)
 	ON_WM_CONTEXTMENU()
 	ON_BN_CLICKED(ID_TRACES_OPENTRACEINWPA, &CUIforETWDlg::OnOpenTraceWPA)
+	ON_BN_CLICKED(ID_TRACES_OPENTRACEIN10WPA, &CUIforETWDlg::OnOpenTrace10WPA)
 	ON_BN_CLICKED(ID_TRACES_OPENTRACEINGPUVIEW, &CUIforETWDlg::OnOpenTraceGPUView)
 	ON_BN_CLICKED(ID_RENAME, &CUIforETWDlg::OnRenameKey)
 	ON_BN_CLICKED(ID_RENAMEFULL, &CUIforETWDlg::OnFullRenameKey)
@@ -305,8 +306,13 @@ BOOL CUIforETWDlg::OnInitDialog()
 	// ProgramFilesX86, on 32-bit and 64-bit operating systems.
 	wchar_t* progFilesx86Dir = nullptr;
 	VERIFY(SUCCEEDED(SHGetKnownFolderPath(FOLDERID_ProgramFilesX86, 0, NULL, &progFilesx86Dir)));
-	wptDir_ = progFilesx86Dir;
-	wptDir_ += L"\\Windows Kits\\8.1\\Windows Performance Toolkit\\";
+	windowsKitsDir_ = progFilesx86Dir;
+  windowsKitsDir_ += L"\\Windows Kits\\";
+	wptDir_ = windowsKitsDir_ + L"8.1\\Windows Performance Toolkit\\";
+  wpt10Dir_ = windowsKitsDir_ + L"10\\Windows Performance Toolkit\\";
+  wpaPath_ = wptDir_ + L"wpa.exe";
+  gpuViewPath_ = wptDir_ + L"gpuview\\gpuview.exe";
+  wpa10Path_ = wpt10Dir_ + L"wpa.exe";
 	CoTaskMemFree(progFilesx86Dir);
 	if (!PathFileExists(GetXperfPath().c_str()))
 	{
@@ -868,7 +874,7 @@ void CUIforETWDlg::StopTracingAndMaybeRecord(bool bSaveTrace)
 		PreprocessTrace(traceFilename);
 
 		if (bAutoViewTraces_)
-			LaunchTraceViewer(traceFilename);
+			LaunchTraceViewer(traceFilename, wpaPath_);
 		// Record the name so that it gets selected.
 		lastTraceFilename_ = CrackFilePart(traceFilename);
 
@@ -916,11 +922,11 @@ void CUIforETWDlg::OnBnClickedStoptracing()
 	StopTracingAndMaybeRecord(false);
 }
 
-void CUIforETWDlg::LaunchTraceViewer(const std::wstring traceFilename, const std::wstring viewer)
+void CUIforETWDlg::LaunchTraceViewer(const std::wstring traceFilename, const std::wstring viewerPath)
 {
 	if (!PathFileExists(traceFilename.c_str()))
 	{
-		std::wstring zipPath = traceFilename.substr(0, traceFilename.size() - 4) + L".zip";
+		const std::wstring zipPath = traceFilename.substr(0, traceFilename.size() - 4) + L".zip";
 		if (PathFileExists(zipPath.c_str()))
 		{
 			AfxMessageBox(L"Viewing of zipped ETL files is not yet supported.\n"
@@ -933,10 +939,16 @@ void CUIforETWDlg::LaunchTraceViewer(const std::wstring traceFilename, const std
 		return;
 	}
 
-	std::wstring viewerPath = GetWPTDir() + viewer;
-	std::wstring viewerName = GetFilePart(viewer);
+	const std::wstring viewerName = GetFilePart(viewerPath);
 
-	const std::wstring args = std::wstring(viewerName + L" \"") + traceFilename.c_str() + L"\"";
+	std::wstring args = std::wstring(viewerName + L" \"") + traceFilename.c_str() + L"\"";
+
+	if (viewerPath == wpa10Path_)
+	{
+		// Load a WPA 10.0 specific profile. Temporary hack. Doesn't work very
+		// well because the 8.1 profile *also* gets loaded. Sigh...
+		args += L" -profile " + GetExeDir() + L"Startup10.wpaProfile";
+	}
 
 	// Wacky CreateProcess rules say args has to be writable!
 	std::vector<wchar_t> argsCopy(args.size() + 1);
@@ -1112,7 +1124,7 @@ void CUIforETWDlg::OnLbnDblclkTracelist()
 	if (selIndex < 0 || selIndex >= (int)traces_.size())
 		return;
 	std::wstring tracename = GetTraceDir() + traces_[selIndex] + L".etl";
-	LaunchTraceViewer(tracename);
+	LaunchTraceViewer(tracename, wpaPath_);
 }
 
 void CUIforETWDlg::OnGetMinMaxInfo(MINMAXINFO* lpMMI)
@@ -1382,10 +1394,13 @@ void CUIforETWDlg::OnContextMenu(CWnd* pWnd, CPoint point)
 		switch (selection)
 		{
 			case ID_TRACES_OPENTRACEINWPA:
-				LaunchTraceViewer(tracePath);
+				LaunchTraceViewer(tracePath, wpaPath_);
+				break;
+			case ID_TRACES_OPENTRACEIN10WPA:
+				LaunchTraceViewer(tracePath, wpa10Path_);
 				break;
 			case ID_TRACES_OPENTRACEINGPUVIEW:
-				LaunchTraceViewer(tracePath, L"gpuview\\GPUView.exe");
+				LaunchTraceViewer(tracePath, gpuViewPath_);
 				break;
 			case ID_TRACES_DELETETRACE:
 				DeleteTrace();
@@ -1471,7 +1486,18 @@ void CUIforETWDlg::OnOpenTraceWPA()
 	if (selIndex >= 0)
 	{
 		std::wstring tracePath = GetTraceDir() + traces_[selIndex] + L".etl";
-		LaunchTraceViewer(tracePath);
+		LaunchTraceViewer(tracePath, wpaPath_);
+	}
+}
+
+void CUIforETWDlg::OnOpenTrace10WPA()
+{
+	int selIndex = btTraces_.GetCurSel();
+
+	if (selIndex >= 0)
+	{
+		std::wstring tracePath = GetTraceDir() + traces_[selIndex] + L".etl";
+		LaunchTraceViewer(tracePath, wpa10Path_);
 	}
 }
 
@@ -1482,7 +1508,7 @@ void CUIforETWDlg::OnOpenTraceGPUView()
 	if (selIndex >= 0)
 	{
 		std::wstring tracePath = GetTraceDir() + traces_[selIndex] + L".etl";
-		LaunchTraceViewer(tracePath, L"gpuview\\GPUView.exe");
+		LaunchTraceViewer(tracePath, gpuViewPath_);
 	}
 }
 

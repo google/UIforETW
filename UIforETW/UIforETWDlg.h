@@ -116,7 +116,13 @@ private:
 	// this string object, so don't change it without adding synchronization.
 	std::wstring traceDir_;
 	std::wstring tempTraceDir_;
+	std::wstring windowsKitsDir_; // C:\\Program Files (x86)\\Windows Kits
 	std::wstring wptDir_;
+	std::wstring wpt10Dir_;
+	std::wstring wpaPath_;
+	std::wstring gpuViewPath_;
+	std::wstring wpa10Path_;
+
 	std::wstring windowsDir_; // C:\Windows\, or some-such.
 	std::string systemDrive_; // C:\, or something like that, ANSI.
 
@@ -181,7 +187,7 @@ private:
 	void UpdateNotesState();
 	void StripChromeSymbols(const std::wstring& traceFilename);
 	void PreprocessTrace(const std::wstring& traceFilename);
-	void LaunchTraceViewer(const std::wstring traceFilename, const std::wstring viewer = L"wpa.exe");
+	void LaunchTraceViewer(const std::wstring traceFilename, const std::wstring viewerPath);
 	void SaveNotesIfNeeded();
 	void ShutdownTasks();
 	bool bShutdownCompleted_ = false;
@@ -220,6 +226,7 @@ private:
 	afx_msg void FinishTraceRename();
 	afx_msg void CancelTraceRename();
 	afx_msg void OnOpenTraceWPA();
+	afx_msg void OnOpenTrace10WPA();
 	afx_msg void OnOpenTraceGPUView();
 	afx_msg void CopyTraceName();
 	afx_msg void DeleteTrace();
