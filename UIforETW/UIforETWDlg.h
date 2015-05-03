@@ -41,7 +41,7 @@ public:
 	void vprintf(const wchar_t* pFormat, va_list marker);
 
 private:
-	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV support
+	virtual void DoDataExchange(CDataExchange* pDX) override;	// DDX/DDV support
 
 	HICON m_hIcon;
 
@@ -193,7 +193,7 @@ private:
 	bool bShutdownCompleted_ = false;
 
 	// Generated message map functions
-	virtual BOOL OnInitDialog();
+	virtual BOOL OnInitDialog() override;
 	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
 	afx_msg void OnPaint();
 	afx_msg HCURSOR OnQueryDragIcon();

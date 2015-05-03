@@ -34,7 +34,7 @@ public:
 
 // Overrides
 public:
-	virtual BOOL InitInstance();
+	virtual BOOL InitInstance() override;
 	afx_msg void OnHelp();
 
 // Implementation
