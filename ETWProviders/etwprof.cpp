@@ -211,7 +211,7 @@ void ETWMarkPrintf( const char *pMessage, ... )
 	EventWriteMark( buffer );
 }
 
-void ETWMarkWorkingSet(const char* pProcessName, const char* pProcess, float privateWS, float PSS, float workingSet)
+void ETWMarkWorkingSet(const wchar_t* pProcessName, const wchar_t* pProcess, unsigned privateWS, unsigned PSS, unsigned workingSet)
 {
 	EventWriteMarkWorkingSet(pProcessName, pProcess, privateWS, PSS, workingSet);
 }

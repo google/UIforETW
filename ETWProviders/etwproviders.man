@@ -103,11 +103,11 @@ Adjust that to match your games actual install path.
             <data inType="win:AnsiString" name="ThreadName" />
           </template>
           <template tid="T_WorkingSet">
-            <data inType="win:AnsiString" name="Process Name" />
-            <data inType="win:AnsiString" name="Process" />
-            <data inType="win:Float" name="Private WS (MiB)" />
-            <data inType="win:Float" name="Proportional Set Size (MiB)" />
-            <data inType="win:Float" name="Working Set (MiB)" />
+            <data inType="win:UnicodeString" name="Process Name" />
+            <data inType="win:UnicodeString" name="Process" />
+            <data inType="win:UInt32" name="Private WS (KiB)" />
+            <data inType="win:UInt32" name="Proportional Set Size (KiB)" />
+            <data inType="win:UInt32" name="Working Set (KiB)" />
           </template>
         </templates>
         <keywords>

@@ -20,6 +20,7 @@ limitations under the License.
 #include <psapi.h>
 #include <vector>
 #include <cstdint>
+#include <TlHelp32.h>
 #include "Utility.h"
 #include "WorkingSet.h"
 
@@ -29,23 +30,24 @@ const DWORD kSamplingInterval = 1000;
 
 static void SampleWorkingSets()
 {
-	DWORD processIDs[1024];
-	DWORD cbReturned;
-
-	// Get a list of process IDs.
-	if (!EnumProcesses(processIDs, sizeof(processIDs), &cbReturned))
-	{
+	// CreateToolhelp32Snapshot runs faster than EnumProcesses and
+	// it returns the process name as well, thus avoiding a call to
+	// EnumProcessModules to get the name.
+	HANDLE hSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, TH32CS_SNAPPROCESS);
+	if (!hSnapshot)
 		return;
-	}
 
-	const DWORD numProcesses = cbReturned / sizeof(processIDs[0]);
+	PROCESSENTRY32W peInfo;
+	peInfo.dwSize = sizeof(peInfo);
+	BOOL nextProcess = Process32First(hSnapshot, &peInfo);
 
+	// Allocate enough space to get the working set of most processes.
+	// It will grow if needed.
 	ULONG_PTR numEntries = 100000;
 	std::vector<char> buffer(sizeof(PSAPI_WORKING_SET_INFORMATION) + numEntries * sizeof(PSAPI_WORKING_SET_BLOCK));
 	PSAPI_WORKING_SET_INFORMATION* pwsBuffer = reinterpret_cast<PSAPI_WORKING_SET_INFORMATION*>(&buffer[0]);
 
-	// Iterate through the processes.
-	uint64_t totalWSPages = 0;
+	unsigned totalWSPages = 0;
 	// The PSS page count is stored as a multiple of PSSMultiplier.
 	// This allows all the supported share counts, from 1 to 7, to be
 	// divided out without loss of precision. That is, an unshared page
@@ -53,73 +55,70 @@ static void SampleWorkingSets()
 	// maximum recorded) is recorded by adding 420/7.
 	const uint64_t PSSMultiplier = 420; // LCM of 1, 2, 3, 4, 5, 6, 7
 	uint64_t totalPSSPages = 0;
-	uint64_t totalPrivateWSPages = 0;
-	for (DWORD i = 0; i < numProcesses; ++i)
+	unsigned totalPrivateWSPages = 0;
+
+	// Iterate through the processes.
+	while (nextProcess)
 	{
-		// Get a handle to the process.
-		HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION |
-			PROCESS_VM_READ, FALSE, processIDs[i]);
-
-		if (NULL != hProcess)
+		if (_wcsicmp(peInfo.szExeFile, L"chrome.exe") == 0)
 		{
-			HMODULE hMod;
+			DWORD pid = peInfo.th32ProcessID;
+			// Get a handle to the process.
+			HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION |
+				PROCESS_VM_READ, FALSE, pid);
 
-			// Get the process name and working set.
-			char processName[MAX_PATH];
-			if (EnumProcessModules(hProcess, &hMod, sizeof(hMod), &cbReturned) &&
-				GetModuleBaseNameA(hProcess, hMod, processName,
-				ARRAYSIZE(processName)))
+			if (NULL != hProcess)
 			{
-				if (_stricmp(processName, "chrome.exe") == 0)
+				bool success = true;
+				if (!QueryWorkingSet(hProcess, &buffer[0], buffer.size()))
 				{
-					bool success = true;
+					// Increase the buffer size based on the NumberOfEntries returned,
+					// with some padding in case the working set is increasing.
+					if (GetLastError() == ERROR_BAD_LENGTH)
+						numEntries = pwsBuffer->NumberOfEntries + pwsBuffer->NumberOfEntries / 4;
+					buffer.resize(sizeof(PSAPI_WORKING_SET_INFORMATION) + numEntries * sizeof(PSAPI_WORKING_SET_BLOCK));
+					pwsBuffer = reinterpret_cast<PSAPI_WORKING_SET_INFORMATION*>(&buffer[0]);
 					if (!QueryWorkingSet(hProcess, &buffer[0], buffer.size()))
 					{
-						// Increase the buffer size based on the NumberOfEntries returned,
-						// with some padding in case the working set is increasing.
-						if (GetLastError() == ERROR_BAD_LENGTH)
-							numEntries = pwsBuffer->NumberOfEntries + pwsBuffer->NumberOfEntries / 4;
-						buffer.resize(sizeof(PSAPI_WORKING_SET_INFORMATION) + numEntries * sizeof(PSAPI_WORKING_SET_BLOCK));
-						pwsBuffer = reinterpret_cast<PSAPI_WORKING_SET_INFORMATION*>(&buffer[0]);
-						if (!QueryWorkingSet(hProcess, &buffer[0], buffer.size()))
-						{
-							success = false;
-						}
-					}
-
-					if (success)
-					{
-						ULONG_PTR wsPages = pwsBuffer->NumberOfEntries;
-						uint64_t PSSPages = 0;
-						ULONG_PTR privateWSPages = 0;
-						for (ULONG_PTR page = 0; page < wsPages; ++page)
-						{
-							if (!pwsBuffer->WorkingSetInfo[page].Shared)
-							{
-								++privateWSPages;
-								PSSPages += PSSMultiplier;
-							}
-							else
-							{
-								assert(pwsBuffer->WorkingSetInfo[page].ShareCount <= 7);
-								PSSPages += PSSMultiplier / pwsBuffer->WorkingSetInfo[page].ShareCount;
-							}
-						}
-						totalWSPages += wsPages;
-						totalPSSPages += PSSPages;
-						totalPrivateWSPages += privateWSPages;
-
-						char process[MAX_PATH + 100];
-						sprintf_s(process, "%s (%u)", processName, processIDs[i]);
-						ETWMarkWorkingSet(processName, process, privateWSPages / 256.0f, PSSPages / (256.0f * PSSMultiplier), wsPages / 256.0f);
+						success = false;
 					}
 				}
-			}
 
-			CloseHandle(hProcess);
+				if (success)
+				{
+					ULONG_PTR wsPages = pwsBuffer->NumberOfEntries;
+					uint64_t PSSPages = 0;
+					ULONG_PTR privateWSPages = 0;
+					for (ULONG_PTR page = 0; page < wsPages; ++page)
+					{
+						if (!pwsBuffer->WorkingSetInfo[page].Shared)
+						{
+							++privateWSPages;
+							PSSPages += PSSMultiplier;
+						}
+						else
+						{
+							assert(pwsBuffer->WorkingSetInfo[page].ShareCount <= 7);
+							PSSPages += PSSMultiplier / pwsBuffer->WorkingSetInfo[page].ShareCount;
+						}
+					}
+					totalWSPages += wsPages;
+					totalPSSPages += PSSPages;
+					totalPrivateWSPages += privateWSPages;
+
+					wchar_t process[MAX_PATH + 100];
+					swprintf_s(process, L"%s (%u)", peInfo.szExeFile, pid);
+					ETWMarkWorkingSet(peInfo.szExeFile, process, privateWSPages * 4, (unsigned)((PSSPages * 4) / PSSMultiplier), wsPages * 4);
+				}
+
+				CloseHandle(hProcess);
+			}
+			nextProcess = Process32Next(hSnapshot, &peInfo);
 		}
 	}
-	ETWMarkWorkingSet("Total", "", totalPrivateWSPages / 256.0f, totalPSSPages / (256.0f * PSSMultiplier), totalWSPages / 256.0f);
+	CloseHandle(hSnapshot);
+
+	ETWMarkWorkingSet(L"Total", L"", totalPrivateWSPages * 4, (unsigned)((totalPSSPages * 4) / PSSMultiplier), totalWSPages * 4);
 }
 
 DWORD __stdcall CWorkingSetMonitor::StaticWSMonitorThread(LPVOID param)
