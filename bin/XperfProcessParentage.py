@@ -27,16 +27,16 @@ import sys
 import subprocess
 
 # This dictionary maps from process IDs to their parents
-# It's a fucking global. Fuck!
+# TODO: remove global!
 parents = {}
 
 # This dictionary maps from process IDs to their details
-# It's a fucking global. Fuck!
+# TODO: remove global!
 details = {}
 
 # When this is stored in the data field of the parents dictionary
 # it indicates that a process has been printed already.
-# It's a fucking global. Fuck!
+# TODO: remove global!
 processedParent = -1
 
 
