@@ -1124,12 +1124,12 @@ BOOL CUIforETWDlg::OnInitDialog()
 	wchar_t* progFilesx86Dir = nullptr;
 	VERIFY(SUCCEEDED(SHGetKnownFolderPath(FOLDERID_ProgramFilesX86, 0, NULL, &progFilesx86Dir)));
 	windowsKitsDir_ = progFilesx86Dir;
-  windowsKitsDir_ += L"\\Windows Kits\\";
+	windowsKitsDir_ += L"\\Windows Kits\\";
 	wptDir_ = windowsKitsDir_ + L"8.1\\Windows Performance Toolkit\\";
-  wpt10Dir_ = windowsKitsDir_ + L"10\\Windows Performance Toolkit\\";
-  wpaPath_ = wptDir_ + L"wpa.exe";
-  gpuViewPath_ = wptDir_ + L"gpuview\\gpuview.exe";
-  wpa10Path_ = wpt10Dir_ + L"wpa.exe";
+	wpt10Dir_ = windowsKitsDir_ + L"10\\Windows Performance Toolkit\\";
+	wpaPath_ = wptDir_ + L"wpa.exe";
+	gpuViewPath_ = wptDir_ + L"gpuview\\gpuview.exe";
+	wpa10Path_ = wpt10Dir_ + L"wpa.exe";
 	CoTaskMemFree(progFilesx86Dir);
 	if (!PathFileExists(GetXperfPath().c_str()))
 	{
@@ -1137,6 +1137,7 @@ BOOL CUIforETWDlg::OnInitDialog()
 		exit(10);
 	}
 
+	std::wstring documents = getDocumentsPath( );
 	std::wstring defaultTraceDir = documents + std::wstring(L"\\etwtraces\\");
 	traceDir_ = GetDirectory(L"etwtracedir", defaultTraceDir);
 	const bool copyToDirResult =
@@ -2218,44 +2219,7 @@ void CUIforETWDlg::OnContextMenu(CWnd* pWnd, CPoint point)
 
 		for (auto id : disableList)
 		{
-			case ID_TRACES_OPENTRACEINWPA:
-				LaunchTraceViewer(tracePath, wpaPath_);
-				break;
-			case ID_TRACES_OPENTRACEIN10WPA:
-				LaunchTraceViewer(tracePath, wpa10Path_);
-				break;
-			case ID_TRACES_OPENTRACEINGPUVIEW:
-				LaunchTraceViewer(tracePath, gpuViewPath_);
-				break;
-			case ID_TRACES_DELETETRACE:
-				DeleteTrace();
-				break;
-			case ID_TRACES_RENAMETRACE:
-				StartRenameTrace(false);
-				break;
-			case ID_TRACES_COMPRESSTRACE:
-				CompressTrace(tracePath);
-				break;
-			case ID_TRACES_ZIPCOMPRESSTRACE:
-				AfxMessageBox(L"Not implemented yet.");
-				break;
-			case ID_TRACES_COMPRESSTRACES:
-				CompressAllTraces();
-				break;
-			case ID_TRACES_ZIPCOMPRESSALLTRACES:
-				AfxMessageBox(L"Not implemented yet.");
-				break;
-			case ID_TRACES_BROWSEFOLDER:
-				ShellExecute(NULL, L"open", GetTraceDir().c_str(), NULL, GetTraceDir().c_str(), SW_SHOW);
-				break;
-			case ID_TRACES_STRIPCHROMESYMBOLS:
-				outputPrintf(L"\n");
-				StripChromeSymbols(tracePath);
-				break;
-			case ID_TRACES_TRACEPATHTOCLIPBOARD:
-				// Comma delimited for easy pasting into DOS commands.
-				SetClipboardText(L"\"" + tracePath + L"\"");
-				break;
+			pContextMenu->EnableMenuItem(id, MF_BYCOMMAND | MF_GRAYED);
 		}
 	}
 
@@ -2277,10 +2241,13 @@ void CUIforETWDlg::OnContextMenu(CWnd* pWnd, CPoint point)
 	switch (selection)
 	{
 		case ID_TRACES_OPENTRACEINWPA:
-			LaunchTraceViewer(tracePath);
+			LaunchTraceViewer(tracePath, wpaPath_);
+			break;
+		case ID_TRACES_OPENTRACEIN10WPA:
+			LaunchTraceViewer(tracePath, wpa10Path_);
 			break;
 		case ID_TRACES_OPENTRACEINGPUVIEW:
-			LaunchTraceViewer(tracePath, L"gpuview\\GPUView.exe");
+			LaunchTraceViewer(tracePath, gpuViewPath_);
 			break;
 		case ID_TRACES_DELETETRACE:
 			DeleteTrace();
@@ -2295,14 +2262,7 @@ void CUIforETWDlg::OnContextMenu(CWnd* pWnd, CPoint point)
 			AfxMessageBox(L"Not implemented yet.");
 			break;
 		case ID_TRACES_COMPRESSTRACES:
-			outputPrintf(
-				L"\nCompressing all traces - "
-				L"this may take a while:\n");
-			
-			for (auto traceName : traces_)
-				CompressTrace(GetTraceDir() + traceName + L".etl");
-
-			outputPrintf(L"Finished compressing traces.\n");
+			CompressAllTraces();
 			break;
 		case ID_TRACES_ZIPCOMPRESSALLTRACES:
 			AfxMessageBox(L"Not implemented yet.");
