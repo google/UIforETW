@@ -307,12 +307,12 @@ BOOL CUIforETWDlg::OnInitDialog()
 	wchar_t* progFilesx86Dir = nullptr;
 	VERIFY(SUCCEEDED(SHGetKnownFolderPath(FOLDERID_ProgramFilesX86, 0, NULL, &progFilesx86Dir)));
 	windowsKitsDir_ = progFilesx86Dir;
-  windowsKitsDir_ += L"\\Windows Kits\\";
+	windowsKitsDir_ += L"\\Windows Kits\\";
 	wptDir_ = windowsKitsDir_ + L"8.1\\Windows Performance Toolkit\\";
-  wpt10Dir_ = windowsKitsDir_ + L"10\\Windows Performance Toolkit\\";
-  wpaPath_ = wptDir_ + L"wpa.exe";
-  gpuViewPath_ = wptDir_ + L"gpuview\\gpuview.exe";
-  wpa10Path_ = wpt10Dir_ + L"wpa.exe";
+	wpt10Dir_ = windowsKitsDir_ + L"10\\Windows Performance Toolkit\\";
+	wpaPath_ = wptDir_ + L"wpa.exe";
+	gpuViewPath_ = wptDir_ + L"gpuview\\gpuview.exe";
+	wpa10Path_ = wpt10Dir_ + L"wpa.exe";
 	CoTaskMemFree(progFilesx86Dir);
 	if (!PathFileExists(GetXperfPath().c_str()))
 	{
