@@ -21,6 +21,7 @@ limitations under the License.
 #include <memory>
 #include "KeyLoggerThread.h"
 #include "DirectoryMonitor.h"
+#include "WorkingSet.h"
 
 enum TracingMode
 {
@@ -102,6 +103,9 @@ private:
 	// This starts and stops a thread that watches for changes to the
 	// trace directory and sends a message when one is detected.
 	DirectoryMonitor monitorThread_;
+	// This starts and stops a thread that monitors process working sets.
+	CWorkingSetMonitor workingSetThread_;
+	std::wstring WSMonitoredProcesses_;
 
 	// This contains the notes for the selected trace, as loaded from disk.
 	std::wstring traceNotes_;

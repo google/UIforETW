@@ -150,6 +150,7 @@
     <ClInclude Include="Utility.h" />
     <ClInclude Include="UIforETW.h" />
     <ClInclude Include="UIforETWDlg.h" />
+    <ClInclude Include="WorkingSet.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="alias.cpp" />
@@ -165,6 +166,7 @@
     <ClCompile Include="Utility.cpp" />
     <ClCompile Include="UIforETW.cpp" />
     <ClCompile Include="UIforETWDlg.cpp" />
+    <ClCompile Include="WorkingSet.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="UIforETW.rc" />

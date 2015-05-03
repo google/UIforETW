@@ -6,7 +6,7 @@
 *Generated*
 # Excluded most executables, but include a few specific ones.
 *.exe
-
+*.exp
 *.ilk
 *.pdb
 Debug/

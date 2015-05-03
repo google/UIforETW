@@ -54,6 +54,9 @@ PLATFORM_INTERFACE void ETWMark2F(const char* pMessage, float data1, float data2
 PLATFORM_INTERFACE void ETWMarkPrintf( _Printf_format_string_ const char *pMessage, ... );
 PLATFORM_INTERFACE void ETWWorkerMarkPrintf( _Printf_format_string_ const char *pMessage, ... );
 
+// Private Working Set, Proportional Set Size (shared memory charged proportionally, and total Working Set
+PLATFORM_INTERFACE void ETWMarkWorkingSet(const wchar_t* pProcessName, const wchar_t* pProcess, unsigned privateWS, unsigned PSS, unsigned workingSet);
+
 // Insert a begin event to mark the start of some work. The return value is a 64-bit
 // time stamp which should be passed to the corresponding ETWEnd function.
 PLATFORM_INTERFACE int64 ETWBegin( const char *pMessage );
@@ -112,6 +115,7 @@ inline void ETWMark1F(const char* pMessage, float data1) {}
 inline void ETWMark2F(const char* pMessage, float data1, float data2) {}
 inline void ETWMarkPrintf( const char *pMessage, ... ) {}
 inline void ETWWorkerMarkPrintf( const char *pMessage, ... ) {}
+inline void ETWMarkWorkingSet(const wchar_t* pProcessName, const wchar_t* pProcess, unsigned privateWS, unsigned PSS, unsigned workingSet) {}
 inline int64 ETWBegin( const char* ) { return 0; }
 inline int64 ETWWorkerBegin( const char* ) { return 0; }
 inline int64 ETWEnd( const char*, int64 ) { return 0; }

@@ -49,6 +49,7 @@ void CSettings::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_AUTOVIEWTRACES, btAutoViewTraces_);
 	DDX_Control(pDX, IDC_HEAPSTACKS, btHeapStacks_);
 	DDX_Control(pDX, IDC_CHROMEDLLPATH, btChromeDllPath_);
+	DDX_Control(pDX, IDC_WSMONITOREDPROCESSES, btWSMonitoredProcesses_);
 
 	CDialogEx::DoDataExchange(pDX);
 }
@@ -71,6 +72,8 @@ BOOL CSettings::OnInitDialog()
 	CheckDlgButton(IDC_AUTOVIEWTRACES, bAutoViewTraces_);
 	CheckDlgButton(IDC_HEAPSTACKS, bHeapStacks_);
 	SetDlgItemText(IDC_CHROMEDLLPATH, chromeDllPath_.c_str());
+
+	SetDlgItemText(IDC_WSMONITOREDPROCESSES, WSMonitoredProcesses_.c_str());
 
 	btExtraProviders_.EnableWindow(FALSE);
 	btExtraStackwalks_.EnableWindow(FALSE);
@@ -100,6 +103,9 @@ BOOL CSettings::OnInitDialog()
 					L"and similar calls, when doing heap traces.");
 		toolTip_.AddTool(&btChromeDllPath_, L"Specify the path where chrome.dll resides. This is used "
 					L"to register the Chrome providers if the Chrome developer option is set.");
+		toolTip_.AddTool(&btWSMonitoredProcesses_, L"Names of processes whose working sets will be "
+					L"monitored, separated by semi-colons. An empty string means no monitoring. A '*' means "
+					L"that all processes will be monitored. For instance 'chrome.exe;notepad.exe'");
 	}
 
 	return TRUE;  // return TRUE  unless you set the focus to a control
@@ -109,6 +115,7 @@ void CSettings::OnOK()
 {
 	heapTracingExe_ = GetEditControlText(btHeapTracingExe_);
 	chromeDllPath_ = GetEditControlText(btChromeDllPath_);
+	WSMonitoredProcesses_ = GetEditControlText(btWSMonitoredProcesses_);
 	if (heapTracingExe_.size() <= 4 || heapTracingExe_.substr(heapTracingExe_.size() - 4, heapTracingExe_.size()) != L".exe")
 	{
 		AfxMessageBox(L"The heap-profiled process name must end in .exe");

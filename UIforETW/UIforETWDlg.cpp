@@ -24,6 +24,7 @@ limitations under the License.
 #include "Settings.h"
 #include "Utility.h"
 #include "alias.h"
+#include "WorkingSet.h"
 
 #include <algorithm>
 #include <direct.h>
@@ -1197,6 +1198,9 @@ BOOL CUIforETWDlg::OnInitDialog()
 	// Don't change traceDir_ because the monitor thread has a pointer to it.
 	monitorThread_.StartThread(&traceDir_);
 
+	// Configure the working set monitor.
+	workingSetThread_.SetProcessFilter(WSMonitoredProcesses_);
+
 	DisablePagingExecutive();
 
 	UpdateTraceList();
@@ -2141,6 +2145,7 @@ void CUIforETWDlg::OnBnClickedSettings()
 	CSettings dlgAbout(nullptr, GetExeDir(), GetWPTDir());
 	dlgAbout.heapTracingExe_ = heapTracingExe_;
 	dlgAbout.chromeDllPath_ = chromeDllPath_;
+	dlgAbout.WSMonitoredProcesses_ = WSMonitoredProcesses_;
 	dlgAbout.bChromeDeveloper_ = bChromeDeveloper_;
 	dlgAbout.bAutoViewTraces_ = bAutoViewTraces_;
 	dlgAbout.bHeapStacks_ = bHeapStacks_;
@@ -2169,6 +2174,8 @@ void CUIforETWDlg::OnBnClickedSettings()
 
 		// Copy over the remaining settings.
 		chromeDllPath_ = dlgAbout.chromeDllPath_;
+		WSMonitoredProcesses_ = dlgAbout.WSMonitoredProcesses_;
+		workingSetThread_.SetProcessFilter(WSMonitoredProcesses_);
 		bAutoViewTraces_ = dlgAbout.bAutoViewTraces_;
 		bHeapStacks_ = dlgAbout.bHeapStacks_;
 	}

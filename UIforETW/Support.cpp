@@ -97,6 +97,7 @@ void CUIforETWDlg::TransferSettings(bool saving)
 	{
 		{ L"HeapProfiledProcess", &heapTracingExe_ },
 		{ L"ChromeDllPath", &chromeDllPath_ },
+		{ L"WSMonitoredProcesses", &WSMonitoredProcesses_ },
 	};
 
 	for (auto& m : strings)

@@ -52,6 +52,7 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="alias.h">
+    <ClInclude Include="WorkingSet.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -84,6 +85,7 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="alias.cpp">
+    <ClCompile Include="WorkingSet.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
