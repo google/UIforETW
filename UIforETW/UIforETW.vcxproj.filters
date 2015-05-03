@@ -52,6 +52,7 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="alias.h">
+    </ClInclude>
     <ClInclude Include="WorkingSet.h">
       <Filter>Header Files</Filter>
     </ClInclude>
