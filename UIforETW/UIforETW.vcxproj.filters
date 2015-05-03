@@ -51,6 +51,9 @@
     <ClInclude Include="DirectoryMonitor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="WorkingSet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="UIforETW.cpp">
@@ -78,6 +81,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Support.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="WorkingSet.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

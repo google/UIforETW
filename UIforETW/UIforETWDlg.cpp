@@ -23,6 +23,7 @@ limitations under the License.
 #include "ChildProcess.h"
 #include "Settings.h"
 #include "Utility.h"
+#include "WorkingSet.h"
 
 #include <algorithm>
 #include <direct.h>
@@ -123,6 +124,8 @@ void CUIforETWDlg::ShutdownTasks()
 
 	// Forcibly clear the heap tracing registry keys.
 	SetHeapTracing(true);
+
+	StopWorkingSetMonitor();
 
 	// Make sure the sampling speed is set to normal on the way out.
 	// Don't change bFastSampling because it needs to get saved.
@@ -435,6 +438,8 @@ BOOL CUIforETWDlg::OnInitDialog()
 	SetHeapTracing(false);
 	// Start the input logging thread with the current settings.
 	SetKeyloggingState(InputTracing_);
+	// Start the working set logging thread.
+	StartWorkingSetMonitor();
 
 	return TRUE; // return TRUE unless you set the focus to a control
 }

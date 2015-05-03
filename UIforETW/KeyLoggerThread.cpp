@@ -17,7 +17,7 @@ limitations under the License.
 #include "stdafx.h"
 #include <assert.h>
 #include "KeyLoggerThread.h"
-#include "ETWProviders\etwprof.h"
+#include <ETWProviders\etwprof.h>
 #include <atomic>
 
 namespace
