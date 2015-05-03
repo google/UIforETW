@@ -102,6 +102,13 @@ Adjust that to match your games actual install path.
             <data inType="win:Int32" name="ThreadID" />
             <data inType="win:AnsiString" name="ThreadName" />
           </template>
+          <template tid="T_WorkingSet">
+            <data inType="win:AnsiString" name="Process Name" />
+            <data inType="win:AnsiString" name="Process" />
+            <data inType="win:Float" name="Private WS" />
+            <data inType="win:Float" name="Proportional Set Size" />
+            <data inType="win:Float" name="Working Set" />
+          </template>
         </templates>
         <keywords>
           <keyword name="HighFrequency" mask="0x2" />
@@ -127,6 +134,7 @@ Adjust that to match your games actual install path.
           <event symbol="Mark2I" template="T_Mark2I" value="105" task="Block" opcode="Mark" keywords="NormalFrequency" />
           <event symbol="Mark1F" template="T_Mark1F" value="106" task="Block" opcode="Mark" keywords="NormalFrequency" />
           <event symbol="Mark2F" template="T_Mark2F" value="107" task="Block" opcode="Mark" keywords="NormalFrequency" />
+          <event symbol="MarkWorkingSet" template="T_WorkingSet" value="108" task="Block" opcode="Information" keywords="NormalFrequency" />
         </events>
       </provider>
 

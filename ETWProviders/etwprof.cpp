@@ -211,6 +211,11 @@ void ETWMarkPrintf( const char *pMessage, ... )
 	EventWriteMark( buffer );
 }
 
+void ETWMarkWorkingSet(const char* pProcessName, const char* pProcess, float privateWS, float PSS, float workingSet)
+{
+	EventWriteMarkWorkingSet(pProcessName, pProcess, privateWS, PSS, workingSet);
+}
+
 // Track the depth of ETW Begin/End pairs. This needs to be per-thread
 // if we start emitting marks on multiple threads. Using __declspec(thread)
 // has some problems on Windows XP, but since these ETW functions only work
