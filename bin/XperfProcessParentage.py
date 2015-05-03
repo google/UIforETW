@@ -40,18 +40,18 @@ details = {}
 processedParent = -1
 
 
-"""
-Print a process and recursively print all of its children.
+def PrintProcessTree(procID, indent, is_loop):
+  """
+  Print a process and recursively print all of its children.
 
-Mark the processes as
-being printed so that we don't print any processes more than once.
-Print with the requested indent level from 0 to ...
-Annotate the printout with extra information if the process is
-missing from the trace (must have a child that outlived it) or
-if the process is part of a loop (some part of the loop must have
-reused a process ID).
-"""
-def PrintProcessTree(procID, indent, bIsLoop):
+  Mark the processes as
+  being printed so that we don't print any processes more than once.
+  Print with the requested indent level from 0 to ...
+  Annotate the printout with extra information if the process is
+  missing from the trace (must have a child that outlived it) or
+  if the process is part of a loop (some part of the loop must have
+  reused a process ID).
+  """
   missing = ""
   detail = ""
   loop = ""
@@ -61,7 +61,7 @@ def PrintProcessTree(procID, indent, bIsLoop):
     detail = details[procID]
   else:
     missing = " (missing process)"
-  if bIsLoop:
+  if is_loop:
     loop = " (loop)"
   parents[procID] = processedParent
   print("%s%d%s%s, %s" % ("    " * indent, procID, missing, loop, detail))
@@ -73,6 +73,9 @@ def PrintProcessTree(procID, indent, bIsLoop):
       PrintProcessTree(childID, indent+1, False)
 
 def main():
+  """
+  Otherwise, pylint complains about not having a docstring!
+  """
 
   # This is the name of the file that wpaexporter creates when using
   # ProcessParentage.wpaProfile. Ideally this filename could be
@@ -109,32 +112,30 @@ def main():
   for line in lines:
     print(line, file=sys.stderr)
 
-  
-
-
-
   # Read the raw data.
   with open(csvFilename) as csvFile:
     lines = csvFile.readlines()
-    if len(lines) < 2:
-      print("Missing data. Sorry.")
-      sys.exit(0)
 
-    # Scan through every line of the .csv file (except the first
-    # line which just contains column labels) and fill in the
-    # parents and details dictionaries.
-    for line in lines[1:]:
-      # Should probably do better CSV parsing, but I don't think it matters.
-      parts = line.strip().split(",")
-      procID = int(parts[0])
-      parentID = int(parts[1])
-      # Treat the remaining fields as a single string.
-      extraData = ",".join(parts[2:])
-      if procID in parents:
-        print("Process ID %d found again. Discarding %s\n" % (procID, extraData), file=sys.stderr)
-      else:
-        parents[procID] = parentID
-        details[procID] = extraData
+  #lines = open(csvFilename).readlines()
+  if len(lines) < 2:
+    print("Missing data. Sorry.")
+    sys.exit(0)
+
+  # Scan through every line of the .csv file (except the first
+  # line which just contains column labels) and fill in the
+  # parents and details dictionaries.
+  for line in lines[1:]:
+    # Should probably do better CSV parsing, but I don't think it matters.
+    parts = line.strip().split(",")
+    procID = int(parts[0])
+    parentID = int(parts[1])
+    # Treat the remaining fields as a single string.
+    extraData = ",".join(parts[2:])
+    if procID in parents:
+      print("Process ID %d found again. Discarding %s\n" % (procID, extraData), file=sys.stderr)
+    else:
+      parents[procID] = parentID
+      details[procID] = extraData
 
 
   # Iterate through all processes. For each process try to find
@@ -143,7 +144,9 @@ def main():
   # We detect loops but, unfortunately, they make determining the
   # correct structure impossible, so the code just randomly chooses
   # a point in the loop to print from.
-  for procID in parents.keys():
+  # NOTE: in Python 3.x, keys returns an iterator
+  # ...In Python 2.x, it returned a COPY!
+  for procID in list(parents.keys()):
     if parents[procID] == processedParent:
       continue
     # For each one find the 'oldest' ancestor process
