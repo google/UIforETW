@@ -2223,7 +2223,7 @@ void CUIforETWDlg::OnContextMenu(CWnd* pWnd, CPoint point)
 		}
 	}
 
-	if (GetWindowsVersion() < kWindowsVersion8)
+	if (!IsWindows8OrGreater( ))
 	{
 		// Disable ETW trace compress options on Windows 7 and below
 		// since they don't work there.
