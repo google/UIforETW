@@ -20,15 +20,14 @@ limitations under the License.
 #include <psapi.h>
 #include <vector>
 #include <cstdint>
+#include "Utility.h"
+#include "WorkingSet.h"
 
 #pragma comment(lib, "psapi.lib")
 
-static HANDLE s_hThread;
-static HANDLE s_hExitEvent;
-
 const DWORD kSamplingInterval = 1000;
 
-void SampleWorkingSets()
+static void SampleWorkingSets()
 {
 	DWORD processIDs[1024];
 	DWORD cbReturned;
@@ -47,6 +46,13 @@ void SampleWorkingSets()
 
 	// Iterate through the processes.
 	uint64_t totalWSPages = 0;
+	// The PSS page count is stored as a multiple of PSSMultiplier.
+	// This allows all the supported share counts, from 1 to 7, to be
+	// divided out without loss of precision. That is, an unshared page
+	// is recorded by adding 420. A page shared by seven processes (the
+	// maximum recorded) is recorded by adding 420/7.
+	const uint64_t PSSMultiplier = 420; // LCM of 1, 2, 3, 4, 5, 6, 7
+	uint64_t totalPSSPages = 0;
 	uint64_t totalPrivateWSPages = 0;
 	for (DWORD i = 0; i < numProcesses; ++i)
 	{
@@ -84,20 +90,28 @@ void SampleWorkingSets()
 					if (success)
 					{
 						ULONG_PTR wsPages = pwsBuffer->NumberOfEntries;
+						uint64_t PSSPages = 0;
 						ULONG_PTR privateWSPages = 0;
 						for (ULONG_PTR page = 0; page < wsPages; ++page)
 						{
 							if (!pwsBuffer->WorkingSetInfo[page].Shared)
 							{
 								++privateWSPages;
+								PSSPages += PSSMultiplier;
+							}
+							else
+							{
+								assert(pwsBuffer->WorkingSetInfo[page].ShareCount <= 7);
+								PSSPages += PSSMultiplier / pwsBuffer->WorkingSetInfo[page].ShareCount;
 							}
 						}
 						totalWSPages += wsPages;
+						totalPSSPages += PSSPages;
 						totalPrivateWSPages += privateWSPages;
 
-						char buffer[MAX_PATH + 100];
-						sprintf_s(buffer, "%s (%u) WS/private-WS in MB", processName, processIDs[i]);
-						ETWMark2F(buffer, wsPages / 256.0f, privateWSPages / 256.0f);
+						char process[MAX_PATH + 100];
+						sprintf_s(process, "%s (%u)", processName, processIDs[i]);
+						ETWMarkWorkingSet(processName, process, privateWSPages / 256.0f, PSSPages / (256.0f * PSSMultiplier), wsPages / 256.0f);
 					}
 				}
 			}
@@ -105,33 +119,46 @@ void SampleWorkingSets()
 			CloseHandle(hProcess);
 		}
 	}
-	ETWMark2F("Total:", totalWSPages / 256.0f, totalPrivateWSPages / 256.0f);
+	ETWMarkWorkingSet("Total", "", totalPrivateWSPages / 256.0f, totalPSSPages / (256.0f * PSSMultiplier), totalWSPages / 256.0f);
 }
 
-static DWORD __stdcall WSMonitorThread(LPVOID)
+DWORD __stdcall CWorkingSetMonitor::StaticWSMonitorThread(LPVOID param)
 {
+	CWorkingSetMonitor* pThis = reinterpret_cast<CWorkingSetMonitor*>(param);
+	pThis->WSMonitorThread();
+	return 0;
+}
+
+void CWorkingSetMonitor::WSMonitorThread()
+{
+
 	for (;;)
 	{
-		DWORD result = WaitForSingleObject(s_hExitEvent, kSamplingInterval);
+		DWORD result = WaitForSingleObject(hExitEvent_, kSamplingInterval);
 		if (result == WAIT_OBJECT_0)
 			break;
 
 		SampleWorkingSets();
 	}
-
-	return 0;
 }
 
-void StartWorkingSetMonitor()
+CWorkingSetMonitor::CWorkingSetMonitor()
 {
-	s_hExitEvent = CreateEvent(nullptr, FALSE, FALSE, nullptr);
-	s_hThread = CreateThread(NULL, 0, WSMonitorThread, NULL, 0, NULL);
+	hExitEvent_ = CreateEvent(nullptr, FALSE, FALSE, nullptr);
+	hThread_ = CreateThread(NULL, 0, StaticWSMonitorThread, this, 0, NULL);
 }
 
-void StopWorkingSetMonitor()
+CWorkingSetMonitor::~CWorkingSetMonitor()
 {
-	SetEvent(s_hExitEvent);
-	WaitForSingleObject(s_hThread, INFINITE);
-	CloseHandle(s_hThread);
-	CloseHandle(s_hExitEvent);
+	// Shut down the child thread.
+	SetEvent(hExitEvent_);
+	WaitForSingleObject(hThread_, INFINITE);
+	CloseHandle(hThread_);
+	CloseHandle(hExitEvent_);
+}
+
+void CWorkingSetMonitor::SetProcessFilter(const std::wstring& processes)
+{
+	CSingleLock locker(&processesLock_);
+	processes_ = split(processes, ';');
 }
