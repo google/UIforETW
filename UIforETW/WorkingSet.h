@@ -18,6 +18,8 @@ private:
 	static DWORD __stdcall StaticWSMonitorThread(LPVOID);
 	void WSMonitorThread();
 
+	void SampleWorkingSets();
+
 	HANDLE hThread_;
 	HANDLE hExitEvent_;
 
@@ -29,4 +31,5 @@ private:
 	// insensitive) matches one of the entries.
 	// This variable is protected by processesLock_;
 	std::vector<std::wstring> processes_;
+	bool processAll_ = false;
 };

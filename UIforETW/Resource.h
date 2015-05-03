@@ -39,6 +39,8 @@
 #define IDC_BUTTON1                     1020
 #define IDC_EXTRASTACKWALKS             1020
 #define IDC_TEMPTRACEDIR                1021
+#define IDC_HEAPEXE2                    1021
+#define IDC_WSMONITOREDPROCESSES        1021
 #define IDC_BUTTON2                     1022
 #define IDC_COPYSTARTUPPROFILE          1022
 #define IDC_COMBO1                      1023

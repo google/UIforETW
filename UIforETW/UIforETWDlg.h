@@ -105,6 +105,7 @@ private:
 	DirectoryMonitor monitorThread_;
 	// This starts and stops a thread that monitors process working sets.
 	CWorkingSetMonitor workingSetThread_;
+	std::wstring WSMonitoredProcesses_;
 
 	// This contains the notes for the selected trace, as loaded from disk.
 	std::wstring traceNotes_;

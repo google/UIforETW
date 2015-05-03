@@ -28,8 +28,11 @@ limitations under the License.
 
 const DWORD kSamplingInterval = 1000;
 
-static void SampleWorkingSets()
+void CWorkingSetMonitor::SampleWorkingSets()
 {
+	if (processes_.empty() && !processAll_)
+		return;
+
 	// CreateToolhelp32Snapshot runs faster than EnumProcesses and
 	// it returns the process name as well, thus avoiding a call to
 	// EnumProcessModules to get the name.
@@ -60,7 +63,13 @@ static void SampleWorkingSets()
 	// Iterate through the processes.
 	while (nextProcess)
 	{
-		if (_wcsicmp(peInfo.szExeFile, L"chrome.exe") == 0)
+		bool match = processAll_;
+		for (const auto& name : processes_)
+		{
+			if (_wcsicmp(peInfo.szExeFile, name.c_str()) == 0)
+				match = true;
+		}
+		if (match)
 		{
 			DWORD pid = peInfo.th32ProcessID;
 			// Get a handle to the process.
@@ -113,8 +122,8 @@ static void SampleWorkingSets()
 
 				CloseHandle(hProcess);
 			}
-			nextProcess = Process32Next(hSnapshot, &peInfo);
 		}
+		nextProcess = Process32Next(hSnapshot, &peInfo);
 	}
 	CloseHandle(hSnapshot);
 
@@ -159,5 +168,13 @@ CWorkingSetMonitor::~CWorkingSetMonitor()
 void CWorkingSetMonitor::SetProcessFilter(const std::wstring& processes)
 {
 	CSingleLock locker(&processesLock_);
-	processes_ = split(processes, ';');
+	if (processes == L"*")
+	{
+		processAll_ = true;
+	}
+	else
+	{
+		processAll_ = false;
+		processes_ = split(processes, ';');
+	}
 }
