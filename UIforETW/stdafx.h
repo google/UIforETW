@@ -16,6 +16,9 @@ limitations under the License.
 
 #pragma once
 
+// Include this first so that the requested version is known.
+#include "targetver.h"
+
 #ifndef VC_EXTRALEAN
 #define VC_EXTRALEAN            // Exclude rarely-used stuff from Windows headers
 #endif
@@ -23,7 +26,6 @@ limitations under the License.
 #define _ATL_NO_AUTOMATIC_NAMESPACE 1
 
 #include <afxwin.h>         // MFC core and standard components //THIS NEEDS TO BE THE VERY FIRST INCLUDE!
-#include "targetver.h"
 
 #define _ATL_CSTRING_EXPLICIT_CONSTRUCTORS      // some CString constructors will be explicit
 
@@ -33,7 +35,7 @@ limitations under the License.
 #define _ATL_ENABLE_PTM_WARNING                 //force the use of ANSI C++ standard-compliant syntax for pointer to member functions.
                                                 //Using this macro will cause the C4867 compiler error to be generated when non-standard syntax is used to initialize a pointer to a member function.
 #include <afxext.h>         // MFC extensions
-
+#include <assert.h>
 
 #ifndef _AFX_NO_AFXCMN_SUPPORT
 #include <afxcmn.h>             // MFC support for Windows Common Controls

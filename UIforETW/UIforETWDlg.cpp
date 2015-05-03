@@ -1023,6 +1023,7 @@ BEGIN_MESSAGE_MAP(CUIforETWDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_SETTINGS, &CUIforETWDlg::OnBnClickedSettings)
 	ON_WM_CONTEXTMENU()
 	ON_BN_CLICKED(ID_TRACES_OPENTRACEINWPA, &CUIforETWDlg::OnOpenTraceWPA)
+	ON_BN_CLICKED(ID_TRACES_OPENTRACEIN10WPA, &CUIforETWDlg::OnOpenTrace10WPA)
 	ON_BN_CLICKED(ID_TRACES_OPENTRACEINGPUVIEW, &CUIforETWDlg::OnOpenTraceGPUView)
 	ON_BN_CLICKED(ID_RENAME, &CUIforETWDlg::OnRenameKey)
 	ON_BN_CLICKED(ID_RENAMEFULL, &CUIforETWDlg::OnFullRenameKey)
@@ -1118,8 +1119,23 @@ BOOL CUIforETWDlg::OnInitDialog()
 	systemDrive_ = static_cast<char>(windowsDir_[0]);
 	systemDrive_ += ":\\";
 
-	wptDir_ = getWPTDir();
-	std::wstring documents = getDocumentsPath();
+	// The WPT 8.1 installer is always a 32-bit installer, so we look for it in
+	// ProgramFilesX86, on 32-bit and 64-bit operating systems.
+	wchar_t* progFilesx86Dir = nullptr;
+	VERIFY(SUCCEEDED(SHGetKnownFolderPath(FOLDERID_ProgramFilesX86, 0, NULL, &progFilesx86Dir)));
+	windowsKitsDir_ = progFilesx86Dir;
+  windowsKitsDir_ += L"\\Windows Kits\\";
+	wptDir_ = windowsKitsDir_ + L"8.1\\Windows Performance Toolkit\\";
+  wpt10Dir_ = windowsKitsDir_ + L"10\\Windows Performance Toolkit\\";
+  wpaPath_ = wptDir_ + L"wpa.exe";
+  gpuViewPath_ = wptDir_ + L"gpuview\\gpuview.exe";
+  wpa10Path_ = wpt10Dir_ + L"wpa.exe";
+	CoTaskMemFree(progFilesx86Dir);
+	if (!PathFileExists(GetXperfPath().c_str()))
+	{
+		AfxMessageBox((GetXperfPath() + L" does not exist. Please install WPT 8.1. Exiting.").c_str());
+		exit(10);
+	}
 
 	std::wstring defaultTraceDir = documents + std::wstring(L"\\etwtraces\\");
 	traceDir_ = GetDirectory(L"etwtracedir", defaultTraceDir);
@@ -1686,8 +1702,7 @@ void CUIforETWDlg::StopTracingAndMaybeRecord(bool bSaveTrace)
 		PreprocessTrace(traceFilename);
 
 		if (bAutoViewTraces_)
-			LaunchTraceViewer(traceFilename);
-
+			LaunchTraceViewer(traceFilename, wpaPath_);
 		// Record the name so that it gets selected.
 		lastTraceFilename_ = CrackFilePart(traceFilename);
 
@@ -1731,7 +1746,7 @@ void CUIforETWDlg::OnBnClickedStoptracing()
 	StopTracingAndMaybeRecord(false);
 }
 
-void CUIforETWDlg::LaunchTraceViewer(const std::wstring traceFilename, const std::wstring viewer)
+void CUIforETWDlg::LaunchTraceViewer(const std::wstring traceFilename, const std::wstring viewerPath)
 {
 	if (!isValidPathToFSObject(traceFilename))
 	{
@@ -1749,13 +1764,16 @@ void CUIforETWDlg::LaunchTraceViewer(const std::wstring traceFilename, const std
 		return;
 	}
 
-	std::wstring viewerPath = GetWPTDir() + viewer;
-	std::wstring viewerName = GetFilePart(viewer);
+	const std::wstring viewerName = GetFilePart(viewerPath);
 
-	const std::wstring args = 
-		std::wstring( viewerName + L" \"" ) +
-		traceFilename.c_str()               +
-		L"\"";
+	std::wstring args = std::wstring(viewerName + L" \"") + traceFilename.c_str() + L"\"";
+
+	if (viewerPath == wpa10Path_)
+	{
+		// Load a WPA 10.0 specific profile. Temporary hack. Doesn't work very
+		// well because the 8.1 profile *also* gets loaded. Sigh...
+		args += L" -profile " + GetExeDir() + L"Startup10.wpaProfile";
+	}
 
 	// Wacky CreateProcess rules say args has to be writable!
 	std::vector<wchar_t> argsCopy(args.size() + 1);
@@ -1941,7 +1959,7 @@ void CUIforETWDlg::OnLbnDblclkTracelist()
 	if (selIndex < 0 || selIndex >= static_cast< int >(traces_.size()))
 		return;
 	std::wstring tracename = GetTraceDir() + traces_[selIndex] + L".etl";
-	LaunchTraceViewer(tracename);
+	LaunchTraceViewer(tracename, wpaPath_);
 }
 
 void CUIforETWDlg::OnGetMinMaxInfo(MINMAXINFO* lpMMI)
@@ -2107,15 +2125,10 @@ void CUIforETWDlg::OnCbnSelchangeTracingmode()
 					 L"allow arbitrarily long recordings.\n");
 		break;
 	case kHeapTracingToFile:
-		outputPrintf(L"Heap traces will be recorded to disk for %s. "
-					 L"Note that only %s processes "
-					 L"started after this is selected will be traced. "
-					 L"Note that %s processes started now "
-					 L"may run slightly slower even if not being traced.\n"
-					 L"To keep trace sizes manageable you may want to turn "
-					 L"off context switch and CPU sampling call stacks.\n",
-					 heapTracingExe_.c_str(), heapTracingExe_.c_str(),
-					 heapTracingExe_.c_str() );
+		outputPrintf(L"Heap traces will be recorded to disk for %s. Note that only %s processes "
+			L"started after this is selected will be traced. \n"
+			L"To keep trace sizes manageable you may want to turn off context switch and CPU "
+			L"sampling call stacks.\n", heapTracingExe_.c_str(), heapTracingExe_.c_str());
 		break;
 	}
 	SetHeapTracing(false);
@@ -2205,7 +2218,44 @@ void CUIforETWDlg::OnContextMenu(CWnd* pWnd, CPoint point)
 
 		for (auto id : disableList)
 		{
-			pContextMenu->EnableMenuItem(id, (MF_BYCOMMAND | MF_GRAYED));
+			case ID_TRACES_OPENTRACEINWPA:
+				LaunchTraceViewer(tracePath, wpaPath_);
+				break;
+			case ID_TRACES_OPENTRACEIN10WPA:
+				LaunchTraceViewer(tracePath, wpa10Path_);
+				break;
+			case ID_TRACES_OPENTRACEINGPUVIEW:
+				LaunchTraceViewer(tracePath, gpuViewPath_);
+				break;
+			case ID_TRACES_DELETETRACE:
+				DeleteTrace();
+				break;
+			case ID_TRACES_RENAMETRACE:
+				StartRenameTrace(false);
+				break;
+			case ID_TRACES_COMPRESSTRACE:
+				CompressTrace(tracePath);
+				break;
+			case ID_TRACES_ZIPCOMPRESSTRACE:
+				AfxMessageBox(L"Not implemented yet.");
+				break;
+			case ID_TRACES_COMPRESSTRACES:
+				CompressAllTraces();
+				break;
+			case ID_TRACES_ZIPCOMPRESSALLTRACES:
+				AfxMessageBox(L"Not implemented yet.");
+				break;
+			case ID_TRACES_BROWSEFOLDER:
+				ShellExecute(NULL, L"open", GetTraceDir().c_str(), NULL, GetTraceDir().c_str(), SW_SHOW);
+				break;
+			case ID_TRACES_STRIPCHROMESYMBOLS:
+				outputPrintf(L"\n");
+				StripChromeSymbols(tracePath);
+				break;
+			case ID_TRACES_TRACEPATHTOCLIPBOARD:
+				// Comma delimited for easy pasting into DOS commands.
+				SetClipboardText(L"\"" + tracePath + L"\"");
+				break;
 		}
 	}
 
@@ -2324,8 +2374,22 @@ void CUIforETWDlg::OnOpenTraceWPA()
 	if (selIndex == LB_ERR)
 		return;
 
-	std::wstring tracePath = GetTraceDir() + traces_.at( selIndex ) + L".etl";
-	LaunchTraceViewer(tracePath);
+	if (selIndex >= 0)
+	{
+		std::wstring tracePath = GetTraceDir() + traces_[selIndex] + L".etl";
+		LaunchTraceViewer(tracePath, wpaPath_);
+	}
+}
+
+void CUIforETWDlg::OnOpenTrace10WPA()
+{
+	int selIndex = btTraces_.GetCurSel();
+
+	if (selIndex >= 0)
+	{
+		std::wstring tracePath = GetTraceDir() + traces_[selIndex] + L".etl";
+		LaunchTraceViewer(tracePath, wpa10Path_);
+	}
 }
 
 void CUIforETWDlg::OnOpenTraceGPUView()
@@ -2334,11 +2398,14 @@ void CUIforETWDlg::OnOpenTraceGPUView()
 	if (selIndex == LB_ERR)
 		return;
 
-	std::wstring tracePath = GetTraceDir() + traces_.at( selIndex ) + L".etl";
-	LaunchTraceViewer(tracePath, L"gpuview\\GPUView.exe");
+	if (selIndex >= 0)
+	{
+		std::wstring tracePath = GetTraceDir() + traces_[selIndex] + L".etl";
+		LaunchTraceViewer(tracePath, gpuViewPath_);
+	}
 }
 
-void CUIforETWDlg::CompressTrace(const std::wstring& tracePath)
+std::pair<uint64_t, uint64_t> CUIforETWDlg::CompressTrace(const std::wstring& tracePath) const
 {
 	std::wstring compressedPath = tracePath + L".compressed";
 	DWORD exitCode = 0;
@@ -2357,7 +2424,7 @@ void CUIforETWDlg::CompressTrace(const std::wstring& tracePath)
 	if (exitCode)
 	{
 		DeleteOneFile(*this, compressedPath);
-		return;
+		return std::pair<uint64_t, uint64_t>();
 	}
 
 	int64_t originalSize = GetFileSize(tracePath);
@@ -2368,14 +2435,42 @@ void CUIforETWDlg::CompressTrace(const std::wstring& tracePath)
 		DeleteOneFile(*this, tracePath);
 		MoveFile(compressedPath.c_str(), tracePath.c_str());
 		outputPrintf(L"%s was compressed from %1.1f MB to %1.1f MB.\n",
-					 tracePath.c_str(), ( originalSize / 1000000.0 ),
-					 ( compressedSize / 1000000.0 ));
+			tracePath.c_str(), originalSize / 1e6, compressedSize / 1e6);
 	}
 	else
 	{
 		outputPrintf(L"%s was not compressed.\n", tracePath.c_str());
 		DeleteOneFile(*this, compressedPath);
+		compressedSize = originalSize; // So that callers will know that nothing happened.
 	}
+	return std::pair<uint64_t, uint64_t>(originalSize, compressedSize);
+}
+
+
+void CUIforETWDlg::CompressAllTraces() const
+{
+	outputPrintf(L"\nCompressing all traces - this may take a while:\n");
+	int64_t initialTotalSize = 0;
+	int64_t finalTotalSize = 0;
+	int notCompressedCount = 0;
+	int compressedCount = 0;
+	for (auto traceName : traces_)
+	{
+		auto result = CompressTrace(GetTraceDir() + traceName + L".etl");
+		if (result.first == result.second)
+		{
+			++notCompressedCount;
+		}
+		else
+		{
+			++compressedCount;
+			initialTotalSize += result.first;
+			finalTotalSize += result.second;
+		}
+	}
+	outputPrintf(L"Finished compressing traces.\n");
+	outputPrintf(L"%d traces not compressed. %d traces compressed from %1.1f MB to %1.1f MB.\n",
+		notCompressedCount, compressedCount, initialTotalSize / 1e6, finalTotalSize / 1e6);
 }
 
 
