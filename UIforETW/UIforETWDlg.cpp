@@ -657,12 +657,8 @@ std::wstring CUIforETWDlg::GenerateResultFilename() const
 
 	if (tracingMode_ == kHeapTracingToFile)
 	{
-		outputPrintf(L"heapTracingExes_ is '%s'\n", heapTracingExes_.c_str());
 		for (const auto& tracingName : split(heapTracingExes_, ';'))
-		{
-			outputPrintf(L"tracingName is '%s'\n", tracingName.c_str());
 			filePart += L"_" + CrackFilePart(tracingName);
-		}
 		filePart += L"_heap";
 	}
 
