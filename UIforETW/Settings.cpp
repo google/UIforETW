@@ -67,7 +67,7 @@ BOOL CSettings::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
 
-	SetDlgItemText(IDC_HEAPEXE, heapTracingExe_.c_str());
+	SetDlgItemText(IDC_HEAPEXE, heapTracingExes_.c_str());
 	CheckDlgButton(IDC_CHROMEDEVELOPER, bChromeDeveloper_);
 	CheckDlgButton(IDC_AUTOVIEWTRACES, bAutoViewTraces_);
 	CheckDlgButton(IDC_HEAPSTACKS, bHeapStacks_);
@@ -85,9 +85,10 @@ BOOL CSettings::OnInitDialog()
 		toolTip_.SetMaxTipWidth(400);
 		toolTip_.Activate(TRUE);
 
-		toolTip_.AddTool(&btHeapTracingExe_, L"Specify the file name of the exe to be heap traced. "
-				L"Enter just the file part (with the .exe extension) not a full path. For example, "
-				L"'chrome.exe'. This is for use with the heap-tracing-to-file mode.");
+		toolTip_.AddTool(&btHeapTracingExe_, L"Specify the file names of the exes to be heap traced, "
+				L"separated by semi-colons. "
+				L"Enter just the file parts (with the .exe extension) not a full path. For example, "
+				L"'chrome.exe;notepad.exe'. This is for use with the heap-tracing-to-file mode.");
 		toolTip_.AddTool(&btCopyStartupProfile_, L"Copy a startup profile to 'My Documents\\WPA Files' "
 					L"so that next time WPA starts up it will have reasonable analysis defaults.");
 		toolTip_.AddTool(&btCopySymbolDLLs_, L"Copy dbghelp.dll and symsrv.dll to the xperf directory to "
@@ -113,14 +114,9 @@ BOOL CSettings::OnInitDialog()
 
 void CSettings::OnOK()
 {
-	heapTracingExe_ = GetEditControlText(btHeapTracingExe_);
+	heapTracingExes_ = GetEditControlText(btHeapTracingExe_);
 	chromeDllPath_ = GetEditControlText(btChromeDllPath_);
 	WSMonitoredProcesses_ = GetEditControlText(btWSMonitoredProcesses_);
-	if (heapTracingExe_.size() <= 4 || heapTracingExe_.substr(heapTracingExe_.size() - 4, heapTracingExe_.size()) != L".exe")
-	{
-		AfxMessageBox(L"The heap-profiled process name must end in .exe");
-		return;
-	}
 	CDialog::OnOK();
 }
 

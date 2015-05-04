@@ -657,7 +657,12 @@ std::wstring CUIforETWDlg::GenerateResultFilename() const
 
 	if (tracingMode_ == kHeapTracingToFile)
 	{
-		filePart += L"_" + heapTracingExe_.substr(0, heapTracingExe_.size() - 4);
+		outputPrintf(L"heapTracingExes_ is '%s'\n", heapTracingExes_.c_str());
+		for (const auto& tracingName : split(heapTracingExes_, ';'))
+		{
+			outputPrintf(L"tracingName is '%s'\n", tracingName.c_str());
+			filePart += L"_" + CrackFilePart(tracingName);
+		}
 		filePart += L"_heap";
 	}
 
@@ -672,7 +677,7 @@ void CUIforETWDlg::OnBnClickedStarttracing()
 	else if (tracingMode_ == kTracingToFile)
 		outputPrintf(L"\nStarting tracing to disk...\n");
 	else if (tracingMode_ == kHeapTracingToFile)
-		outputPrintf(L"\nStarting heap tracing to disk of %s...\n", heapTracingExe_.c_str());
+		outputPrintf(L"\nStarting heap tracing to disk of %s...\n", heapTracingExes_.c_str());
 	else
 		assert(0);
 
@@ -1270,13 +1275,16 @@ BOOL CUIforETWDlg::PreTranslateMessage(MSG* pMsg)
 
 void CUIforETWDlg::SetHeapTracing(bool forceOff)
 {
-	std::wstring targetKey = L"Software\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options";
 	DWORD tracingFlags = tracingMode_ == kHeapTracingToFile ? 1 : 0;
 	if (forceOff)
 		tracingFlags = 0;
-	CreateRegistryKey(HKEY_LOCAL_MACHINE, targetKey, heapTracingExe_);
-	targetKey += L"\\" + heapTracingExe_;
-	SetRegistryDWORD(HKEY_LOCAL_MACHINE, targetKey, L"TracingFlags", tracingFlags);
+	for (const auto& tracingName : split(heapTracingExes_, ';'))
+	{
+		std::wstring targetKey = L"Software\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options";
+		CreateRegistryKey(HKEY_LOCAL_MACHINE, targetKey, tracingName);
+		targetKey += L"\\" + tracingName;
+		SetRegistryDWORD(HKEY_LOCAL_MACHINE, targetKey, L"TracingFlags", tracingFlags);
+	}
 }
 
 void CUIforETWDlg::OnCbnSelchangeTracingmode()
@@ -1295,7 +1303,7 @@ void CUIforETWDlg::OnCbnSelchangeTracingmode()
 		outputPrintf(L"Heap traces will be recorded to disk for %s. Note that only %s processes "
 			L"started after this is selected will be traced. \n"
 			L"To keep trace sizes manageable you may want to turn off context switch and CPU "
-			L"sampling call stacks.\n", heapTracingExe_.c_str(), heapTracingExe_.c_str());
+			L"sampling call stacks.\n", heapTracingExes_.c_str(), heapTracingExes_.c_str());
 		break;
 	}
 	SetHeapTracing(false);
@@ -1305,7 +1313,7 @@ void CUIforETWDlg::OnCbnSelchangeTracingmode()
 void CUIforETWDlg::OnBnClickedSettings()
 {
 	CSettings dlgAbout(nullptr, GetExeDir(), GetWPTDir());
-	dlgAbout.heapTracingExe_ = heapTracingExe_;
+	dlgAbout.heapTracingExes_ = heapTracingExes_;
 	dlgAbout.chromeDllPath_ = chromeDllPath_;
 	dlgAbout.WSMonitoredProcesses_ = WSMonitoredProcesses_;
 	dlgAbout.bChromeDeveloper_ = bChromeDeveloper_;
@@ -1316,11 +1324,11 @@ void CUIforETWDlg::OnBnClickedSettings()
 		// If the heap tracing executable name has changed then clear and
 		// then (potentially) reset the registry key, otherwise the other
 		// executable may end up with heap tracing enabled indefinitely.
-		if (heapTracingExe_ != dlgAbout.heapTracingExe_)
+		if (heapTracingExes_ != dlgAbout.heapTracingExes_)
 		{
 			// Force heap tracing off
 			SetHeapTracing(true);
-			heapTracingExe_ = dlgAbout.heapTracingExe_;
+			heapTracingExes_ = dlgAbout.heapTracingExes_;
 			// Potentially re-enable heap tracing with the new name.
 			SetHeapTracing(false);
 		}

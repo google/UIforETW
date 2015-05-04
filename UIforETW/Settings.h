@@ -32,7 +32,7 @@ public:
 	enum { IDD = IDD_SETTINGS };
 
 	// These settings are written and read by the creator of this object.
-	std::wstring heapTracingExe_;
+	std::wstring heapTracingExes_;
 	std::wstring chromeDllPath_;
 	std::wstring WSMonitoredProcesses_;
 	bool bChromeDeveloper_ = false;
