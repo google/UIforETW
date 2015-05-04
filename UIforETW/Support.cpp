@@ -60,6 +60,7 @@ void CUIforETWDlg::TransferSettings(bool saving)
 		{ L"ChromeDeveloper", &bChromeDeveloper_ },
 		{ L"AutoViewTraces", &bAutoViewTraces_ },
 		{ L"HeapStacks", &bHeapStacks_ },
+		{ L"VirtualAllocStacks", &bVirtualAllocStacks_ },
 	};
 
 	for (auto& m : bools)

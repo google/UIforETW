@@ -94,6 +94,7 @@ private:
 	std::wstring heapTracingExes_ = L"chrome.exe";
 	std::wstring chromeDllPath_ = L"C:\\Temp\\";
 	void SetHeapTracing(bool forceOff);
+	bool bVirtualAllocStacks_ = false;
 
 	std::vector<std::wstring> traces_;
 	CListBox btTraces_;

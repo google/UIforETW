@@ -688,7 +688,7 @@ void CUIforETWDlg::OnBnClickedStarttracing()
 		kernelStackWalk += L"+CSWITCH+READYTHREAD";
 	// Record VirtualAlloc call stacks from the VIRT_ALLOC provider. Could
 	// also record VirtualFree.
-	if (tracingMode_ == kHeapTracingToFile)
+	if (bVirtualAllocStacks_ || tracingMode_ == kHeapTracingToFile)
 		kernelStackWalk += L"+VirtualAlloc";
 	// Set up a -stackwalk configuration, removing the leading '+' sign.
 	if (!kernelStackWalk.empty())
@@ -1315,6 +1315,7 @@ void CUIforETWDlg::OnBnClickedSettings()
 	dlgAbout.bChromeDeveloper_ = bChromeDeveloper_;
 	dlgAbout.bAutoViewTraces_ = bAutoViewTraces_;
 	dlgAbout.bHeapStacks_ = bHeapStacks_;
+	dlgAbout.bVirtualAllocStacks_ = bVirtualAllocStacks_;
 	if (dlgAbout.DoModal() == IDOK)
 	{
 		// If the heap tracing executable name has changed then clear and
@@ -1344,6 +1345,7 @@ void CUIforETWDlg::OnBnClickedSettings()
 		workingSetThread_.SetProcessFilter(WSMonitoredProcesses_);
 		bAutoViewTraces_ = dlgAbout.bAutoViewTraces_;
 		bHeapStacks_ = dlgAbout.bHeapStacks_;
+		bVirtualAllocStacks_ = dlgAbout.bVirtualAllocStacks_;
 	}
 }
 

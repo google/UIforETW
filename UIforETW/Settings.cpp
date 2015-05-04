@@ -50,6 +50,7 @@ void CSettings::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_HEAPSTACKS, btHeapStacks_);
 	DDX_Control(pDX, IDC_CHROMEDLLPATH, btChromeDllPath_);
 	DDX_Control(pDX, IDC_WSMONITOREDPROCESSES, btWSMonitoredProcesses_);
+	DDX_Control(pDX, IDC_VIRTUALALLOCSTACKS, btVirtualAllocStacks_);
 
 	CDialogEx::DoDataExchange(pDX);
 }
@@ -61,6 +62,7 @@ BEGIN_MESSAGE_MAP(CSettings, CDialogEx)
 	ON_BN_CLICKED(IDC_CHROMEDEVELOPER, &CSettings::OnBnClickedChromedeveloper)
 	ON_BN_CLICKED(IDC_AUTOVIEWTRACES, &CSettings::OnBnClickedAutoviewtraces)
 	ON_BN_CLICKED(IDC_HEAPSTACKS, &CSettings::OnBnClickedHeapstacks)
+	ON_BN_CLICKED(IDC_VIRTUALALLOCSTACKS, &CSettings::OnBnClickedVirtualallocstacks)
 END_MESSAGE_MAP()
 
 BOOL CSettings::OnInitDialog()
@@ -71,6 +73,7 @@ BOOL CSettings::OnInitDialog()
 	CheckDlgButton(IDC_CHROMEDEVELOPER, bChromeDeveloper_);
 	CheckDlgButton(IDC_AUTOVIEWTRACES, bAutoViewTraces_);
 	CheckDlgButton(IDC_HEAPSTACKS, bHeapStacks_);
+	CheckDlgButton(IDC_VIRTUALALLOCSTACKS, bVirtualAllocStacks_);
 	SetDlgItemText(IDC_CHROMEDLLPATH, chromeDllPath_.c_str());
 
 	SetDlgItemText(IDC_WSMONITOREDPROCESSES, WSMonitoredProcesses_.c_str());
@@ -107,6 +110,8 @@ BOOL CSettings::OnInitDialog()
 		toolTip_.AddTool(&btWSMonitoredProcesses_, L"Names of processes whose working sets will be "
 					L"monitored, separated by semi-colons. An empty string means no monitoring. A '*' means "
 					L"that all processes will be monitored. For instance 'chrome.exe;notepad.exe'");
+		toolTip_.AddTool(&btVirtualAllocStacks_, L"Check this to record call stacks on VirtualAlloc on all "
+					L"traces instead of just heap traces.");
 	}
 
 	return TRUE;  // return TRUE  unless you set the focus to a control
@@ -200,4 +205,10 @@ void CSettings::OnBnClickedAutoviewtraces()
 void CSettings::OnBnClickedHeapstacks()
 {
 	bHeapStacks_ = !bHeapStacks_;
+}
+
+
+void CSettings::OnBnClickedVirtualallocstacks()
+{
+	bVirtualAllocStacks_ = !bVirtualAllocStacks_;
 }
