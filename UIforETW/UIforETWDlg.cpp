@@ -1615,7 +1615,7 @@ void CUIforETWDlg::StripChromeSymbols(const std::wstring& traceFilename)
 	}
 	else
 	{
-		outputPrintf(L"Can't find Python. Chrome symbol stripping disabled.");
+		outputPrintf(L"Can't find Python. Chrome symbol stripping disabled.\n");
 	}
 }
 
