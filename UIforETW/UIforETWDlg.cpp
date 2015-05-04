@@ -1308,24 +1308,24 @@ void CUIforETWDlg::OnCbnSelchangeTracingmode()
 
 void CUIforETWDlg::OnBnClickedSettings()
 {
-	CSettings dlgAbout(nullptr, GetExeDir(), GetWPTDir());
-	dlgAbout.heapTracingExes_ = heapTracingExes_;
-	dlgAbout.chromeDllPath_ = chromeDllPath_;
-	dlgAbout.WSMonitoredProcesses_ = WSMonitoredProcesses_;
-	dlgAbout.bChromeDeveloper_ = bChromeDeveloper_;
-	dlgAbout.bAutoViewTraces_ = bAutoViewTraces_;
-	dlgAbout.bHeapStacks_ = bHeapStacks_;
-	dlgAbout.bVirtualAllocStacks_ = bVirtualAllocStacks_;
-	if (dlgAbout.DoModal() == IDOK)
+	CSettings dlgSettings(nullptr, GetExeDir(), GetWPTDir());
+	dlgSettings.heapTracingExes_ = heapTracingExes_;
+	dlgSettings.chromeDllPath_ = chromeDllPath_;
+	dlgSettings.WSMonitoredProcesses_ = WSMonitoredProcesses_;
+	dlgSettings.bChromeDeveloper_ = bChromeDeveloper_;
+	dlgSettings.bAutoViewTraces_ = bAutoViewTraces_;
+	dlgSettings.bHeapStacks_ = bHeapStacks_;
+	dlgSettings.bVirtualAllocStacks_ = bVirtualAllocStacks_;
+	if (dlgSettings.DoModal() == IDOK)
 	{
 		// If the heap tracing executable name has changed then clear and
 		// then (potentially) reset the registry key, otherwise the other
 		// executable may end up with heap tracing enabled indefinitely.
-		if (heapTracingExes_ != dlgAbout.heapTracingExes_)
+		if (heapTracingExes_ != dlgSettings.heapTracingExes_)
 		{
 			// Force heap tracing off
 			SetHeapTracing(true);
-			heapTracingExes_ = dlgAbout.heapTracingExes_;
+			heapTracingExes_ = dlgSettings.heapTracingExes_;
 			// Potentially re-enable heap tracing with the new name.
 			SetHeapTracing(false);
 		}
@@ -1333,19 +1333,19 @@ void CUIforETWDlg::OnBnClickedSettings()
 		// Update the symbol path if the chrome developer flag has changed.
 		// This will be a NOP if the user set _NT_SYMBOL_PATH outside of
 		// UIforETW.
-		if (bChromeDeveloper_ != dlgAbout.bChromeDeveloper_)
+		if (bChromeDeveloper_ != dlgSettings.bChromeDeveloper_)
 		{
-			bChromeDeveloper_ = dlgAbout.bChromeDeveloper_;
+			bChromeDeveloper_ = dlgSettings.bChromeDeveloper_;
 			SetSymbolPath();
 		}
 
 		// Copy over the remaining settings.
-		chromeDllPath_ = dlgAbout.chromeDllPath_;
-		WSMonitoredProcesses_ = dlgAbout.WSMonitoredProcesses_;
+		chromeDllPath_ = dlgSettings.chromeDllPath_;
+		WSMonitoredProcesses_ = dlgSettings.WSMonitoredProcesses_;
 		workingSetThread_.SetProcessFilter(WSMonitoredProcesses_);
-		bAutoViewTraces_ = dlgAbout.bAutoViewTraces_;
-		bHeapStacks_ = dlgAbout.bHeapStacks_;
-		bVirtualAllocStacks_ = dlgAbout.bVirtualAllocStacks_;
+		bAutoViewTraces_ = dlgSettings.bAutoViewTraces_;
+		bHeapStacks_ = dlgSettings.bHeapStacks_;
+		bVirtualAllocStacks_ = dlgSettings.bVirtualAllocStacks_;
 	}
 }
 
