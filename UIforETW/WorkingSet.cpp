@@ -30,6 +30,7 @@ const DWORD kSamplingInterval = 1000;
 
 void CWorkingSetMonitor::SampleWorkingSets()
 {
+	CSingleLock locker(&processesLock_);
 	if (processes_.empty() && !processAll_)
 		return;
 

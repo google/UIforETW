@@ -20,3 +20,6 @@ GuidStats.txt
 Log.txt
 present.txt
 *.exe.lastcodeanalysissucceeded
+
+# XperfProcessParentage.py drops this
+Processes_Summary_Table_ProcessParentage.csv

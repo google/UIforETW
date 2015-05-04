@@ -31,5 +31,6 @@ private:
 	// insensitive) matches one of the entries.
 	// This variable is protected by processesLock_;
 	std::vector<std::wstring> processes_;
+	// This variable is protected by processesLock_;
 	bool processAll_ = false;
 };
