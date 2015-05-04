@@ -82,15 +82,18 @@ void CWorkingSetMonitor::SampleWorkingSets()
 				bool success = true;
 				if (!QueryWorkingSet(hProcess, &buffer[0], buffer.size()))
 				{
+					success = false;
 					// Increase the buffer size based on the NumberOfEntries returned,
 					// with some padding in case the working set is increasing.
 					if (GetLastError() == ERROR_BAD_LENGTH)
-						numEntries = pwsBuffer->NumberOfEntries + pwsBuffer->NumberOfEntries / 4;
-					buffer.resize(sizeof(PSAPI_WORKING_SET_INFORMATION) + numEntries * sizeof(PSAPI_WORKING_SET_BLOCK));
-					pwsBuffer = reinterpret_cast<PSAPI_WORKING_SET_INFORMATION*>(&buffer[0]);
-					if (!QueryWorkingSet(hProcess, &buffer[0], buffer.size()))
 					{
-						success = false;
+						numEntries = pwsBuffer->NumberOfEntries + pwsBuffer->NumberOfEntries / 4;
+						buffer.resize(sizeof(PSAPI_WORKING_SET_INFORMATION) + numEntries * sizeof(PSAPI_WORKING_SET_BLOCK));
+						pwsBuffer = reinterpret_cast<PSAPI_WORKING_SET_INFORMATION*>(&buffer[0]);
+						if (QueryWorkingSet(hProcess, &buffer[0], buffer.size()))
+						{
+							success = true;
+						}
 					}
 				}
 
