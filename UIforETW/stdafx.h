@@ -42,6 +42,7 @@ limitations under the License.
 #include <afxcontrolbars.h>     // MFC support for ribbons and control bars
 #include <atlwin.h>
 #include <sal.h>
+#include <VersionHelpers.h>
 
 // Global function for printing to the dialog output window.
 void outputPrintf(_Printf_format_string_ const wchar_t* pFormat, ...);

@@ -17,10 +17,133 @@ limitations under the License.
 #include "stdafx.h"
 #include "UIforETW.h"
 #include "UIforETWDlg.h"
+#include <exception>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
+
+
+namespace {
+
+struct HMODULEhelper
+{
+
+	HMODULE hModule;
+
+	HMODULEhelper(_In_z_ PCSTR const moduleName)
+	{
+		HMODULE module_temp;
+		const BOOL result = GetModuleHandleExA(0, moduleName, &module_temp);
+		if (result == 0)
+		{
+			//Grr. Exceptions don't like wchar_t strings!
+			std::string exceptionStr("Failed to load module: " +
+									  std::string(moduleName));
+			throw std::runtime_error( exceptionStr );
+		}
+		hModule = module_temp;
+	}
+
+	~HMODULEhelper( )
+	{
+		ATLVERIFY( FreeLibrary(hModule) );
+	}
+
+};
+
+typedef WINBASEAPI BOOL(WINAPI* SetProcessMitigationPolicy_t)(\
+	_In_ _Const_ PROCESS_MITIGATION_POLICY MitigationPolicy,
+	_In_reads_bytes_( dwLength ) _Const_ PVOID lpBuffer,
+	_In_ _Const_ SIZE_T dwLength);
+
+void enableTerminateOnHeapCorruption()
+{
+	const BOOL result =
+		HeapSetInformation(NULL, HeapEnableTerminationOnCorruption, NULL, 0u);
+	if ( result != 0 )
+	{
+		ATLTRACE(L"Enabled HeapEnableTerminationOnCorruption!!\r\n");
+		return;
+	}
+	ATLTRACE(L"Failed to enable HeapEnableTerminationOnCorruption!!\r\n");
+}
+
+void enableASLRMitigation(_In_ SetProcessMitigationPolicy_t SetProcessMitigationPolicy_f)
+{
+	PROCESS_MITIGATION_ASLR_POLICY ASLRpolicy = {0};
+	ASLRpolicy.EnableBottomUpRandomization = true;
+	ASLRpolicy.EnableForceRelocateImages = true;
+#ifdef _WIN64
+	ASLRpolicy.EnableHighEntropy = true;
+#endif
+	ASLRpolicy.DisallowStrippedImages = true;
+	const BOOL result =
+		SetProcessMitigationPolicy_f(ProcessASLRPolicy, &ASLRpolicy, sizeof(ASLRpolicy));
+	if (result == TRUE)
+	{
+		ATLTRACE(L"Successfully applied aggressive ASLR policy!\r\n");
+		return;
+	}
+	const DWORD lastErr = GetLastError();
+	ATLTRACE(L"Failed to apply aggressive ASLR policy! Error code: %u\r\n", lastErr);
+	}
+
+void enableExtensionPointMitigations(_In_ SetProcessMitigationPolicy_t SetProcessMitigationPolicy_f)
+{
+	PROCESS_MITIGATION_EXTENSION_POINT_DISABLE_POLICY ExtensionPolicy = {0};
+	ExtensionPolicy.DisableExtensionPoints = true;
+	const BOOL result =
+		SetProcessMitigationPolicy_f(ProcessExtensionPointDisablePolicy, &ExtensionPolicy, sizeof(ExtensionPolicy));
+	if (result == TRUE)
+	{
+		ATLTRACE(L"Successfully applied aggressive extension point policy!\r\n");
+		return;
+	}
+	const DWORD lastErr = GetLastError();
+	ATLTRACE(L"Failed to apply aggressive extension point policy! Error code: %u\r\n", lastErr);
+}
+
+void enableStrictHandleCheckingMitigations(_In_ SetProcessMitigationPolicy_t SetProcessMitigationPolicy_f)
+{
+	PROCESS_MITIGATION_STRICT_HANDLE_CHECK_POLICY HandlePolicy = {0};
+	HandlePolicy.RaiseExceptionOnInvalidHandleReference = true;
+	HandlePolicy.HandleExceptionsPermanentlyEnabled = true;
+	const BOOL result =
+		SetProcessMitigationPolicy_f(ProcessStrictHandleCheckPolicy, &HandlePolicy, sizeof(HandlePolicy));
+	if (result == TRUE)
+	{
+		ATLTRACE(L"Successfully applied strict handle checking policy!\r\n");
+		return;
+	}
+	const DWORD lastErr = GetLastError();
+	ATLTRACE(L"Failed to apply strict handle checking policy! Error code: %u\r\n", lastErr);
+}
+
+void enableAggressiveProcessMitigations()
+{
+	if (!IsWindows8OrGreater())
+	{
+		return;
+	}
+
+	HMODULEhelper kern32("kernel32.dll");
+	PVOID const address =
+		reinterpret_cast<PVOID>(GetProcAddress(kern32.hModule, "SetProcessMitigationPolicy"));
+	if (address == NULL)
+	{
+		const DWORD lastErr = GetLastError();
+		ATLTRACE(L"Failed to get address of SetProcessMitigationPolicy! Error code: %u\r\n", lastErr);
+		return;
+	}
+	const SetProcessMitigationPolicy_t SetProcessMitigationPolicy_f =
+		reinterpret_cast<SetProcessMitigationPolicy_t>(address);
+	enableASLRMitigation(SetProcessMitigationPolicy_f);
+	enableExtensionPointMitigations(SetProcessMitigationPolicy_f);
+	enableStrictHandleCheckingMitigations(SetProcessMitigationPolicy_f);
+}
+
+} //namespace {
 
 
 // CUIforETWApp
@@ -51,6 +174,8 @@ CUIforETWApp theApp;
 
 BOOL CUIforETWApp::InitInstance()
 {
+	enableAggressiveProcessMitigations( );
+
 	// InitCommonControlsEx() is required on Windows XP if an application
 	// manifest specifies use of ComCtl32.dll version 6 or later to enable
 	// visual styles.  Otherwise, any window creation will fail.
@@ -68,7 +193,8 @@ BOOL CUIforETWApp::InitInstance()
 
 	// Create the shell manager, in case the dialog contains
 	// any shell tree view or shell list view controls.
-	CShellManager *pShellManager = new CShellManager;
+	// Code mysteriously inserted by MFC.
+	auto pShellManager = std::make_unique<CShellManager>();
 
 	// Activate "Windows Native" visual manager for enabling themes in MFC controls
 	CMFCVisualManager::SetDefaultManager(RUNTIME_CLASS(CMFCVisualManagerWindows));
@@ -88,15 +214,13 @@ BOOL CUIforETWApp::InitInstance()
 		INT_PTR nResponse = dlg.DoModal();
 		if (nResponse == -1)
 		{
-			TRACE(traceAppMsg, 0, "Warning: dialog creation failed, so application is terminating unexpectedly.\n");
-			TRACE(traceAppMsg, 0, "Warning: if you are using MFC controls on the dialog, you cannot #define _AFX_NO_MFC_CONTROLS_IN_DIALOGS.\n");
-		}
-	}
+			ATLTRACE("Warning: dialog creation failed, "
+					 "so application is terminating unexpectedly.\r\n");
 
-	// Delete the shell manager created above.
-	if (pShellManager != NULL)
-	{
-		delete pShellManager;
+			ATLTRACE("Warning: if you are using MFC controls on the dialog, "
+					 "you cannot #define _AFX_NO_MFC_CONTROLS_IN_DIALOGS.\r\n");
+			std::terminate( );
+		}
 	}
 
 	// Since the dialog has been closed, return FALSE so that we exit the
