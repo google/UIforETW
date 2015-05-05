@@ -140,7 +140,7 @@ std::wstring GetEditControlText(HWND hEdit)
 	std::wstring result;
 	int length = GetWindowTextLength(hEdit);
 	std::vector<wchar_t> buffer(length + 1);
-	GetWindowText(hEdit, &buffer[0], buffer.size());
+	GetWindowText(hEdit, &buffer[0], static_cast<int>(buffer.size()));
 	// Double-verify that the buffer is null-terminated.
 	buffer[buffer.size() - 1] = 0;
 	return &buffer[0];
@@ -156,7 +156,7 @@ std::wstring AnsiToUnicode(const std::string& text)
 
 	// Convert to Unicode.
 	std::wstring result;
-	if (MultiByteToWideChar(CP_ACP, 0, text.c_str(), cCharacters, &buffer[0], cCharacters))
+	if (MultiByteToWideChar(CP_ACP, 0, text.c_str(), static_cast<int>(cCharacters), &buffer[0], static_cast<int>(cCharacters)))
 	{
 		// Double-verify that the buffer is null-terminated.
 		buffer[buffer.size() - 1] = 0;
