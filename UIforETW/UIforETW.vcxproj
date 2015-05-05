@@ -73,7 +73,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(SolutionDir)..\bin\</OutDir>
-    <TargetName>$(ProjectName)_devdeb64</TargetName>
+    <TargetName>$(ProjectName)_devdeb32</TargetName>
     <CodeAnalysisRuleSet>StrictRules.ruleset</CodeAnalysisRuleSet>
     <RunCodeAnalysis>false</RunCodeAnalysis>
   </PropertyGroup>
@@ -87,7 +87,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SolutionDir)..\bin\</OutDir>
-    <TargetName>$(ProjectName)_devrel64</TargetName>
+    <TargetName>$(ProjectName)_devrel32</TargetName>
     <CodeAnalysisRuleSet>StrictRules.ruleset</CodeAnalysisRuleSet>
     <RunCodeAnalysis>false</RunCodeAnalysis>
   </PropertyGroup>
