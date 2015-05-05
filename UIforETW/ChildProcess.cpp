@@ -17,8 +17,7 @@ limitations under the License.
 #include "stdafx.h"
 #include "ChildProcess.h"
 #include "Utility.h"
-
-#include <assert.h>
+#include "alias.h"
 #include <vector>
 
 static const wchar_t* kPipeName = L"\\\\.\\PIPE\\UIforETWPipe";
@@ -29,7 +28,7 @@ ChildProcess::ChildProcess(std::wstring exePath)
 	// Create the pipe here so that it is guaranteed to be created before
 	// we try starting the process.
 	hPipe_ = CreateNamedPipe(kPipeName,
-		PIPE_ACCESS_DUPLEX | PIPE_TYPE_BYTE | PIPE_READMODE_BYTE,
+		(PIPE_ACCESS_DUPLEX | PIPE_TYPE_BYTE | PIPE_READMODE_BYTE),
 		PIPE_WAIT,
 		1,
 		1024 * 16,
@@ -45,14 +44,14 @@ ChildProcess::~ChildProcess()
 {
 	if (hProcess_)
 	{
-		DWORD exitCode = GetExitCode();
+		const DWORD exitCode = GetExitCode();
 		if (exitCode)
-			outputPrintf(L"Process exit code was %08x (%lu)\n", exitCode, exitCode);
-		CloseHandle(hProcess_);
+			outputPrintf( L"Process exit code was %08x (%lu)\n", exitCode, exitCode );
+		handle_close::closeHandle(hProcess_);
 	}
 	if (hOutputAvailable_)
 	{
-		CloseHandle(hOutputAvailable_);
+		handle_close::closeHandle(hOutputAvailable_);
 	}
 }
 
@@ -88,10 +87,13 @@ DWORD ChildProcess::ListenerThread()
 	if (ConnectNamedPipe(hPipe_, NULL) || GetLastError() == ERROR_PIPE_CONNECTED)
 	{
 		// Acquire the lock while writing to processOutput_
-		char buffer[1024];
+		const rsize_t bufferSize = 1024u;
+		char buffer[bufferSize];
 		DWORD dwRead;
 		while (ReadFile(hPipe_, buffer, sizeof(buffer) - 1, &dwRead, NULL) != FALSE)
 		{
+			if (dwRead >= bufferSize)
+				std::terminate( );
 			if (dwRead > 0)
 			{
 				CSingleLock locker(&outputLock_);
@@ -104,7 +106,7 @@ DWORD ChildProcess::ListenerThread()
 	}
 	else
 	{
-		OutputDebugString(L"Connect failed.\n");
+		OutputDebugStringW(L"Connect failed.\n");
 	}
 
 	DisconnectNamedPipe(hPipe_);
@@ -112,10 +114,11 @@ DWORD ChildProcess::ListenerThread()
 	return 0;
 }
 
-
+_Pre_satisfies_( hProcess_ == 0 )
+_Success_( return )
 bool ChildProcess::Run(bool showCommand, std::wstring args)
 {
-	assert(!hProcess_);
+	ATLASSERT(!hProcess_);
 
 	if (showCommand)
 		outputPrintf(L"%s\n", args.c_str());
@@ -127,7 +130,7 @@ bool ChildProcess::Run(bool showCommand, std::wstring args)
 	if (hStdOutput_ == INVALID_HANDLE_VALUE)
 		return false;
 	if (!DuplicateHandle(GetCurrentProcess(), hStdOutput_, GetCurrentProcess(),
-		&hStdError_, 0, TRUE, DUPLICATE_SAME_ACCESS))
+		&hStdError_, 0, TRUE, DUPLICATE_SAME_ACCESS ))
 		return false;
 
 	STARTUPINFO startupInfo = {};
@@ -140,18 +143,20 @@ bool ChildProcess::Run(bool showCommand, std::wstring args)
 	DWORD flags = CREATE_NO_WINDOW;
 	// Wacky CreateProcess rules say args has to be writable!
 	std::vector<wchar_t> argsCopy(args.size() + 1);
-	wcscpy_s(&argsCopy[0], argsCopy.size(), args.c_str());
-	BOOL success = CreateProcess(exePath_.c_str(), &argsCopy[0], NULL, NULL,
+	const int res = wcscpy_s(&argsCopy[0], argsCopy.size(), args.c_str());
+	if ( res != 0 )
+		std::terminate( );
+	const BOOL success = CreateProcess(exePath_.c_str(), &argsCopy[0], NULL, NULL,
 		TRUE, flags, NULL, NULL, &startupInfo, &processInfo);
 	if (success)
 	{
-		CloseHandle(processInfo.hThread);
+		handle_close::closeHandle(processInfo.hThread);
 		hProcess_ = processInfo.hProcess;
 		return true;
 	}
 	else
 	{
-		outputPrintf(L"Error %d starting %s, %s\n", (int)GetLastError(), exePath_.c_str(), args.c_str());
+		outputPrintf(L"Error %u starting %s, %s\n", GetLastError(), exePath_.c_str(), args.c_str());
 	}
 
 	return false;
@@ -201,12 +206,12 @@ void ChildProcess::WaitForCompletion(bool printOutput)
 	// close these if the process never started.
 	if (hStdError_ != INVALID_HANDLE_VALUE)
 	{
-		CloseHandle(hStdError_);
+		handle_close::closeHandle(hStdError_);
 		hStdError_ = INVALID_HANDLE_VALUE;
 	}
 	if (hStdOutput_ != INVALID_HANDLE_VALUE)
 	{
-		CloseHandle(hStdOutput_);
+		handle_close::closeHandle(hStdOutput_);
 		hStdOutput_ = INVALID_HANDLE_VALUE;
 	}
 
@@ -214,14 +219,14 @@ void ChildProcess::WaitForCompletion(bool printOutput)
 	if (hChildThread_)
 	{
 		WaitForSingleObject(hChildThread_, INFINITE);
-		CloseHandle(hChildThread_);
+		handle_close::closeHandle(hChildThread_);
 		hChildThread_ = 0;
 	}
 
 	// Clean up.
 	if (hPipe_ != INVALID_HANDLE_VALUE)
 	{
-		CloseHandle(hPipe_);
+		handle_close::closeHandle(hPipe_);
 		hPipe_ = INVALID_HANDLE_VALUE;
 	}
 

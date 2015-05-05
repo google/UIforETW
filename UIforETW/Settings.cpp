@@ -145,7 +145,7 @@ void CSettings::OnBnClickedCopystartupprofile()
 	wchar_t documents[MAX_PATH];
 	if (!SHGetSpecialFolderPath(*this, documents, CSIDL_MYDOCUMENTS, TRUE))
 	{
-		assert(!"Failed to find My Documents directory.\n");
+		ATLASSERT(!"Failed to find My Documents directory.\n");
 		return;
 	}
 	std::wstring dest = documents + std::wstring(L"\\WPA Files\\") + fileName;

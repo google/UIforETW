@@ -20,7 +20,44 @@ limitations under the License.
 #include <string>
 #include <chrono>
 
+
+//Annotation macro that describes the behavior of a buffer-writing function
+//It's kinda ugly, sorry, but it works well.
+#define ETWUI_WRITES_TO_STACK( strSize )                       \
+								_Out_writes_z_( strSize )      \
+								_Pre_writable_size_( strSize ) \
+
+namespace ErrorHandling {
+
+template<rsize_t strSize>
+void GetLastErrorAsFormattedMessage( ETWUI_WRITES_TO_STACK( strSize )
+									 wchar_t( &psz_formatted_error )[ strSize ],
+									 DWORD error = GetLastError( ) );
+void outputErrorDebug( DWORD lastErr = GetLastError( ) );
+void outputPrintfErrorDebug( DWORD lastErr = GetLastError( ) );
+}
+
+
+namespace handle_close {
+void regCloseKey( _In_ _Pre_valid_ _Post_ptr_invalid_ HKEY hKey );
+void closeHandle( _In_ _Pre_valid_ _Post_ptr_invalid_ HANDLE handle );
+void fClose( _In_ _Pre_valid_ _Post_ptr_invalid_ FILE* stream );
+}
+
+namespace clipboard {
+void closeClipboard( );
+void openClipboard( );
+void emptyClipboard( );
+void setClipboardText( _In_ HANDLE textmem );
+}
+
+namespace checked_CRT {
+
+void fPutWS( _In_z_ PCWSTR str, _In_ FILE* stream );
+}
+
 std::vector<std::wstring> split(const std::wstring& s, char c);
+
 // If fullPaths == true then the names returned will be full Paths to the files. Otherwise
 // they will just be the file portions.
 std::vector<std::wstring> GetFileList(const std::wstring& pattern, bool fullPaths = false);
@@ -38,7 +75,7 @@ std::wstring AnsiToUnicode(const std::string& text);
 // This function checks to see whether a control has focus before
 // disabling it. If it does have focus then it moves the focus, to
 // avoid breaking keyboard mnemonics.
-void SmartEnableWindow(HWND Win, BOOL Enable);
+void SmartEnableWindow(_In_ HWND Win, _In_ BOOL Enable);
 
 // Return the string after the final '\' or after the final '.' in
 // the file part of a path. If the last character is '\' then GetFilePart
@@ -74,21 +111,17 @@ enum WindowsVersion
 	kWindowsVersion10,
 };
 
+
 bool Is64BitWindows();
 WindowsVersion GetWindowsVersion();
 //bool IsWindowsServer();
 
 std::wstring FindPython(); // Returns a full path to python.exe or nothing.
 
-class ElapsedTimer
+class ElapsedTimer final
 {
 public:
-	double ElapsedSeconds() const
-	{
-		auto duration = std::chrono::steady_clock::now() - start_;
-		auto microseconds = std::chrono::duration_cast<std::chrono::microseconds>(duration);
-		return microseconds.count() / 1e6;
-	}
+	double ElapsedSeconds( ) const;
 private:
 	std::chrono::steady_clock::time_point start_ = std::chrono::steady_clock::now();
 };

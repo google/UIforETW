@@ -117,6 +117,8 @@
       <UACExecutionLevel>RequireAdministrator</UACExecutionLevel>
       <AdditionalLibraryDirectories>..\lib</AdditionalLibraryDirectories>
       <AdditionalDependencies>ETWProviders.lib</AdditionalDependencies>
+      <AdditionalOptions>
+      </AdditionalOptions>
     </Link>
     <Midl>
       <MkTypLibCompatible>false</MkTypLibCompatible>
@@ -177,6 +179,9 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <TreatWarningAsError>true</TreatWarningAsError>
       <AdditionalIncludeDirectories>..\include</AdditionalIncludeDirectories>
+      <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
+      <StringPooling>true</StringPooling>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <EnablePREfast>false</EnablePREfast>
     </ClCompile>
     <Link>
@@ -187,6 +192,9 @@
       <UACExecutionLevel>RequireAdministrator</UACExecutionLevel>
       <AdditionalLibraryDirectories>..\lib</AdditionalLibraryDirectories>
       <AdditionalDependencies>ETWProviders.lib</AdditionalDependencies>
+      <AdditionalOptions>
+      </AdditionalOptions>
+      <LargeAddressAware>true</LargeAddressAware>
     </Link>
     <Midl>
       <MkTypLibCompatible>false</MkTypLibCompatible>
@@ -243,6 +251,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="About.h" />
+    <ClInclude Include="alias.h" />
     <ClInclude Include="ChildProcess.h" />
     <ClInclude Include="DirectoryMonitor.h" />
     <ClInclude Include="KeyLoggerThread.h" />
@@ -256,6 +265,7 @@
     <ClInclude Include="WorkingSet.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="alias.cpp" />
     <ClCompile Include="ChildProcess.cpp" />
     <ClCompile Include="DirectoryMonitor.cpp" />
     <ClCompile Include="KeyLoggerThread.cpp" />

@@ -30,16 +30,16 @@ enum TracingMode
 	kHeapTracingToFile
 };
 
-class CUIforETWDlg : public CDialogEx
+class CUIforETWDlg final : public CDialogEx
 {
 public:
-	CUIforETWDlg(CWnd* pParent = NULL);	// standard constructor
+	CUIforETWDlg(_In_opt_ CWnd* pParent = NULL);	// standard constructor
 	~CUIforETWDlg();
 
 // Dialog Data
 	enum { IDD = IDD_UIFORETW_DIALOG };
 
-	void vprintf(const wchar_t* pFormat, va_list marker);
+	void vprintf(PCWSTR pFormat, va_list marker);
 
 private:
 	virtual void DoDataExchange(CDataExchange* pDX) override;	// DDX/DDV support
@@ -141,7 +141,8 @@ private:
 	// Keyboard accelerators that are active only when the trace list is active.
 	HACCEL hTracesAccelTable_ = NULL;
 
-	void SetSamplingSpeed();
+	void SetSamplingSpeed() const;
+	void initializeToolTip();
 
 	// Stop tracing (if tracing to a file or if bSaveTrace is
 	// false), saving the trace as well if bSaveTrace is true.
@@ -172,10 +173,9 @@ private:
 	void SetSymbolPath();
 	// Call this to retrieve a directory from an environment variable, or use
 	// a default, and make sure it exists.
-	std::wstring GetDirectory(const wchar_t* env, const std::wstring& default);
+	std::wstring GetDirectory(_In_z_ PCWSTR env, const std::wstring& default);
 	void CUIforETWDlg::UpdateTraceList();
 	void RegisterProviders();
-	void DisablePagingExecutive();
 
 	CToolTipCtrl toolTip_;
 
@@ -201,6 +201,7 @@ private:
 	afx_msg void OnPaint();
 	afx_msg HCURSOR OnQueryDragIcon();
 	DECLARE_MESSAGE_MAP()
+	_Pre_satisfies_( ( tracingMode_ == kTracingToMemory ) || ( tracingMode_ == kTracingToFile ) || ( tracingMode_ == kHeapTracingToFile ) )
 	afx_msg void OnBnClickedStarttracing();
 	afx_msg void OnBnClickedStoptracing();
 	afx_msg void OnBnClickedCompresstrace();

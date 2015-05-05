@@ -30,13 +30,15 @@ limitations under the License.
 // the process to exit.
 //   DWORD exitCode = child.GetExitCode();
 
-class ChildProcess
+class ChildProcess final
 {
 public:
 	ChildProcess(std::wstring exePath);
 	~ChildProcess();
 
 	// Returns true if the process started.
+	_Pre_satisfies_( hProcess_ == 0 )
+	_Success_( return )
 	bool Run(bool showCommand, std::wstring args);
 
 	// This can be called even if the process doesn't start, but
@@ -63,6 +65,9 @@ private:
 	// The processOutput_ string is written to by the listener thread.
 	// Don't modify processOutput_ without acquiring the lock.
 	CCriticalSection outputLock_;
+	//This annotation is commented out because /analyze doesn't
+	//properly understand it.
+	/*_Guarded_by_( outputLock_ )*/
 	std::wstring processOutput_;
 
 	// Output handles for the child process -- connected to the pipe.

@@ -32,6 +32,8 @@ limitations under the License.
 // turns off MFC's hiding of some common and often safely ignored warning messages
 #define _AFX_ALL_WARNINGS
 
+#define _ATL_ENABLE_PTM_WARNING                 //force the use of ANSI C++ standard-compliant syntax for pointer to member functions.
+                                                //Using this macro will cause the C4867 compiler error to be generated when non-standard syntax is used to initialize a pointer to a member function.
 #include <afxext.h>         // MFC extensions
 #include <assert.h>
 
@@ -45,10 +47,14 @@ limitations under the License.
 #include <VersionHelpers.h>
 
 // Global function for printing to the dialog output window.
-void outputPrintf(_Printf_format_string_ const wchar_t* pFormat, ...);
+void outputPrintf(_Printf_format_string_ PCWSTR pFormat, ...);
 // Needed for int64_t and friends
 #include <inttypes.h>
 
+#include <VersionHelpers.h>
+#include <exception>
+#include <string>
+#include <vector>
 // Using #define NOMINMAX would be nice but gdiplustypes.h *depends*
 // on min/max macros, so the best I can do is to undefine them here.
 #undef min

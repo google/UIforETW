@@ -18,7 +18,7 @@ limitations under the License.
 
 #include <string>
 
-class DirectoryMonitor
+class DirectoryMonitor final
 {
 public:
 	DirectoryMonitor(CWnd* pMainWindow);

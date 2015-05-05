@@ -20,7 +20,7 @@ limitations under the License.
 
 // CSettings dialog
 
-class CSettings : public CDialogEx
+class CSettings final : public CDialogEx
 {
 	DECLARE_DYNAMIC(CSettings)
 

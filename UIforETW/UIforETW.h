@@ -27,7 +27,7 @@ limitations under the License.
 // See UIforETW.cpp for the implementation of this class
 //
 
-class CUIforETWApp : public CWinApp
+class CUIforETWApp final : public CWinApp
 {
 public:
 	CUIforETWApp();

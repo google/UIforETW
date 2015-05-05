@@ -51,6 +51,8 @@
     <ClInclude Include="DirectoryMonitor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="alias.h">
+    </ClInclude>
     <ClInclude Include="WorkingSet.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -83,6 +85,7 @@
     <ClCompile Include="Support.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="alias.cpp">
     <ClCompile Include="WorkingSet.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

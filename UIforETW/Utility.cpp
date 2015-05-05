@@ -17,6 +17,199 @@ limitations under the License.
 #include "stdafx.h"
 #include "Utility.h"
 #include <fstream>
+#include "alias.h"
+
+namespace {
+
+}
+
+namespace handle_close {
+
+
+//Die if we fail to close registry key
+void regCloseKey( _In_ _Pre_valid_ _Post_ptr_invalid_ HKEY hKey )
+{
+	//If [RegCloseKey] succeeds, the return value is ERROR_SUCCESS.
+	//If the function fails, the return value is a nonzero error code 
+	//defined in Winerror.h. 
+	//You can use the FormatMessage function with the 
+	//FORMAT_MESSAGE_FROM_SYSTEM flag to get a generic description of the error.
+	const LONG result = ::RegCloseKey( hKey );
+	if ( result == ERROR_SUCCESS )
+	{
+		return;
+	}
+	debug::Alias( &result );
+	debug::Alias( &hKey );
+
+	ErrorHandling::outputErrorDebug( );
+	std::terminate( );
+}
+
+void closeHandle( _In_ _Pre_valid_ _Post_ptr_invalid_ HANDLE handle )
+{
+	//If [CloseHandle] succeeds, the return value is nonzero.
+	//If [CloseHandle] fails, the return value is zero.
+	//To get extended error information, call GetLastError.
+	const BOOL result = ::CloseHandle( handle );
+	ATLASSERT( result != 0 );
+	
+	if ( result != 0 )
+	{
+		return;
+	}
+
+	ErrorHandling::outputErrorDebug( );
+	std::terminate( );
+}
+
+void fClose( _In_ _Pre_valid_ _Post_ptr_invalid_ FILE* const stream )
+{
+	//fclose returns 0 if the stream is successfully closed. 
+	//[fclose returns] EOF to indicate an error.
+	const int closeResult = fclose( stream );
+	if ( closeResult == 0 )
+	{
+		return;
+	}
+	ATLASSERT( closeResult == EOF );
+	std::terminate( );
+}
+
+} //namespace handle_close
+
+namespace clipboard {
+
+void closeClipboard( )
+{
+	//If [CloseClipboard] succeeds, the return value is nonzero.
+	//If [CloseClipboard] fails, the return value is zero. 
+	//To get extended error information, call GetLastError.
+	const BOOL closeResult = ::CloseClipboard( );
+	if (closeResult != 0)
+	{
+		return;
+	}
+	OutputDebugStringW( L"UIforETW: Failed to close clipboard!!\r\n" );
+	ErrorHandling::outputErrorDebug( );
+	std::terminate( );
+}
+
+void openClipboard( )
+{
+	//If [OpenClipboard] succeeds, the return value is nonzero.
+	//If [OpenClipboard] fails, the return value is zero. 
+	//To get extended error information, call GetLastError.
+	const BOOL openResult = ::OpenClipboard( ::GetDesktopWindow( ) );
+	if (openResult != 0)
+	{
+		return;
+	}
+	OutputDebugStringW( L"UIforETW: Failed to open clipboard!!\r\n" );
+	ErrorHandling::outputErrorDebug( );
+	std::terminate( );
+}
+
+void emptyClipboard( )
+{
+	//If [EmptyClipboard] succeeds, the return value is nonzero.
+	//If [EmptyClipboard] fails, the return value is zero. 
+	//To get extended error information, call GetLastError.
+	const BOOL emptyResult = ::EmptyClipboard( );
+	if (emptyResult != 0)
+	{
+		return;
+	}
+	OutputDebugStringW( L"UIforETW: Failed to empty clipboard!!\r\n" );
+	ErrorHandling::outputErrorDebug( );
+	std::terminate( );
+}
+
+void setClipboardText( _In_ HANDLE textmem )
+{
+	//If [SetClipboardData] succeeds, the return value is the handle to the data.
+	//If [SetClipboardData] fails, the return value is NULL. 
+	//To get extended error information, call GetLastError.
+	const HANDLE setResult = ::SetClipboardData( CF_UNICODETEXT, textmem );
+	if ( setResult != NULL )
+	{
+		return;
+	}
+	OutputDebugStringW( L"UIforETW: Failed to set clipboard text!!\r\n" );
+	ErrorHandling::outputErrorDebug( );
+	std::terminate( );
+}
+
+} //namespace clipboard
+
+namespace ErrorHandling {
+
+template<rsize_t strSize>
+void GetLastErrorAsFormattedMessage( ETWUI_WRITES_TO_STACK( strSize )
+									 wchar_t (&psz_formatted_error)[strSize],
+									 const DWORD error )
+{
+	static_assert( strSize < DWORD_MAX, "static cast to DWORD will FAIL!" );
+
+	const DWORD ret = FormatMessageW( 
+		(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS), NULL, 
+		error, MAKELANGID( LANG_NEUTRAL, SUBLANG_DEFAULT ), 
+		psz_formatted_error, static_cast<DWORD>( strSize ), NULL );
+
+	if ( ret != 0 )
+	{
+		return;
+	}
+	const DWORD error_err = GetLastError( );
+	ATLTRACE2( L"FormatMessageW failed with error code: `%lu`!!\r\n", 
+				error_err );
+	
+	debug::Alias( &error_err );
+	debug::Alias( &ret );
+	debug::Alias( &error );
+	debug::Alias( &psz_formatted_error );
+	std::terminate( );
+}
+
+void outputErrorDebug( const DWORD lastErr )
+{
+	const rsize_t bufferSize = 512u;
+	wchar_t errBuffer[ bufferSize ] = { 0 };
+	ErrorHandling::GetLastErrorAsFormattedMessage( errBuffer, lastErr );
+	OutputDebugStringA( "UIforETW:\tError message: " );
+	OutputDebugStringW( errBuffer );
+	OutputDebugStringA( "\r\n" );
+}
+
+void outputPrintfErrorDebug( const DWORD lastErr )
+{
+	const rsize_t bufferSize = 512u;
+	wchar_t errBuffer[ bufferSize ] = { 0 };
+	ErrorHandling::GetLastErrorAsFormattedMessage( errBuffer, lastErr );
+	outputPrintf( L"Error message: %s\n", errBuffer );
+}
+
+} //namespace ErrorHandling 
+
+
+namespace checked_CRT {
+
+void fPutWS( _In_z_ PCWSTR const str, _In_ FILE* stream )
+{
+	//Each of these functions returns a nonnegative value if it is successful. 
+	//On an error, fputs and fputws return EOF. 
+	//If execution is allowed to continue 
+	//(from inv param. handler), fputws returns WEOF.
+	const int putsResult = fputws( str, stream );
+	if ( putsResult >= 0 )
+	{
+		return;
+	}
+	debug::Alias( &putsResult );
+	std::terminate( );
+}
+
+}//namespace checked_CRT
 
 std::vector<std::wstring> split(const std::wstring& s, char c)
 {
@@ -71,7 +264,11 @@ std::wstring LoadFileAsText(const std::wstring& fileName)
 
 	// Find the file length.
 	f.seekg(0, std::ios_base::end);
-	size_t length = (size_t)f.tellg();
+	const auto raw_length = f.tellg( );
+	ATLASSERT( raw_length >= 0 );
+	ATLASSERT( raw_length < SIZE_T_MAX );
+	size_t length = static_cast<size_t>( f.tellg() );
+	
 	f.seekg(0, std::ios_base::beg);
 
 	// Allocate a buffer and read the file.
@@ -108,37 +305,74 @@ void WriteTextAsFile(const std::wstring& fileName, const std::wstring& text)
 	outFile.write(reinterpret_cast<const char*>(text.c_str()), text.size() * sizeof(text[0]));
 }
 
-void SetRegistryDWORD(HKEY root, const std::wstring& subkey, const std::wstring& valueName, DWORD value)
+void SetRegistryDWORD(HKEY root, const std::wstring& subkey, const std::wstring& valueName, const DWORD value)
 {
-	HKEY key;
-	LONG result = RegOpenKeyEx(root, subkey.c_str(), 0, KEY_ALL_ACCESS, &key);
-	if (result == ERROR_SUCCESS)
+	//See Registry Element Size Limits:
+	//    https://msdn.microsoft.com/en-us/library/windows/desktop/ms724872.aspx
+	if (subkey.length( ) >= 255)
 	{
-		RegSetValueEx(key, valueName.c_str(), 0, REG_DWORD, reinterpret_cast<const BYTE*>(&value), sizeof(value));
-		RegCloseKey(key);
+		OutputDebugStringA( "UIforETW: Key too long!\r\n" );
+		std::terminate( );
 	}
+	if (valueName.length( ) >= 16383)
+	{
+		OutputDebugStringA("UIforETW: Value too long!\r\n");
+		std::terminate( );
+	}
+
+	HKEY key;
+	//If [RegOpenKeyEx] succeeds, the return value is ERROR_SUCCESS.
+	//If [RegOpenKeyEx] fails,
+	//    the return value is a nonzero error code defined in Winerror.h.
+	//  You can use the FormatMessage function with the 
+	//    FORMAT_MESSAGE_FROM_SYSTEM flag to get a generic description of the error.
+	const LONG openResult = RegOpenKeyExW(root, subkey.c_str(), 0, KEY_ALL_ACCESS, &key);
+	if (openResult != ERROR_SUCCESS)
+	{
+		outputPrintf( L"Failed to open registry key `%s`\n", subkey.c_str( ) );
+		ErrorHandling::outputPrintfErrorDebug( );
+		return;
+	}
+	//RegSetValueEx has the exact same return behavior as RegOpenKeyEx
+	const LONG setValueResult =
+		RegSetValueExW( key, valueName.c_str(), 0, REG_DWORD,
+						reinterpret_cast<const BYTE*>(&value), sizeof(value) );
+
+	if (setValueResult != ERROR_SUCCESS)
+	{
+		OutputDebugStringA( "UIforETW: Failed to write value to registry!!!\r\n" );
+		std::terminate( );
+	}
+	handle_close::regCloseKey( key );
 }
 
 void CreateRegistryKey(HKEY root, const std::wstring& subkey, const std::wstring& newKey)
 {
 	HKEY key;
-	LONG result = RegOpenKeyEx(root, subkey.c_str(), 0, KEY_ALL_ACCESS, &key);
-	if (result == ERROR_SUCCESS)
+	const LONG openResult =
+		RegOpenKeyExW(root, subkey.c_str(), 0, KEY_ALL_ACCESS, &key);
+	
+	if ( openResult != ERROR_SUCCESS )
 	{
-		HKEY resultKey;
-		result = RegCreateKey(key, newKey.c_str(), &resultKey);
-		if (result == ERROR_SUCCESS)
-		{
-			RegCloseKey(resultKey);
-		}
-		RegCloseKey(key);
+		outputPrintf( L"Failed to open registry key `%s`\n", subkey.c_str( ) );
+		ErrorHandling::outputPrintfErrorDebug( );
+		return;
 	}
+
+	HKEY resultKey;
+	const LONG createResult =
+		RegCreateKeyW(key, newKey.c_str(), &resultKey);
+	if (createResult == ERROR_SUCCESS)
+		RegCloseKey(resultKey);
+
+	RegCloseKey(key);
+
 }
 
 std::wstring GetEditControlText(HWND hEdit)
 {
 	std::wstring result;
-	int length = GetWindowTextLength(hEdit);
+	const int length = GetWindowTextLength(hEdit);
 	std::vector<wchar_t> buffer(length + 1);
 	GetWindowText(hEdit, &buffer[0], static_cast<int>(buffer.size()));
 	// Double-verify that the buffer is null-terminated.
@@ -150,7 +384,7 @@ std::wstring AnsiToUnicode(const std::string& text)
 {
 	// Determine number of wide characters to be allocated for the
 	// Unicode string.
-	size_t cCharacters = text.size() + 1;
+	const rsize_t cCharacters = text.size() + 1;
 
 	std::vector<wchar_t> buffer(cCharacters);
 
@@ -163,8 +397,8 @@ std::wstring AnsiToUnicode(const std::string& text)
 		result = &buffer[0];
 		return result;
 	}
-
-	return result;
+	ErrorHandling::outputErrorDebug( );
+	std::terminate( );
 }
 
 // Get the next/previous dialog item (next/prev in window order and tab order) allowing
@@ -186,36 +420,38 @@ static bool ControlOK(HWND win)
 	return true;
 }
 
-static HWND GetNextDlgItem(HWND win, bool Wrap)
+static HWND GetNextDlgItem(HWND win, const bool Wrap)
 {
 	HWND next = GetWindow(win, GW_HWNDNEXT);
 	while (next != win && !ControlOK(next))
 	{
 		if (next)
-			next = GetWindow(next, GW_HWNDNEXT);
+			next = GetWindow( next, GW_HWNDNEXT );
 		else
 		{
 			if (Wrap)
-				next = GetWindow(win, GW_HWNDFIRST);
+				next = GetWindow( win, GW_HWNDFIRST );
 			else
 				return 0;
 		}
 	}
-	assert(!Wrap || next);
+	ATLASSERT(!Wrap || next);
 	return next;
 }
 
-void SmartEnableWindow(HWND Win, BOOL Enable)
+void SmartEnableWindow(_In_ const HWND Win, _In_ const BOOL Enable)
 {
-	assert(Win);
+	ATLASSERT(Win);
 	if (!Enable)
 	{
 		HWND hasfocus = GetFocus();
 		bool FocusProblem = false;
 		HWND focuscopy;
 		for (focuscopy = hasfocus; focuscopy; focuscopy = (GetParent)(focuscopy))
+		{
 			if (focuscopy == Win)
 				FocusProblem = true;
+		}
 		if (FocusProblem)
 		{
 			HWND nextctrl = GetNextDlgItem(Win, true);
@@ -228,7 +464,8 @@ void SmartEnableWindow(HWND Win, BOOL Enable)
 
 std::wstring GetFilePart(const std::wstring& path)
 {
-	const wchar_t* pLastSlash = wcsrchr(path.c_str(), '\\');
+	ATLASSERT( path.length( ) > 0 );
+	PCWSTR const pLastSlash = wcsrchr(path.c_str(), '\\');
 	if (pLastSlash)
 		return pLastSlash + 1;
 	// If there's no slash then the file part is the entire string.
@@ -237,8 +474,9 @@ std::wstring GetFilePart(const std::wstring& path)
 
 std::wstring GetFileExt(const std::wstring& path)
 {
+	ATLASSERT( path.length( ) > 0 );
 	std::wstring filePart = GetFilePart(path);
-	const wchar_t* pLastPeriod = wcsrchr(filePart.c_str(), '.');
+	PCWSTR const pLastPeriod = wcsrchr(filePart.c_str(), '.');
 	if (pLastPeriod)
 		return pLastPeriod;
 	return L"";
@@ -246,7 +484,8 @@ std::wstring GetFileExt(const std::wstring& path)
 
 std::wstring GetDirPart(const std::wstring& path)
 {
-	const wchar_t* pLastSlash = wcsrchr(path.c_str(), '\\');
+	ATLASSERT( path.length( ) > 0 );
+	PCWSTR const pLastSlash = wcsrchr(path.c_str(), '\\');
 	if (pLastSlash)
 		return path.substr(0, pLastSlash + 1 - path.c_str());
 	// If there's no slash then there is no directory.
@@ -255,13 +494,14 @@ std::wstring GetDirPart(const std::wstring& path)
 
 std::wstring CrackFilePart(const std::wstring& path)
 {
+	ATLASSERT( path.length( ) > 0 );
 	std::wstring filePart = GetFilePart(path);
 	const std::wstring extension = GetFileExt(filePart);
+
 	if (!extension.empty())
-	{
+	{	
 		filePart = filePart.substr(0, filePart.size() - extension.size());
 	}
-
 	return filePart;
 }
 
@@ -281,6 +521,7 @@ int DeleteOneFile(HWND hwnd, const std::wstring& path)
 int DeleteFiles(HWND hwnd, const std::vector<std::wstring>& paths)
 {
 	std::vector<wchar_t> fileNames;
+	fileNames.reserve( paths.size( ) );
 	for (auto& path : paths)
 	{
 		// Push the file name and its NULL terminator onto the vector.
@@ -297,54 +538,69 @@ int DeleteFiles(HWND hwnd, const std::vector<std::wstring>& paths)
 		FO_DELETE,
 		&fileNames[0],
 		NULL,
-		FOF_ALLOWUNDO | FOF_FILESONLY | FOF_NOCONFIRMATION,
+		(FOF_ALLOWUNDO | FOF_FILESONLY | FOF_NOCONFIRMATION),
 	};
 	// Delete using the recycle bin.
-	int result = SHFileOperation(&fileOp);
+	const int result = SHFileOperation(&fileOp);
 
 	return result;
 }
 
 void SetClipboardText(const std::wstring& text)
 {
-	BOOL cb = OpenClipboard(GetDesktopWindow());
-	if (!cb)
-		return;
+	clipboard::openClipboard( );
+	clipboard::emptyClipboard( );
 
-	EmptyClipboard();
-
-	size_t length = (text.size() + 1) * sizeof(wchar_t);
-	HANDLE hmem = GlobalAlloc(GMEM_MOVEABLE, length);
-	if (hmem)
+	const rsize_t length = (text.size() + 1) * sizeof(wchar_t);
+	
+	//If [GlobalAlloc] fails, the return value is NULL. 
+	//To get extended error information, call GetLastError.
+	const HANDLE hmem = GlobalAlloc(GMEM_MOVEABLE, length);
+	if (hmem == NULL)
 	{
-		void *ptr = GlobalLock(hmem);
-		if (ptr != NULL)
-		{
-			memcpy(ptr, text.c_str(), length);
-			GlobalUnlock(hmem);
-
-			SetClipboardData(CF_UNICODETEXT, hmem);
-		}
+		clipboard::closeClipboard( );
+		outputPrintf( L"GlobalAlloc failed!!\n" );
+		ErrorHandling::outputPrintfErrorDebug( );
+		return;
 	}
+	
+	//If [GlobalLock] fails, the return value is NULL. 
+	//To get extended error information, call GetLastError.
+	void* const ptr = GlobalLock(hmem);
+	if (ptr == NULL)
+	{
+		//If [GlobalFree] succeeds, the return value is NULL.
+		GlobalFree( hmem );
+		clipboard::closeClipboard( );
+		outputPrintf( L"GlobalLock failed!!\n" );
+		ErrorHandling::outputPrintfErrorDebug( );
+		return;
+	}
+	memcpy(ptr, text.c_str(), length);
 
-	CloseClipboard();
+	//GlobalUnlock has crazy return values!
+	GlobalUnlock(hmem);
+
+	clipboard::setClipboardText(hmem);
+	clipboard::closeClipboard( );
 }
 
 int64_t GetFileSize(const std::wstring& path)
 {
 	LARGE_INTEGER result;
-	HANDLE hFile = CreateFile(path.c_str(), GENERIC_READ,
-		FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING,
-		FILE_ATTRIBUTE_NORMAL, NULL);
+	HANDLE hFile = CreateFileW( path.c_str(), GENERIC_READ,
+								(FILE_SHARE_READ | FILE_SHARE_WRITE), NULL,
+								OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL );
+
 	if (hFile == INVALID_HANDLE_VALUE)
 		return 0;
 
 	if (GetFileSizeEx(hFile, &result))
 	{
-		CloseHandle(hFile);
+		handle_close::closeHandle(hFile);
 		return result.QuadPart;
 	}
-	CloseHandle(hFile);
+	handle_close::closeHandle(hFile);
 	return 0;
 }
 
@@ -387,6 +643,14 @@ WindowsVersion GetWindowsVersion()
 	return kWindowsVersionXP;
 }
 
+double ElapsedTimer::ElapsedSeconds() const
+{
+	const auto duration = std::chrono::steady_clock::now() - start_;
+	const auto microseconds =
+		std::chrono::duration_cast<std::chrono::microseconds>(duration);
+	
+	return microseconds.count() / 1e6;
+}
 //bool IsWindowsServer()
 //{
 //	OSVERSIONINFOEXW osvi = { sizeof(osvi), 0, 0, 0, 0, { 0 }, 0, 0, 0, VER_NT_WORKSTATION };
@@ -395,7 +659,6 @@ WindowsVersion GetWindowsVersion()
 //	bool result = !VerifyVersionInfoW(&osvi, VER_PRODUCT_TYPE, dwlConditionMask);
 //	return result;
 //}
-
 
 
 std::wstring FindPython()
@@ -411,21 +674,24 @@ std::wstring FindPython()
 	{
 		return pytwoseven;
 	}
-
 #pragma warning(suppress:4996)	
-    const wchar_t* path = _wgetenv(L"path");
-	if (path)
+	PCWSTR path = _wgetenv(L"path");
+	if (!path)
 	{
-		std::vector<std::wstring> pathParts = split(path, ';');
-		for (auto part : pathParts)
+		// No python found.
+		return L"";
+	}
+
+	std::vector<std::wstring> pathParts = split(path, ';');
+	for (auto part : pathParts)
+	{
+		const std::wstring pythonPath( part + L"\\python.exe" );
+		if (PathFileExistsW(pythonPath.c_str()))
 		{
-			std::wstring pythonPath = part + L"\\python.exe";
-			if (PathFileExists(pythonPath.c_str()))
-			{
-				return pythonPath;
-			}
+			return pythonPath;
 		}
 	}
+
 	// No python found.
 	return L"";
 }
