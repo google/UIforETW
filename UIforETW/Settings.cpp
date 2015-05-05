@@ -76,12 +76,16 @@ BOOL CSettings::OnInitDialog()
 	CheckDlgButton(IDC_VIRTUALALLOCSTACKS, bVirtualAllocStacks_);
 	SetDlgItemText(IDC_CHROMEDLLPATH, chromeDllPath_.c_str());
 
-	SetDlgItemText(IDC_WSMONITOREDPROCESSES, WSMonitoredProcesses_.c_str());
-
 	btExtraProviders_.EnableWindow(FALSE);
 	btExtraStackwalks_.EnableWindow(FALSE);
 	btBufferSizes_.EnableWindow(FALSE);
 	btChromeDllPath_.EnableWindow(bChromeDeveloper_);
+	// A 32-bit process on 64-bit Windows will not be able to read the
+	// full working set of 64-bit processes, so don't even try.
+	if (Is64BitWindows() && sizeof(void*) != 8)
+		btWSMonitoredProcesses_.EnableWindow(FALSE);
+	else
+		SetDlgItemText(IDC_WSMONITOREDPROCESSES, WSMonitoredProcesses_.c_str());
 
 	if (toolTip_.Create(this))
 	{

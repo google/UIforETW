@@ -171,6 +171,10 @@ CWorkingSetMonitor::~CWorkingSetMonitor()
 
 void CWorkingSetMonitor::SetProcessFilter(const std::wstring& processes)
 {
+	// A 32-bit process on 64-bit Windows will not be able to read the
+	// full working set of 64-bit processes, so don't even try.
+	if (Is64BitWindows() && sizeof(void*) != 8)
+		return;
 	CSingleLock locker(&processesLock_);
 	if (processes == L"*")
 	{
