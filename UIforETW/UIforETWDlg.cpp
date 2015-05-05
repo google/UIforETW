@@ -931,7 +931,7 @@ void CUIforETWDlg::LaunchTraceViewer(const std::wstring traceFilename, const std
 {
 	if (!PathFileExists(traceFilename.c_str()))
 	{
-		const std::wstring zipPath = traceFilename.substr(0, traceFilename.size() - 4) + L".zip";
+		const std::wstring zipPath = StripExtensionFromPath(traceFilename) + L".zip";
 		if (PathFileExists(zipPath.c_str()))
 		{
 			AfxMessageBox(L"Viewing of zipped ETL files is not yet supported.\n"
@@ -1073,8 +1073,8 @@ void CUIforETWDlg::UpdateTraceList()
 	tempTraces.erase(std::remove_if(tempTraces.begin(), tempTraces.end(), ifInvalid), tempTraces.end());
 	for (auto& name : tempTraces)
 	{
-		// Trim off the file extension, which *should* always be in .3 form.
-		name = name.substr(0, name.size() - 4);
+		// Trim off the file extension. Yes, this is mutating the vector.
+		name = CrackFilePart(name);
 	}
 	// The same trace may show up as .etl and as .zip (compressed). Delete
 	// one copy.
@@ -1634,7 +1634,7 @@ void CUIforETWDlg::PreprocessTrace(const std::wstring& traceFilename)
 			std::wstring output = child.GetOutput();
 			// The output of the script is written to the trace description file.
 			// Ideally it would be appended, but good enough for now.
-			std::wstring textFilename = traceFilename.substr(0, traceFilename.size() - 4) + L".txt";
+			std::wstring textFilename = StripExtensionFromPath(traceFilename) + L".txt";
 			WriteTextAsFile(textFilename, output);
 		}
 #else
@@ -1675,7 +1675,7 @@ void CUIforETWDlg::PreprocessTrace(const std::wstring& traceFilename)
 			}
 		}
 #pragma warning(suppress : 4996)
-		FILE* pFile = _wfopen((traceFilename.substr(0, traceFilename.size() - 4) + L".txt").c_str(), L"a");
+		FILE* pFile = _wfopen((StripExtensionFromPath(traceFilename) + L".txt").c_str(), L"a");
 		if (pFile)
 		{
 			fwprintf(pFile, L"Chrome PIDs by process type:\n");

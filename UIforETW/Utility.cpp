@@ -265,6 +265,12 @@ std::wstring CrackFilePart(const std::wstring& path)
 	return filePart;
 }
 
+std::wstring StripExtensionFromPath(const std::wstring& path)
+{
+	std::wstring ext = GetFileExt(path);
+	return path.substr(0, path.size() - ext.size());
+}
+
 int DeleteOneFile(HWND hwnd, const std::wstring& path)
 {
 	std::vector<std::wstring> paths;
