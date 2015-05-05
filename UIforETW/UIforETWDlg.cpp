@@ -1472,7 +1472,8 @@ std::wstring CUIforETWDlg::GenerateResultFilename() const
 
 	if (tracingMode_ == kHeapTracingToFile)
 	{
-		filePart += L"_" + heapTracingExe_.substr(0, heapTracingExe_.size() - 4);
+		for (const auto& tracingName : split(heapTracingExes_, ';'))
+			filePart += L"_" + CrackFilePart(tracingName);
 		filePart += L"_heap";
 	}
 
@@ -1494,7 +1495,7 @@ void CUIforETWDlg::OnBnClickedStarttracing()
 		outputPrintf( L"\nStarting tracing to disk...\n" );
 	}
 	else if (tracingMode_ == kHeapTracingToFile)
-		outputPrintf(L"\nStarting heap tracing to disk of %s...\n", heapTracingExe_.c_str());
+		outputPrintf(L"\nStarting heap tracing to disk of %s...\n", heapTracingExes_.c_str());
 	else
 		assert(0);
 
@@ -1509,7 +1510,7 @@ void CUIforETWDlg::OnBnClickedStarttracing()
 		kernelStackWalk += L"+CSWITCH+READYTHREAD";
 	// Record VirtualAlloc call stacks from the VIRT_ALLOC provider. Could
 	// also record VirtualFree.
-	if (tracingMode_ == kHeapTracingToFile)
+	if (bVirtualAllocStacks_ || tracingMode_ == kHeapTracingToFile)
 		kernelStackWalk += L"+VirtualAlloc";
 	// Set up a -stackwalk configuration, removing the leading '+' sign.
 	if (!kernelStackWalk.empty())
@@ -1755,7 +1756,7 @@ void CUIforETWDlg::LaunchTraceViewer(const std::wstring traceFilename, const std
 {
 	if (!isValidPathToFSObject(traceFilename))
 	{
-		const std::wstring zipPath = traceFilename.substr(0, traceFilename.size() - 4) + L".zip";
+		const std::wstring zipPath = StripExtensionFromPath(traceFilename) + L".zip";
 		if (isValidPathToFSObject(zipPath))
 		{
 			AfxMessageBox(L"Viewing of zipped ETL files is not yet supported.\n"
@@ -1907,8 +1908,8 @@ void CUIforETWDlg::UpdateTraceList()
 	tempTraces.erase(std::remove_if(tempTraces.begin(), tempTraces.end(), ifInvalid), tempTraces.end());
 	for (auto& name : tempTraces)
 	{
-		// Trim off the file extension, which *should* always be in .3 form.
-		name = name.substr(0, name.size() - 4);
+		// Trim off the file extension. Yes, this is mutating the vector.
+		name = CrackFilePart(name);
 	}
 	// The same trace may show up as .etl and as .zip (compressed). Delete
 	// one copy.
@@ -2110,9 +2111,13 @@ void CUIforETWDlg::SetHeapTracing(bool forceOff)
 	DWORD tracingFlags = tracingMode_ == kHeapTracingToFile ? 1 : 0;
 	if (forceOff)
 		tracingFlags = 0;
-	CreateRegistryKey(HKEY_LOCAL_MACHINE, targetKey, heapTracingExe_);
-	targetKey += L"\\" + heapTracingExe_;
-	SetRegistryDWORD(HKEY_LOCAL_MACHINE, targetKey, L"TracingFlags", tracingFlags);
+	for (const auto& tracingName : split(heapTracingExes_, ';'))
+	{
+		std::wstring targetKey = L"Software\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options";
+		CreateRegistryKey(HKEY_LOCAL_MACHINE, targetKey, tracingName);
+		targetKey += L"\\" + tracingName;
+		SetRegistryDWORD(HKEY_LOCAL_MACHINE, targetKey, L"TracingFlags", tracingFlags);
+	}
 }
 
 void CUIforETWDlg::OnCbnSelchangeTracingmode()
@@ -2133,7 +2138,7 @@ void CUIforETWDlg::OnCbnSelchangeTracingmode()
 		outputPrintf(L"Heap traces will be recorded to disk for %s. Note that only %s processes "
 			L"started after this is selected will be traced. \n"
 			L"To keep trace sizes manageable you may want to turn off context switch and CPU "
-			L"sampling call stacks.\n", heapTracingExe_.c_str(), heapTracingExe_.c_str());
+			L"sampling call stacks.\n", heapTracingExes_.c_str(), heapTracingExes_.c_str());
 		break;
 	}
 	SetHeapTracing(false);
@@ -2142,23 +2147,24 @@ void CUIforETWDlg::OnCbnSelchangeTracingmode()
 
 void CUIforETWDlg::OnBnClickedSettings()
 {
-	CSettings dlgAbout(nullptr, GetExeDir(), GetWPTDir());
-	dlgAbout.heapTracingExe_ = heapTracingExe_;
-	dlgAbout.chromeDllPath_ = chromeDllPath_;
-	dlgAbout.WSMonitoredProcesses_ = WSMonitoredProcesses_;
-	dlgAbout.bChromeDeveloper_ = bChromeDeveloper_;
-	dlgAbout.bAutoViewTraces_ = bAutoViewTraces_;
-	dlgAbout.bHeapStacks_ = bHeapStacks_;
-	if (dlgAbout.DoModal() == IDOK)
+	CSettings dlgSettings(nullptr, GetExeDir(), GetWPTDir());
+	dlgSettings.heapTracingExes_ = heapTracingExes_;
+	dlgSettings.chromeDllPath_ = chromeDllPath_;
+	dlgSettings.WSMonitoredProcesses_ = WSMonitoredProcesses_;
+	dlgSettings.bChromeDeveloper_ = bChromeDeveloper_;
+	dlgSettings.bAutoViewTraces_ = bAutoViewTraces_;
+	dlgSettings.bHeapStacks_ = bHeapStacks_;
+	dlgSettings.bVirtualAllocStacks_ = bVirtualAllocStacks_;
+	if (dlgSettings.DoModal() == IDOK)
 	{
 		// If the heap tracing executable name has changed then clear and
 		// then (potentially) reset the registry key, otherwise the other
 		// executable may end up with heap tracing enabled indefinitely.
-		if (heapTracingExe_ != dlgAbout.heapTracingExe_)
+		if (heapTracingExes_ != dlgSettings.heapTracingExes_)
 		{
 			// Force heap tracing off
 			SetHeapTracing(true);
-			heapTracingExe_ = dlgAbout.heapTracingExe_;
+			heapTracingExes_ = dlgSettings.heapTracingExes_;
 			// Potentially re-enable heap tracing with the new name.
 			SetHeapTracing(false);
 		}
@@ -2166,18 +2172,19 @@ void CUIforETWDlg::OnBnClickedSettings()
 		// Update the symbol path if the chrome developer flag has changed.
 		// This will be a NOP if the user set _NT_SYMBOL_PATH outside of
 		// UIforETW.
-		if (bChromeDeveloper_ != dlgAbout.bChromeDeveloper_)
+		if (bChromeDeveloper_ != dlgSettings.bChromeDeveloper_)
 		{
-			bChromeDeveloper_ = dlgAbout.bChromeDeveloper_;
+			bChromeDeveloper_ = dlgSettings.bChromeDeveloper_;
 			SetSymbolPath();
 		}
 
 		// Copy over the remaining settings.
-		chromeDllPath_ = dlgAbout.chromeDllPath_;
-		WSMonitoredProcesses_ = dlgAbout.WSMonitoredProcesses_;
+		chromeDllPath_ = dlgSettings.chromeDllPath_;
+		WSMonitoredProcesses_ = dlgSettings.WSMonitoredProcesses_;
 		workingSetThread_.SetProcessFilter(WSMonitoredProcesses_);
-		bAutoViewTraces_ = dlgAbout.bAutoViewTraces_;
-		bHeapStacks_ = dlgAbout.bHeapStacks_;
+		bAutoViewTraces_ = dlgSettings.bAutoViewTraces_;
+		bHeapStacks_ = dlgSettings.bHeapStacks_;
+		bVirtualAllocStacks_ = dlgSettings.bVirtualAllocStacks_;
 	}
 }
 
@@ -2451,7 +2458,7 @@ void CUIforETWDlg::StripChromeSymbols(const std::wstring& traceFilename)
 	const std::wstring pythonPath = FindPython();
 	if (pythonPath.empty())
 	{
-		outputPrintf(L"Can't find Python. Chrome symbol stripping disabled.");
+		outputPrintf(L"Can't find Python. Chrome symbol stripping disabled.\n");
 		return;
 	}
 
@@ -2491,7 +2498,7 @@ void CUIforETWDlg::PreprocessTrace(const std::wstring& traceFilename)
 		std::wstring output = child.GetOutput();
 		// The output of the script is written to the trace description file.
 		// Ideally it would be appended, but good enough for now.
-		std::wstring textFilename = traceFilename.substr(0, traceFilename.size() - 4) + L".txt";
+		std::wstring textFilename = StripExtensionFromPath(traceFilename) + L".txt";
 		WriteTextAsFile(textFilename, output);
 	}
 #else
@@ -2544,9 +2551,10 @@ void CUIforETWDlg::PreprocessTrace(const std::wstring& traceFilename)
 			if (pid)
 				pidsByType[type].push_back(pid);
 		}
+<<<<<<< HEAD
 	}
 	//Maybe we should request the Unicode version of the APIs (for long path support)?
-	const std::wstring fileToOpen = (traceFilename.substr(0, traceFilename.size() - 4) + L".txt");
+	const std::wstring fileToOpen = (StripExtensionFromPath(traceFilename) + L".txt");
 
 	FILE* pFile = NULL;
 
@@ -2568,6 +2576,11 @@ void CUIforETWDlg::PreprocessTrace(const std::wstring& traceFilename)
 		}
 
 		for (const auto& pid : types.second)
+=======
+#pragma warning(suppress : 4996)
+		FILE* pFile = _wfopen((StripExtensionFromPath(traceFilename) + L".txt").c_str(), L"a");
+		if (pFile)
+>>>>>>> master
 		{
 			const int secondTypesResult = fwprintf_s(pFile, L" %lu", pid);
 			if (secondTypesResult < 0)

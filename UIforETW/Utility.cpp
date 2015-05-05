@@ -374,7 +374,7 @@ std::wstring GetEditControlText(HWND hEdit)
 	std::wstring result;
 	const int length = GetWindowTextLength(hEdit);
 	std::vector<wchar_t> buffer(length + 1);
-	GetWindowTextW(hEdit, &buffer[0], buffer.size());
+	GetWindowText(hEdit, &buffer[0], static_cast<int>(buffer.size()));
 	// Double-verify that the buffer is null-terminated.
 	buffer[buffer.size() - 1] = 0;
 	return &buffer[0];
@@ -390,11 +390,7 @@ std::wstring AnsiToUnicode(const std::string& text)
 
 	// Convert to Unicode.
 	std::wstring result;
-	
-	const int mbToWcResult = MultiByteToWideChar( CP_ACP, 0, text.c_str( ), 
-												  cCharacters, &buffer[0], 
-												  cCharacters );
-	if (mbToWcResult)
+	if (MultiByteToWideChar(CP_ACP, 0, text.c_str(), static_cast<int>(cCharacters), &buffer[0], static_cast<int>(cCharacters)))
 	{
 		// Double-verify that the buffer is null-terminated.
 		buffer[buffer.size() - 1] = 0;
@@ -507,6 +503,12 @@ std::wstring CrackFilePart(const std::wstring& path)
 		filePart = filePart.substr(0, filePart.size() - extension.size());
 	}
 	return filePart;
+}
+
+std::wstring StripExtensionFromPath(const std::wstring& path)
+{
+	std::wstring ext = GetFileExt(path);
+	return path.substr(0, path.size() - ext.size());
 }
 
 int DeleteOneFile(HWND hwnd, const std::wstring& path)

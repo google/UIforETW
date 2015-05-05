@@ -87,7 +87,7 @@ void enableASLRMitigation(_In_ SetProcessMitigationPolicy_t SetProcessMitigation
 	}
 	const DWORD lastErr = GetLastError();
 	ATLTRACE(L"Failed to apply aggressive ASLR policy! Error code: %u\r\n", lastErr);
-	}
+}
 
 void enableExtensionPointMitigations(_In_ SetProcessMitigationPolicy_t SetProcessMitigationPolicy_f)
 {

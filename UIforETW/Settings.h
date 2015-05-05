@@ -32,12 +32,13 @@ public:
 	enum { IDD = IDD_SETTINGS };
 
 	// These settings are written and read by the creator of this object.
-	std::wstring heapTracingExe_;
+	std::wstring heapTracingExes_;
 	std::wstring chromeDllPath_;
 	std::wstring WSMonitoredProcesses_;
 	bool bChromeDeveloper_ = false;
 	bool bAutoViewTraces_ = false;
 	bool bHeapStacks_ = false;
+	bool bVirtualAllocStacks_ = false;
 
 protected:
 	CEdit btHeapTracingExe_;
@@ -53,6 +54,7 @@ protected:
 	CButton btChromeDeveloper_;
 	CButton btAutoViewTraces_;
 	CButton btHeapStacks_;
+	CButton btVirtualAllocStacks_;
 
 	CToolTipCtrl toolTip_;
 
@@ -71,4 +73,5 @@ public:
 	afx_msg void OnBnClickedChromedeveloper();
 	afx_msg void OnBnClickedAutoviewtraces();
 	afx_msg void OnBnClickedHeapstacks();
+	afx_msg void OnBnClickedVirtualallocstacks();
 };

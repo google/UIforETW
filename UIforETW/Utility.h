@@ -90,6 +90,8 @@ std::wstring GetDirPart(const std::wstring& path);
 // the file part of the path (which could conceivably be an
 // empty string).
 std::wstring CrackFilePart(const std::wstring& path);
+// Pass this a path and it returns everything except the extension.
+std::wstring StripExtensionFromPath(const std::wstring& path);
 
 // Delete one or more files using the shell so that errors will bring up
 // a dialog and deleted files will go to the recycle bin.

@@ -54,6 +54,8 @@
 #define IDC_AUTOVIEWTRACES              1027
 #define IDC_CHECK1                      1028
 #define IDC_HEAPSTACKS                  1028
+#define IDC_VIRTALLOCSTACKS             1029
+#define IDC_VIRTUALALLOCSTACKS          1029
 #define IDC_CHROMEDLLPATH               1030
 #define ID_TRACES_OPENTRACEINWPA        32771
 #define ID_TRACES_DELETETRACE           32772

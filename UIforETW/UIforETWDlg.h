@@ -91,11 +91,10 @@ private:
 
 	TracingMode tracingMode_ = kTracingToMemory;
 	CComboBox btTracingMode_;
-	// Hardcoded to chrome.exe for now.
-	std::wstring heapTracingExe_ = L"chrome.exe";
-	// Default is hardcoded to C:\\Temp\\ if it cannot be restored..
+	std::wstring heapTracingExes_ = L"chrome.exe";
 	std::wstring chromeDllPath_ = L"C:\\Temp\\";
 	void SetHeapTracing(bool forceOff);
+	bool bVirtualAllocStacks_ = false;
 
 	std::vector<std::wstring> traces_;
 	CListBox btTraces_;

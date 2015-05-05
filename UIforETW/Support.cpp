@@ -60,6 +60,7 @@ void CUIforETWDlg::TransferSettings(bool saving)
 		{ L"ChromeDeveloper", &bChromeDeveloper_ },
 		{ L"AutoViewTraces", &bAutoViewTraces_ },
 		{ L"HeapStacks", &bHeapStacks_ },
+		{ L"VirtualAllocStacks", &bVirtualAllocStacks_ },
 	};
 
 	for (auto& m : bools)
@@ -95,7 +96,7 @@ void CUIforETWDlg::TransferSettings(bool saving)
 
 	NameToString strings[] =
 	{
-		{ L"HeapProfiledProcess", &heapTracingExe_ },
+		{ L"HeapProfiledProcess", &heapTracingExes_ },
 		{ L"ChromeDllPath", &chromeDllPath_ },
 		{ L"WSMonitoredProcesses", &WSMonitoredProcesses_ },
 	};
