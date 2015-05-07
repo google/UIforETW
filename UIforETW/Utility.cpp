@@ -17,7 +17,6 @@ limitations under the License.
 #include "stdafx.h"
 #include "Utility.h"
 #include <fstream>
-#include "alias.h"
 
 namespace {
 
@@ -39,9 +38,6 @@ void regCloseKey( _In_ _Pre_valid_ _Post_ptr_invalid_ HKEY hKey )
 	{
 		return;
 	}
-	debug::Alias( &result );
-	debug::Alias( &hKey );
-
 	ErrorHandling::outputErrorDebug( );
 	std::terminate( );
 }
@@ -164,10 +160,6 @@ void GetLastErrorAsFormattedMessage( ETWUI_WRITES_TO_STACK( strSize )
 	ATLTRACE2( L"FormatMessageW failed with error code: `%lu`!!\r\n", 
 				error_err );
 	
-	debug::Alias( &error_err );
-	debug::Alias( &ret );
-	debug::Alias( &error );
-	debug::Alias( &psz_formatted_error );
 	std::terminate( );
 }
 
@@ -205,7 +197,6 @@ void fPutWS( _In_z_ PCWSTR const str, _In_ FILE* stream )
 	{
 		return;
 	}
-	debug::Alias( &putsResult );
 	std::terminate( );
 }
 

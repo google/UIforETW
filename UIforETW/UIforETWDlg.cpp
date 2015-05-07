@@ -23,7 +23,6 @@ limitations under the License.
 #include "ChildProcess.h"
 #include "Settings.h"
 #include "Utility.h"
-#include "alias.h"
 #include "WorkingSet.h"
 
 #include <algorithm>
@@ -258,7 +257,6 @@ void addStringToCComboBox( _Inout_ CComboBox* const comboBox, _In_z_ PCWSTR cons
 	if (addStringResult == CB_ERR)
 	{
 		MessageBoxW(NULL, stringToAdd, L"Unexpected (fatal) error adding string to comboBox!", MB_OK);
-		debug::Alias(&stringToAdd);
 		std::terminate();
 	}
 	if (addStringResult == CB_ERRSPACE)
@@ -786,8 +784,6 @@ std::wstring getWindowsDirectory( )
 		SHGetKnownFolderPath(FOLDERID_Windows, 0, NULL, &windowsDir);
 	if (FAILED(windowsDirectoryResult))
 	{
-		debug::Alias(&windowsDir);
-		debug::Alias(&FOLDERID_Windows);
 		std::terminate();
 	}
 
@@ -813,8 +809,6 @@ std::wstring getWPTDir( )
 		SHGetKnownFolderPath(FOLDERID_ProgramFilesX86, 0, NULL, &progFilesx86Dir);
 	if (FAILED(progFilesResult))
 	{
-		debug::Alias(&progFilesx86Dir);
-		debug::Alias(&FOLDERID_Windows);
 		std::terminate();
 	}
 
@@ -840,8 +834,6 @@ std::wstring getDocumentsPath( )
 		SHGetKnownFolderPath(FOLDERID_Documents, 0, NULL, &documents_temp);
 	if (FAILED(shGetMyDocResult))
 	{
-		debug::Alias(&documents_temp);
-		debug::Alias(&FOLDERID_Windows);
 		std::terminate();
 	}
 
@@ -1409,7 +1401,6 @@ std::wstring CUIforETWDlg::GetExeDir() const
 	if ((moduleFileNameResult >= MAX_PATH) || ( moduleFileNameResult == 0))
 	{
 		ErrorHandling::outputErrorDebug();
-		debug::Alias(&moduleFileNameResult);
 		std::terminate();
 	}
 	//Huh?
@@ -2551,7 +2542,6 @@ void CUIforETWDlg::PreprocessTrace(const std::wstring& traceFilename)
 			if (pid)
 				pidsByType[type].push_back(pid);
 		}
-<<<<<<< HEAD
 	}
 	//Maybe we should request the Unicode version of the APIs (for long path support)?
 	const std::wstring fileToOpen = (StripExtensionFromPath(traceFilename) + L".txt");
@@ -2576,11 +2566,6 @@ void CUIforETWDlg::PreprocessTrace(const std::wstring& traceFilename)
 		}
 
 		for (const auto& pid : types.second)
-=======
-#pragma warning(suppress : 4996)
-		FILE* pFile = _wfopen((StripExtensionFromPath(traceFilename) + L".txt").c_str(), L"a");
-		if (pFile)
->>>>>>> master
 		{
 			const int secondTypesResult = fwprintf_s(pFile, L" %lu", pid);
 			if (secondTypesResult < 0)

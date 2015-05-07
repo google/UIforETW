@@ -183,6 +183,7 @@
       <StringPooling>true</StringPooling>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <EnablePREfast>false</EnablePREfast>
+      <AdditionalOptions> /Qvec-report:2</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -223,6 +224,7 @@
       <TreatWarningAsError>true</TreatWarningAsError>
       <AdditionalIncludeDirectories>..\include</AdditionalIncludeDirectories>
       <EnablePREfast>false</EnablePREfast>
+      <AdditionalOptions> /Qvec-report:2</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -251,7 +253,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="About.h" />
-    <ClInclude Include="alias.h" />
     <ClInclude Include="ChildProcess.h" />
     <ClInclude Include="DirectoryMonitor.h" />
     <ClInclude Include="KeyLoggerThread.h" />
@@ -265,7 +266,6 @@
     <ClInclude Include="WorkingSet.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="alias.cpp" />
     <ClCompile Include="ChildProcess.cpp" />
     <ClCompile Include="DirectoryMonitor.cpp" />
     <ClCompile Include="KeyLoggerThread.cpp" />
