@@ -38,7 +38,7 @@ DWORD DirectoryMonitor::DirectoryMonitorThread()
 
 	if (hChangeHandle == INVALID_HANDLE_VALUE)
 	{
-		assert(0);
+		ATLASSERT(0);
 		return 0;
 	}
 
@@ -53,7 +53,7 @@ DWORD DirectoryMonitor::DirectoryMonitorThread()
 			mainWindow_->PostMessage(WM_UPDATETRACELIST, 0, 0);
 			if (FindNextChangeNotification(hChangeHandle) == FALSE)
 			{
-				assert(0);
+				ATLASSERT(0);
 				return 0;
 			}
 			break;
@@ -62,21 +62,23 @@ DWORD DirectoryMonitor::DirectoryMonitorThread()
 			return 0;
 
 		default:
-			assert(0);
+			ATLASSERT(0);
 			break;
 		}
 	}
   // Unreachable.
 }
 
+_Pre_satisfies_(this->hThread_ == 0)
+_Pre_satisfies_(this->hShutdownRequest_ == 0)
 void DirectoryMonitor::StartThread(const std::wstring* traceDir)
 {
-	assert(hThread_ == 0);
-	assert(hShutdownRequest_ == 0);
+	ATLASSERT(hThread_ == 0);
+	ATLASSERT(hShutdownRequest_ == 0);
 	traceDir_ = traceDir;
 	// No error checking -- what could go wrong?
 	hThread_ = CreateThread(nullptr, 0, DirectoryMonitorThreadStatic, this, 0, 0);
-	hShutdownRequest_ = CreateEvent(nullptr, FALSE, FALSE, nullptr);;
+	hShutdownRequest_ = CreateEvent(nullptr, FALSE, FALSE, nullptr);
 }
 
 DirectoryMonitor::~DirectoryMonitor()

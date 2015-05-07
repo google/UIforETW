@@ -112,10 +112,10 @@ DWORD ChildProcess::ListenerThread()
 	return 0;
 }
 
-
+_Pre_satisfies_(!(this->hProcess_))
 bool ChildProcess::Run(bool showCommand, std::wstring args)
 {
-	assert(!hProcess_);
+	ATLASSERT(!hProcess_);
 
 	if (showCommand)
 		outputPrintf(L"%s\n", args.c_str());

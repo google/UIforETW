@@ -37,6 +37,7 @@ public:
 	~ChildProcess();
 
 	// Returns true if the process started.
+	_Pre_satisfies_(!(this->hProcess_))
 	bool Run(bool showCommand, std::wstring args);
 
 	// This can be called even if the process doesn't start, but

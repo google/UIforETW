@@ -24,6 +24,9 @@ public:
 	DirectoryMonitor(CWnd* pMainWindow);
 	~DirectoryMonitor();
 
+
+	_Pre_satisfies_(this->hThread_ == 0)
+	_Pre_satisfies_(this->hShutdownRequest_ == 0)
 	void StartThread(const std::wstring* traceDir);
 
 private:

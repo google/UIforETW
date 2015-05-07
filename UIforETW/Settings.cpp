@@ -143,11 +143,15 @@ void CSettings::OnBnClickedCopystartupprofile()
 	std::wstring source = exeDir_ + fileName;
 
 	wchar_t documents[MAX_PATH];
-	if (!SHGetSpecialFolderPath(*this, documents, CSIDL_MYDOCUMENTS, TRUE))
+
+	const BOOL getMyDocsResult = SHGetSpecialFolderPathW(m_hWnd, documents, CSIDL_MYDOCUMENTS, TRUE);
+	ATLASSERT(getMyDocsResult);
+	if (!getMyDocsResult)
 	{
-		assert(!"Failed to find My Documents directory.\n");
+		OutputDebugStringA("Failed to find My Documents directory.\r\n");
 		return;
 	}
+
 	std::wstring dest = documents + std::wstring(L"\\WPA Files\\") + fileName;
 	if (CopyFile(source.c_str(), dest.c_str(), FALSE))
 	{

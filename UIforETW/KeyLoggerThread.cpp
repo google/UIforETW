@@ -27,7 +27,7 @@ std::atomic<bool> g_LogKeyboardDetails = false;
 
 LRESULT CALLBACK LowLevelKeyboardHook(int nCode, WPARAM wParam, LPARAM lParam)
 {
-	assert(nCode == HC_ACTION);
+	ATLASSERT(nCode == HC_ACTION);
 	// wParam is WM_KEYDOWN, WM_KEYUP, WM_SYSKEYDOWN, or WM_SYSKEYUP
 
 	KBDLLHOOKSTRUCT* pKbdLLHook = (KBDLLHOOKSTRUCT*)lParam;
