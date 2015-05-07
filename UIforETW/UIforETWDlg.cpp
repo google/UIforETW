@@ -1388,7 +1388,7 @@ void CUIforETWDlg::OnContextMenu(CWnd* pWnd, CPoint point)
 				ID_TRACES_TRACEPATHTOCLIPBOARD,
 			};
 
-			for (auto id : disableList)
+			for (const auto& id : disableList)
 				pContextMenu->EnableMenuItem(id, MF_BYCOMMAND | MF_GRAYED);
 		}
 
@@ -1569,7 +1569,7 @@ void CUIforETWDlg::CompressAllTraces() const
 	int64_t finalTotalSize = 0;
 	int notCompressedCount = 0;
 	int compressedCount = 0;
-	for (auto traceName : traces_)
+	for (const auto& traceName : traces_)
 	{
 		auto result = CompressTrace(GetTraceDir() + traceName + L".etl");
 		if (result.first == result.second)
@@ -1646,7 +1646,7 @@ void CUIforETWDlg::PreprocessTrace(const std::wstring& traceFilename)
 		child.Run(bShowCommands_, L"xperf.exe" + args);
 		std::wstring output = child.GetOutput();
 		std::map<std::wstring, std::vector<DWORD>> pidsByType;
-		for (auto& line : split(output, '\n'))
+		for (const auto line : split(output, '\n'))
 		{
 			if (wcsstr(line.c_str(), L"chrome.exe"))
 			{
@@ -1670,7 +1670,7 @@ void CUIforETWDlg::PreprocessTrace(const std::wstring& traceFilename)
 				}
 				if (pid)
 				{
-					pidsByType[type].push_back(pid);
+					pidsByType[type].emplace_back(pid);
 				}
 			}
 		}
@@ -1679,10 +1679,10 @@ void CUIforETWDlg::PreprocessTrace(const std::wstring& traceFilename)
 		if (pFile)
 		{
 			fwprintf(pFile, L"Chrome PIDs by process type:\n");
-			for (auto& types : pidsByType)
+			for (const auto& types : pidsByType)
 			{
 				fwprintf(pFile, L"%-10s:", types.first.c_str());
-				for (auto& pid : types.second)
+				for (const auto& pid : types.second)
 				{
 					fwprintf(pFile, L" %lu", pid);
 				}
@@ -1773,10 +1773,11 @@ void CUIforETWDlg::FinishTraceRename()
 	{
 		auto oldNames = GetFileList(GetTraceDir() + preRenameTraceName_ + L".*");
 		std::vector<std::pair<std::wstring, std::wstring>> renamed;
+		renamed.reserve(oldNames.size());
 		std::wstring failedSource;
-		for (auto oldName : oldNames)
+		for (const auto& oldName : oldNames)
 		{
-			std::wstring extension = GetFileExt(oldName);;
+			std::wstring extension = GetFileExt(oldName);
 			std::wstring newName = newTraceName + extension;
 			BOOL result = MoveFile((GetTraceDir() + oldName).c_str(), (GetTraceDir() + newName).c_str());
 			if (!result)
@@ -1784,7 +1785,7 @@ void CUIforETWDlg::FinishTraceRename()
 				failedSource = oldName;
 				break;
 			}
-			renamed.push_back(std::pair<std::wstring, std::wstring>(oldName, newName));
+			renamed.emplace_back(std::make_pair(oldName, newName));
 		}
 		// If any of the renaming steps fail then undo the renames that
 		// succeeded. This should usually fail. If not, there isn't much that
@@ -1798,7 +1799,7 @@ void CUIforETWDlg::FinishTraceRename()
 		}
 		else
 		{
-			for (auto& renamePair : renamed)
+			for (const auto& renamePair : renamed)
 			{
 				(void)MoveFile((GetTraceDir() + renamePair.second).c_str(), (GetTraceDir() + renamePair.first).c_str());
 			}

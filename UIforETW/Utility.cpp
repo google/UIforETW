@@ -24,15 +24,16 @@ std::vector<std::wstring> split(const std::wstring& s, char c)
 	std::wstring::size_type j = s.find(c);
 
 	std::vector<std::wstring> result;
+	result.reserve(s.length());
 	while (j != std::wstring::npos)
 	{
-		result.push_back(s.substr(i, j - i));
+		result.emplace_back(s.substr(i, j - i));
 		i = ++j;
 		j = s.find(c, j);
 	}
 
 	if (!s.empty())
-		result.push_back(s.substr(i, s.length()));
+		result.emplace_back(s.substr(i, s.length()));
 
 	return result;
 }
@@ -51,7 +52,7 @@ std::vector<std::wstring> GetFileList(const std::wstring& pattern, bool fullPath
 	{
 		do
 		{
-			result.push_back(directory + findData.cFileName);
+			result.emplace_back(directory + findData.cFileName);
 		} while (FindNextFile(hFindFile, &findData));
 
 		FindClose(hFindFile);
@@ -274,22 +275,31 @@ std::wstring StripExtensionFromPath(const std::wstring& path)
 int DeleteOneFile(HWND hwnd, const std::wstring& path)
 {
 	std::vector<std::wstring> paths;
-	paths.push_back(path);
+	paths.emplace_back(path);
 	return DeleteFiles(hwnd, paths);
 }
 
 int DeleteFiles(HWND hwnd, const std::vector<std::wstring>& paths)
 {
+	ATLASSERT(paths.size() > 0);
+
+	size_t totalLength = 1;
+	for (const auto& path : paths)
+	{
+		totalLength += (path.length() + 1);
+	}
+
 	std::vector<wchar_t> fileNames;
-	for (auto& path : paths)
+	fileNames.reserve(totalLength);
+	for (const auto& path : paths)
 	{
 		// Push the file name and its NULL terminator onto the vector.
 		fileNames.insert(fileNames.end(), path.c_str(), path.c_str() + path.size());
-		fileNames.push_back(0);
+		fileNames.emplace_back(0);
 	}
 
 	// Double null-terminate.
-	fileNames.push_back(0);
+	fileNames.emplace_back(0);
 
 	SHFILEOPSTRUCT fileOp =
 	{
@@ -417,7 +427,7 @@ std::wstring FindPython()
 	if (path)
 	{
 		std::vector<std::wstring> pathParts = split(path, ';');
-		for (auto part : pathParts)
+		for (const auto& part : pathParts)
 		{
 			std::wstring pythonPath = part + L"\\python.exe";
 			if (PathFileExists(pythonPath.c_str()))
