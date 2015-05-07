@@ -216,6 +216,7 @@ BEGIN_MESSAGE_MAP(CUIforETWDlg, CDialogEx)
 	ON_BN_CLICKED(ID_COPYTRACENAME, &CUIforETWDlg::CopyTraceName)
 	ON_BN_CLICKED(ID_DELETETRACE, &CUIforETWDlg::DeleteTrace)
 	ON_BN_CLICKED(ID_SELECTALL, &CUIforETWDlg::SelectAll)
+	ON_WM_ACTIVATE()
 END_MESSAGE_MAP()
 
 
@@ -1816,4 +1817,16 @@ void CUIforETWDlg::CancelTraceRename()
 	// That's it.
 	btTraceNameEdit_.ShowWindow(SW_HIDE);
 	btTraces_.SetFocus();
+}
+
+void CUIforETWDlg::OnActivate(UINT nState, CWnd* pWndOther, BOOL bMinimized)
+{
+	if (nState == WA_INACTIVE)
+	{
+		// When the window goes inactive then the user may be switching to
+		// explorer/cmd to copy the notes file, so we need to make sure it
+		// is up-to-date.
+		SaveNotesIfNeeded();
+	}
+	CDialog::OnActivate(nState, pWndOther, bMinimized);
 }
