@@ -22,4 +22,4 @@ present.txt
 *.exe.lastcodeanalysissucceeded
 
 # wpaexporter drops these
-*Summary_Table_*.csv
+*.csv
