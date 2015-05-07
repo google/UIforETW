@@ -17,6 +17,7 @@ limitations under the License.
 #include "stdafx.h"
 #include "ChildProcess.h"
 #include "Utility.h"
+
 #include <vector>
 
 static const wchar_t* kPipeName = L"\\\\.\\PIPE\\UIforETWPipe";
@@ -105,7 +106,7 @@ DWORD ChildProcess::ListenerThread()
 	}
 	else
 	{
-		OutputDebugStringW(L"Connect failed.\n");
+		OutputDebugStringA("Connect failed.\r\n");
 	}
 
 	DisconnectNamedPipe(hPipe_);
