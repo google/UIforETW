@@ -16,7 +16,6 @@ limitations under the License.
 
 #include "stdafx.h"
 #include "DirectoryMonitor.h"
-#include <assert.h>
 
 DirectoryMonitor::DirectoryMonitor(CWnd* pMainWindow)
 	: mainWindow_(pMainWindow)

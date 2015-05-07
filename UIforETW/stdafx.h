@@ -33,7 +33,6 @@ limitations under the License.
 #define _AFX_ALL_WARNINGS
 
 #include <afxext.h>         // MFC extensions
-#include <assert.h>
 
 #ifndef _AFX_NO_AFXCMN_SUPPORT
 #include <afxcmn.h>             // MFC support for Windows Common Controls

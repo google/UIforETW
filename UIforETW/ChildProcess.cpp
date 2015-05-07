@@ -18,7 +18,6 @@ limitations under the License.
 #include "ChildProcess.h"
 #include "Utility.h"
 
-#include <assert.h>
 #include <vector>
 
 static const wchar_t* kPipeName = L"\\\\.\\PIPE\\UIforETWPipe";

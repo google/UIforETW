@@ -15,7 +15,6 @@ limitations under the License.
 */
 
 #include "stdafx.h"
-#include <assert.h>
 #include "KeyLoggerThread.h"
 #include <ETWProviders\etwprof.h>
 #include <atomic>
@@ -126,7 +125,7 @@ LRESULT CALLBACK LowLevelKeyboardHook(int nCode, WPARAM wParam, LPARAM lParam)
 
 LRESULT CALLBACK LowLevelMouseHook(int nCode, WPARAM wParam, LPARAM lParam)
 {
-	assert(nCode == HC_ACTION);
+	ATLASSERT(nCode == HC_ACTION);
 
 	MSLLHOOKSTRUCT* pMouseLLHook = (MSLLHOOKSTRUCT*)lParam;
 
