@@ -57,6 +57,7 @@
 #define IDC_VIRTALLOCSTACKS             1029
 #define IDC_VIRTUALALLOCSTACKS          1029
 #define IDC_CHROMEDLLPATH               1030
+#define IDC_BUILDDATE                   1031
 #define ID_TRACES_OPENTRACEINWPA        32771
 #define ID_TRACES_DELETETRACE           32772
 #define ID_TRACES_COMPRESSTRACE         32773
@@ -86,7 +87,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        136
 #define _APS_NEXT_COMMAND_VALUE         32805
-#define _APS_NEXT_CONTROL_VALUE         1031
+#define _APS_NEXT_CONTROL_VALUE         1032
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

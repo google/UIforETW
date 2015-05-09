@@ -429,3 +429,49 @@ std::wstring FindPython()
 	// No python found.
 	return L"";
 }
+
+std::wstring GetBuildTimeFromAddress(void* codeAddress)
+{
+	// Get the base of the address reservation. This lets this
+	// function be passed any function or global variable address
+	// in a DLL or EXE.
+	MEMORY_BASIC_INFORMATION	memoryInfo;
+	if (VirtualQuery(codeAddress, &memoryInfo, sizeof(memoryInfo)) != sizeof(memoryInfo))
+	{
+		assert(0);
+		return L"";
+	}
+	void* ModuleHandle = memoryInfo.AllocationBase;
+
+	// Walk the PE data structures to find the link time stamp.
+	IMAGE_DOS_HEADER *DosHeader = (IMAGE_DOS_HEADER*)ModuleHandle;
+	if (IMAGE_DOS_SIGNATURE != DosHeader->e_magic)
+	{
+		assert(0);
+		return L"";
+	}
+	IMAGE_NT_HEADERS *NTHeader = (IMAGE_NT_HEADERS*)((char *)DosHeader
+		+ DosHeader->e_lfanew);
+	if (IMAGE_NT_SIGNATURE != NTHeader->Signature)
+	{
+		assert(0);
+		return L"";
+	}
+
+	tm linkTime = {};
+	gmtime_s(&linkTime, (time_t*)&NTHeader->FileHeader.TimeDateStamp);
+	// Print out the module information. The %.24s is necessary to trim
+	// the new line character off of the date string returned by asctime().
+	wchar_t	buffer[100];
+	wchar_t ascTimeBuf[100];
+	_wasctime_s(ascTimeBuf, &linkTime);
+	swprintf_s(buffer, L"%.24s GMT (%08lx)", ascTimeBuf, NTHeader->FileHeader.TimeDateStamp);
+	// Return buffer+4 because we don't need the day of the week.
+	return buffer + 4;
+}
+
+std::wstring GetEXEBuildTime()
+{
+	HMODULE ModuleHandle = GetModuleHandle(0);
+	return GetBuildTimeFromAddress(ModuleHandle);
+}

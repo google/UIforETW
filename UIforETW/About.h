@@ -16,13 +16,23 @@ limitations under the License.
 
 #pragma once
 
+#include "Utility.h"
+
 class CATLAboutDlg final : public ATL::CDialogImpl< CATLAboutDlg >
 {
 public:
 	enum { IDD = IDD_ABOUTBOX };
 	BEGIN_MSG_MAP( CATLAboutDlg )
+		MESSAGE_HANDLER(WM_INITDIALOG, OnInitDialog)
 		COMMAND_HANDLER(IDOK, BN_CLICKED, OnBnClickedOk)
 	END_MSG_MAP()
+	LRESULT OnInitDialog(UINT, WPARAM, LPARAM, BOOL&)
+	{
+		wchar_t buffer[200];
+		swprintf_s(buffer, L"Build date: %s", GetEXEBuildTime().c_str());
+		SetDlgItemText(IDC_BUILDDATE, buffer);
+		return 0;
+	}
 	LRESULT OnBnClickedOk( WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/ )
 	{
 		EndDialog( 1 );
