@@ -86,6 +86,7 @@
       <StringPooling>true</StringPooling>
       <EnablePREfast>true</EnablePREfast>
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
+      <AdditionalOptions>/Gw</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
