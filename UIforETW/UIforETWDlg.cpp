@@ -1646,7 +1646,7 @@ void CUIforETWDlg::PreprocessTrace(const std::wstring& traceFilename)
 		child.Run(bShowCommands_, L"xperf.exe" + args);
 		std::wstring output = child.GetOutput();
 		std::map<std::wstring, std::vector<DWORD>> pidsByType;
-		for (const auto line : split(output, '\n'))
+		for (const auto& line : split(output, '\n'))
 		{
 			if (wcsstr(line.c_str(), L"chrome.exe"))
 			{
