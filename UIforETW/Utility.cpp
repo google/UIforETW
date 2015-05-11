@@ -439,7 +439,7 @@ std::wstring GetBuildTimeFromAddress(void* codeAddress)
 	MEMORY_BASIC_INFORMATION	memoryInfo;
 	if (VirtualQuery(codeAddress, &memoryInfo, sizeof(memoryInfo)) != sizeof(memoryInfo))
 	{
-		assert(0);
+		UIETWASSERT(0);
 		return L"";
 	}
 	void* ModuleHandle = memoryInfo.AllocationBase;
@@ -448,14 +448,14 @@ std::wstring GetBuildTimeFromAddress(void* codeAddress)
 	IMAGE_DOS_HEADER *DosHeader = (IMAGE_DOS_HEADER*)ModuleHandle;
 	if (IMAGE_DOS_SIGNATURE != DosHeader->e_magic)
 	{
-		assert(0);
+		UIETWASSERT(0);
 		return L"";
 	}
 	IMAGE_NT_HEADERS *NTHeader = (IMAGE_NT_HEADERS*)((char *)DosHeader
 		+ DosHeader->e_lfanew);
 	if (IMAGE_NT_SIGNATURE != NTHeader->Signature)
 	{
-		assert(0);
+		UIETWASSERT(0);
 		return L"";
 	}
 
