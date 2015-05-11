@@ -33,7 +33,6 @@ limitations under the License.
 #define _AFX_ALL_WARNINGS
 
 #include <afxext.h>         // MFC extensions
-#include <assert.h>
 
 #ifndef _AFX_NO_AFXCMN_SUPPORT
 #include <afxcmn.h>             // MFC support for Windows Common Controls
@@ -56,6 +55,9 @@ void outputPrintf(_Printf_format_string_ const wchar_t* pFormat, ...);
 
 // Send this when the list of traces needs to be updated.
 const int WM_UPDATETRACELIST = WM_USER + 10;
+
+
+#define UIETWASSERT( x ) ATLASSERT( x )
 
 
 #ifdef _UNICODE

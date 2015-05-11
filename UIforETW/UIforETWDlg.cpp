@@ -272,16 +272,15 @@ BOOL CUIforETWDlg::OnInitDialog()
 	// Add "About..." menu item to system menu.
 
 	// IDM_ABOUTBOX must be in the system command range.
-	ASSERT((IDM_ABOUTBOX & 0xFFF0) == IDM_ABOUTBOX);
-	ASSERT(IDM_ABOUTBOX < 0xF000);
+	UIETWASSERT((IDM_ABOUTBOX & 0xFFF0) == IDM_ABOUTBOX);
+	UIETWASSERT(IDM_ABOUTBOX < 0xF000);
 
 	CMenu* pSysMenu = GetSystemMenu(FALSE);
 	if (pSysMenu)
 	{
-		BOOL bNameValid;
 		CString strAboutMenu;
-		bNameValid = strAboutMenu.LoadString(IDS_ABOUTBOX);
-		ASSERT(bNameValid);
+		const BOOL bNameValid = strAboutMenu.LoadString(IDS_ABOUTBOX);
+		UIETWASSERT(bNameValid);
 		if (!strAboutMenu.IsEmpty())
 		{
 			pSysMenu->AppendMenu(MF_SEPARATOR);
@@ -296,7 +295,7 @@ BOOL CUIforETWDlg::OnInitDialog()
 	}
 
 	wchar_t* windowsDir = nullptr;
-	VERIFY(SUCCEEDED(SHGetKnownFolderPath(FOLDERID_Windows, 0, NULL, &windowsDir)));
+	ATLVERIFY(SUCCEEDED(SHGetKnownFolderPath(FOLDERID_Windows, 0, NULL, &windowsDir)));
 	windowsDir_ = windowsDir;
 	windowsDir_ += '\\';
 	CoTaskMemFree(windowsDir);
@@ -323,9 +322,11 @@ BOOL CUIforETWDlg::OnInitDialog()
 	}
 
 	wchar_t documents[MAX_PATH];
-	if (!SHGetSpecialFolderPath(*this, documents, CSIDL_MYDOCUMENTS, TRUE))
+	const BOOL getMyDocsResult = SHGetSpecialFolderPath(*this, documents, CSIDL_MYDOCUMENTS, TRUE);
+	UIETWASSERT(getMyDocsResult);
+	if (!getMyDocsResult)
 	{
-		assert(!"Failed to find My Documents directory.\n");
+		OutputDebugStringA("Failed to find My Documents directory.\r\n");
 		exit(10);
 	}
 	std::wstring defaultTraceDir = documents + std::wstring(L"\\etwtraces\\");
@@ -676,7 +677,7 @@ void CUIforETWDlg::OnBnClickedStarttracing()
 	else if (tracingMode_ == kHeapTracingToFile)
 		outputPrintf(L"\nStarting heap tracing to disk of %s...\n", heapTracingExes_.c_str());
 	else
-		assert(0);
+		UIETWASSERT(0);
 
 	std::wstring kernelProviders = L" Latency+POWER+DISPATCHER+FILE_IO+FILE_IO_INIT+VIRT_ALLOC+MEMINFO";
 	std::wstring kernelStackWalk;
@@ -1044,7 +1045,7 @@ void CUIforETWDlg::OnCbnSelchangeInputtracing()
 		outputPrintf(L"Key logging enabled. Full keyboard information recorded - beware of private information being recorded.\n");
 		break;
 	default:
-		assert(0);
+		UIETWASSERT(0);
 		InputTracing_ = kKeyLoggerOff;
 		break;
 	}

@@ -111,7 +111,7 @@ void CWorkingSetMonitor::SampleWorkingSets()
 						}
 						else
 						{
-							assert(pwsBuffer->WorkingSetInfo[page].ShareCount <= 7);
+							UIETWASSERT(pwsBuffer->WorkingSetInfo[page].ShareCount <= 7);
 							PSSPages += PSSMultiplier / pwsBuffer->WorkingSetInfo[page].ShareCount;
 						}
 					}

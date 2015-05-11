@@ -18,7 +18,6 @@ limitations under the License.
 #include "ChildProcess.h"
 #include "Utility.h"
 
-#include <assert.h>
 #include <vector>
 
 static const wchar_t* kPipeName = L"\\\\.\\PIPE\\UIforETWPipe";
@@ -112,10 +111,10 @@ DWORD ChildProcess::ListenerThread()
 	return 0;
 }
 
-
+_Pre_satisfies_(!(this->hProcess_))
 bool ChildProcess::Run(bool showCommand, std::wstring args)
 {
-	assert(!hProcess_);
+	UIETWASSERT(!hProcess_);
 
 	if (showCommand)
 		outputPrintf(L"%s\n", args.c_str());

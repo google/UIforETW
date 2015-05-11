@@ -35,9 +35,11 @@ void CreateRegistryKey(HKEY root, const std::wstring& subkey, const std::wstring
 
 std::wstring GetEditControlText(HWND hwnd);
 std::wstring AnsiToUnicode(const std::string& text);
+
 // This function checks to see whether a control has focus before
 // disabling it. If it does have focus then it moves the focus, to
 // avoid breaking keyboard mnemonics.
+_Pre_satisfies_(Win)
 void SmartEnableWindow(HWND Win, BOOL Enable);
 
 // Return the string after the final '\' or after the final '.' in

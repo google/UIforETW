@@ -15,7 +15,6 @@ limitations under the License.
 */
 
 #include "stdafx.h"
-#include <assert.h>
 #include "KeyLoggerThread.h"
 #include <ETWProviders\etwprof.h>
 #include <atomic>
@@ -25,9 +24,10 @@ namespace
 
 std::atomic<bool> g_LogKeyboardDetails = false;
 
+_Pre_satisfies_(nCode == HC_ACTION)
 LRESULT CALLBACK LowLevelKeyboardHook(int nCode, WPARAM wParam, LPARAM lParam)
 {
-	assert(nCode == HC_ACTION);
+	UIETWASSERT(nCode == HC_ACTION);
 	// wParam is WM_KEYDOWN, WM_KEYUP, WM_SYSKEYDOWN, or WM_SYSKEYUP
 
 	KBDLLHOOKSTRUCT* pKbdLLHook = (KBDLLHOOKSTRUCT*)lParam;
@@ -124,9 +124,10 @@ LRESULT CALLBACK LowLevelKeyboardHook(int nCode, WPARAM wParam, LPARAM lParam)
 	return CallNextHookEx(0, nCode, wParam, lParam);
 }
 
+_Pre_satisfies_(nCode == HC_ACTION)
 LRESULT CALLBACK LowLevelMouseHook(int nCode, WPARAM wParam, LPARAM lParam)
 {
-	assert(nCode == HC_ACTION);
+	UIETWASSERT(nCode == HC_ACTION);
 
 	MSLLHOOKSTRUCT* pMouseLLHook = (MSLLHOOKSTRUCT*)lParam;
 
