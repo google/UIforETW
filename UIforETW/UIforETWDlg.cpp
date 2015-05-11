@@ -1044,7 +1044,7 @@ void CUIforETWDlg::OnCbnSelchangeInputtracing()
 		outputPrintf(L"Key logging enabled. Full keyboard information recorded - beware of private information being recorded.\n");
 		break;
 	default:
-		ATLASSERT(0);
+		UIETWASSERT(0);
 		InputTracing_ = kKeyLoggerOff;
 		break;
 	}
