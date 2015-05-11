@@ -22,12 +22,14 @@ profiling Chrome this delay happens with every new set of symbols, so with
 every new version of Chrome.
 
 This script uses xperf actions to dump a list of the symbols referenced in
-an ETW trace. If chrome.dll or chrome_child.dll is detected and if decoded
-symbols are not found in %_NT_SYMCACHE_PATH% (default is c:\symcache) then
-RetrieveSymbols.exe is used to download the symbols from the Chromium
-symbol server, pdbcopy.exe is used to strip the private symbols, and then
-another xperf action is used to load the stripped symbols, thus converting
+an ETW trace. If chrome.dll, chrome_child.dll, content.dll, or blink_web.dll are
+detected and if decoded symbols are not found in %_NT_SYMCACHE_PATH% (default is
+c:\symcache) then RetrieveSymbols.exe is used to download the symbols from the
+Chromium symbol server, pdbcopy.exe is used to strip the private symbols, and
+then another xperf action is used to load the stripped symbols, thus converting
 them to .symcache files that can be efficiently loaded by WPA.
+
+Locally built Chrome symbols are also supported.
 
 More details on the discovery of this slowness and the evolution of the fix
 can be found here:
@@ -108,15 +110,22 @@ def main():
   command_output = os.popen(command).readlines()
 
   for line in command_output:
+    dllMatch = None
     if line.count("chrome.dll") > 0 or line.count("chrome_child.dll") > 0:
+      dllMatch = "chrome.dll"
+    if line.count("blink_web.dll") > 0:
+      dllMatch = "blink_web.dll"
+    if line.count("\\content.dll") > 0:
+      dllMatch = "content.dll"
+    if dllMatch:
       match = pdb_re.match(line)
       if match:
         guid, age, path = match.groups()
         guid = guid.replace("-", "")
         filepart = os.path.split(path)[1]
-        symcache_file = r"c:\symcache\chrome.dll-%s%sv2.symcache" % (guid, age)
+        symcache_file = r"c:\symcache\%s-%s%sv2.symcache" % (dllMatch, guid, age)
         if os.path.exists(symcache_file):
-          #print "Symcache file %s already exists. Skipping." % symcache_file
+          #print("Symcache file %s already exists. Skipping." % symcache_file)
           continue
         # Only print messages for chrome PDBs that aren't in the symcache
         found_uncached = True
@@ -149,18 +158,24 @@ def main():
     symbol_path = ";".join(tempdirs)
     print("Stripped PDBs are in %s. Converting to symcache files now." % symbol_path)
     os.environ["_NT_SYMBOL_PATH"] = symbol_path
-    for local_pdb in local_symbol_files:
-      temp_name = local_pdb + "x"
-      print("Renaming %s to %s to stop unstripped PDBs from being used." % (local_pdb, temp_name))
-      os.rename(local_pdb, temp_name)
-    gen_command = 'xperf -i "%s" -symbols -tle -tti -a symcache -build' % tracename
-    print("> %s" % gen_command)
-    for line in os.popen(gen_command).readlines():
-      pass # Don't print line
-    for local_pdb in local_symbol_files:
-      temp_name = local_pdb + "x"
-      os.rename(temp_name, local_pdb)
+    # Create a list of to/from renamed tuples
+    renames = []
     error = False
+    try:
+      for local_pdb in local_symbol_files:
+        temp_name = local_pdb + "x"
+        print("Renaming %s to %s to stop unstripped PDBs from being used." % (local_pdb, temp_name))
+        os.rename(local_pdb, temp_name)
+        renames.append((local_pdb, temp_name))
+      gen_command = 'xperf -i "%s" -symbols -tle -tti -a symcache -build' % tracename
+      print("> %s" % gen_command)
+      for line in os.popen(gen_command).readlines():
+        pass # Don't print line
+    except KeyboardInterrupt:
+      # Catch Ctrl+C exception so that PDBs will get renamed back.
+      error = True
+    for rename_names in renames:
+      os.rename(rename_names[1], rename_names[0])
     for symcache_file in symcache_files:
       if os.path.exists(symcache_file):
         print("%s generated." % symcache_file)
