@@ -114,7 +114,7 @@ DWORD ChildProcess::ListenerThread()
 _Pre_satisfies_(!(this->hProcess_))
 bool ChildProcess::Run(bool showCommand, std::wstring args)
 {
-	ATLASSERT(!hProcess_);
+	UIETWASSERT(!hProcess_);
 
 	if (showCommand)
 		outputPrintf(L"%s\n", args.c_str());

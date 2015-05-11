@@ -201,14 +201,14 @@ static HWND GetNextDlgItem(HWND win, bool Wrap)
 				return 0;
 		}
 	}
-	ATLASSERT(!Wrap || next);
+	UIETWASSERT(!Wrap || next);
 	return next;
 }
 
 _Pre_satisfies_(Win)
 void SmartEnableWindow(HWND Win, BOOL Enable)
 {
-	ATLASSERT(Win);
+	UIETWASSERT(Win);
 	if (!Enable)
 	{
 		HWND hasfocus = GetFocus();

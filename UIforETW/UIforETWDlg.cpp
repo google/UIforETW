@@ -271,16 +271,15 @@ BOOL CUIforETWDlg::OnInitDialog()
 	// Add "About..." menu item to system menu.
 
 	// IDM_ABOUTBOX must be in the system command range.
-	ATLASSERT((IDM_ABOUTBOX & 0xFFF0) == IDM_ABOUTBOX);
-	ATLASSERT(IDM_ABOUTBOX < 0xF000);
+	UIETWASSERT((IDM_ABOUTBOX & 0xFFF0) == IDM_ABOUTBOX);
+	UIETWASSERT(IDM_ABOUTBOX < 0xF000);
 
 	CMenu* pSysMenu = GetSystemMenu(FALSE);
 	if (pSysMenu)
 	{
-		//BOOL bNameValid;
 		CString strAboutMenu;
 		const BOOL bNameValid = strAboutMenu.LoadString(IDS_ABOUTBOX);
-		ATLASSERT(bNameValid);
+		UIETWASSERT(bNameValid);
 		if (!strAboutMenu.IsEmpty())
 		{
 			pSysMenu->AppendMenu(MF_SEPARATOR);
@@ -323,7 +322,7 @@ BOOL CUIforETWDlg::OnInitDialog()
 
 	wchar_t documents[MAX_PATH];
 	const BOOL getMyDocsResult = SHGetSpecialFolderPath(*this, documents, CSIDL_MYDOCUMENTS, TRUE);
-	ATLASSERT(getMyDocsResult);
+	UIETWASSERT(getMyDocsResult);
 	if (!getMyDocsResult)
 	{
 		OutputDebugStringA("Failed to find My Documents directory.\r\n");
@@ -677,7 +676,7 @@ void CUIforETWDlg::OnBnClickedStarttracing()
 	else if (tracingMode_ == kHeapTracingToFile)
 		outputPrintf(L"\nStarting heap tracing to disk of %s...\n", heapTracingExes_.c_str());
 	else
-		ATLASSERT(0);
+		UIETWASSERT(0);
 
 	std::wstring kernelProviders = L" Latency+POWER+DISPATCHER+FILE_IO+FILE_IO_INIT+VIRT_ALLOC+MEMINFO";
 	std::wstring kernelStackWalk;

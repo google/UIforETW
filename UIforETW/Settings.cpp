@@ -145,7 +145,7 @@ void CSettings::OnBnClickedCopystartupprofile()
 	wchar_t documents[MAX_PATH];
 
 	const BOOL getMyDocsResult = SHGetSpecialFolderPathW(m_hWnd, documents, CSIDL_MYDOCUMENTS, TRUE);
-	ATLASSERT(getMyDocsResult);
+	UIETWASSERT(getMyDocsResult);
 	if (!getMyDocsResult)
 	{
 		OutputDebugStringA("Failed to find My Documents directory.\r\n");
