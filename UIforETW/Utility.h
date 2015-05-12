@@ -77,6 +77,7 @@ enum WindowsVersion
 };
 
 bool Is64BitWindows();
+bool Is64BitBuild();
 WindowsVersion GetWindowsVersion();
 //bool IsWindowsServer();
 

@@ -357,6 +357,11 @@ bool Is64BitWindows()
 	return bIsWin64;
 }
 
+bool Is64BitBuild()
+{
+	return sizeof(void*) == 8;
+}
+
 WindowsVersion GetWindowsVersion()
 {
 	OSVERSIONINFO verInfo = { sizeof(OSVERSIONINFO) };
@@ -463,9 +468,10 @@ std::wstring GetBuildTimeFromAddress(void* codeAddress)
 	gmtime_s(&linkTime, (time_t*)&NTHeader->FileHeader.TimeDateStamp);
 	// Print out the module information. The %.24s is necessary to trim
 	// the new line character off of the date string returned by asctime().
-	wchar_t	buffer[100];
-	wchar_t ascTimeBuf[100];
+	// _wasctime_s requires a 26-character buffer.
+	wchar_t ascTimeBuf[26];
 	_wasctime_s(ascTimeBuf, &linkTime);
+	wchar_t	buffer[100];
 	swprintf_s(buffer, L"%.24s GMT (%08lx)", ascTimeBuf, NTHeader->FileHeader.TimeDateStamp);
 	// Return buffer+4 because we don't need the day of the week.
 	return buffer + 4;
@@ -473,6 +479,6 @@ std::wstring GetBuildTimeFromAddress(void* codeAddress)
 
 std::wstring GetEXEBuildTime()
 {
-	HMODULE ModuleHandle = GetModuleHandle(0);
+	HMODULE ModuleHandle = GetModuleHandle(nullptr);
 	return GetBuildTimeFromAddress(ModuleHandle);
 }
