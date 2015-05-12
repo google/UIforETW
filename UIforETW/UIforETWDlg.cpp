@@ -355,7 +355,7 @@ BOOL CUIforETWDlg::OnInitDialog()
 	if (winver <= kWindowsVersion7)
 	{
 		bCompress_ = false; // ETW trace compression requires Windows 8.0
-		SmartEnableWindow(btCompress_, false);
+		SmartEnableWindow(btCompress_.m_hWnd, false);
 	}
 
 	CheckDlgButton(IDC_COMPRESSTRACE, bCompress_);
@@ -550,14 +550,14 @@ void CUIforETWDlg::DisablePagingExecutive()
 
 void CUIforETWDlg::UpdateEnabling()
 {
-	SmartEnableWindow(btStartTracing_, !bIsTracing_);
-	SmartEnableWindow(btSaveTraceBuffers_, bIsTracing_);
-	SmartEnableWindow(btStopTracing_, bIsTracing_);
-	SmartEnableWindow(btTracingMode_, !bIsTracing_);
+	SmartEnableWindow(btStartTracing_.m_hWnd, !bIsTracing_);
+	SmartEnableWindow(btSaveTraceBuffers_.m_hWnd, bIsTracing_);
+	SmartEnableWindow(btStopTracing_.m_hWnd, bIsTracing_);
+	SmartEnableWindow(btTracingMode_.m_hWnd, !bIsTracing_);
 
-	SmartEnableWindow(btSampledStacks_, !bIsTracing_);
-	SmartEnableWindow(btCswitchStacks_, !bIsTracing_);
-	SmartEnableWindow(btGPUTracing_, !bIsTracing_);
+	SmartEnableWindow(btSampledStacks_.m_hWnd, !bIsTracing_);
+	SmartEnableWindow(btCswitchStacks_.m_hWnd, !bIsTracing_);
+	SmartEnableWindow(btGPUTracing_.m_hWnd, !bIsTracing_);
 }
 
 void CUIforETWDlg::OnSysCommand(UINT nID, LPARAM lParam)
@@ -1197,7 +1197,7 @@ void CUIforETWDlg::UpdateNotesState()
 	int curSel = btTraces_.GetCurSel();
 	if (curSel >= 0 && curSel < (int)traces_.size())
 	{
-		SmartEnableWindow(btTraceNotes_, true);
+		SmartEnableWindow(btTraceNotes_.m_hWnd, true);
 		std::wstring traceName = traces_[curSel];
 		traceNoteFilename_ = GetTraceDir() + traceName + L".txt";
 		traceNotes_ = LoadFileAsText(traceNoteFilename_);
@@ -1205,7 +1205,7 @@ void CUIforETWDlg::UpdateNotesState()
 	}
 	else
 	{
-		SmartEnableWindow(btTraceNotes_, false);
+		SmartEnableWindow(btTraceNotes_.m_hWnd, false);
 		SetDlgItemText(IDC_TRACENOTES, L"");
 	}
 }

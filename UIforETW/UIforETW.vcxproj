@@ -178,6 +178,7 @@
       <TreatWarningAsError>true</TreatWarningAsError>
       <AdditionalIncludeDirectories>..\include</AdditionalIncludeDirectories>
       <EnablePREfast>false</EnablePREfast>
+      <AdditionalOptions> /Qvec-report:2</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -215,6 +216,7 @@
       <TreatWarningAsError>true</TreatWarningAsError>
       <AdditionalIncludeDirectories>..\include</AdditionalIncludeDirectories>
       <EnablePREfast>false</EnablePREfast>
+      <AdditionalOptions> /Qvec-report:2</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
