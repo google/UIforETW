@@ -283,14 +283,7 @@ int DeleteFiles(HWND hwnd, const std::vector<std::wstring>& paths)
 {
 	ATLASSERT(paths.size() > 0);
 
-	size_t totalLength = 1;
-	for (const auto& path : paths)
-	{
-		totalLength += (path.length() + 1);
-	}
-
 	std::vector<wchar_t> fileNames;
-	fileNames.reserve(totalLength);
 	for (const auto& path : paths)
 	{
 		// Push the file name and its NULL terminator onto the vector.
