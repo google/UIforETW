@@ -271,9 +271,8 @@ BOOL CUIforETWDlg::OnInitDialog()
 
 	// Add "About..." menu item to system menu.
 
-	// IDM_ABOUTBOX must be in the system command range.
-	UIETWASSERT((IDM_ABOUTBOX & 0xFFF0) == IDM_ABOUTBOX);
-	UIETWASSERT(IDM_ABOUTBOX < 0xF000);
+	static_assert((IDM_ABOUTBOX & 0xFFF0) == IDM_ABOUTBOX, "IDM_ABOUTBOX must be in the system command range!");
+	static_assert(IDM_ABOUTBOX < 0xF000, "IDM_ABOUTBOX must be in the system command range!");
 
 	CMenu* pSysMenu = GetSystemMenu(FALSE);
 	if (pSysMenu)
