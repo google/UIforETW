@@ -1737,9 +1737,11 @@ void CUIforETWDlg::StartRenameTrace(bool fullRename)
 			newEditRect.left = listBoxRect.left;
 		}
 		btTraceNameEdit_.MoveWindow(newEditRect, TRUE);
-		btTraceNameEdit_.ShowWindow(SW_SHOWNORMAL);
 		btTraceNameEdit_.SetFocus();
 		btTraceNameEdit_.SetWindowTextW(editablePart.c_str());
+		// Select the text for easy replacing.
+		btTraceNameEdit_.SetSel(0, -1);
+		btTraceNameEdit_.ShowWindow(SW_SHOWNORMAL);
 		preRenameTraceName_ = traceName;
 	}
 }
