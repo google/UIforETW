@@ -178,7 +178,7 @@
       <TreatWarningAsError>true</TreatWarningAsError>
       <AdditionalIncludeDirectories>..\include</AdditionalIncludeDirectories>
       <EnablePREfast>false</EnablePREfast>
-      <AdditionalOptions> /Qvec-report:2 /Qpar-report:2 /Gw</AdditionalOptions>
+      <AdditionalOptions>/Gw</AdditionalOptions>
       <StringPooling>true</StringPooling>
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
       <EnableParallelCodeGeneration>true</EnableParallelCodeGeneration>
@@ -221,7 +221,7 @@
       <TreatWarningAsError>true</TreatWarningAsError>
       <AdditionalIncludeDirectories>..\include</AdditionalIncludeDirectories>
       <EnablePREfast>false</EnablePREfast>
-      <AdditionalOptions> /Qvec-report:2 /Qpar-report:2 /Gw</AdditionalOptions>
+      <AdditionalOptions>/Gw</AdditionalOptions>
       <StringPooling>true</StringPooling>
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
       <EnableParallelCodeGeneration>true</EnableParallelCodeGeneration>
