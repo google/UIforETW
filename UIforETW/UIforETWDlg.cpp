@@ -471,6 +471,10 @@ std::wstring CUIforETWDlg::GetDirectory(const wchar_t* env, const std::wstring& 
 
 void CUIforETWDlg::RegisterProviders()
 {
+	// Assume failure. This assures that when we say
+	// "Chrome providers will not be recorded." it will actually be true.
+	useChromeProviders_ = false;
+
 	std::wstring dllSource = GetExeDir() + L"ETWProviders.dll";
 #pragma warning(suppress:4996)
 	const wchar_t* temp = _wgetenv(L"temp");
