@@ -31,58 +31,58 @@ Done:
 - [X] Unicode support
 
 Trace list should let the user:
-- [ ] Delete traces
-- [ ] Compress traces
-- [ ] Explore to the trace directory
-- [ ] Copy the traces name/path to the clipboard
-- [ ] Run StripChromeSymbols.py
+- [X] Delete traces
+- [X] Compress traces
+- [X] Explore to the trace directory
+- [X] Copy the traces name/path to the clipboard
+- [X] Run StripChromeSymbols.py
 
 - [X] Remove references to _T macro.
-- [ ] Remove .etl extension from list of traces -- it adds no value and wastes space.
-- [ ] Make sure trace notes are disabled when no trace is selected, including when
-- [ ] traces are added or deleted.
-- [ ] Move focus away from buttons before they are disabled, as when starting a trace with Alt+T.
-- [ ] Error checking -- checking for failures to start or stop tracing.
+- [X] Remove .etl extension from list of traces -- it adds no value and wastes space.
+- [X] Make sure trace notes are disabled when no trace is selected, including when
+- [X] traces are added or deleted.
+- [X] Move focus away from buttons before they are disabled, as when starting a trace with Alt+T.
+- [X] Error checking -- checking for failures to start or stop tracing.
 - [X] Renaming of traces and associated files.
-- [ ] Need keyboard accelerators for F2 (start renaming), enter (stop renaming),
-- [ ] and probably ESC (to stop it from closing the dialog).
-- [ ] Add DX provider.
-- [ ] Copy over startup profile on first-run, and subsequent runs?
-- [ ] Optionally copy over 64-bit dbghelp.dll and symsrv.dll?
-- [ ] Remember all settings.
-- [ ] Support for 32-bit operating systems.
-- [ ] Add compatibility manifest up to Windows 8.1
-- [ ] Add OS specific checks for what user providers to enable, compression options, etc.
-- [ ] Increase the user-provider buffer counts when doing DX profiling.
-- [ ] Disable compress options (checkbox and menu) for Windows 7 and below.
+- [X] Need keyboard accelerators for F2 (start renaming), enter (stop renaming),
+- [X] and probably ESC (to stop it from closing the dialog).
+- [X] Add DX provider.
+- [X] Copy over startup profile on first-run, and subsequent runs?
+- [X] Optionally copy over 64-bit dbghelp.dll and symsrv.dll?
+- [X] Remember all settings.
+- [X] Support for 32-bit operating systems.
+- [X] Add compatibility manifest up to Windows 8.1
+- [X] Add OS specific checks for what user providers to enable, compression options, etc.
+- [X] Increase the user-provider buffer counts when doing DX profiling.
+- [X] Disable compress options (checkbox and menu) for Windows 7 and below.
 - [X] Move GetPython function to utility.cpp
-- [ ] Don't allow having two copies of UIforETW to run simultaneously.
-- [ ] Ignore Ctrl+Win+C when tracing is halted.
-- [ ] Need more keyboard accelerators, to delete traces, view them, copy names to the clipboard, select-all in the notes field, etc.
-- [ ] Detect and handle trace files that lack the date component - still allow renaming.
-- [ ] Only have the delete key active when the trace list is active - otherwise it interferes with renaming.
-- [ ] Make sure edits to notes files are loaded on directory change notifications.
-- [ ] Set focus to the trace list after renaming a trace.
-- [ ] Select the newly added trace after recording a trace.
-- [ ] Place the trace-name editing box appropriately.
-- [ ] Change path splitting functions to return wstring instead of wchar_t pointers.
-- [ ] Fix StripChromeSymbols.py so that it can find RetrieveSymbols.exe - copy Microsoft DLLs over?
+- [X] Don't allow having two copies of UIforETW to run simultaneously.
+- [X] Ignore Ctrl+Win+C when tracing is halted.
+- [X] Need more keyboard accelerators, to delete traces, view them, copy names to the clipboard, select-all in the notes field, etc.
+- [X] Detect and handle trace files that lack the date component - still allow renaming.
+- [X] Only have the delete key active when the trace list is active - otherwise it interferes with renaming.
+- [X] Make sure edits to notes files are loaded on directory change notifications.
+- [X] Set focus to the trace list after renaming a trace.
+- [X] Select the newly added trace after recording a trace.
+- [X] Place the trace-name editing box appropriately.
+- [X] Change path splitting functions to return wstring instead of wchar_t pointers.
+- [X] Fix StripChromeSymbols.py so that it can find RetrieveSymbols.exe - copy Microsoft DLLs over?
 - [X] Should have a Chrome developer checkbox.
 - [X] Have an option to not auto-view traces immediately after they are recorded.
-- [ ] Remove deprecated file/extension usage, and have functions to return file part, extension, or stripped file part.
-- [ ] Fix IdentifyChromeProcesses.py to print the heading after processing the trace.
-- [ ] Remove this line from RetrieveSymbols: Parsing symbol data for a PDB file.
-- [ ] Support Ctrl+Shift+C to copy just the trace file name.
-- [ ] Have an option (Shift+F2?) to allow renaming of the entire trace name
+- [X] Remove deprecated file/extension usage, and have functions to return file part, extension, or stripped file part.
+- [X] Fix IdentifyChromeProcesses.py to print the heading after processing the trace.
+- [X] Remove this line from RetrieveSymbols: Parsing symbol data for a PDB file.
+- [X] Support Ctrl+Shift+C to copy just the trace file name.
+- [X] Have an option (Shift+F2?) to allow renaming of the entire trace name
 - [X] Move ETWEventDemo out of bin directory.
 - [X] Display how long a trace took to be recorded, save versus merge?
-- [ ] Ship batch file to record trace of tracing, and detect when to use it (slow save or merge).
+- [X] Ship batch file to record trace of tracing, and detect when to use it (slow save or merge).
 - [X] Ship batch file to create non-DLL version of UIforETW
 
 
 
 Most important tasks:
-- [ ] Figure out why .txt files keep getting left behind - race condition in renaming or deleting or???
+- [ ] Figure out why .txt files keep getting left behind - race condition in renaming or deleting or??? (no repro)
 - [ ] Create an installer that will install the MFC DLLs: https://msdn.microsoft.com/en-us/library/dd293568.aspx
 - [ ] Implement more settings - configure trace directories, buffer sizes, option for stacks on user events.
 - [ ] Handle the duplicate copies of etwproviders.man.
@@ -97,7 +97,7 @@ To-do eventually:
 - [ ] Should have an option to put an entire process tree in the trace text file.
 - [ ] ChildProcess or PreprocessTrace should convert from LF to CRLF for the edit control.
 - [ ] Try using the -cancel option for more efficient stopping of traces without recording. See xperf -help stop
-- [ ] Give the user a chance to rename trace before launching viewer
+- [X] Give the user a chance to rename trace before launching viewer
 - [ ] Transparent compression/decompression into .zip files. When unzipping use the .zip file name as the base.
 - [ ] Have the option to copy different startup profiles, for different situations.
 - [ ] Resize output window as well when sizing the window, just a bit.
