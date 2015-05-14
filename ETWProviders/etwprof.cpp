@@ -165,31 +165,31 @@ static float QPCToMS( int64 nDelta )
 
 // Public functions for emitting ETW events.
 
-void ETWMark( const char *pMessage )
+void ETWMark( _In_z_ PCSTR pMessage )
 {
 	EventWriteMark( pMessage );
 }
 
-void ETWMark1I(const char* pMessage, int data1)
+void ETWMark1I(_In_z_ PCSTR pMessage, int data1)
 {
 	EventWriteMark1I( pMessage, data1 );
 }
 
-void ETWMark2I(const char* pMessage, int data1, int data2)
+void ETWMark2I(_In_z_ PCSTR pMessage, int data1, int data2)
 {
 	EventWriteMark2I( pMessage, data1, data2 );
 }
 
-void ETWMark1F(const char* pMessage, float data1)
+void ETWMark1F(_In_z_ PCSTR pMessage, float data1)
 {
 	EventWriteMark1F( pMessage, data1 );
 }
-void ETWMark2F(const char* pMessage, float data1, float data2)
+void ETWMark2F(_In_z_ PCSTR pMessage, float data1, float data2)
 {
 	EventWriteMark2F( pMessage, data1, data2 );
 }
 
-void ETWMarkPrintf( const char *pMessage, ... )
+void ETWMarkPrintf( _In_z_ PCSTR pMessage, ... )
 {
 	// If we are running on Windows XP or if our providers have not been enabled
 	// (by xperf or other) then this will be false and we can early out.
@@ -211,7 +211,7 @@ void ETWMarkPrintf( const char *pMessage, ... )
 	EventWriteMark( buffer );
 }
 
-void ETWMarkWorkingSet(const wchar_t* pProcessName, const wchar_t* pProcess, unsigned privateWS, unsigned PSS, unsigned workingSet)
+void ETWMarkWorkingSet(_In_z_ PCWSTR pProcessName, _In_z_ PCWSTR pProcess, unsigned privateWS, unsigned PSS, unsigned workingSet)
 {
 	EventWriteMarkWorkingSet(pProcessName, pProcess, privateWS, PSS, workingSet);
 }
@@ -222,7 +222,7 @@ void ETWMarkWorkingSet(const wchar_t* pProcessName, const wchar_t* pProcess, uns
 // on Vista+ that doesn't matter.
 static __declspec( thread ) int s_nDepth;
 
-int64 ETWBegin( const char *pMessage )
+int64 ETWBegin( _In_z_ PCSTR pMessage )
 {
 	// If we are running on Windows XP or if our providers have not been enabled
 	// (by xperf or other) then this will be false and we can early out.
@@ -242,7 +242,7 @@ int64 ETWBegin( const char *pMessage )
 	return nTime;
 }
 
-int64 ETWEnd( const char *pMessage, int64 nStartTime )
+int64 ETWEnd( _In_z_ PCSTR pMessage, int64 nStartTime )
 {
 	// If we are running on Windows XP or if our providers have not been enabled
 	// (by xperf or other) then this will be false and we can early out.
@@ -264,12 +264,12 @@ int64 ETWEnd( const char *pMessage, int64 nStartTime )
 
 
 
-void ETWWorkerMark( const char *pMessage )
+void ETWWorkerMark( _In_z_ PCSTR pMessage )
 {
 	EventWriteMarkWorker( pMessage );
 }
 
-void ETWWorkerMarkPrintf( const char *pMessage, ... )
+void ETWWorkerMarkPrintf( _Printf_format_string_ _In_z_ PCSTR pMessage, ... )
 {
 	// If we are running on Windows XP or if our providers have not been enabled
 	// (by xperf or other) then this will be false and we can early out.
@@ -297,7 +297,7 @@ void ETWWorkerMarkPrintf( const char *pMessage, ... )
 // on Vista+ that doesn't matter.
 static __declspec( thread ) int s_nWorkerDepth;
 
-int64 ETWWorkerBegin( const char *pMessage )
+int64 ETWWorkerBegin( _In_z_ PCSTR pMessage )
 {
 	// If we are running on Windows XP or if our providers have not been enabled
 	// (by xperf or other) then this will be false and we can early out.
@@ -317,7 +317,7 @@ int64 ETWWorkerBegin( const char *pMessage )
 	return nTime;
 }
 
-int64 ETWWorkerEnd( const char *pMessage, int64 nStartTime )
+int64 ETWWorkerEnd( _In_z_ PCSTR pMessage, int64 nStartTime )
 {
 	// If we are running on Windows XP or if our providers have not been enabled
 	// (by xperf or other) then this will be false and we can early out.
