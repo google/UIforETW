@@ -120,7 +120,7 @@ public:
 } g_ETWRegister;
 
 // Redirector function for EventRegister. Called by macros in ETWProviderGenerated.h
-ULONG EVNTAPI EventRegister( LPCGUID ProviderId, PENABLECALLBACK EnableCallback, PVOID CallbackContext, PREGHANDLE RegHandle )
+ULONG EVNTAPI EventRegister( _In_ LPCGUID ProviderId, _In_opt_ PENABLECALLBACK EnableCallback, _In_opt_ PVOID CallbackContext, _Out_ PREGHANDLE RegHandle )
 {
 	if ( g_ETWRegister.m_pEventRegister )
 		return g_ETWRegister.m_pEventRegister( ProviderId, EnableCallback, CallbackContext, RegHandle );
