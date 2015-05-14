@@ -129,7 +129,7 @@ ULONG EVNTAPI EventRegister( _In_ LPCGUID ProviderId, _In_opt_ PENABLECALLBACK E
 }
 
 // Redirector function for EventWrite. Called by macros in ETWProviderGenerated.h
-ULONG EVNTAPI EventWrite( REGHANDLE RegHandle, PCEVENT_DESCRIPTOR EventDescriptor, ULONG UserDataCount, PEVENT_DATA_DESCRIPTOR UserData )
+ULONG EVNTAPI EventWrite( _In_ REGHANDLE RegHandle, _In_ PCEVENT_DESCRIPTOR EventDescriptor, _In_ ULONG UserDataCount, _In_reads_opt_(UserDataCount) PEVENT_DATA_DESCRIPTOR UserData )
 {
 	if ( g_ETWRegister.m_pEventWrite )
 		return g_ETWRegister.m_pEventWrite( RegHandle, EventDescriptor, UserDataCount, UserData );
