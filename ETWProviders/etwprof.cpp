@@ -59,9 +59,9 @@ limitations under the License.
 #include "ETWProvidersGenerated.h"
 
 // Typedefs for use with GetProcAddress
-typedef _Success_(return == ERROR_SUCCESS) ULONG (__stdcall *tEventRegister)( _In_ LPCGUID ProviderId, _In_opt_ PENABLECALLBACK EnableCallback, _In_opt_ PVOID CallbackContext, _Out_ PREGHANDLE RegHandle);
-typedef _Success_(return == ERROR_SUCCESS) ULONG (__stdcall *tEventWrite)( _In_ REGHANDLE RegHandle, _In_ PCEVENT_DESCRIPTOR EventDescriptor, _In_ ULONG UserDataCount, _In_reads_opt_(UserDataCount) PEVENT_DATA_DESCRIPTOR UserData);
-typedef _Success_(return == ERROR_SUCCESS) ULONG (__stdcall *tEventUnregister)( _In_ REGHANDLE RegHandle );
+typedef ULONG (__stdcall *tEventRegister)( _In_ LPCGUID ProviderId, _In_opt_ PENABLECALLBACK EnableCallback, _In_opt_ PVOID CallbackContext, _Out_ PREGHANDLE RegHandle);
+typedef ULONG (__stdcall *tEventWrite)( _In_ REGHANDLE RegHandle, _In_ PCEVENT_DESCRIPTOR EventDescriptor, _In_ ULONG UserDataCount, _In_reads_opt_(UserDataCount) PEVENT_DATA_DESCRIPTOR UserData);
+typedef ULONG (__stdcall *tEventUnregister)( _In_ REGHANDLE RegHandle );
 
 // Helper class to dynamically load Advapi32.dll, find the ETW functions, 
 // register the providers if possible, and get the performance counter frequency.
@@ -120,19 +120,16 @@ public:
 } g_ETWRegister;
 
 // Redirector function for EventRegister. Called by macros in ETWProviderGenerated.h
-#pragma warning(suppress: 28253)
-_Success_(return == ERROR_SUCCESS)
 ULONG EVNTAPI EventRegister( _In_ LPCGUID ProviderId, _In_opt_ PENABLECALLBACK EnableCallback, _In_opt_ PVOID CallbackContext, _Out_ PREGHANDLE RegHandle )
 {
 	if ( g_ETWRegister.m_pEventRegister )
 		return g_ETWRegister.m_pEventRegister( ProviderId, EnableCallback, CallbackContext, RegHandle );
 
+	*RegHandle = 0;
 	return ERROR_INVALID_FUNCTION;
 }
 
 // Redirector function for EventWrite. Called by macros in ETWProviderGenerated.h
-#pragma warning(suppress: 28253)
-_Success_(return == ERROR_SUCCESS)
 ULONG EVNTAPI EventWrite( _In_ REGHANDLE RegHandle, _In_ PCEVENT_DESCRIPTOR EventDescriptor, _In_ ULONG UserDataCount, _In_reads_opt_(UserDataCount) PEVENT_DATA_DESCRIPTOR UserData )
 {
 	if ( g_ETWRegister.m_pEventWrite )
@@ -142,8 +139,6 @@ ULONG EVNTAPI EventWrite( _In_ REGHANDLE RegHandle, _In_ PCEVENT_DESCRIPTOR Even
 
 // Redirector function for EventUnregister. Called by macros in ETWProviderGenerated.h
 // Maybe _Post_ptr_invalid_/_Post_invalid_ would be a good idea?
-#pragma warning(suppress: 28253)
-_Success_(return == ERROR_SUCCESS)
 ULONG EVNTAPI EventUnregister( _In_ REGHANDLE RegHandle )
 {
 	if ( g_ETWRegister.m_pEventUnregister )

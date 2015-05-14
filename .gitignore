@@ -19,7 +19,7 @@ FuncStats.txt
 GuidStats.txt
 Log.txt
 present.txt
-*.exe.lastcodeanalysissucceeded
+*.lastcodeanalysissucceeded
 
 # wpaexporter drops these
 *.csv
