@@ -25,7 +25,7 @@ limitations under the License.
 #include <stdio.h>
 #include "ETWProviders\etwprof.h"
 
-#ifdef	ETW_MARKS_ENABLED
+#ifdef ETW_MARKS_ENABLED
 
 // After building the DLL if it has never been registered on this machine or
 // if the providers have changed you need to go:
