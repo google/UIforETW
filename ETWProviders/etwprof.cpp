@@ -137,7 +137,7 @@ ULONG EVNTAPI EventWrite( _In_ REGHANDLE RegHandle, _In_ PCEVENT_DESCRIPTOR Even
 }
 
 // Redirector function for EventUnregister. Called by macros in ETWProviderGenerated.h
-ULONG EVNTAPI EventUnregister( REGHANDLE RegHandle )
+ULONG EVNTAPI EventUnregister( _In_ REGHANDLE RegHandle )
 {
 	if ( g_ETWRegister.m_pEventUnregister )
 		return g_ETWRegister.m_pEventUnregister( RegHandle );
