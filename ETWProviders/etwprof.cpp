@@ -127,7 +127,7 @@ ULONG EVNTAPI EventRegister( _In_ LPCGUID ProviderId, _In_opt_ PENABLECALLBACK E
 	if ( g_ETWRegister.m_pEventRegister )
 		return g_ETWRegister.m_pEventRegister( ProviderId, EnableCallback, CallbackContext, RegHandle );
 
-	return 0;
+	return ERROR_INVALID_FUNCTION;
 }
 
 // Redirector function for EventWrite. Called by macros in ETWProviderGenerated.h
@@ -137,7 +137,7 @@ ULONG EVNTAPI EventWrite( _In_ REGHANDLE RegHandle, _In_ PCEVENT_DESCRIPTOR Even
 {
 	if ( g_ETWRegister.m_pEventWrite )
 		return g_ETWRegister.m_pEventWrite( RegHandle, EventDescriptor, UserDataCount, UserData );
-	return 0;
+	return ERROR_INVALID_FUNCTION;
 }
 
 // Redirector function for EventUnregister. Called by macros in ETWProviderGenerated.h
@@ -147,7 +147,7 @@ ULONG EVNTAPI EventUnregister( _In_ REGHANDLE RegHandle )
 {
 	if ( g_ETWRegister.m_pEventUnregister )
 		return g_ETWRegister.m_pEventUnregister( RegHandle );
-	return 0;
+	return ERROR_INVALID_FUNCTION;
 }
 
 // Call QueryPerformanceCounter
