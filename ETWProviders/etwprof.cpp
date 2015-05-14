@@ -189,7 +189,7 @@ void ETWMark2F(_In_z_ PCSTR pMessage, float data1, float data2)
 	EventWriteMark2F( pMessage, data1, data2 );
 }
 
-void ETWMarkPrintf( _In_z_ PCSTR pMessage, ... )
+void ETWMarkPrintf( _Printf_format_string_ _In_z_ PCSTR pMessage, ... )
 {
 	// If we are running on Windows XP or if our providers have not been enabled
 	// (by xperf or other) then this will be false and we can early out.
