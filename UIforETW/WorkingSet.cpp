@@ -48,8 +48,13 @@ void CWorkingSetMonitor::SampleWorkingSets()
 	// Allocate enough space to get the working set of most processes.
 	// It will grow if needed.
 	ULONG_PTR numEntries = 100000;
-	std::vector<char> buffer(sizeof(PSAPI_WORKING_SET_INFORMATION) + numEntries * sizeof(PSAPI_WORKING_SET_BLOCK));
-	PSAPI_WORKING_SET_INFORMATION* pwsBuffer = reinterpret_cast<PSAPI_WORKING_SET_INFORMATION*>(&buffer[0]);
+
+	const rsize_t bufferSizeNeeded =
+		sizeof(PSAPI_WORKING_SET_INFORMATION) +
+		(numEntries * sizeof(PSAPI_WORKING_SET_BLOCK));
+
+	std::vector<char> buffer(bufferSizeNeeded);
+	PSAPI_WORKING_SET_INFORMATION* pwsBuffer = reinterpret_cast<PSAPI_WORKING_SET_INFORMATION*>(buffer.data());
 
 	ULONG_PTR totalWSPages = 0;
 	// The PSS page count is stored as a multiple of PSSMultiplier.
@@ -68,13 +73,16 @@ void CWorkingSetMonitor::SampleWorkingSets()
 		for (const auto& name : processes_)
 		{
 			if (_wcsicmp(peInfo.szExeFile, name.c_str()) == 0)
+			{
 				match = true;
+			}
 		}
 		if (match)
 		{
 			DWORD pid = peInfo.th32ProcessID;
 			// Get a handle to the process.
-			HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION |
+			HANDLE hProcess =
+				OpenProcess(PROCESS_QUERY_INFORMATION |
 				PROCESS_VM_READ, FALSE, pid);
 
 			if (NULL != hProcess)
