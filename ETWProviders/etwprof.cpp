@@ -120,6 +120,7 @@ public:
 } g_ETWRegister;
 
 // Redirector function for EventRegister. Called by macros in ETWProviderGenerated.h
+_Success_(return == ERROR_SUCCESS)
 ULONG EVNTAPI EventRegister( _In_ LPCGUID ProviderId, _In_opt_ PENABLECALLBACK EnableCallback, _In_opt_ PVOID CallbackContext, _Out_ PREGHANDLE RegHandle )
 {
 	if ( g_ETWRegister.m_pEventRegister )
@@ -129,6 +130,7 @@ ULONG EVNTAPI EventRegister( _In_ LPCGUID ProviderId, _In_opt_ PENABLECALLBACK E
 }
 
 // Redirector function for EventWrite. Called by macros in ETWProviderGenerated.h
+_Success_(return == ERROR_SUCCESS)
 ULONG EVNTAPI EventWrite( _In_ REGHANDLE RegHandle, _In_ PCEVENT_DESCRIPTOR EventDescriptor, _In_ ULONG UserDataCount, _In_reads_opt_(UserDataCount) PEVENT_DATA_DESCRIPTOR UserData )
 {
 	if ( g_ETWRegister.m_pEventWrite )
@@ -137,6 +139,7 @@ ULONG EVNTAPI EventWrite( _In_ REGHANDLE RegHandle, _In_ PCEVENT_DESCRIPTOR Even
 }
 
 // Redirector function for EventUnregister. Called by macros in ETWProviderGenerated.h
+_Success_(return == ERROR_SUCCESS)
 ULONG EVNTAPI EventUnregister( _In_ REGHANDLE RegHandle )
 {
 	if ( g_ETWRegister.m_pEventUnregister )
