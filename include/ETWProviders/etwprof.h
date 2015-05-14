@@ -78,7 +78,7 @@ PLATFORM_INTERFACE void ETWMouseDown( int nWhichButton, unsigned flags, int nX, 
 PLATFORM_INTERFACE void ETWMouseUp( int nWhichButton, unsigned flags, int nX, int nY );
 PLATFORM_INTERFACE void ETWMouseMove( unsigned flags, int nX, int nY );
 PLATFORM_INTERFACE void ETWMouseWheel( unsigned flags, int zDelta, int nX, int nY );
-PLATFORM_INTERFACE void ETWKeyDown( unsigned nChar, const char* keyName, unsigned nRepCnt, unsigned flags );
+PLATFORM_INTERFACE void ETWKeyDown( unsigned nChar, _In_opt_z_ const char* keyName, unsigned nRepCnt, unsigned flags );
 
 // This class calls the ETW Begin and End functions in order to insert a
 // pair of events to bracket some work.
