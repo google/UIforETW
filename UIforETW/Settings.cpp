@@ -144,7 +144,7 @@ void CSettings::OnBnClickedCopystartupprofile()
 
 	wchar_t documents[MAX_PATH];
 
-	const BOOL getMyDocsResult = SHGetSpecialFolderPathW(m_hWnd, documents, CSIDL_MYDOCUMENTS, TRUE);
+	const BOOL getMyDocsResult = SHGetSpecialFolderPathW(NULL, documents, CSIDL_MYDOCUMENTS, TRUE);
 	UIETWASSERT(getMyDocsResult);
 	if (!getMyDocsResult)
 	{

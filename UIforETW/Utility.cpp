@@ -206,7 +206,7 @@ static HWND GetNextDlgItem(HWND win, bool Wrap)
 	return next;
 }
 
-_Pre_satisfies_(Win)
+_Pre_satisfies_(Win != NULL)
 void SmartEnableWindow(HWND Win, BOOL Enable)
 {
 	UIETWASSERT(Win);
