@@ -54,7 +54,7 @@ def main():
   print("Chrome PIDs by process type:\r")
   for exePath in pidsByPath.keys():
     if len(pidsByPath.keys()) > 1:
-      print(exePath)
+      print("%s\r" % exePath)
     pidsByType = pidsByPath[exePath]
     keys = pidsByType.keys()
     keys.sort()

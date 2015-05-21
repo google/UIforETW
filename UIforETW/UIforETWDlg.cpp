@@ -1628,6 +1628,8 @@ void CUIforETWDlg::PreprocessTrace(const std::wstring& traceFilename)
 	if (bChromeDeveloper_)
 	{
 		outputPrintf(L"Preprocessing trace to identify Chrome processes...\n");
+    // The script now has more features than the C++ code, and is simpler.
+#define IDENTIFY_CHROME_PROCESSES_IN_PYTHON
 #ifdef IDENTIFY_CHROME_PROCESSES_IN_PYTHON
 		std::wstring pythonPath = FindPython();
 		if (!pythonPath.empty())
