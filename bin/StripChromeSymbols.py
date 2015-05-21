@@ -165,17 +165,30 @@ def main():
       for local_pdb in local_symbol_files:
         temp_name = local_pdb + "x"
         print("Renaming %s to %s to stop unstripped PDBs from being used." % (local_pdb, temp_name))
-        os.rename(local_pdb, temp_name)
-        renames.append((local_pdb, temp_name))
+        try:
+          os.rename(local_pdb, temp_name)
+        except:
+          # Rename can and does throw exceptions. We must catch and continue.
+          e = sys.exc_info()[0]
+          print("Hit exception while renaming %s to %s. Continuing.\n%s" % (local_pdb, temp_name, e))
+        else:
+          renames.append((local_pdb, temp_name))
       gen_command = 'xperf -i "%s" -symbols -tle -tti -a symcache -build' % tracename
       print("> %s" % gen_command)
       for line in os.popen(gen_command).readlines():
         pass # Don't print line
     except KeyboardInterrupt:
       # Catch Ctrl+C exception so that PDBs will get renamed back.
+      if renames:
+        print("Ctrl+C detected. Renaming PDBs back.")
       error = True
     for rename_names in renames:
-      os.rename(rename_names[1], rename_names[0])
+      try:
+        os.rename(rename_names[1], rename_names[0])
+      except:
+        # Rename can and does throw exceptions. We must catch and continue.
+        e = sys.exc_info()[0]
+        print("Hit exception while renaming %s back. Continuing.\n%s" % (rename_names[1], e))
     for symcache_file in symcache_files:
       if os.path.exists(symcache_file):
         print("%s generated." % symcache_file)
