@@ -32,24 +32,26 @@ def main():
   # Group all of the chrome.exe processes by exePath, then by type.
   pidsByPath = {}
   for line in os.popen(command).readlines():
-    if line.count("chrome.exe") > 0:
-      # Split the commandline from the .csv data and then extract the exePath.
-      # It may or may not be quoted.
-      commandLine = line.split(", ")[8]
+    # Split the commandline from the .csv data and then extract the exePath.
+    # It may or may not be quoted.
+    parts = line.split(", ")
+    if len(parts) > 8:
+      commandLine = parts[8]
       if commandLine[0] == '"':
         exePath = commandLine[1:commandLine.find('"', 1)]
       else:
         exePath = commandLine.split(" ")[0]
-      match = processTypeRe.match(line)
-      type = "browser"
-      if match:
-        type = match.groups()[0]
-      pid = int(pidRe.match(line).groups()[0])
-      pidsByType = pidsByPath.get(exePath, {})
-      pidList = pidsByType.get(type, [])
-      pidList.append(pid)
-      pidsByType[type] = pidList
-      pidsByPath[exePath] = pidsByType
+      if exePath.count("chrome.exe") > 0:
+        match = processTypeRe.match(line)
+        type = "browser"
+        if match:
+          type = match.groups()[0]
+        pid = int(pidRe.match(line).groups()[0])
+        pidsByType = pidsByPath.get(exePath, {})
+        pidList = pidsByType.get(type, [])
+        pidList.append(pid)
+        pidsByType[type] = pidList
+        pidsByPath[exePath] = pidsByType
 
   print("Chrome PIDs by process type:\r")
   for exePath in pidsByPath.keys():
