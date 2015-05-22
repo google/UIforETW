@@ -29,14 +29,19 @@ limitations under the License.
 // Uncomment this line to test with known-good parameters.
 //#define TESTING
 
-int main(int argc, char* argv[])
+int main(int argc, _Pre_readable_size_(argc) char* argv[])
 {
    // Tell dbghelp to print diagnostics to the debugger output.
    SymSetOptions(SYMOPT_DEBUG);
 
    // Initialize dbghelp
-   const HANDLE fakeProcess = (HANDLE)1;
-   BOOL result = SymInitialize(fakeProcess, NULL, FALSE);
+   const HANDLE fakeProcess = reinterpret_cast<const HANDLE>(1);
+   const BOOL initResult = SymInitialize(fakeProcess, NULL, FALSE);
+   if (initResult == FALSE)
+   {
+      printf("SymInitialize failed!! Error: %u\n", ::GetLastError());
+      return -1;
+   }
 
 #ifdef TESTING
    // Set a search path and cache directory. If this isn't set
@@ -70,10 +75,10 @@ int main(int argc, char* argv[])
    }
 
    std::string gTextArg = argv[1];
-   const char* dateStampText = argv[1];
-   const char* ageText = argv[2];
-   const char* sizeText = argv[2];
-   const char* fileName = argv[3];
+   PCSTR const dateStampText = argv[1];
+   PCSTR const ageText = argv[2];
+   PCSTR const sizeText = argv[2];
+   PCSTR const fileName = argv[3];
 #endif
 
    // Parse the GUID and age from the text
@@ -87,7 +92,7 @@ int main(int argc, char* argv[])
    DWORD flags = 0;
    DWORD two = 0;
 
-   const char* ext = strrchr(fileName, '.');
+   PCSTR const ext = strrchr(fileName, '.');
    if (!ext)
    {
      printf("No extension found on %s. Fatal error.\n", fileName);
@@ -101,7 +106,7 @@ int main(int argc, char* argv[])
      // passing GUIDs with '-', '{', and '}' characters.
      for (auto c : gTextArg)
      {
-       if (isxdigit(c))
+       if (isxdigit(static_cast<unsigned char>(c)))
        {
          gText.push_back(c);
        }
@@ -149,7 +154,11 @@ int main(int argc, char* argv[])
      printf("Looking for PE file %s %x %x.\n", fileName, dateStamp, two);
    }
 
-   char filePath[MAX_PATH] = {};
+   //SymFindFileInPath is annotated_Out_writes_(MAX_PATH + 1)
+   //thus, passing less than (MAX_PATH+1) is an overrun!
+   //The documentation says the buffer needs to be MAX_PATH - hurray for
+   //consistency - but better safe than owned.
+   char filePath[MAX_PATH+1] = {};
    DWORD three = 0;
 
    if (SymFindFileInPath(fakeProcess, NULL, fileName, id, two, three,
@@ -166,7 +175,11 @@ int main(int argc, char* argv[])
               "Try again?\n");
    }
 
-   SymCleanup(fakeProcess);
+   const BOOL cleanupResult = SymCleanup(fakeProcess);
+   if (cleanupResult == FALSE)
+   {
+      printf("SymCleanup failed!! Error: %u\n", ::GetLastError());
+   }
 
    return 0;
 }
