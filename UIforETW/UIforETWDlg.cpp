@@ -475,7 +475,14 @@ void CUIforETWDlg::RegisterProviders()
 	// "Chrome providers will not be recorded." it will actually be true.
 	useChromeProviders_ = false;
 
-	std::wstring dllSource = GetExeDir() + L"ETWProviders.dll";
+	std::wstring dllSource = GetExeDir();
+	// Be sure to register the version of the DLLs that we are actually using.
+	// This is important when adding new provider tasks, but should not otherwise
+	// matter.
+	if (Is64BitBuild())
+		dllSource += L"ETWProviders64.dll";
+	else
+		dllSource += L"ETWProviders.dll";
 #pragma warning(suppress:4996)
 	const wchar_t* temp = _wgetenv(L"temp");
 	if (!temp)
