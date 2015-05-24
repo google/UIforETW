@@ -105,9 +105,15 @@ Adjust that to match your games actual install path.
           <template tid="T_WorkingSet">
             <data inType="win:UnicodeString" name="Process Name" />
             <data inType="win:UnicodeString" name="Process" />
+            <data inType="win:UInt32" name="Counter" />
             <data inType="win:UInt32" name="Private WS (KiB)" />
             <data inType="win:UInt32" name="Proportional Set Size (KiB)" />
             <data inType="win:UInt32" name="Working Set (KiB)" />
+          </template>
+          <template tid="T_Battery">
+            <data inType="win:AnsiString" name="Power state" />
+            <data inType="win:Float" name="Battery percentage" />
+            <data inType="win:AnsiString" name="Rate" />
           </template>
         </templates>
         <keywords>
@@ -125,6 +131,7 @@ Adjust that to match your games actual install path.
           <task name="Block" symbol="Block_Task" value="1" eventGUID="{4E9A75EB-4FBA-4BA0-9A1B-2175B671A16D}"/>
           <task name="ThreadID" symbol="ThreadID_Task" value="2" eventGUID="{F2EC684F-AD3A-4AF5-8B10-E7B29AF67EE2}"/>
           <task name="WorkingSet" symbol="WorkingSet_Task" value="3" eventGUID="{68438942-F3E7-47D0-BA01-30F0304F9D2D}"/>
+          <task name="BatteryStatus" symbol="BatterStatus_Task" value="4" eventGUID="{F54A4B5D-C295-42DD-A79A-F2D9C5EFCBD2}"/>
         </tasks>
         <events>
           <event symbol="Start" template="T_Start" value="100" task="Block" opcode="Begin" keywords="NormalFrequency" />
@@ -136,6 +143,7 @@ Adjust that to match your games actual install path.
           <event symbol="Mark1F" template="T_Mark1F" value="106" task="Block" opcode="Mark" keywords="NormalFrequency" />
           <event symbol="Mark2F" template="T_Mark2F" value="107" task="Block" opcode="Mark" keywords="NormalFrequency" />
           <event symbol="MarkWorkingSet" template="T_WorkingSet" value="108" task="WorkingSet" opcode="Information" keywords="NormalFrequency" />
+          <event symbol="MarkBatteryStatus" template="T_Battery" value="109" task="BatteryStatus" opcode="Information" keywords="NormalFrequency" />
         </events>
       </provider>
 

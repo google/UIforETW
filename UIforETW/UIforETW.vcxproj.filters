@@ -54,6 +54,9 @@
     <ClInclude Include="WorkingSet.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="BatteryStatus.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="UIforETW.cpp">
@@ -84,6 +87,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="WorkingSet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BatteryStatus.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

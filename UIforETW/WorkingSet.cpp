@@ -129,7 +129,7 @@ void CWorkingSetMonitor::SampleWorkingSets()
 
 					wchar_t process[MAX_PATH + 100];
 					swprintf_s(process, L"%s (%u)", peInfo.szExeFile, pid);
-					ETWMarkWorkingSet(peInfo.szExeFile, process, static_cast<unsigned>(privateWSPages * 4), static_cast<unsigned>((PSSPages * 4) / PSSMultiplier), static_cast<unsigned>((wsPages * 4)));
+					ETWMarkWorkingSet(peInfo.szExeFile, process, counter_, static_cast<unsigned>(privateWSPages * 4), static_cast<unsigned>((PSSPages * 4) / PSSMultiplier), static_cast<unsigned>((wsPages * 4)));
 				}
 
 				CloseHandle(hProcess);
@@ -139,7 +139,8 @@ void CWorkingSetMonitor::SampleWorkingSets()
 	}
 	CloseHandle(hSnapshot);
 
-	ETWMarkWorkingSet(L"Total", L"", static_cast<unsigned>(totalPrivateWSPages * 4), static_cast<unsigned>((totalPSSPages * 4) / PSSMultiplier), static_cast<unsigned>(totalWSPages * 4));
+	ETWMarkWorkingSet(L"Total", L"", counter_, static_cast<unsigned>(totalPrivateWSPages * 4), static_cast<unsigned>((totalPSSPages * 4) / PSSMultiplier), static_cast<unsigned>(totalWSPages * 4));
+	++counter_;
 }
 
 DWORD __stdcall CWorkingSetMonitor::StaticWSMonitorThread(LPVOID param)

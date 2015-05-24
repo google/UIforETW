@@ -213,9 +213,14 @@ void ETWMarkPrintf( _Printf_format_string_ _In_z_ PCSTR pMessage, ... )
 	EventWriteMark( buffer );
 }
 
-void ETWMarkWorkingSet(_In_z_ PCWSTR pProcessName, _In_z_ PCWSTR pProcess, unsigned privateWS, unsigned PSS, unsigned workingSet)
+void ETWMarkWorkingSet(_In_z_ PCWSTR pProcessName, _In_z_ PCWSTR pProcess, unsigned counter, unsigned privateWS, unsigned PSS, unsigned workingSet)
 {
-	EventWriteMarkWorkingSet(pProcessName, pProcess, privateWS, PSS, workingSet);
+	EventWriteMarkWorkingSet(pProcessName, pProcess, counter, privateWS, PSS, workingSet);
+}
+
+void ETWMarkBatteryStatus(_In_z_ PCSTR powerState, float batteryPercentage, _In_z_ PCSTR rate)
+{
+	EventWriteMarkBatteryStatus(powerState, batteryPercentage, rate);
 }
 
 // Track the depth of ETW Begin/End pairs. This needs to be per-thread
