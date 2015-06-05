@@ -960,13 +960,6 @@ void CUIforETWDlg::LaunchTraceViewer(const std::wstring traceFilename, const std
 
 	std::wstring args = std::wstring(viewerName + L" \"") + traceFilename.c_str() + L"\"";
 
-	if (viewerPath == wpa10Path_)
-	{
-		// Load a WPA 10.0 specific profile. Temporary hack. Doesn't work very
-		// well because the 8.1 profile *also* gets loaded. Sigh...
-		args += L" -profile " + GetExeDir() + L"Startup10.wpaProfile";
-	}
-
 	// Wacky CreateProcess rules say args has to be writable!
 	std::vector<wchar_t> argsCopy(args.size() + 1);
 	wcscpy_s(&argsCopy[0], argsCopy.size(), args.c_str());
