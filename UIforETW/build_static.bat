@@ -17,12 +17,14 @@
 
 @setlocal
 
+pushd %~dp0
+
 call "%VS120COMNTOOLS%..\..\VC\vcvarsall.bat"
 
 sed "s/UseOfMfc>Dynamic/UseOfMfc>Static/" <UIforETW.vcxproj >UIforETWStatic.vcxproj
 sed "s/UIforETW.vcxproj/UIforETWStatic.vcxproj/" <UIforETW.sln >UIforETWStatic.sln
-rmdir Release /s/q
-rmdir x64\Release /s/q
+if exist Release rmdir Release /s/q
+if exist x64\Release rmdir x64\Release /s/q
 devenv /rebuild "release|Win32" UIforETWStatic.sln
 devenv /rebuild "release|x64" UIforETWStatic.sln
 del UIforETWStatic.vcxproj
