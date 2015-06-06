@@ -16,7 +16,7 @@ limitations under the License.
 
 #include "stdafx.h"
 
-#include "BatteryStatus.h"
+#include "PowerStatus.h"
 #include <ETWProviders\etwprof.h>
 
 #include <devguid.h>
@@ -29,7 +29,7 @@ limitations under the License.
 
 const int kSamplingInterval = 200;
 
-void CBatteryStatusMonitor::SampleBatteryStat()
+void CPowerStatusMonitor::SampleBatteryStat()
 {
 	HDEVINFO hdev = SetupDiGetClassDevs(&GUID_DEVCLASS_BATTERY,
 							0,
@@ -166,14 +166,14 @@ void CBatteryStatusMonitor::SampleBatteryStat()
 	SetupDiDestroyDeviceInfoList(hdev);
 }
 
-DWORD __stdcall CBatteryStatusMonitor::StaticBatteryMonitorThread(LPVOID param)
+DWORD __stdcall CPowerStatusMonitor::StaticBatteryMonitorThread(LPVOID param)
 {
-	CBatteryStatusMonitor* pThis = reinterpret_cast<CBatteryStatusMonitor*>(param);
+	CPowerStatusMonitor* pThis = reinterpret_cast<CPowerStatusMonitor*>(param);
 	pThis->BatteryMonitorThread();
 	return 0;
 }
 
-void CBatteryStatusMonitor::BatteryMonitorThread()
+void CPowerStatusMonitor::BatteryMonitorThread()
 {
 
 	for (;;)
@@ -186,13 +186,13 @@ void CBatteryStatusMonitor::BatteryMonitorThread()
 	}
 }
 
-CBatteryStatusMonitor::CBatteryStatusMonitor()
+CPowerStatusMonitor::CPowerStatusMonitor()
 {
 	hExitEvent_ = CreateEvent(nullptr, FALSE, FALSE, nullptr);
 	hThread_ = CreateThread(NULL, 0, StaticBatteryMonitorThread, this, 0, NULL);
 }
 
-CBatteryStatusMonitor::~CBatteryStatusMonitor()
+CPowerStatusMonitor::~CPowerStatusMonitor()
 {
 	// Shut down the child thread.
 	SetEvent(hExitEvent_);

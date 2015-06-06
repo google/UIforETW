@@ -16,11 +16,11 @@ limitations under the License.
 
 #pragma once
 
-class CBatteryStatusMonitor
+class CPowerStatusMonitor
 {
 public:
-	CBatteryStatusMonitor();
-	~CBatteryStatusMonitor();
+	CPowerStatusMonitor();
+	~CPowerStatusMonitor();
 
 private:
 	static DWORD __stdcall StaticBatteryMonitorThread(LPVOID);
@@ -31,6 +31,6 @@ private:
 	HANDLE hThread_;
 	HANDLE hExitEvent_;
 
-	CBatteryStatusMonitor& operator=(const CBatteryStatusMonitor&) = delete;
-	CBatteryStatusMonitor(const CBatteryStatusMonitor&) = delete;
+	CPowerStatusMonitor& operator=(const CPowerStatusMonitor&) = delete;
+	CPowerStatusMonitor(const CPowerStatusMonitor&) = delete;
 };

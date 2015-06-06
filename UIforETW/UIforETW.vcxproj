@@ -255,7 +255,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="About.h" />
-    <ClInclude Include="BatteryStatus.h" />
+    <ClInclude Include="PowerStatus.h" />
     <ClInclude Include="ChildProcess.h" />
     <ClInclude Include="DirectoryMonitor.h" />
     <ClInclude Include="KeyLoggerThread.h" />
@@ -269,7 +269,7 @@
     <ClInclude Include="WorkingSet.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="BatteryStatus.cpp" />
+    <ClCompile Include="PowerStatus.cpp" />
     <ClCompile Include="ChildProcess.cpp" />
     <ClCompile Include="DirectoryMonitor.cpp" />
     <ClCompile Include="KeyLoggerThread.cpp" />

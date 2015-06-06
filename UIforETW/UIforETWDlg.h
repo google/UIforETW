@@ -22,7 +22,7 @@ limitations under the License.
 #include "KeyLoggerThread.h"
 #include "DirectoryMonitor.h"
 #include "WorkingSet.h"
-#include "BatteryStatus.h"
+#include "PowerStatus.h"
 
 enum TracingMode
 {
@@ -107,7 +107,7 @@ private:
 	CWorkingSetMonitor workingSetThread_;
 	std::wstring WSMonitoredProcesses_;
 	// This starts and stops a thread that monitors battery status.
-	CBatteryStatusMonitor BatteryMonitor_;
+	CPowerStatusMonitor PowerMonitor_;
 
 	// This contains the notes for the selected trace, as loaded from disk.
 	std::wstring traceNotes_;
