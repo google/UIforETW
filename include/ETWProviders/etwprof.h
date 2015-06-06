@@ -62,6 +62,11 @@ PLATFORM_INTERFACE void ETWMarkWorkingSet(_In_z_ PCWSTR pProcessName, _In_z_ PCW
 // discharge rate from struct BATTERY_STATUS.
 PLATFORM_INTERFACE void ETWMarkBatteryStatus(_In_z_ PCSTR powerState, float batteryPercentage, _In_z_ PCSTR rate);
 
+// Record CPU/package frequency, power usage, and temperature. Currently Intel only.
+PLATFORM_INTERFACE void ETWMarkCPUFrequency(_In_z_ PCWSTR MSRName, double frequencyMHz);
+PLATFORM_INTERFACE void ETWMarkCPUPower(_In_z_ PCWSTR MSRName, double powerW, double energymWh);
+PLATFORM_INTERFACE void ETWMarkCPUTemp(_In_z_ PCWSTR MSRName, double tempC, double maxTempC);
+
 // Insert a begin event to mark the start of some work. The return value is a 64-bit
 // time stamp which should be passed to the corresponding ETWEnd function.
 PLATFORM_INTERFACE int64 ETWBegin( _In_z_ PCSTR pMessage );
@@ -122,6 +127,9 @@ inline void ETWMarkPrintf( const char *pMessage, ... ) {}
 inline void ETWWorkerMarkPrintf( const char *pMessage, ... ) {}
 inline void ETWMarkWorkingSet(const wchar_t* pProcessName, const wchar_t* pProcess, unsigned counter, unsigned privateWS, unsigned PSS, unsigned workingSet) {}
 inline void ETWMarkBatteryStatus(_In_z_ PCSTR powerState, float batteryPercentage, _In_z_ PCSTR rate) {}
+inline void ETWMarkCPUFrequency(_In_z_ PCSTR MSRName, double frequencyMHz) {}
+inline void ETWMarkCPUPower(_In_z_ PCSTR MSRName, double powerW, double energymWh) {}
+inline void ETWMarkCPUTemp(_In_z_ PCSTR MSRName, double tempC, double maxTempC) {}
 inline int64 ETWBegin( const char* ) { return 0; }
 inline int64 ETWWorkerBegin( const char* ) { return 0; }
 inline int64 ETWEnd( const char*, int64 ) { return 0; }

@@ -16,6 +16,9 @@ limitations under the License.
 
 #include "stdafx.h"
 
+#include <string>
+#include <stdlib.h>
+
 #include "PowerStatus.h"
 #include <ETWProviders\etwprof.h>
 
@@ -28,6 +31,67 @@ limitations under the License.
 #pragma comment(lib, "setupapi.lib")
 
 const int kSamplingInterval = 200;
+
+// These correspond to the funcID values returned by GetMsrFunc
+const int MSR_FUNC_FREQ = 0;
+const int MSR_FUNC_POWER = 1;
+const int MSR_FUNC_TEMP = 2;
+const int MSR_FUNC_MAX_POWER = 3; /* ????? */
+
+void CPowerStatusMonitor::SampleCPUPowerState()
+{
+	if (!IntelEnergyLibInitialize || !GetNumMsrs || !GetMsrName || !GetMsrFunc ||
+		!GetPowerData || !ReadSample)
+	{
+		return;
+	}
+
+	int numMSRs = 0;
+	GetNumMsrs(&numMSRs);
+	ReadSample();
+	for (int i = 0; i < numMSRs; ++i)
+	{
+		int funcID;
+		wchar_t MSRName[1024];
+		GetMsrFunc(i, &funcID);
+		GetMsrName(i, MSRName);
+
+		int nData;
+		double data[3] = {};
+		GetPowerData(0, i, data, &nData);
+
+		if (funcID == MSR_FUNC_FREQ)
+		{
+			ETWMarkCPUFrequency(MSRName, (float)data[0]);
+			//outputPrintf(L"%s = %4.0f MHz\n", MSRName, data[0]);
+		}
+		else if (funcID == MSR_FUNC_POWER)
+		{
+			// Round to nearest .0001 to avoid distracting excess precision.
+			data[0] = round(data[0] * 10000) / 10000;
+			data[2] = round(data[2] * 10000) / 10000;
+			ETWMarkCPUPower(MSRName, data[0], data[2]);
+			//outputPrintf(L"%s Power (W) = %3.2f\n", MSRName, data[0]);
+			//outputPrintf(L"%s Energy(J) = %3.2f\n", MSRName, data[1]);
+			//outputPrintf(L"%s Energy(mWh)=%3.2f\n", MSRName, data[2]);
+		}
+		else if (funcID == MSR_FUNC_TEMP)
+		{
+			// The 3.02 version of Intel Power Gadget seems to report the temperature
+			// in F instead of C.
+			ETWMarkCPUTemp(MSRName, data[0], maxTemperature);
+			//outputPrintf(L"%s Temp (C) = %3.0f (max is %3.0f)\n", MSRName, data[0], (double)maxTemperature);
+		}
+		else if (funcID == MSR_FUNC_MAX_POWER)
+		{
+			//outputPrintf(L"%s Max Power (W) = %3.0f\n", MSRName, data[0]);
+		}
+		else
+		{
+			//outputPrintf(L"Unused funcID %d\n", funcID);
+		}
+	}
+}
 
 void CPowerStatusMonitor::SampleBatteryStat()
 {
@@ -183,11 +247,40 @@ void CPowerStatusMonitor::BatteryMonitorThread()
 			break;
 
 		SampleBatteryStat();
+		SampleCPUPowerState();
 	}
 }
 
 CPowerStatusMonitor::CPowerStatusMonitor()
 {
+	// If Intel Power Gadget is installed then use it to get CPU power data.
+#if _M_X64
+	PCWSTR dllName = L"\\EnergyLib64.dll";
+#else
+	PCWSTR dllName = L"\\EnergyLib32.dll";
+#endif
+#pragma warning(disable : 4996)
+	PCWSTR powerGadgetDir = _wgetenv(L"IPG_Dir");
+	if (powerGadgetDir)
+		energyLib_ = LoadLibrary((std::wstring(powerGadgetDir) + dllName).c_str());
+	if (energyLib_)
+	{
+		IntelEnergyLibInitialize = (IntelEnergyLibInitialize_t)GetProcAddress(energyLib_, "IntelEnergyLibInitialize");
+		GetNumMsrs = (GetNumMsrs_t)GetProcAddress(energyLib_, "GetNumMsrs");
+		GetMsrName = (GetMsrName_t)GetProcAddress(energyLib_, "GetMsrName");
+		GetMsrFunc = (GetMsrFunc_t)GetProcAddress(energyLib_, "GetMsrFunc");
+		GetPowerData = (GetPowerData_t)GetProcAddress(energyLib_, "GetPowerData");
+		ReadSample = (ReadSample_t)GetProcAddress(energyLib_, "ReadSample");
+		auto GetMaxTemperature = (GetMaxTemperature_t)GetProcAddress(energyLib_, "GetMaxTemperature");
+		if (GetMaxTemperature)
+			GetMaxTemperature(0, &maxTemperature);
+		if (IntelEnergyLibInitialize && ReadSample)
+		{
+			IntelEnergyLibInitialize();
+			ReadSample();
+		}
+	}
+
 	hExitEvent_ = CreateEvent(nullptr, FALSE, FALSE, nullptr);
 	hThread_ = CreateThread(NULL, 0, StaticBatteryMonitorThread, this, 0, NULL);
 }

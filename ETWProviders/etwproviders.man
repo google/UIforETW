@@ -115,6 +115,20 @@ Adjust that to match your games actual install path.
             <data inType="win:Float" name="Battery percentage" />
             <data inType="win:AnsiString" name="Rate" />
           </template>
+          <template tid="T_Frequency">
+            <data inType="win:UnicodeString" name="MSR name" />
+            <data inType="win:Double" name="Frequency (MHz)"/>
+          </template>
+          <template tid="T_Power">
+            <data inType="win:UnicodeString" name="MSR name" />
+            <data inType="win:Double" name="Power (W)"/>
+            <data inType="win:Double" name="Energy (mWh)"/>
+          </template>
+          <template tid="T_Temp">
+            <data inType="win:UnicodeString" name="MSR name" />
+            <data inType="win:Double" name="Temp (C)"/>
+            <data inType="win:Double" name="Max temp (C)"/>
+          </template>
         </templates>
         <keywords>
           <keyword name="HighFrequency" mask="0x2" />
@@ -131,7 +145,10 @@ Adjust that to match your games actual install path.
           <task name="Block" symbol="Block_Task" value="1" eventGUID="{4E9A75EB-4FBA-4BA0-9A1B-2175B671A16D}"/>
           <task name="ThreadID" symbol="ThreadID_Task" value="2" eventGUID="{F2EC684F-AD3A-4AF5-8B10-E7B29AF67EE2}"/>
           <task name="WorkingSet" symbol="WorkingSet_Task" value="3" eventGUID="{68438942-F3E7-47D0-BA01-30F0304F9D2D}"/>
-          <task name="BatteryStatus" symbol="BatterStatus_Task" value="4" eventGUID="{F54A4B5D-C295-42DD-A79A-F2D9C5EFCBD2}"/>
+          <task name="BatteryStatus" symbol="BatteryStatus_Task" value="4" eventGUID="{F54A4B5D-C295-42DD-A79A-F2D9C5EFCBD2}"/>
+          <task name="FrequencyStatus" symbol="FrequencyStatus_Task" value="5" eventGUID="{0A875F88-5FFE-4BC7-9B46-E4FA87754610}"/>
+          <task name="PowerStatus" symbol="PowerStatus_Task" value="6" eventGUID="{484C71EE-2A86-466C-88AB-EB7DA15D6E86}"/>
+          <task name="TempStatus" symbol="TempStatus_Task" value="7" eventGUID="{D94A8004-28EF-467E-98E2-12B00E3DC1EE}"/>
         </tasks>
         <events>
           <event symbol="Start" template="T_Start" value="100" task="Block" opcode="Begin" keywords="NormalFrequency" />
@@ -144,6 +161,9 @@ Adjust that to match your games actual install path.
           <event symbol="Mark2F" template="T_Mark2F" value="107" task="Block" opcode="Mark" keywords="NormalFrequency" />
           <event symbol="MarkWorkingSet" template="T_WorkingSet" value="108" task="WorkingSet" opcode="Information" keywords="NormalFrequency" />
           <event symbol="MarkBatteryStatus" template="T_Battery" value="109" task="BatteryStatus" opcode="Information" keywords="NormalFrequency" />
+          <event symbol="MarkCPUFrequency" template="T_Frequency" value="110" task="FrequencyStatus" opcode="Information" keywords="NormalFrequency" />
+          <event symbol="MarkCPUPower" template="T_Power" value="111" task="PowerStatus" opcode="Information" keywords="NormalFrequency" />
+          <event symbol="MarkCPUTemp" template="T_Temp" value="112" task="TempStatus" opcode="Information" keywords="NormalFrequency" />
         </events>
       </provider>
 

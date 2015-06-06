@@ -16,6 +16,15 @@ limitations under the License.
 
 #pragma once
 
+// https://software.intel.com/en-us/blogs/2012/12/13/using-the-intel-power-gadget-api-on-mac-os-x
+typedef int(*IntelEnergyLibInitialize_t)();
+typedef int(*GetNumMsrs_t)(int* nMsr);
+typedef int(*GetMsrName_t)(int iMsr, wchar_t* szName);
+typedef int(*GetMsrFunc_t)(int iMsr, int* pFuncID);
+typedef int(*GetPowerData_t)(int iNode, int iMsr, double* pResult, int* nResult);
+typedef int(*ReadSample_t)();
+typedef int(*GetMaxTemperature_t)(int iNode, int* degreeC);
+
 class CPowerStatusMonitor
 {
 public:
@@ -27,9 +36,19 @@ private:
 	void BatteryMonitorThread();
 
 	void SampleBatteryStat();
+	void SampleCPUPowerState();
 
 	HANDLE hThread_;
 	HANDLE hExitEvent_;
+
+	HMODULE energyLib_ = nullptr;
+	IntelEnergyLibInitialize_t IntelEnergyLibInitialize = nullptr;
+	GetNumMsrs_t GetNumMsrs = nullptr;
+	GetMsrName_t GetMsrName = nullptr;
+	GetMsrFunc_t GetMsrFunc = nullptr;
+	GetPowerData_t GetPowerData = nullptr;
+	ReadSample_t ReadSample = nullptr;
+	int maxTemperature = 0;
 
 	CPowerStatusMonitor& operator=(const CPowerStatusMonitor&) = delete;
 	CPowerStatusMonitor(const CPowerStatusMonitor&) = delete;

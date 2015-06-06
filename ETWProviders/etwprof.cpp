@@ -223,6 +223,21 @@ void ETWMarkBatteryStatus(_In_z_ PCSTR powerState, float batteryPercentage, _In_
 	EventWriteMarkBatteryStatus(powerState, batteryPercentage, rate);
 }
 
+PLATFORM_INTERFACE void ETWMarkCPUFrequency(_In_z_ PCWSTR MSRName, double frequencyMHz)
+{
+	EventWriteMarkCPUFrequency(MSRName, frequencyMHz);
+}
+
+PLATFORM_INTERFACE void ETWMarkCPUPower(_In_z_ PCWSTR MSRName, double powerW, double energymWh)
+{
+	EventWriteMarkCPUPower(MSRName, powerW, energymWh);
+}
+
+PLATFORM_INTERFACE void ETWMarkCPUTemp(_In_z_ PCWSTR MSRName, double tempC, double maxTempC)
+{
+	EventWriteMarkCPUTemp(MSRName, tempC, maxTempC);
+}
+
 // Track the depth of ETW Begin/End pairs. This needs to be per-thread
 // if we start emitting marks on multiple threads. Using __declspec(thread)
 // has some problems on Windows XP, but since these ETW functions only work
