@@ -22,9 +22,20 @@ call "%VS120COMNTOOLS%..\..\VC\vcvarsall.bat"
 sed "s/UseOfMfc>Dynamic/UseOfMfc>Static/" <UIforETW.vcxproj >UIforETWStatic.vcxproj
 sed "s/UIforETW.vcxproj/UIforETWStatic.vcxproj/" <UIforETW.sln >UIforETWStatic.sln
 rmdir Release /s/q
+rmdir x64\Release /s/q
 devenv /rebuild "release|Win32" UIforETWStatic.sln
+devenv /rebuild "release|x64" UIforETWStatic.sln
 del UIforETWStatic.vcxproj
 del UIforETWStatic.sln
 
-@rem Clean up the build directory at the end to avoid subsequent build warnings.
+@rem Clean up the build directories at the end to avoid subsequent build warnings.
 rmdir Release /s/q
+rmdir x64\Release /s/q
+
+@rem Copy the results to the release executables
+pushd %~dp0..\bin
+echo >UIforETW32.exe
+xcopy /y UIforETWStatic_devrel32.exe UIforETW32.exe
+echo >UIforETW.exe
+xcopy /y UIforETWStatic_devrel.exe UIforETW.exe
+popd
