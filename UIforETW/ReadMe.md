@@ -82,8 +82,6 @@ Trace list should let the user:
 
 
 Most important tasks:
-- [ ] Figure out why .txt files keep getting left behind - race condition in renaming or deleting or??? (no repro)
-- [ ] Create an installer that will install the MFC DLLs: https://msdn.microsoft.com/en-us/library/dd293568.aspx
 - [ ] Implement more settings - configure trace directories, buffer sizes, option for stacks on user events.
 - [ ] Handle the duplicate copies of etwproviders.man.
 - [ ] Add some unit tests.
