@@ -191,6 +191,15 @@ LRESULT CALLBACK LowLevelMouseHook(int nCode, WPARAM wParam, LPARAM lParam)
 
 DWORD __stdcall InputThread(LPVOID)
 {
+	// When UIforETW is halted in a debugger the keyboard and mouse hooks cannot respond
+	// in a timely manner. This means that each bit of user input has to timeout, which
+	// makes debugging painful - the timeout appears to be about ten seconds.
+	if (IsDebuggerPresent())
+	{
+		OutputDebugString(L"Input logging disabled while debugging.\n");
+		return 0;
+	}
+
 	// Install a hook so that this thread will receive all keyboard messages. They must be
 	// processed in a timely manner or else bad things will happen. Doing this on a
 	// separate thread is a good idea, but even then bad things will happen to your system
