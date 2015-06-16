@@ -85,7 +85,6 @@ enum WindowsVersion
 bool Is64BitWindows();
 bool Is64BitBuild();
 WindowsVersion GetWindowsVersion();
-//bool IsWindowsServer();
 
 std::wstring FindPython(); // Returns a full path to python.exe or nothing.
 
