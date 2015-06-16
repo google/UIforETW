@@ -91,6 +91,9 @@ private:
 	CStatic btInputTracingLabel_;
 
 	TracingMode tracingMode_ = kTracingToMemory;
+	// Increase the buffer count by some proportion when tracing to a file
+	// on a large-memory machine.
+	int BufferCountBoost(int requestCount) const;
 	CComboBox btTracingMode_;
 	std::wstring heapTracingExes_ = L"chrome.exe";
 	std::wstring chromeDllPath_ = L"C:\\Temp\\";

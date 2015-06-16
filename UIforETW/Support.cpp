@@ -112,3 +112,44 @@ void CUIforETWDlg::TransferSettings(bool saving)
 		}
 	}
 }
+
+// Increase the buffer count by some proportion when tracing to a file
+// on a large-memory machine, in order to ensure that no events are lost
+// even when tracing high-volume scenarios like multi-threaded builds.
+// Buffer counts should not be adjusted when tracing to memory because
+// these scenarios don't lose events, and increasing the buffer sizes
+// will make the resultant files larger.
+// In the worst-case (heap tracing) this function may be called three
+// times for a trace and will request a total of about 2,000 buffers,
+// each of which is 1 MB. Therefore we should only boost the number of
+// buffers if the machine has enough memory to give up 2-4 GB of physical
+// RAM without ill effects.
+// Machines with over 15 GB of RAM (16 GB minus some overhead) should
+// get a modest boost, and machines with over 30 GB of RAM should get
+// a larger boost.
+int CUIforETWDlg::BufferCountBoost(int requestCount) const
+{
+	if (tracingMode_ == kTracingToMemory)
+		return requestCount;
+
+	int numerator = 1;
+	int denominator = 1;
+	MEMORYSTATUSEX memoryStatus = { sizeof(MEMORYSTATUSEX) };
+	if (!GlobalMemoryStatusEx(&memoryStatus))
+		return requestCount;
+
+	const int64_t oneGB = int64_t(1024) * 1024 * 1024;
+	int64_t physicalRam = memoryStatus.ullTotalPhys;
+	if (physicalRam > 15 * oneGB)
+	{
+		numerator = 3;
+		denominator = 2;
+	}
+	if (physicalRam > 30 * oneGB)
+	{
+		numerator = 2;
+		denominator = 1;
+	}
+
+	return (requestCount * numerator) / denominator;
+}

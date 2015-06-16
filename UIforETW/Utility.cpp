@@ -168,6 +168,30 @@ std::wstring AnsiToUnicode(const std::string& text)
 	return result;
 }
 
+// Return a string from a format string and some printf-style arguments.
+std::wstring stringPrintf(_Printf_format_string_ const wchar_t* pFormat, ...)
+{
+	va_list args;
+	va_start(args, pFormat);
+	// 4 K should be enough for anyone and it keeps this function simple.
+	wchar_t buffer[4096];
+	_vsnwprintf_s(buffer, _TRUNCATE, pFormat, args);
+	va_end(args);
+	return buffer;
+}
+
+// Call OutputDebugString with a format string and some printf-style arguments.
+void debugPrintf(_Printf_format_string_ const wchar_t* pFormat, ...)
+{
+	va_list args;
+	va_start(args, pFormat);
+	// 1 K maximum is imposed by OutputDebugString.
+	wchar_t buffer[1024];
+	_vsnwprintf_s(buffer, _TRUNCATE, pFormat, args);
+	va_end(args);
+	OutputDebugString(buffer);
+}
+
 // Get the next/previous dialog item (next/prev in window order and tab order) allowing
 // for disabled controls, invisible controls, and wrapping at the end of the tab order.
 

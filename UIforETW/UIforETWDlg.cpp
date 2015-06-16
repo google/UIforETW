@@ -707,7 +707,8 @@ void CUIforETWDlg::OnBnClickedStarttracing()
 		kernelStackWalk = L" -stackwalk " + kernelStackWalk.substr(1);
 	// Buffer sizes are in KB, so 1024 is actually 1 MB
 	// Make this configurable.
-	std::wstring kernelBuffers = L" -buffersize 1024 -minbuffers 600 -maxbuffers 600";
+	const int numKernelBuffers = BufferCountBoost(600);
+	std::wstring kernelBuffers = stringPrintf(L" -buffersize 1024 -minbuffers %d -maxbuffers %d", numKernelBuffers, numKernelBuffers);
 	std::wstring kernelFile = L" -f \"" + GetKernelFile() + L"\"";
 	if (tracingMode_ == kTracingToMemory)
 		kernelFile = L" -buffering";
@@ -750,10 +751,9 @@ void CUIforETWDlg::OnBnClickedStarttracing()
 		}
 	}
 
-	std::wstring userBuffers = L" -buffersize 1024 -minbuffers 100 -maxbuffers 100";
 	// Increase the user buffer sizes when doing graphics tracing.
-	if (bGPUTracing_)
-		userBuffers = L" -buffersize 1024 -minbuffers 200 -maxbuffers 200";
+	const int numUserBuffers = BufferCountBoost(bGPUTracing_ ? 200 : 100);
+	std::wstring userBuffers = stringPrintf(L" -buffersize 1024 -minbuffers %d -maxbuffers %d", numUserBuffers, numUserBuffers);
 	std::wstring userFile = L" -f \"" + GetUserFile() + L"\"";
 	if (tracingMode_ == kTracingToMemory)
 		userFile = L" -buffering";
@@ -762,7 +762,8 @@ void CUIforETWDlg::OnBnClickedStarttracing()
 	// Heap tracing settings -- only used for heap tracing.
 	// Could also record stacks on HeapFree
 	// Buffer sizes need to be huge for some programs - should be configurable.
-	std::wstring heapBuffers = L" -buffersize 1024 -minbuffers 1000";
+	const int numHeapBuffers = BufferCountBoost(1000);
+	std::wstring heapBuffers = stringPrintf(L" -buffersize 1024 -minbuffers %d -maxBuffers %d", numHeapBuffers, numHeapBuffers);
 	std::wstring heapFile = L" -f \"" + GetHeapFile() + L"\"";
 	std::wstring heapStackWalk;
 	if (bHeapStacks_)
