@@ -48,7 +48,7 @@ private:
 	GetMsrFunc_t GetMsrFunc = nullptr;
 	GetPowerData_t GetPowerData = nullptr;
 	ReadSample_t ReadSample = nullptr;
-	int maxTemperature = 0;
+	int maxTemperature_ = 0;
 
 	CPowerStatusMonitor& operator=(const CPowerStatusMonitor&) = delete;
 	CPowerStatusMonitor(const CPowerStatusMonitor&) = delete;

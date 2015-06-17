@@ -79,8 +79,8 @@ void CPowerStatusMonitor::SampleCPUPowerState()
 		{
 			// The 3.02 version of Intel Power Gadget seems to report the temperature
 			// in F instead of C.
-			ETWMarkCPUTemp(MSRName, data[0], maxTemperature);
-			//outputPrintf(L"%s Temp (C) = %3.0f (max is %3.0f)\n", MSRName, data[0], (double)maxTemperature);
+			ETWMarkCPUTemp(MSRName, data[0], maxTemperature_);
+			//outputPrintf(L"%s Temp (C) = %3.0f (max is %3.0f)\n", MSRName, data[0], (double)maxTemperature_);
 		}
 		else if (funcID == MSR_FUNC_MAX_POWER)
 		{
@@ -273,7 +273,7 @@ CPowerStatusMonitor::CPowerStatusMonitor()
 		ReadSample = (ReadSample_t)GetProcAddress(energyLib_, "ReadSample");
 		auto GetMaxTemperature = (GetMaxTemperature_t)GetProcAddress(energyLib_, "GetMaxTemperature");
 		if (GetMaxTemperature)
-			GetMaxTemperature(0, &maxTemperature);
+			GetMaxTemperature(0, &maxTemperature_);
 		if (IntelEnergyLibInitialize && ReadSample)
 		{
 			IntelEnergyLibInitialize();
