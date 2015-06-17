@@ -27,6 +27,9 @@
     <ClInclude Include="..\include\ETWProviders\etwprof.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -47,6 +50,9 @@
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="etwprovidersGenerated.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+    <ResourceCompile Include="ETWProviders.rc">
       <Filter>Resource Files</Filter>
     </ResourceCompile>
   </ItemGroup>

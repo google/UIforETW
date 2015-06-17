@@ -206,6 +206,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\ETWProviders\etwprof.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
@@ -256,7 +257,10 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="etwprovidersGenerated.rc" />
+    <None Include="etwprovidersGenerated.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="ETWProviders.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
