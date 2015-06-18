@@ -16,6 +16,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
+    <None Include="etwprovidersGenerated.rc">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -49,9 +52,6 @@
     <CustomBuild Include="etwproviders.man" />
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="etwprovidersGenerated.rc">
-      <Filter>Resource Files</Filter>
-    </ResourceCompile>
     <ResourceCompile Include="ETWProviders.rc">
       <Filter>Resource Files</Filter>
     </ResourceCompile>
