@@ -1003,6 +1003,9 @@ void CUIforETWDlg::SetSamplingSpeed()
 	std::wstring profInt = bFastSampling_ ? L"1221" : L"9001";
 	std::wstring args = L" -setprofint " + profInt + L" cached";
 	child.Run(bShowCommands_, L"xperf.exe" + args);
+	if (child.GetExitCode())
+		outputPrintf(L"Note: Setting the sampling speed with the 8.1 version of WPT fails "
+					L"on Windows 10. The 10.0 version of WPT will correct this.\n");
 }
 
 void CUIforETWDlg::OnBnClickedFastsampling()
@@ -1017,7 +1020,7 @@ void CUIforETWDlg::OnBnClickedFastsampling()
 	{
 		message = L"Setting CPU sampling speed to 1 KHz, for lower overhead.";
 	}
-	outputPrintf(L"%s\n", message);
+	outputPrintf(L"\n%s\n", message);
 	SetSamplingSpeed();
 }
 
