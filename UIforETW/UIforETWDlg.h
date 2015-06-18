@@ -239,7 +239,8 @@ private:
 	afx_msg void OnOpenTraceGPUView();
 	afx_msg void CopyTraceName();
 	afx_msg void DeleteTrace();
-	afx_msg void SelectAll();
+	afx_msg void NotesSelectAll();
+	afx_msg void NotesPaste();
 	afx_msg void OnActivate(UINT nState, CWnd* pWndOther, BOOL bMinimized);
 public:
 	afx_msg void OnBnClickedGPUtracing();

@@ -57,18 +57,11 @@ void CUIforETWDlg::vprintf(const wchar_t* pFormat, va_list args)
 	wchar_t buffer[5000];
 	_vsnwprintf_s(buffer, _TRUNCATE, pFormat, args);
 
-	for (const wchar_t* pBuf = buffer; *pBuf; ++pBuf)
-	{
-		// Need \r\n as a line separator.
-		if (pBuf[0] == '\n')
-		{
-			// Don't add a line separator at the very beginning.
-			if (!output_.empty())
-				output_ += L"\r\n";
-		}
-		else
-			output_ += pBuf[0];
-	}
+	auto converted = ConvertToCRLF(buffer);
+	// Don't add a line separator at the very beginning.
+	if (output_.empty() && converted.substr(0, 2) == L"\r\n")
+		converted = converted.substr(2);
+	output_ += converted;
 
 	SetDlgItemText(IDC_OUTPUT, output_.c_str());
 
@@ -215,7 +208,8 @@ BEGIN_MESSAGE_MAP(CUIforETWDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_GPUTRACING, &CUIforETWDlg::OnBnClickedGPUtracing)
 	ON_BN_CLICKED(ID_COPYTRACENAME, &CUIforETWDlg::CopyTraceName)
 	ON_BN_CLICKED(ID_DELETETRACE, &CUIforETWDlg::DeleteTrace)
-	ON_BN_CLICKED(ID_SELECTALL, &CUIforETWDlg::SelectAll)
+	ON_BN_CLICKED(ID_SELECTALL, &CUIforETWDlg::NotesSelectAll)
+	ON_BN_CLICKED(ID_PASTEOVERRIDE, &CUIforETWDlg::NotesPaste)
 	ON_WM_ACTIVATE()
 END_MESSAGE_MAP()
 
@@ -232,7 +226,7 @@ void CUIforETWDlg::SetSymbolPath()
 		if (bChromeDeveloper_)
 			symbolPath = "SRV*" + systemDrive_ + "symbols*http://msdl.microsoft.com/download/symbols;SRV*" + systemDrive_ + "symbols*https://chromium-browser-symsrv.commondatastorage.googleapis.com";
 		(void)_putenv(("_NT_SYMBOL_PATH=" + symbolPath).c_str());
-		outputPrintf(L"Setting _NT_SYMBOL_PATH to %s (Microsoft%s). "
+		outputPrintf(L"\nSetting _NT_SYMBOL_PATH to %s (Microsoft%s). "
 			L"Set _NT_SYMBOL_PATH yourself or toggle 'Chrome developer' if you want different defaults.\n",
 			AnsiToUnicode(symbolPath).c_str(), bChromeDeveloper_ ? L" plus Chrome" : L"");
 	}
@@ -1214,9 +1208,17 @@ void CUIforETWDlg::UpdateNotesState()
 	}
 }
 
-void CUIforETWDlg::SelectAll()
+void CUIforETWDlg::NotesSelectAll()
 {
 	btTraceNotes_.SetSel(0, -1, TRUE);
+}
+
+void CUIforETWDlg::NotesPaste()
+{
+	const auto clipText = ConvertToCRLF(GetClipboardText());
+	if (clipText.empty())
+		return;
+	btTraceNotes_.ReplaceSel(clipText.c_str());
 }
 
 void CUIforETWDlg::OnLbnSelchangeTracelist()

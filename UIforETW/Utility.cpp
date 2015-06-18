@@ -109,6 +109,26 @@ void WriteTextAsFile(const std::wstring& fileName, const std::wstring& text)
 	outFile.write(reinterpret_cast<const char*>(text.c_str()), text.size() * sizeof(text[0]));
 }
 
+std::wstring ConvertToCRLF(const std::wstring& input)
+{
+	std::wstring result;
+	result.reserve(input.size());
+
+	for (wchar_t c : input)
+	{
+		// Replace '\n' with '\r\n' and ignore any '\r' characters that were
+		// previously present.
+		// Checking for '\n' and '\r' is safe even when dealing with surrogate
+		// pairs because the high and low surrogate have non-overlapping ranges.
+		if (c == '\n')
+			result += '\r';
+		if (c != '\r')
+			result += c;
+	}
+
+	return result;
+}
+
 void SetRegistryDWORD(HKEY root, const std::wstring& subkey, const std::wstring& valueName, DWORD value)
 {
 	HKEY key;
@@ -356,6 +376,30 @@ void SetClipboardText(const std::wstring& text)
 	}
 
 	CloseClipboard();
+}
+
+std::wstring GetClipboardText()
+{
+	std::wstring result;
+	BOOL cb = OpenClipboard(GetDesktopWindow());
+	if (!cb)
+		return result;
+
+	HANDLE hClip = GetClipboardData(CF_UNICODETEXT);
+	if (hClip)
+	{
+		wchar_t *text = static_cast<wchar_t *>(GlobalLock(hClip));
+		if (text)
+		{
+			size_t bytes = GlobalSize(hClip);
+			result.insert(result.begin(), text, text + bytes / sizeof(wchar_t));
+		}
+		::GlobalUnlock(hClip);
+	}
+
+	CloseClipboard();
+
+	return result;
 }
 
 int64_t GetFileSize(const std::wstring& path)

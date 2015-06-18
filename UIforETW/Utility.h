@@ -30,6 +30,9 @@ std::wstring LoadFileAsText(const std::wstring& fileName);
 // Write a wstring as UTF-16.
 void WriteTextAsFile(const std::wstring& fileName, const std::wstring& text);
 
+// Convert a string that may have '\n' line endings to '\r\n' line endings.
+std::wstring ConvertToCRLF(const std::wstring& input);
+
 void SetRegistryDWORD(HKEY root, const std::wstring& subkey, const std::wstring& valueName, DWORD value);
 void CreateRegistryKey(HKEY root, const std::wstring& subkey, const std::wstring& newKey);
 
@@ -71,6 +74,7 @@ int DeleteFiles(HWND hwnd, const std::vector<std::wstring>& paths);
 int64_t GetFileSize(const std::wstring& path);
 
 void SetClipboardText(const std::wstring& text);
+std::wstring GetClipboardText();
 
 enum WindowsVersion
 {
