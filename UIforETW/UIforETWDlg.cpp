@@ -211,6 +211,7 @@ BEGIN_MESSAGE_MAP(CUIforETWDlg, CDialogEx)
 	ON_BN_CLICKED(ID_SELECTALL, &CUIforETWDlg::NotesSelectAll)
 	ON_BN_CLICKED(ID_PASTEOVERRIDE, &CUIforETWDlg::NotesPaste)
 	ON_WM_ACTIVATE()
+	ON_WM_TIMER()
 END_MESSAGE_MAP()
 
 
@@ -434,6 +435,8 @@ BOOL CUIforETWDlg::OnInitDialog()
 	SetHeapTracing(false);
 	// Start the input logging thread with the current settings.
 	SetKeyloggingState(InputTracing_);
+
+	SetTimer(0, 1000, nullptr);
 
 	return TRUE; // return TRUE unless you set the focus to a control
 }
@@ -795,6 +798,8 @@ void CUIforETWDlg::OnBnClickedStarttracing()
 	// Set this whether starting succeeds or not, to allow forced-stopping.
 	bIsTracing_ = true;
 	UpdateEnabling();
+
+	traceStartTime_ = GetTickCount64();
 }
 
 void CUIforETWDlg::StopTracingAndMaybeRecord(bool bSaveTrace)
@@ -926,6 +931,19 @@ void CUIforETWDlg::StopTracingAndMaybeRecord(bool bSaveTrace)
 		outputPrintf(L"Tracing stopped.\n");
 }
 
+void CUIforETWDlg::OnTimer(UINT_PTR)
+{
+	if (bIsTracing_ && (tracingMode_ == kTracingToFile || tracingMode_ == kHeapTracingToFile))
+	{
+		ULONGLONG elapsed = GetTickCount64() - traceStartTime_;
+		if (elapsed > kMaxFileTraceMs)
+		{
+			outputPrintf(L"\nTracing to disk ran excessively long. Auto-saving and stopping.\n");
+			ETWMark("Auto-saving trace.");
+			StopTracingAndMaybeRecord(true);
+		}
+	}
+}
 
 void CUIforETWDlg::OnBnClickedSavetracebuffers()
 {

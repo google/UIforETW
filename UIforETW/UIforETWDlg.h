@@ -48,6 +48,11 @@ private:
 	HICON m_hIcon;
 
 	bool bIsTracing_ = false;
+	ULONGLONG traceStartTime_ = 0;
+	// Auto-save trace if tracing to a file runs for longer than this length of time.
+	// Otherwise the trace files can fill hard drives and be unusably large.
+	// This should be configurable. But it is not.
+	const ULONGLONG kMaxFileTraceMs = 120000;
 
 	CButton btStartTracing_;
 	CButton btSaveTraceBuffers_;
@@ -242,6 +247,7 @@ private:
 	afx_msg void NotesSelectAll();
 	afx_msg void NotesPaste();
 	afx_msg void OnActivate(UINT nState, CWnd* pWndOther, BOOL bMinimized);
+	afx_msg void OnTimer(UINT_PTR nIDEvent);
 public:
 	afx_msg void OnBnClickedGPUtracing();
 };
