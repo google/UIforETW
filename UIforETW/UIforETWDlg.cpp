@@ -825,6 +825,7 @@ void CUIforETWDlg::StopTracingAndMaybeRecord(bool bSaveTrace)
 		ChildProcess child(GetXperfPath());
 		if (bSaveTrace && tracingMode_ == kTracingToMemory)
 		{
+			ETWMark("Flushing trace buffers to disk.");
 			// If we are in memory tracing mode then don't actually stop tracing,
 			// just flush the buffers to disk.
 			std::wstring args = L" -flush " + GetKernelLogger() + L" -f \"" + GetKernelFile() + L"\" -flush UIforETWSession -f \"" + GetUserFile() + L"\"";
@@ -832,6 +833,8 @@ void CUIforETWDlg::StopTracingAndMaybeRecord(bool bSaveTrace)
 		}
 		else
 		{
+			if (bSaveTrace)
+				ETWMark("Stopping tracing.");
 			if (tracingMode_ == kHeapTracingToFile)
 				child.Run(bShowCommands_, L"xperf.exe -stop xperfHeapSession -stop UIforETWSession -stop " + GetKernelLogger());
 			else
