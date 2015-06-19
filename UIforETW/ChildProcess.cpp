@@ -128,11 +128,16 @@ bool ChildProcess::Run(bool showCommand, std::wstring args)
 	if (!DuplicateHandle(GetCurrentProcess(), hStdOutput_, GetCurrentProcess(),
 		&hStdError_, 0, TRUE, DUPLICATE_SAME_ACCESS))
 		return false;
+	// This is slightly dodgy since the pipe handle is write-only, but it keeps
+	// Python happy by giving it a valid hStdInput handle.
+	if (!DuplicateHandle(GetCurrentProcess(), hStdOutput_, GetCurrentProcess(),
+		&hStdInput_, 0, TRUE, DUPLICATE_SAME_ACCESS))
+		return false;
 
 	STARTUPINFO startupInfo = {};
 	startupInfo.hStdOutput = hStdOutput_;
 	startupInfo.hStdError = hStdError_;
-	startupInfo.hStdInput = INVALID_HANDLE_VALUE;
+	startupInfo.hStdInput = hStdInput_;
 	startupInfo.dwFlags = STARTF_USESTDHANDLES;
 
 	PROCESS_INFORMATION processInfo = {};
@@ -195,7 +200,7 @@ void ChildProcess::WaitForCompletion(bool printOutput)
 		WaitForSingleObject(hProcess_, INFINITE);
 	}
 
-	// Once the process is finished we have to close the stderr/stdout
+	// Once the process is finished we have to close the stderr/stdout/stdin
 	// handles so that the listener thread will exit. We also have to
 	// close these if the process never started.
 	if (hStdError_ != INVALID_HANDLE_VALUE)
@@ -207,6 +212,11 @@ void ChildProcess::WaitForCompletion(bool printOutput)
 	{
 		CloseHandle(hStdOutput_);
 		hStdOutput_ = INVALID_HANDLE_VALUE;
+	}
+	if (hStdInput_ != INVALID_HANDLE_VALUE)
+	{
+		CloseHandle(hStdInput_);
+		hStdInput_ = INVALID_HANDLE_VALUE;
 	}
 
 	// Wait for the listener thread to exit.

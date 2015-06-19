@@ -69,6 +69,7 @@ private:
 	// Output handles for the child process -- connected to the pipe.
 	HANDLE hStdOutput_ = INVALID_HANDLE_VALUE;
 	HANDLE hStdError_ = INVALID_HANDLE_VALUE;
+	HANDLE hStdInput_ = INVALID_HANDLE_VALUE;
 
 	// Pipe to read from, and the handle to the pipe reading thread.
 	HANDLE hPipe_ = INVALID_HANDLE_VALUE;

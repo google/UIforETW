@@ -103,11 +103,8 @@ def main():
   command = 'xperf -i "%s" -tle -tti -a symcache -dbgid' % tracename
   print("> %s" % command)
   found_uncached = False
-  #raw_command_output = subprocess.check_output(command)
-  #command_output = str(raw_command_output).splitlines()
-  # os.popen() is deprecated, but it *works*. Using subprocess leads to
-  # "WindowsError: [Error 6] The handle is invalid" when running this script.
-  command_output = os.popen(command).readlines()
+  raw_command_output = subprocess.check_output(command, stderr=subprocess.STDOUT)
+  command_output = str(raw_command_output).splitlines()
 
   for line in command_output:
     dllMatch = None
