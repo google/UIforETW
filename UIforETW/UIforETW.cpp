@@ -17,6 +17,7 @@ limitations under the License.
 #include "stdafx.h"
 #include "UIforETW.h"
 #include "UIforETWDlg.h"
+#include "Utility.h"
 #include <exception>
 
 #ifdef _DEBUG
@@ -160,8 +161,7 @@ CUIforETWApp::CUIforETWApp()
 	// support Restart Manager
 	m_dwRestartManagerSupportFlags = AFX_RESTART_MANAGER_SUPPORT_RESTART;
 
-	// TODO: add construction code here,
-	// Place all significant initialization in InitInstance
+	SetCurrentThreadName("Main thread");
 }
 
 
