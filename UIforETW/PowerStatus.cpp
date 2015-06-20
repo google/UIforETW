@@ -21,6 +21,7 @@ limitations under the License.
 
 #include "PowerStatus.h"
 #include <ETWProviders\etwprof.h>
+#include "Utility.h"
 
 #include <devguid.h>
 #include <Setupapi.h>
@@ -232,6 +233,8 @@ void CPowerStatusMonitor::SampleBatteryStat()
 
 DWORD __stdcall CPowerStatusMonitor::StaticBatteryMonitorThread(LPVOID param)
 {
+	SetCurrentThreadName("Power monitor thread");
+
 	CPowerStatusMonitor* pThis = reinterpret_cast<CPowerStatusMonitor*>(param);
 	pThis->BatteryMonitorThread();
 	return 0;

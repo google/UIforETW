@@ -106,3 +106,5 @@ private:
 };
 
 std::wstring GetEXEBuildTime();
+
+void SetCurrentThreadName(char* threadName);

@@ -16,6 +16,7 @@ limitations under the License.
 
 #include "stdafx.h"
 #include "DirectoryMonitor.h"
+#include "Utility.h"
 
 DirectoryMonitor::DirectoryMonitor(CWnd* pMainWindow)
 	: mainWindow_(pMainWindow)
@@ -26,6 +27,7 @@ DirectoryMonitor::DirectoryMonitor(CWnd* pMainWindow)
 // whenever anything changes. That's it. All UI work is done in the main thread.
 DWORD WINAPI DirectoryMonitor::DirectoryMonitorThreadStatic(LPVOID pVoidThis)
 {
+	SetCurrentThreadName("Directory monitor thread");
 	DirectoryMonitor* pThis = static_cast<DirectoryMonitor*>(pVoidThis);
 	return pThis->DirectoryMonitorThread();
 }

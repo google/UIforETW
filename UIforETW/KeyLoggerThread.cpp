@@ -16,6 +16,7 @@ limitations under the License.
 
 #include "stdafx.h"
 #include "KeyLoggerThread.h"
+#include "Utility.h"
 #include <ETWProviders\etwprof.h>
 #include <atomic>
 
@@ -191,6 +192,8 @@ LRESULT CALLBACK LowLevelMouseHook(int nCode, WPARAM wParam, LPARAM lParam)
 
 DWORD __stdcall InputThread(LPVOID)
 {
+	SetCurrentThreadName("Input logging thread");
+
 	// When UIforETW is halted in a debugger the keyboard and mouse hooks cannot respond
 	// in a timely manner. This means that each bit of user input has to timeout, which
 	// makes debugging painful - the timeout appears to be about ten seconds.
