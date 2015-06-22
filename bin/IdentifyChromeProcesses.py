@@ -48,7 +48,7 @@ def main():
           type = match.groups()[0]
         pid = int(pidRe.match(line).groups()[0])
         pidsByType = pidsByPath.get(exePath, {})
-        pidList = pidsByType.get(type, [])
+        pidList = list(pidsByType.get(type, []))
         pidList.append(pid)
         pidsByType[type] = pidList
         pidsByPath[exePath] = pidsByType
@@ -58,7 +58,7 @@ def main():
     if len(pidsByPath.keys()) > 1:
       print("%s\r" % exePath)
     pidsByType = pidsByPath[exePath]
-    keys = pidsByType.keys()
+    keys = list(pidsByType.keys())
     keys.sort()
     # Note the importance of printing the '\r' so that the
     # output will be compatible with Windows edit controls.
