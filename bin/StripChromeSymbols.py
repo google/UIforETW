@@ -100,6 +100,10 @@ def main():
   # to stop xperf from using -- rename them from .pdb to .pdbx
   local_symbol_files = []
 
+  #-tle = tolerate lost events
+  #-tti = tolerate time ivnersions
+  #-a symcache = show image and symbol identification
+  #-dbgid = show symbol identification information
   command = 'xperf -i "%s" -tle -tti -a symcache -dbgid' % tracename
   print("> %s" % command)
   found_uncached = False
@@ -170,6 +174,8 @@ def main():
           print("Hit exception while renaming %s to %s. Continuing.\n%s" % (local_pdb, temp_name, e))
         else:
           renames.append((local_pdb, temp_name))
+
+      #-build = build the symcache store for this trace
       gen_command = 'xperf -i "%s" -symbols -tle -tti -a symcache -build' % tracename
       print("> %s" % gen_command)
       for line in os.popen(gen_command).readlines():
