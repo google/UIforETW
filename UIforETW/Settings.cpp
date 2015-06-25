@@ -20,6 +20,32 @@ limitations under the License.
 #include "Utility.h"
 #include "afxdialogex.h"
 
+/*
+When doing Chrome profilng it is possible to ask various Chrome tracing
+categories to emit ETW events. The filtered_event_group_names array
+documents what categories map to what flag/keyword values.
+
+The table below is subject to change, but probably not very frequently.
+*/
+
+// Copied from Chrome's trace_event_etw_export_win.cc (future version)
+const wchar_t* const filtered_event_group_names[] =
+{
+	L"benchmark",                                       // 0x1
+	L"blink",                                           // 0x2
+	L"browser",                                         // 0x4
+	L"cc",                                              // 0x8
+	L"evdev",                                           // 0x10
+	L"gpu",                                             // 0x20
+	L"input",                                           // 0x40
+	L"netlog",                                          // 0x80
+	L"renderer.scheduler",                              // 0x100
+	L"toplevel",                                        // 0x200
+	L"v8",                                              // 0x400
+	L"disabled-by-default-cc.debug",                    // 0x800
+	L"disabled-by-default-cc.debug.picture",            // 0x1000
+	L"disabled-by-default-toplevel.flow",               // 0x2000
+};
 
 // CSettings dialog
 
@@ -51,6 +77,7 @@ void CSettings::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_CHROMEDLLPATH, btChromeDllPath_);
 	DDX_Control(pDX, IDC_WSMONITOREDPROCESSES, btWSMonitoredProcesses_);
 	DDX_Control(pDX, IDC_VIRTUALALLOCSTACKS, btVirtualAllocStacks_);
+	DDX_Control(pDX, IDC_CHROME_CATEGORIES, btChromeCategories_);
 
 	CDialogEx::DoDataExchange(pDX);
 }
@@ -118,6 +145,15 @@ BOOL CSettings::OnInitDialog()
 					L"traces instead of just heap traces.");
 	}
 
+	btChromeCategories_.SetCheckStyle(BS_AUTOCHECKBOX);
+	int index = 0;
+	for (auto category : filtered_event_group_names)
+	{
+		btChromeCategories_.AddString(category);
+		btChromeCategories_.SetCheck(index, (chromeKeywords_ & (1LL << index)) != 0);
+		++index;
+	}
+
 	return TRUE;  // return TRUE  unless you set the focus to a control
 }
 
@@ -126,6 +162,12 @@ void CSettings::OnOK()
 	heapTracingExes_ = GetEditControlText(btHeapTracingExe_);
 	chromeDllPath_ = GetEditControlText(btChromeDllPath_);
 	WSMonitoredProcesses_ = GetEditControlText(btWSMonitoredProcesses_);
+	chromeKeywords_ = 0;
+	for (int index = 0; index < ARRAYSIZE(filtered_event_group_names); ++index)
+	{
+		if (btChromeCategories_.GetCheck(index))
+			chromeKeywords_ |= 1LL << index;
+	}
 	CDialog::OnOK();
 }
 

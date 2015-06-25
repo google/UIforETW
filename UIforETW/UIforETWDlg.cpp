@@ -716,6 +716,10 @@ void CUIforETWDlg::OnBnClickedStarttracing()
 	if (winver <= kWindowsVersionVista)
 		userProviders = L"Microsoft-Windows-LUA"; // Because Microsoft-Windows-Win32k doesn't work on Vista.
 	userProviders += L"+Multi-MAIN+Multi-FrameRate+Multi-Input+Multi-Worker";
+	/*
+	if (bChromeDeveloper_)
+		userProviders += stringPrintf(L"+chrome:0x%llx", 0x8000000000000000 | chromeKeywords_);
+	*/
 
 	// DWM providers can be helpful also. Uncomment to enable.
 	//userProviders += L"+Microsoft-Windows-Dwm-Dwm";
@@ -1348,6 +1352,7 @@ void CUIforETWDlg::OnBnClickedSettings()
 	dlgSettings.bAutoViewTraces_ = bAutoViewTraces_;
 	dlgSettings.bHeapStacks_ = bHeapStacks_;
 	dlgSettings.bVirtualAllocStacks_ = bVirtualAllocStacks_;
+	dlgSettings.chromeKeywords_ = chromeKeywords_;
 	if (dlgSettings.DoModal() == IDOK)
 	{
 		// If the heap tracing executable name has changed then clear and
@@ -1378,6 +1383,7 @@ void CUIforETWDlg::OnBnClickedSettings()
 		bAutoViewTraces_ = dlgSettings.bAutoViewTraces_;
 		bHeapStacks_ = dlgSettings.bHeapStacks_;
 		bVirtualAllocStacks_ = dlgSettings.bVirtualAllocStacks_;
+		chromeKeywords_ = dlgSettings.chromeKeywords_;
 	}
 }
 

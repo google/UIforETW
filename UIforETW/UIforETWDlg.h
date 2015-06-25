@@ -104,6 +104,9 @@ private:
 	std::wstring chromeDllPath_ = L"C:\\Temp\\";
 	void SetHeapTracing(bool forceOff);
 	bool bVirtualAllocStacks_ = false;
+	// ETW keywords, also known as flags, map to Chrome categories.
+	// Confused yet?
+	uint64_t chromeKeywords_ = 0;
 
 	std::vector<std::wstring> traces_;
 	CListBox btTraces_;

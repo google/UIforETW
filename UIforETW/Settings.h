@@ -17,6 +17,7 @@ limitations under the License.
 #pragma once
 
 #include <string>
+#include "afxwin.h"
 
 // CSettings dialog
 
@@ -39,6 +40,7 @@ public:
 	bool bAutoViewTraces_ = false;
 	bool bHeapStacks_ = false;
 	bool bVirtualAllocStacks_ = false;
+	uint64_t chromeKeywords_ = 0;
 
 protected:
 	CEdit btHeapTracingExe_;
@@ -55,6 +57,7 @@ protected:
 	CButton btAutoViewTraces_;
 	CButton btHeapStacks_;
 	CButton btVirtualAllocStacks_;
+	CCheckListBox btChromeCategories_;
 
 	CToolTipCtrl toolTip_;
 

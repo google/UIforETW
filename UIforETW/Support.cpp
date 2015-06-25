@@ -39,6 +39,12 @@ struct NameToRangedInt
 	int min, max;
 };
 
+struct NameToUInt64
+{
+	const wchar_t* pName;
+	uint64_t* pSetting;
+};
+
 struct NameToString
 {
 	const wchar_t* pName;
@@ -91,6 +97,28 @@ void CUIforETWDlg::TransferSettings(bool saving)
 			if (temp > m.max)
 				temp = m.max;
 			*m.pSetting = temp;
+		}
+	}
+
+	NameToUInt64 bigInts[] =
+	{
+		{ L"ChromeKeywords", &chromeKeywords_ },
+	};
+
+	for (auto& m : bigInts)
+	{
+		if (saving)
+		{
+			pApp->WriteProfileBinary(pSettings, m.pName, (LPBYTE)m.pSetting, sizeof(*m.pSetting));
+		}
+		else
+		{
+			LPBYTE temp = 0;
+			UINT byteCount = sizeof(temp);
+			pApp->GetProfileBinary(pSettings, m.pName, &temp, &byteCount);
+			if (byteCount == sizeof(temp))
+				*m.pSetting = *(uint64_t*)temp;
+			delete [] temp;
 		}
 	}
 
