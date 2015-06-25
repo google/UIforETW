@@ -505,8 +505,9 @@ void CUIforETWDlg::RegisterProviders()
 		child.Run(bShowCommands_, L"wevtutil.exe" + args);
 	}
 
-	// Register chrome.dll if the Chrome Developer option is set.
-	if (bChromeDeveloper_)
+	// Register chrome.dll if the Chrome Developer option is set and some chrome
+	// keywords are selected to be recorded..
+	if (bChromeDeveloper_ && chromeKeywords_ != 0)
 	{
 		std::wstring manifestPath = GetExeDir() + L"chrome_events_win.man";
 		std::wstring dllSuffix = L"chrome.dll";
@@ -716,10 +717,6 @@ void CUIforETWDlg::OnBnClickedStarttracing()
 	if (winver <= kWindowsVersionVista)
 		userProviders = L"Microsoft-Windows-LUA"; // Because Microsoft-Windows-Win32k doesn't work on Vista.
 	userProviders += L"+Multi-MAIN+Multi-FrameRate+Multi-Input+Multi-Worker";
-	/*
-	if (bChromeDeveloper_)
-		userProviders += stringPrintf(L"+chrome:0x%llx", 0x8000000000000000 | chromeKeywords_);
-	*/
 
 	// DWM providers can be helpful also. Uncomment to enable.
 	//userProviders += L"+Microsoft-Windows-Dwm-Dwm";
@@ -727,8 +724,11 @@ void CUIforETWDlg::OnBnClickedStarttracing()
 	// seem to work.
 	//userProviders += L"+Microsoft-Windows-Kernel-Processor-Power+Microsoft-Windows-Kernel-Power";
 
+	// If the Chrome providers were successfully registered and if the user has requested tracing
+	// some of Chrome's categories (keywords/flags) then add chrome:flags to the list of user
+	// providers to monitor. See https://codereview.chromium.org/1176243016 for details.
 	if (useChromeProviders_)
-		userProviders += L"+Chrome";
+		userProviders += stringPrintf(L"+chrome:0x%llx", 0x8000000000000000 | chromeKeywords_);
 
 	if (bGPUTracing_)
 	{

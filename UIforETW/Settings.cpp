@@ -26,10 +26,15 @@ categories to emit ETW events. The filtered_event_group_names array
 documents what categories map to what flag/keyword values.
 
 The table below is subject to change, but probably not very frequently.
+
+For more details see this Chrome change that added the initial version of the
+ETW event filtering:
+https://codereview.chromium.org/1176243016
 */
 
-// Copied from Chrome's trace_event_etw_export_win.cc (future version)
-const wchar_t* const filtered_event_group_names[] =
+// Copied from Chrome's trace_event_etw_export_win.cc. This file can be found by
+// searching for "f:trace_event_etw_export_win.cc" in https://code.google.com/p/chromium/codesearch#/.
+const PCWSTR filtered_event_group_names[] =
 {
 	L"benchmark",                                       // 0x1
 	L"blink",                                           // 0x2
@@ -46,6 +51,14 @@ const wchar_t* const filtered_event_group_names[] =
 	L"disabled-by-default-cc.debug.picture",            // 0x1000
 	L"disabled-by-default-toplevel.flow",               // 0x2000
 };
+
+// 1ULL << 61 and 1ULL << 62 are special values that indicate to Chrome to
+// enable all enabled-by-default and disabled-by-default categories
+// respectively.
+const PCWSTR other_events_group_name = L"All enabled-by-default events";  // 0x2000000000000000
+const PCWSTR disabled_other_events_group_name = L"All disabled-by-default events";  // 0x4000000000000000
+uint64_t other_events_keyword_bit = 1ULL << 61;
+uint64_t disabled_other_events_keyword_bit = 1ULL << 62;
 
 // CSettings dialog
 
@@ -145,6 +158,8 @@ BOOL CSettings::OnInitDialog()
 					L"traces instead of just heap traces.");
 	}
 
+	// Initialize the list of check boxes with all of the Chrome categories which
+	// we can enable individually.
 	btChromeCategories_.SetCheckStyle(BS_AUTOCHECKBOX);
 	int index = 0;
 	for (auto category : filtered_event_group_names)
@@ -153,6 +168,12 @@ BOOL CSettings::OnInitDialog()
 		btChromeCategories_.SetCheck(index, (chromeKeywords_ & (1LL << index)) != 0);
 		++index;
 	}
+	// Manually add the two special Chrome category options.
+	btChromeCategories_.AddString(other_events_group_name);
+	btChromeCategories_.SetCheck(index, (chromeKeywords_ & other_events_keyword_bit) != 0);
+	++index;
+	btChromeCategories_.AddString(disabled_other_events_group_name);
+	btChromeCategories_.SetCheck(index, (chromeKeywords_ & disabled_other_events_keyword_bit) != 0);
 
 	return TRUE;  // return TRUE  unless you set the focus to a control
 }
@@ -162,12 +183,22 @@ void CSettings::OnOK()
 	heapTracingExes_ = GetEditControlText(btHeapTracingExe_);
 	chromeDllPath_ = GetEditControlText(btChromeDllPath_);
 	WSMonitoredProcesses_ = GetEditControlText(btWSMonitoredProcesses_);
+
+	// Extract the Chrome categories settings and put the result in chromeKeywords_.
 	chromeKeywords_ = 0;
-	for (int index = 0; index < ARRAYSIZE(filtered_event_group_names); ++index)
+	int index = 0;
+	for (/**/; index < ARRAYSIZE(filtered_event_group_names); ++index)
 	{
 		if (btChromeCategories_.GetCheck(index))
 			chromeKeywords_ |= 1LL << index;
 	}
+	// Manually grab values for the two special Chrome category options
+	if (btChromeCategories_.GetCheck(index))
+		chromeKeywords_ |= other_events_keyword_bit;
+	++index;
+	if (btChromeCategories_.GetCheck(index))
+		chromeKeywords_ |= disabled_other_events_keyword_bit;
+
 	CDialog::OnOK();
 }
 
