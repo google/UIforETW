@@ -223,9 +223,9 @@ void CUIforETWDlg::SetSymbolPath()
 	if (bManageSymbolPath_ || !getenv("_NT_SYMBOL_PATH"))
 	{
 		bManageSymbolPath_ = true;
-		std::string symbolPath = "SRV*" + systemDrive_ + "symbols*http://msdl.microsoft.com/download/symbols";
+		std::string symbolPath = "SRV*" + systemDrive_ + "symbols*https://msdl.microsoft.com/download/symbols";
 		if (bChromeDeveloper_)
-			symbolPath = "SRV*" + systemDrive_ + "symbols*http://msdl.microsoft.com/download/symbols;SRV*" + systemDrive_ + "symbols*https://chromium-browser-symsrv.commondatastorage.googleapis.com";
+			symbolPath = "SRV*" + systemDrive_ + "symbols*https://msdl.microsoft.com/download/symbols;SRV*" + systemDrive_ + "symbols*https://chromium-browser-symsrv.commondatastorage.googleapis.com";
 		(void)_putenv(("_NT_SYMBOL_PATH=" + symbolPath).c_str());
 		outputPrintf(L"\nSetting _NT_SYMBOL_PATH to %s (Microsoft%s). "
 			L"Set _NT_SYMBOL_PATH yourself or toggle 'Chrome developer' if you want different defaults.\n",
