@@ -506,7 +506,7 @@ void CUIforETWDlg::RegisterProviders()
 	}
 
 	// Register chrome.dll if the Chrome Developer option is set and some chrome
-	// keywords are selected to be recorded..
+	// keywords are selected to be recorded.
 	if (bChromeDeveloper_ && chromeKeywords_ != 0)
 	{
 		std::wstring manifestPath = GetExeDir() + L"chrome_events_win.man";
