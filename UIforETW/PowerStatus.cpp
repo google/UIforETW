@@ -231,6 +231,27 @@ void CPowerStatusMonitor::SampleBatteryStat()
 	SetupDiDestroyDeviceInfoList(hdev);
 }
 
+// NTSTATUS definition copied from bcrypt.h.
+typedef _Return_type_success_(return >= 0) LONG NTSTATUS;
+// Other definitions copied from tribal knowledge on the Internet because
+// NtQueryTimerResolution is not officially documented.
+const NTSTATUS STATUS_SUCCESS = 0;
+extern "C" NTSYSAPI NTSTATUS NTAPI NtQueryTimerResolution(
+	OUT PULONG minimumResolution,
+	OUT PULONG maximumResolution,
+	OUT PULONG currentResolution);
+// Link to ntdll.lib to allow calling of NtQueryTimerResolution
+#pragma comment(lib, "ntdll")
+void CPowerStatusMonitor::SampleTimerState()
+{
+	ULONG minResolution, maxResolution, curResolution;
+	NTSTATUS status = NtQueryTimerResolution(&minResolution, &maxResolution, &curResolution);
+	if (status == STATUS_SUCCESS) {
+		// Convert from 100 ns (0.1 microsecond) units to milliseconds.
+		ETWMarkTimerInterval(curResolution * 1e-4);
+	}
+}
+
 DWORD __stdcall CPowerStatusMonitor::StaticBatteryMonitorThread(LPVOID param)
 {
 	SetCurrentThreadName("Power monitor thread");
@@ -251,6 +272,7 @@ void CPowerStatusMonitor::BatteryMonitorThread()
 
 		SampleBatteryStat();
 		SampleCPUPowerState();
+		SampleTimerState();
 	}
 }
 

@@ -129,6 +129,9 @@ Adjust that to match your games actual install path.
             <data inType="win:Double" name="Temp (C)"/>
             <data inType="win:Double" name="Max temp (C)"/>
           </template>
+          <template tid="T_Interval">
+            <data inType="win:Double" name="Interval (ms)"/>
+          </template>
         </templates>
         <keywords>
           <keyword name="HighFrequency" mask="0x2" />
@@ -149,6 +152,7 @@ Adjust that to match your games actual install path.
           <task name="FrequencyStatus" symbol="FrequencyStatus_Task" value="5" eventGUID="{0A875F88-5FFE-4BC7-9B46-E4FA87754610}"/>
           <task name="PowerStatus" symbol="PowerStatus_Task" value="6" eventGUID="{484C71EE-2A86-466C-88AB-EB7DA15D6E86}"/>
           <task name="TempStatus" symbol="TempStatus_Task" value="7" eventGUID="{D94A8004-28EF-467E-98E2-12B00E3DC1EE}"/>
+          <task name="TimerStatus" symbol="TimerStatus_Task" value="8" eventGUID="{F8B8947D-1201-4674-95A5-E1FC60AD92E1}"/>
         </tasks>
         <events>
           <event symbol="Start" template="T_Start" value="100" task="Block" opcode="Begin" keywords="NormalFrequency" />
@@ -164,6 +168,7 @@ Adjust that to match your games actual install path.
           <event symbol="MarkCPUFrequency" template="T_Frequency" value="110" task="FrequencyStatus" opcode="Information" keywords="NormalFrequency" />
           <event symbol="MarkCPUPower" template="T_Power" value="111" task="PowerStatus" opcode="Information" keywords="NormalFrequency" />
           <event symbol="MarkCPUTemp" template="T_Temp" value="112" task="TempStatus" opcode="Information" keywords="NormalFrequency" />
+          <event symbol="MarkTimerInterval" template="T_Interval" value="113" task="TimerStatus" opcode="Information" keywords="NormalFrequency" />
         </events>
       </provider>
 

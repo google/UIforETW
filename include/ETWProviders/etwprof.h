@@ -66,6 +66,7 @@ PLATFORM_INTERFACE void __cdecl ETWMarkBatteryStatus(_In_z_ PCSTR powerState, fl
 PLATFORM_INTERFACE void __cdecl ETWMarkCPUFrequency(_In_z_ PCWSTR MSRName, double frequencyMHz);
 PLATFORM_INTERFACE void __cdecl ETWMarkCPUPower(_In_z_ PCWSTR MSRName, double powerW, double energymWh);
 PLATFORM_INTERFACE void __cdecl ETWMarkCPUTemp(_In_z_ PCWSTR MSRName, double tempC, double maxTempC);
+PLATFORM_INTERFACE void __cdecl ETWMarkTimerInterval(double intervalMs);
 
 // Insert a begin event to mark the start of some work. The return value is a 64-bit
 // time stamp which should be passed to the corresponding ETWEnd function.

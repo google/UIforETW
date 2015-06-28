@@ -238,6 +238,11 @@ PLATFORM_INTERFACE void ETWMarkCPUTemp(_In_z_ PCWSTR MSRName, double tempC, doub
 	EventWriteMarkCPUTemp(MSRName, tempC, maxTempC);
 }
 
+PLATFORM_INTERFACE void ETWMarkTimerInterval(double intervalMs)
+{
+	EventWriteMarkTimerInterval(intervalMs);
+}
+
 // Track the depth of ETW Begin/End pairs. This needs to be per-thread
 // if we start emitting marks on multiple threads. Using __declspec(thread)
 // has some problems on Windows XP, but since these ETW functions only work

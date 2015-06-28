@@ -37,6 +37,7 @@ private:
 
 	void SampleBatteryStat();
 	void SampleCPUPowerState();
+	void SampleTimerState();
 
 	HANDLE hThread_;
 	HANDLE hExitEvent_;
