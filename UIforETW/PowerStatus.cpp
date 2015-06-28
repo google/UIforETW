@@ -252,16 +252,16 @@ void CPowerStatusMonitor::SampleTimerState()
 	}
 }
 
-DWORD __stdcall CPowerStatusMonitor::StaticBatteryMonitorThread(LPVOID param)
+DWORD __stdcall CPowerStatusMonitor::StaticPowerMonitorThread(LPVOID param)
 {
 	SetCurrentThreadName("Power monitor thread");
 
 	CPowerStatusMonitor* pThis = reinterpret_cast<CPowerStatusMonitor*>(param);
-	pThis->BatteryMonitorThread();
+	pThis->PowerMonitorThread();
 	return 0;
 }
 
-void CPowerStatusMonitor::BatteryMonitorThread()
+void CPowerStatusMonitor::PowerMonitorThread()
 {
 
 	for (;;)
@@ -307,8 +307,7 @@ CPowerStatusMonitor::CPowerStatusMonitor()
 	}
 
 	hExitEvent_ = CreateEvent(nullptr, FALSE, FALSE, nullptr);
-	DWORD threadID;
-	hThread_ = CreateThread(NULL, 0, StaticBatteryMonitorThread, this, 0, &threadID);
+	hThread_ = CreateThread(NULL, 0, StaticPowerMonitorThread, this, 0, nullptr);
 }
 
 CPowerStatusMonitor::~CPowerStatusMonitor()

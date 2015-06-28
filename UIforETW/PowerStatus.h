@@ -32,8 +32,8 @@ public:
 	~CPowerStatusMonitor();
 
 private:
-	static DWORD __stdcall StaticBatteryMonitorThread(LPVOID);
-	void BatteryMonitorThread();
+	static DWORD __stdcall StaticPowerMonitorThread(LPVOID);
+	void PowerMonitorThread();
 
 	void SampleBatteryStat();
 	void SampleCPUPowerState();
