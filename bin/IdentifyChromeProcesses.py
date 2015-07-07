@@ -53,8 +53,30 @@ def main():
         pidsByType[type] = pidList
         pidsByPath[exePath] = pidsByType
 
+  # Sometimes Chrome is launched with a relative path and then it launches
+  # child processes with an absolute path. This leads to two 'different'
+  # browser instances being detected. As an example one can easily end up with
+  # one at r".\out\Release\chrome.exe" and the other at
+  # r"D:\src\chromium2\src\out\Release\chrome.exe". This loop attempts to
+  # detect this and fix it up. It's not perfect, but it's better than nothing.
+  for exePath in pidsByPath.keys():
+    if exePath.startswith(".\\") and len(exePath) > len(r".\chrome.exe"):
+      # Strip off the leading period
+      subPath = exePath[1:]
+      for otherPath in pidsByPath.keys():
+        if otherPath.endswith(subPath):
+          # If the end paths match then move the contents of pidsByPath[exePath]
+          # over to pidsByPath[otherPath]
+          for key in pidsByPath[exePath]:
+            pidsByPath[otherPath][key] = pidsByPath[exePath][key]
+          pidsByPath[exePath] = {}
+          break
+
   print("Chrome PIDs by process type:\r")
   for exePath in pidsByPath.keys():
+    # Any paths with no entries in them should be ignored.
+    if len(pidsByPath[exePath]) == 0:
+      continue
     if len(pidsByPath.keys()) > 1:
       print("%s\r" % exePath)
     pidsByType = pidsByPath[exePath]
@@ -63,7 +85,7 @@ def main():
     # Note the importance of printing the '\r' so that the
     # output will be compatible with Windows edit controls.
     for type in keys:
-      print("%-10s : " % type, end="")
+      print("%-11s : " % type, end="")
       for pid in pidsByType[type]:
         print("%d " % pid, end="")
       print("\r")
