@@ -58,6 +58,7 @@
 #define IDC_VIRTUALALLOCSTACKS          1029
 #define IDC_CHROMEDLLPATH               1030
 #define IDC_BUILDDATE                   1031
+#define IDC_EXPENSIVEWS                 1031
 #define IDC_CHROME_CATEGORIES           1033
 #define ID_TRACES_OPENTRACEINWPA        32771
 #define ID_TRACES_DELETETRACE           32772

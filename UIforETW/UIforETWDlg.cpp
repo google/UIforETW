@@ -381,7 +381,7 @@ BOOL CUIforETWDlg::OnInitDialog()
 	monitorThread_.StartThread(&traceDir_);
 
 	// Configure the working set monitor.
-	workingSetThread_.SetProcessFilter(WSMonitoredProcesses_);
+	workingSetThread_.SetProcessFilter(WSMonitoredProcesses_, bExpensiveWSMonitoring_);
 
 	DisablePagingExecutive();
 
@@ -1348,6 +1348,7 @@ void CUIforETWDlg::OnBnClickedSettings()
 	dlgSettings.heapTracingExes_ = heapTracingExes_;
 	dlgSettings.chromeDllPath_ = chromeDllPath_;
 	dlgSettings.WSMonitoredProcesses_ = WSMonitoredProcesses_;
+	dlgSettings.bExpensiveWSMonitoring_ = bExpensiveWSMonitoring_;
 	dlgSettings.bChromeDeveloper_ = bChromeDeveloper_;
 	dlgSettings.bAutoViewTraces_ = bAutoViewTraces_;
 	dlgSettings.bHeapStacks_ = bHeapStacks_;
@@ -1378,8 +1379,11 @@ void CUIforETWDlg::OnBnClickedSettings()
 
 		// Copy over the remaining settings.
 		chromeDllPath_ = dlgSettings.chromeDllPath_;
+
 		WSMonitoredProcesses_ = dlgSettings.WSMonitoredProcesses_;
-		workingSetThread_.SetProcessFilter(WSMonitoredProcesses_);
+		bExpensiveWSMonitoring_ = dlgSettings.bExpensiveWSMonitoring_;
+		workingSetThread_.SetProcessFilter(WSMonitoredProcesses_, bExpensiveWSMonitoring_);
+
 		bAutoViewTraces_ = dlgSettings.bAutoViewTraces_;
 		bHeapStacks_ = dlgSettings.bHeapStacks_;
 		bVirtualAllocStacks_ = dlgSettings.bVirtualAllocStacks_;

@@ -36,6 +36,7 @@ public:
 	std::wstring heapTracingExes_;
 	std::wstring chromeDllPath_;
 	std::wstring WSMonitoredProcesses_;
+	bool bExpensiveWSMonitoring_ = false;
 	bool bChromeDeveloper_ = false;
 	bool bAutoViewTraces_ = false;
 	bool bHeapStacks_ = false;
@@ -46,6 +47,7 @@ protected:
 	CEdit btHeapTracingExe_;
 	CMFCEditBrowseCtrl btChromeDllPath_;
 	CEdit btWSMonitoredProcesses_;
+	CButton btExpensiveWSMonitoring_;
 	CEdit btExtraProviders_;
 	CEdit btExtraStackwalks_;
 	CComboBox btBufferSizes_;
@@ -77,4 +79,5 @@ public:
 	afx_msg void OnBnClickedAutoviewtraces();
 	afx_msg void OnBnClickedHeapstacks();
 	afx_msg void OnBnClickedVirtualallocstacks();
+	afx_msg void OnBnClickedExpensivews();
 };

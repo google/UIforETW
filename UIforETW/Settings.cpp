@@ -89,6 +89,7 @@ void CSettings::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_HEAPSTACKS, btHeapStacks_);
 	DDX_Control(pDX, IDC_CHROMEDLLPATH, btChromeDllPath_);
 	DDX_Control(pDX, IDC_WSMONITOREDPROCESSES, btWSMonitoredProcesses_);
+	DDX_Control(pDX, IDC_EXPENSIVEWS, btExpensiveWSMonitoring_);
 	DDX_Control(pDX, IDC_VIRTUALALLOCSTACKS, btVirtualAllocStacks_);
 	DDX_Control(pDX, IDC_CHROME_CATEGORIES, btChromeCategories_);
 
@@ -103,6 +104,7 @@ BEGIN_MESSAGE_MAP(CSettings, CDialogEx)
 	ON_BN_CLICKED(IDC_AUTOVIEWTRACES, &CSettings::OnBnClickedAutoviewtraces)
 	ON_BN_CLICKED(IDC_HEAPSTACKS, &CSettings::OnBnClickedHeapstacks)
 	ON_BN_CLICKED(IDC_VIRTUALALLOCSTACKS, &CSettings::OnBnClickedVirtualallocstacks)
+	ON_BN_CLICKED(IDC_EXPENSIVEWS, &CSettings::OnBnClickedExpensivews)
 END_MESSAGE_MAP()
 
 BOOL CSettings::OnInitDialog()
@@ -126,6 +128,7 @@ BOOL CSettings::OnInitDialog()
 		btWSMonitoredProcesses_.EnableWindow(FALSE);
 	else
 		SetDlgItemText(IDC_WSMONITOREDPROCESSES, WSMonitoredProcesses_.c_str());
+	CheckDlgButton(IDC_EXPENSIVEWS, bExpensiveWSMonitoring_);
 
 	if (toolTip_.Create(this))
 	{
@@ -154,6 +157,10 @@ BOOL CSettings::OnInitDialog()
 		toolTip_.AddTool(&btWSMonitoredProcesses_, L"Names of processes whose working sets will be "
 					L"monitored, separated by semi-colons. An empty string means no monitoring. A '*' means "
 					L"that all processes will be monitored. For instance 'chrome.exe;notepad.exe'");
+		toolTip_.AddTool(&btExpensiveWSMonitoring_, L"Check this to have private working set and PSS "
+					L"(proportional set size) calculated for monitored processes. This may consume "
+					L"dozens or hundreds of ms each time. Without this checked only full working "
+					L"set is calculated, which is cheap.");
 		toolTip_.AddTool(&btVirtualAllocStacks_, L"Check this to record call stacks on VirtualAlloc on all "
 					L"traces instead of just heap traces.");
 	}
@@ -292,4 +299,10 @@ void CSettings::OnBnClickedHeapstacks()
 void CSettings::OnBnClickedVirtualallocstacks()
 {
 	bVirtualAllocStacks_ = !bVirtualAllocStacks_;
+}
+
+
+void CSettings::OnBnClickedExpensivews()
+{
+	bExpensiveWSMonitoring_ = !bExpensiveWSMonitoring_;
 }

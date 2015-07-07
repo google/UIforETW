@@ -29,7 +29,7 @@ public:
 	// the working set display should monitor. If this is the
 	// empty string then no processes will be monitored.
 	// If this is '*' then all processes will be monitored.
-	void SetProcessFilter(const std::wstring& processes);
+	void SetProcessFilter(const std::wstring& processes, bool expensiveWSMonitoring);
 private:
 	static DWORD __stdcall StaticWSMonitorThread(LPVOID);
 	void WSMonitorThread();
@@ -49,6 +49,8 @@ private:
 	std::vector<std::wstring> processes_;
 	// This variable is protected by processesLock_;
 	bool processAll_ = false;
+	// This variable is protected by processesLock_;
+	bool bExpensiveWSMonitoring_ = false;
 
 	// Incrementing counter that will be the same for all samples recorded
 	// at the same time.

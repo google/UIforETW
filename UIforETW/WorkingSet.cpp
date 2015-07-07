@@ -84,48 +84,63 @@ void CWorkingSetMonitor::SampleWorkingSets()
 			HANDLE hProcess =
 				OpenProcess(PROCESS_QUERY_INFORMATION |
 				PROCESS_VM_READ, FALSE, pid);
+			ULONG_PTR wsPages = 0;
+			uint64_t PSSPages = 0;
+			ULONG_PTR privateWSPages = 0;
 
 			if (NULL != hProcess)
 			{
 				bool success = true;
-				if (!QueryWorkingSet(hProcess, &buffer[0], static_cast<DWORD>(buffer.size())))
+				if (bExpensiveWSMonitoring_)
 				{
-					success = false;
-					// Increase the buffer size based on the NumberOfEntries returned,
-					// with some padding in case the working set is increasing.
-					if (GetLastError() == ERROR_BAD_LENGTH)
+					if (!QueryWorkingSet(hProcess, &buffer[0], static_cast<DWORD>(buffer.size())))
 					{
-						numEntries = pwsBuffer->NumberOfEntries + pwsBuffer->NumberOfEntries / 4;
-						buffer.resize(sizeof(PSAPI_WORKING_SET_INFORMATION) + numEntries * sizeof(PSAPI_WORKING_SET_BLOCK));
-						pwsBuffer = reinterpret_cast<PSAPI_WORKING_SET_INFORMATION*>(&buffer[0]);
-						if (QueryWorkingSet(hProcess, &buffer[0], static_cast<DWORD>(buffer.size())))
+						success = false;
+						// Increase the buffer size based on the NumberOfEntries returned,
+						// with some padding in case the working set is increasing.
+						if (GetLastError() == ERROR_BAD_LENGTH)
 						{
-							success = true;
+							numEntries = pwsBuffer->NumberOfEntries + pwsBuffer->NumberOfEntries / 4;
+							buffer.resize(sizeof(PSAPI_WORKING_SET_INFORMATION) + numEntries * sizeof(PSAPI_WORKING_SET_BLOCK));
+							pwsBuffer = reinterpret_cast<PSAPI_WORKING_SET_INFORMATION*>(&buffer[0]);
+							if (QueryWorkingSet(hProcess, &buffer[0], static_cast<DWORD>(buffer.size())))
+							{
+								success = true;
+							}
 						}
+					}
+
+					if (success)
+					{
+						wsPages = pwsBuffer->NumberOfEntries;
+						for (ULONG_PTR page = 0; page < wsPages; ++page)
+						{
+							if (!pwsBuffer->WorkingSetInfo[page].Shared)
+							{
+								++privateWSPages;
+								PSSPages += PSSMultiplier;
+							}
+							else
+							{
+								UIETWASSERT(pwsBuffer->WorkingSetInfo[page].ShareCount <= 7);
+								PSSPages += PSSMultiplier / pwsBuffer->WorkingSetInfo[page].ShareCount;
+							}
+						}
+						totalPSSPages += PSSPages;
+						totalPrivateWSPages += privateWSPages;
 					}
 				}
-
+				else
+				{
+					PROCESS_MEMORY_COUNTERS memoryCounters = {sizeof(memoryCounters)};
+					if (GetProcessMemoryInfo(hProcess, &memoryCounters, sizeof(memoryCounters)))
+					{
+						wsPages = memoryCounters.WorkingSetSize / 4096;
+					}
+				}
 				if (success)
 				{
-					ULONG_PTR wsPages = pwsBuffer->NumberOfEntries;
-					uint64_t PSSPages = 0;
-					ULONG_PTR privateWSPages = 0;
-					for (ULONG_PTR page = 0; page < wsPages; ++page)
-					{
-						if (!pwsBuffer->WorkingSetInfo[page].Shared)
-						{
-							++privateWSPages;
-							PSSPages += PSSMultiplier;
-						}
-						else
-						{
-							UIETWASSERT(pwsBuffer->WorkingSetInfo[page].ShareCount <= 7);
-							PSSPages += PSSMultiplier / pwsBuffer->WorkingSetInfo[page].ShareCount;
-						}
-					}
 					totalWSPages += wsPages;
-					totalPSSPages += PSSPages;
-					totalPrivateWSPages += privateWSPages;
 
 					wchar_t process[MAX_PATH + 100];
 					swprintf_s(process, L"%s (%u)", peInfo.szExeFile, pid);
@@ -180,7 +195,7 @@ CWorkingSetMonitor::~CWorkingSetMonitor()
 	CloseHandle(hExitEvent_);
 }
 
-void CWorkingSetMonitor::SetProcessFilter(const std::wstring& processes)
+void CWorkingSetMonitor::SetProcessFilter(const std::wstring& processes, bool bExpensiveWSMonitoring)
 {
 	// A 32-bit process on 64-bit Windows will not be able to read the
 	// full working set of 64-bit processes, so don't even try.
@@ -196,4 +211,5 @@ void CWorkingSetMonitor::SetProcessFilter(const std::wstring& processes)
 		processAll_ = false;
 		processes_ = split(processes, ';');
 	}
+	bExpensiveWSMonitoring_ = bExpensiveWSMonitoring;
 }

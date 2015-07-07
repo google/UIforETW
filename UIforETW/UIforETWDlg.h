@@ -117,6 +117,8 @@ private:
 	// This starts and stops a thread that monitors process working sets.
 	CWorkingSetMonitor workingSetThread_;
 	std::wstring WSMonitoredProcesses_;
+	bool bExpensiveWSMonitoring_ = false;
+
 	// This starts and stops a thread that monitors battery status.
 	CPowerStatusMonitor PowerMonitor_;
 
