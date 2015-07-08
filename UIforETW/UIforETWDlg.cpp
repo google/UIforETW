@@ -326,12 +326,8 @@ BOOL CUIforETWDlg::OnInitDialog()
 	std::wstring defaultTraceDir = documents + std::wstring(L"\\etwtraces\\");
 	traceDir_ = GetDirectory(L"etwtracedir", defaultTraceDir);
 
-	std::wstring wpaStartup = documents + std::wstring(L"\\WPA Files\\Startup.wpaProfile");
-	if (!PathFileExists(wpaStartup.c_str()))
-	{
-		// Auto-copy a startup profile if there isn't one.
-		CopyFile((GetExeDir() + L"Startup.wpaProfile").c_str(), wpaStartup.c_str(), TRUE);
-	}
+	// Copy over the startup profiles if they currently don't exist.
+	CopyStartupProfiles(GetExeDir(), false);
 
 	tempTraceDir_ = GetDirectory(L"temp", traceDir_);
 

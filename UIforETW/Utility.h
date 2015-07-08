@@ -108,3 +108,5 @@ private:
 std::wstring GetEXEBuildTime();
 
 void SetCurrentThreadName(char* threadName);
+
+void CopyStartupProfiles(const std::wstring& exeDir, bool force);

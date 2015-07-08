@@ -17,6 +17,7 @@ limitations under the License.
 #include "stdafx.h"
 #include "Utility.h"
 #include <fstream>
+#include <direct.h>
 
 std::vector<std::wstring> split(const std::wstring& s, char c)
 {
@@ -573,5 +574,62 @@ void SetCurrentThreadName(char* threadName)
 	}
 	__except (EXCEPTION_EXECUTE_HANDLER)
 	{
+	}
+}
+
+
+void CopyStartupProfiles(const std::wstring& exeDir, bool force)
+{
+	const wchar_t* fileName = L"\\Startup.wpaProfile";
+
+	// First copy the WPA 8.1 startup.wpaProfile file
+	wchar_t documents[MAX_PATH];
+	const BOOL getMyDocsResult = SHGetSpecialFolderPathW(NULL, documents, CSIDL_MYDOCUMENTS, TRUE);
+	UIETWASSERT(getMyDocsResult);
+	if (force)
+		outputPrintf(L"\n");
+	if (getMyDocsResult)
+	{
+		std::wstring source = exeDir + fileName;
+		std::wstring destDir = documents + std::wstring(L"\\WPA Files");
+		std::wstring dest = destDir + fileName;
+		if (force || !PathFileExists(dest.c_str()))
+		{
+			(void)_wmkdir(destDir.c_str());
+			if (CopyFile(source.c_str(), dest.c_str(), FALSE))
+			{
+				if (force)
+					outputPrintf(L"Copied Startup.wpaProfile to the WPA Files directory.\n");
+			}
+			else
+			{
+				if (force)
+					outputPrintf(L"Failed to copy Startup.wpaProfile to the WPA Files directory.\n");
+			}
+		}
+	}
+
+	// Then copy the WPA 10 startup.wpaProfile file
+#pragma warning(suppress : 4996)
+	const wchar_t* localAppData = _wgetenv(L"localappdata");
+	if (localAppData)
+	{
+		std::wstring source = exeDir + L"\\startup10.wpaProfile";
+		std::wstring destDir = std::wstring(localAppData) + L"\\Windows Performance Analyzer";
+		std::wstring dest = destDir + fileName;
+		if (force || !PathFileExists(dest.c_str()))
+		{
+			(void)_wmkdir(destDir.c_str());
+			if (CopyFile(source.c_str(), dest.c_str(), FALSE))
+			{
+				if (force)
+					outputPrintf(L"%s", L"Copied Startup.10wpaProfile to %localappdata%\\Windows Performance Analyzer\n");
+			}
+			else
+			{
+				if (force)
+					outputPrintf(L"%s", L"Failed to copy Startup.10wpaProfile to %localappdata%\\Windows Performance Analyzer\n");
+			}
+		}
 	}
 }
