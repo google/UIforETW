@@ -302,18 +302,25 @@ BOOL CUIforETWDlg::OnInitDialog()
 	wchar_t* progFilesx86Dir = nullptr;
 	VERIFY(SUCCEEDED(SHGetKnownFolderPath(FOLDERID_ProgramFilesX86, 0, NULL, &progFilesx86Dir)));
 	windowsKitsDir_ = progFilesx86Dir;
+	CoTaskMemFree(progFilesx86Dir);
+	progFilesx86Dir = nullptr;
+
 	windowsKitsDir_ += L"\\Windows Kits\\";
 	wptDir_ = windowsKitsDir_ + L"8.1\\Windows Performance Toolkit\\";
 	wpt10Dir_ = windowsKitsDir_ + L"10\\Windows Performance Toolkit\\";
+	if (!PathFileExists(GetXperfPath().c_str()))
+	{
+		std::wstring oldXperfPath = GetXperfPath();
+		wptDir_ = wpt10Dir_;
+		if (!PathFileExists(GetXperfPath().c_str()))
+		{
+			AfxMessageBox((oldXperfPath + L" and " + GetXperfPath() + L" do not exist. Please install WPT 8.1 or 10. Exiting.").c_str());
+			exit(10);
+		}
+	}
 	wpaPath_ = wptDir_ + L"wpa.exe";
 	gpuViewPath_ = wptDir_ + L"gpuview\\gpuview.exe";
 	wpa10Path_ = wpt10Dir_ + L"wpa.exe";
-	CoTaskMemFree(progFilesx86Dir);
-	if (!PathFileExists(GetXperfPath().c_str()))
-	{
-		AfxMessageBox((GetXperfPath() + L" does not exist. Please install WPT 8.1. Exiting.").c_str());
-		exit(10);
-	}
 
 	wchar_t documents[MAX_PATH];
 	const BOOL getMyDocsResult = SHGetSpecialFolderPath(*this, documents, CSIDL_MYDOCUMENTS, TRUE);
@@ -1403,7 +1410,20 @@ void CUIforETWDlg::OnContextMenu(CWnd* pWnd, CPoint point)
 		std::wstring tracePath;
 		if (selIndex >= 0)
 		{
-			pContextMenu->SetDefaultItem(ID_TRACES_OPENTRACEINWPA);
+			// Either 8.1, 10, or both must be installed or else UIforETW won't run.
+			if (wptDir_ == wpt10Dir_)
+			{
+				// If the two variables match then WPT8.1 is not installed, so disable it.
+				pContextMenu->SetDefaultItem(ID_TRACES_OPENTRACEIN10WPA);
+				pContextMenu->EnableMenuItem(ID_TRACES_OPENTRACEINWPA, MF_BYCOMMAND | MF_GRAYED);
+			}
+			else
+			{
+				// 8.1 is definitely installed, make it the default, but is 10 installed?
+				pContextMenu->SetDefaultItem(ID_TRACES_OPENTRACEINWPA);
+				if (!PathFileExists(wpa10Path_.c_str()))
+					pContextMenu->EnableMenuItem(ID_TRACES_OPENTRACEIN10WPA, MF_BYCOMMAND | MF_GRAYED);
+			}
 			traceFile = traces_[selIndex];
 			tracePath = GetTraceDir() + traceFile + L".etl";
 		}
@@ -1414,6 +1434,7 @@ void CUIforETWDlg::OnContextMenu(CWnd* pWnd, CPoint point)
 			int disableList[] =
 			{
 				ID_TRACES_OPENTRACEINWPA,
+				ID_TRACES_OPENTRACEIN10WPA,
 				ID_TRACES_OPENTRACEINGPUVIEW,
 				ID_TRACES_DELETETRACE,
 				ID_TRACES_RENAMETRACE,
