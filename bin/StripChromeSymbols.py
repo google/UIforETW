@@ -89,7 +89,11 @@ def main():
   tempdirs = []
 
   # Typical output looks like:
-  # "[RSDS] PdbSig: {be90dbc6-fe31-4842-9c72-7e2ea88f0adf}; Age: 1; Pdb: C:\b\build\slave\win\build\src\out\Release\syzygy\chrome.dll.pdb"
+  # "[RSDS] PdbSig: {0e7712be-af06-4421-884b-496f833c8ec1}; Age: 33; Pdb: D:\src\chromium2\src\out\Release\initial\chrome.dll.pdb"
+  # Note that this output implies a .symcache filename like this:
+  # chrome.dll-0e7712beaf064421884b496f833c8ec121v2.symcache
+  # In particular, note that the xperf action prints the age in decimal, but the
+  # symcache names use the age in hexadecimal!
   pdb_re = re.compile(r'"\[RSDS\] PdbSig: {(.*-.*-.*-.*-.*)}; Age: (.*); Pdb: (.*)"')
   pdb_cached_re = re.compile(r"Found .*file - placed it in (.*)")
 
@@ -123,8 +127,9 @@ def main():
       if match:
         guid, age, path = match.groups()
         guid = guid.replace("-", "")
+        age = int(age) # Prefer for printing as hex
         filepart = os.path.split(path)[1]
-        symcache_file = r"c:\symcache\%s-%s%sv2.symcache" % (dllMatch, guid, age)
+        symcache_file = r"c:\symcache\%s-%s%xv2.symcache" % (dllMatch, guid, age)
         if os.path.exists(symcache_file):
           #print("Symcache file %s already exists. Skipping." % symcache_file)
           continue
