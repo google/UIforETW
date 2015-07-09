@@ -28,6 +28,10 @@ def main():
   processTypeRe = re.compile(r".*.exe\" --type=([^ ]*) .*")
 
   tracename = sys.argv[1]
+  #-tle = tolerate lost events
+  #-tti = tolerate time ivnersions
+  #-a process = show process, thread, image information (see xperf -help processing)
+  #-withcmdline = show command line in process reports (see xperf -help process)
   command = 'xperf -i "%s" -tle -tti -a process -withcmdline' % tracename
   # Group all of the chrome.exe processes by exePath, then by type.
   pidsByPath = {}

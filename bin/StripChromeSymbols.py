@@ -102,8 +102,8 @@ def main():
 
   #-tle = tolerate lost events
   #-tti = tolerate time ivnersions
-  #-a symcache = show image and symbol identification
-  #-dbgid = show symbol identification information
+  #-a symcache = show image and symbol identification (see xperf -help processing)
+  #-dbgid = show symbol identification information (see xperf -help symcache)
   command = 'xperf -i "%s" -tle -tti -a symcache -dbgid' % tracename
   print("> %s" % command)
   found_uncached = False
@@ -133,10 +133,9 @@ def main():
         print("Found uncached reference to %s: %s - %s" % (filepart, guid, age, ))
         symcache_files.append(symcache_file)
         pdb_cache_path = None
-        retrieve_ommand = "%s %s %s %s" % (retrieve_path, guid, age, filepart)
-        print("> %s" % retrieve_ommand)
-        for subline in os.popen(retrieve_ommand):
-          print(subline.strip())
+        retrieve_command = "%s %s %s %s" % (retrieve_path, guid, age, filepart)
+        print("  > %s" % retrieve_command)
+        for subline in os.popen(retrieve_command):
           cache_match = pdb_cached_re.match(subline.strip())
           if cache_match:
             pdb_cache_path = cache_match.groups()[0]
@@ -149,11 +148,11 @@ def main():
           tempdir = tempfile.mkdtemp()
           tempdirs.append(tempdir)
           dest_path = os.path.join(tempdir, os.path.split(pdb_cache_path)[1])
-          print("Copying PDB to %s" % dest_path)
+          print("  Copying PDB to %s" % dest_path)
           for copyline in os.popen("%s %s %s -p" % (pdbcopy_path, pdb_cache_path, dest_path)):
-            print(copyline.strip())
+            print("  %s" % copyline.strip())
         else:
-          print("Failed to retrieve symbols. Check for RetrieveSymbols.exe and support files.")
+          print("  Failed to retrieve symbols.")
 
   if tempdirs:
     symbol_path = ";".join(tempdirs)
@@ -175,7 +174,7 @@ def main():
         else:
           renames.append((local_pdb, temp_name))
 
-      #-build = build the symcache store for this trace
+      #-build = build the symcache store for this trace (see xperf -help symcache)
       gen_command = 'xperf -i "%s" -symbols -tle -tti -a symcache -build' % tracename
       print("> %s" % gen_command)
       for line in os.popen(gen_command).readlines():
@@ -201,6 +200,8 @@ def main():
     # Delete the stripped PDB files
     if error:
       print("Retaining PDBs to allow rerunning xperf command-line.")
+      print("If re-running the command be sure to go:")
+      print("set _NT_SYMBOL_PATH=%s" % symbol_path)
     else:
       for directory in tempdirs:
         shutil.rmtree(directory, ignore_errors=True)
