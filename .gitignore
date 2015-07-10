@@ -23,3 +23,7 @@ present.txt
 
 # wpaexporter drops these
 *.csv
+
+#Created by package_etw.bat
+etwpackage/
+etwpackage.zip
