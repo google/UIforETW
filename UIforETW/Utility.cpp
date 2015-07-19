@@ -633,3 +633,24 @@ void CopyStartupProfiles(const std::wstring& exeDir, bool force)
 		}
 	}
 }
+
+void CloseValidHandle( _Pre_valid_ _Post_ptr_invalid_ HANDLE handle )
+{
+	const BOOL handleClosed = ::CloseHandle(handle);
+	if (handleClosed == 0)
+	{
+		std::terminate( );
+	}
+
+}
+
+
+void FreeLocalAlloc( _Post_ptr_invalid_ HLOCAL alloc )
+{
+	const HLOCAL nullIfFreed = ::LocalFree(alloc);
+	if (nullIfFreed != NULL)
+	{
+		std::terminate( );
+	}
+
+}

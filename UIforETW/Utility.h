@@ -110,3 +110,7 @@ std::wstring GetEXEBuildTime();
 void SetCurrentThreadName(char* threadName);
 
 void CopyStartupProfiles(const std::wstring& exeDir, bool force);
+
+void CloseValidHandle( _Pre_valid_ _Post_ptr_invalid_ HANDLE handle );
+
+void FreeLocalAlloc( _Post_ptr_invalid_ HLOCAL alloc );
