@@ -110,6 +110,7 @@
       <TreatWarningAsError>true</TreatWarningAsError>
       <AdditionalIncludeDirectories>..\include</AdditionalIncludeDirectories>
       <EnablePREfast>false</EnablePREfast>
+      <AdditionalOptions>/Gw</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -144,6 +145,7 @@
       <TreatWarningAsError>true</TreatWarningAsError>
       <AdditionalIncludeDirectories>..\include</AdditionalIncludeDirectories>
       <EnablePREfast>false</EnablePREfast>
+      <AdditionalOptions>/Gw</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -178,7 +180,7 @@
       <TreatWarningAsError>true</TreatWarningAsError>
       <AdditionalIncludeDirectories>..\include</AdditionalIncludeDirectories>
       <EnablePREfast>false</EnablePREfast>
-      <AdditionalOptions>/Gw</AdditionalOptions>
+      <AdditionalOptions>/Gw /Zc:strictStrings</AdditionalOptions>
       <StringPooling>true</StringPooling>
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
       <EnableParallelCodeGeneration>true</EnableParallelCodeGeneration>
@@ -221,7 +223,7 @@
       <TreatWarningAsError>true</TreatWarningAsError>
       <AdditionalIncludeDirectories>..\include</AdditionalIncludeDirectories>
       <EnablePREfast>false</EnablePREfast>
-      <AdditionalOptions>/Gw</AdditionalOptions>
+      <AdditionalOptions>/Gw /Zc:strictStrings</AdditionalOptions>
       <StringPooling>true</StringPooling>
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
       <EnableParallelCodeGeneration>true</EnableParallelCodeGeneration>

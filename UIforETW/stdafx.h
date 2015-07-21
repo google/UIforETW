@@ -24,6 +24,7 @@ limitations under the License.
 #endif
 
 #define _ATL_NO_AUTOMATIC_NAMESPACE 1
+#define _ATL_NO_HOSTING // Avoid mshtml.h and its string-constant abuse
 
 #include <afxwin.h>         // MFC core and standard components //THIS NEEDS TO BE THE VERY FIRST INCLUDE!
 
