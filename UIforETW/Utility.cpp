@@ -227,7 +227,9 @@ static bool ControlOK(HWND win)
 	// You have to check for visibility of the parent window because during dialog
 	// creation the parent window is invisible, which renders the child windows
 	// all invisible - not good.
-	if (!IsWindowVisible(win) && IsWindowVisible(GetParent(win)))
+	HWND parent = GetParent(win);
+	UIETWASSERT(parent);
+	if (!IsWindowVisible(win) && IsWindowVisible(parent))
 		return false;
 	return true;
 }
