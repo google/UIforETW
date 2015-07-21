@@ -561,9 +561,9 @@ typedef struct tagTHREADNAME_INFO
 } THREADNAME_INFO;
 #pragma pack(pop)
 
-void SetCurrentThreadName(char* threadName)
+void SetCurrentThreadName(PCSTR threadName)
 {
-	DWORD dwThreadID = GetCurrentThreadId();
+	const DWORD dwThreadID = GetCurrentThreadId();
 	THREADNAME_INFO info;
 	info.dwType = 0x1000;
 	info.szName = threadName;
