@@ -561,6 +561,14 @@ typedef struct tagTHREADNAME_INFO
 } THREADNAME_INFO;
 #pragma pack(pop)
 
+#pragma warning(push)
+#pragma warning(disable: 6320 6322)
+// These warnings rarely, if ever, point out a real problem. And,
+// they fire on lots of totally legitimate code, including Microsoft's
+// own SetThreadName sample code.
+// warning C6320 : Exception - filter expression is the constant EXCEPTION_EXECUTE_HANDLER.This might mask exceptions that were not intended to be handled.
+// warning C6322 : Empty _except block.
+
 void SetCurrentThreadName(PCSTR threadName)
 {
 	const DWORD dwThreadID = GetCurrentThreadId();
@@ -578,6 +586,7 @@ void SetCurrentThreadName(PCSTR threadName)
 	{
 	}
 }
+#pragma warning(pop)
 
 
 void CopyStartupProfiles(const std::wstring& exeDir, bool force)
