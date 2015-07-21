@@ -289,7 +289,8 @@ BOOL CUIforETWDlg::OnInitDialog()
 	}
 
 	wchar_t* windowsDir = nullptr;
-	ATLVERIFY(SUCCEEDED(SHGetKnownFolderPath(FOLDERID_Windows, 0, NULL, &windowsDir)));
+	if (!SUCCEEDED(SHGetKnownFolderPath(FOLDERID_Windows, 0, NULL, &windowsDir)))
+		std::terminate();
 	windowsDir_ = windowsDir;
 	windowsDir_ += '\\';
 	CoTaskMemFree(windowsDir);
@@ -300,7 +301,8 @@ BOOL CUIforETWDlg::OnInitDialog()
 	// The WPT 8.1 installer is always a 32-bit installer, so we look for it in
 	// ProgramFilesX86, on 32-bit and 64-bit operating systems.
 	wchar_t* progFilesx86Dir = nullptr;
-	VERIFY(SUCCEEDED(SHGetKnownFolderPath(FOLDERID_ProgramFilesX86, 0, NULL, &progFilesx86Dir)));
+	if (!SUCCEEDED(SHGetKnownFolderPath(FOLDERID_ProgramFilesX86, 0, NULL, &progFilesx86Dir)))
+		std::terminate();
 	windowsKitsDir_ = progFilesx86Dir;
 	CoTaskMemFree(progFilesx86Dir);
 	progFilesx86Dir = nullptr;
