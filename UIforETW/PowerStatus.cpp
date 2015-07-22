@@ -39,6 +39,126 @@ const int MSR_FUNC_POWER = 1;
 const int MSR_FUNC_TEMP = 2;
 const int MSR_FUNC_MAX_POWER = 3; /* ????? */
 
+namespace {
+
+	//SetupDiGetDeviceInterfaceDetail is not documented to modify pdid when
+	//called to get the required allocation size
+	//https://msdn.microsoft.com/en-us/library/windows/hardware/ff551120.aspx
+	DWORD deviceIFaceDetailDataByteSize( _In_ const HDEVINFO hdev, _In_ _Const_ SP_DEVICE_INTERFACE_DATA* const pdid )
+	{
+		DWORD bytesNeeded = 0;
+		const BOOL getDetailResult = SetupDiGetDeviceInterfaceDetail(hdev,
+										pdid,
+										0,
+										0,
+										&bytesNeeded,
+										0);
+
+		UIETWASSERT(!getDetailResult);
+		if (getDetailResult)
+		{
+			std::terminate( ); //Expected SetupDiGetDeviceInterfaceDetail failure!
+		}
+		return bytesNeeded;
+	}
+
+	void markETWEvent( const BATTERY_STATUS& bs, const BATTERY_INFORMATION& bi )
+	{
+		char powerState[100];
+		powerState[0] = 0;
+		if (bs.PowerState & BATTERY_CHARGING)
+		{
+			strcat_s(powerState, "Charging");
+		}
+		if (bs.PowerState & BATTERY_DISCHARGING)
+		{
+			strcat_s(powerState, "Discharging");
+		}
+		if (bs.PowerState & BATTERY_POWER_ON_LINE)
+		{
+			if (powerState[0])
+			{
+				strcat_s(powerState, ", on AC power");
+			}
+			else
+			{
+				strcat_s(powerState, "On AC power");
+			}
+		}
+
+		const float batPercentage = bs.Capacity * 100.f / bi.FullChargedCapacity;
+
+		char rate[100];
+		
+		if (bs.Rate == BATTERY_UNKNOWN_RATE)
+		{
+			sprintf_s(rate, "Unknown rate");
+		}
+		else if (bi.Capabilities & BATTERY_CAPACITY_RELATIVE)
+		{
+			sprintf_s(rate, "%ld (unknown units)", bs.Rate);
+		}
+		else
+		{
+			sprintf_s(rate, "%1.3f watts", bs.Rate / 1000.0f);
+		}
+
+		ETWMarkBatteryStatus(powerState, batPercentage, rate);
+		//outputPrintf(L"%S, %1.3f%%, %S\n", powerState, batPercentage, rate);
+	}
+
+	struct HDEVINFO_battery final {
+		HDEVINFO hdev;
+		HDEVINFO_battery( )
+		{
+			hdev = SetupDiGetClassDevs(&GUID_DEVCLASS_BATTERY,
+									   0,
+									   0,
+									   (DIGCF_PRESENT | DIGCF_DEVICEINTERFACE));
+		}
+		
+		_At_( this->hdev, _Post_ptr_invalid_ )
+		~HDEVINFO_battery( )
+		{
+			if (hdev == INVALID_HANDLE_VALUE)
+			{
+				return;
+			}
+			const BOOL destroyed = SetupDiDestroyDeviceInfoList( hdev );
+			if (!destroyed)
+			{
+				std::terminate( );
+			}
+		}
+	};
+
+	struct Battery final {
+		HANDLE hBattery;
+		Battery(PCTSTR DevicePath)
+		{
+			hBattery = CreateFile(DevicePath,
+								   (GENERIC_READ | GENERIC_WRITE),
+								   (FILE_SHARE_READ | FILE_SHARE_WRITE),
+								   NULL,
+								   OPEN_EXISTING,
+								   FILE_ATTRIBUTE_NORMAL,
+								   NULL);
+		}
+
+		_At_( this->hBattery, _Post_ptr_invalid_ )
+		~Battery( )
+		{
+			if (hBattery == INVALID_HANDLE_VALUE)
+			{
+				return;
+			}
+			CloseValidHandle( hBattery );
+
+		}
+	};
+
+} //namespace {
+
 void CPowerStatusMonitor::SampleCPUPowerState()
 {
 	if (!IntelEnergyLibInitialize || !GetNumMsrs || !GetMsrName || !GetMsrFunc ||
@@ -96,25 +216,20 @@ void CPowerStatusMonitor::SampleCPUPowerState()
 
 void CPowerStatusMonitor::SampleBatteryStat()
 {
-	HDEVINFO hdev = SetupDiGetClassDevs(&GUID_DEVCLASS_BATTERY,
-							0,
-							0,
-							DIGCF_PRESENT | DIGCF_DEVICEINTERFACE);
-	if (hdev == INVALID_HANDLE_VALUE)
+	HDEVINFO_battery hDev;
+	if (hDev.hdev == INVALID_HANDLE_VALUE)
+	{
 		return;
+	}
 
 	// Avoid infinite loops.
 	const int maxBatteries = 5;
 	for (int deviceNum = 0; deviceNum < maxBatteries; deviceNum++)
 	{
 		SP_DEVICE_INTERFACE_DATA did = { sizeof(did) };
-		const BOOL enumDeviceInterfacesResult =
-			SetupDiEnumDeviceInterfaces(hdev,
-										0,
-										&GUID_DEVCLASS_BATTERY,
-										deviceNum,
-										&did);
-		if (!enumDeviceInterfacesResult)
+
+		if(!SetupDiEnumDeviceInterfaces(hDev.hdev, 0, &GUID_DEVCLASS_BATTERY,
+										deviceNum, &did))
 		{
 			const DWORD lastErr = ::GetLastError( );
 			if (lastErr == ERROR_NO_MORE_ITEMS)
@@ -124,63 +239,30 @@ void CPowerStatusMonitor::SampleBatteryStat()
 			continue;
 		}
 
-		DWORD bytesNeeded = 0;
-		const BOOL getDetailResult = SetupDiGetDeviceInterfaceDetail(hdev,
-										&did,
-										0,
-										0,
-										&bytesNeeded,
-										0);
-
-		if (getDetailResult)
-		{
-			throw std::logic_error("Expected SetupDiGetDeviceInterfaceDetail failure!");
-		}
+		const DWORD bytesNeeded = deviceIFaceDetailDataByteSize( hDev.hdev, &did );
 
 		if (GetLastError() != ERROR_INSUFFICIENT_BUFFER)
 		{
 			continue;
 		}
 
+		std::vector<char> detailDataMemory(bytesNeeded);
 
-		HLOCAL detailDataAlloc = LocalAlloc(LPTR, bytesNeeded);
-		if (detailDataAlloc == NULL)
-		{
-			std::terminate();
-		}
-
-		auto pdidd =
-			reinterpret_cast<PSP_DEVICE_INTERFACE_DETAIL_DATA const>(detailDataAlloc);
-		pdidd->cbSize = sizeof(*pdidd);
+		auto const pDeviceIfaceData = reinterpret_cast<PSP_DEVICE_INTERFACE_DETAIL_DATA>(detailDataMemory.data());
+		pDeviceIfaceData->cbSize = sizeof(*pDeviceIfaceData);
 		
-		const BOOL batteryFound = SetupDiGetDeviceInterfaceDetail(hdev,
-											&did,
-											pdidd,
-											bytesNeeded,
-											&bytesNeeded,
-											0);
-		if (!batteryFound)
+		if (!SetupDiGetDeviceInterfaceDetail(hDev.hdev, &did, pDeviceIfaceData,
+											bytesNeeded, NULL, 0))
 		{
-			FreeLocalAlloc(detailDataAlloc);//use `detailDataAlloc` to suppress
-			                                //analyze warning about using
-			                                //`pdidd` from failed
-			                                //`SetupDiGetDeviceInterfaceDetail`
-			                                //call...
+			//Battery NOT found
 			continue;
 		}
 
 		// Found a battery. Query it.
-		HANDLE hBattery = CreateFile(pdidd->DevicePath,
-						GENERIC_READ | GENERIC_WRITE,
-						FILE_SHARE_READ | FILE_SHARE_WRITE,
-						NULL,
-						OPEN_EXISTING,
-						FILE_ATTRIBUTE_NORMAL,
-						NULL);
+		Battery hBat( pDeviceIfaceData->DevicePath );
 
-		if (hBattery == INVALID_HANDLE_VALUE)
+		if (hBat.hBattery == INVALID_HANDLE_VALUE)
 		{
-			FreeLocalAlloc(pdidd);
 			continue;
 		}
 
@@ -189,19 +271,15 @@ void CPowerStatusMonitor::SampleBatteryStat()
 		DWORD dwWait = 0;
 		DWORD dwOut;
 
-		const BOOL tagQueried = DeviceIoControl(hBattery,
+		const BOOL tagQueried = DeviceIoControl(hBat.hBattery,
 												IOCTL_BATTERY_QUERY_TAG,
-												&dwWait,
-												sizeof(dwWait),
+												&dwWait, sizeof(dwWait),
 												&bqi.BatteryTag,
-												sizeof(bqi.BatteryTag),
-												&dwOut,
+												sizeof(bqi.BatteryTag), &dwOut,
 												NULL);
 
 		if (!(tagQueried && bqi.BatteryTag))
 		{
-			FreeLocalAlloc(pdidd);
-			CloseValidHandle(hBattery);
 			continue;
 		}
 
@@ -209,26 +287,15 @@ void CPowerStatusMonitor::SampleBatteryStat()
 		BATTERY_INFORMATION bi = {};
 		bqi.InformationLevel = BatteryInformation;
 		
-		const BOOL infoQueried = DeviceIoControl(hBattery,
-												 IOCTL_BATTERY_QUERY_INFORMATION,
-												 &bqi,
-												 sizeof(bqi),
-												 &bi,
-												 sizeof(bi),
-												 &dwOut,
-												 NULL);
-		if (!infoQueried)
+		if(!DeviceIoControl(hBat.hBattery, IOCTL_BATTERY_QUERY_INFORMATION,
+						   &bqi, sizeof(bqi), &bi, sizeof(bi), &dwOut, NULL))
 		{
-			FreeLocalAlloc(pdidd);
-			CloseValidHandle(hBattery);
 			continue;
 		}
 
 		// Only non-UPS system batteries count
 		if (!(bi.Capabilities & BATTERY_SYSTEM_BATTERY))
 		{
-			FreeLocalAlloc(pdidd);
-			CloseValidHandle(hBattery);
 			continue;
 		}
 
@@ -239,50 +306,14 @@ void CPowerStatusMonitor::SampleBatteryStat()
 
 		BATTERY_STATUS bs;
 		
-		const BOOL statusQueried = DeviceIoControl(hBattery,
-												   IOCTL_BATTERY_QUERY_STATUS,
-												   &bws,
-												   sizeof(bws),
-												   &bs,
-												   sizeof(bs),
-												   &dwOut,
-												   NULL);
-		if (!statusQueried)
+		if(!DeviceIoControl(hBat.hBattery, IOCTL_BATTERY_QUERY_STATUS,
+							&bws, sizeof(bws), &bs, sizeof(bs), &dwOut, NULL))
 		{
-			FreeLocalAlloc(pdidd);
-			CloseValidHandle(hBattery);
 			continue;
 		}
 
-		char powerState[100];
-		powerState[0] = 0;
-		if (bs.PowerState & BATTERY_CHARGING)
-			strcat_s(powerState, "Charging");
-		if (bs.PowerState & BATTERY_DISCHARGING)
-			strcat_s(powerState, "Discharging");
-		if (bs.PowerState & BATTERY_POWER_ON_LINE)
-		{
-			if (powerState[0])
-				strcat_s(powerState, ", on AC power");
-			else
-				strcat_s(powerState, "On AC power");
-		}
-
-		float batPercentage = bs.Capacity * 100.f / bi.FullChargedCapacity;
-
-		char rate[100];
-		if (bs.Rate == BATTERY_UNKNOWN_RATE)
-			sprintf_s(rate, "Unknown rate");
-		else if (bi.Capabilities & BATTERY_CAPACITY_RELATIVE)
-			sprintf_s(rate, "%ld (unknown units)", bs.Rate);
-		else
-			sprintf_s(rate, "%1.3f watts", bs.Rate / 1000.0f);
-		ETWMarkBatteryStatus(powerState, batPercentage, rate);
-		//outputPrintf(L"%S, %1.3f%%, %S\n", powerState, batPercentage, rate);
-		CloseValidHandle(hBattery);
-		FreeLocalAlloc(pdidd);
+		markETWEvent( bs, bi );
 	}
-	SetupDiDestroyDeviceInfoList(hdev);
 }
 
 // NTSTATUS definition copied from bcrypt.h.
