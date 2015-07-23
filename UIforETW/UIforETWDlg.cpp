@@ -928,7 +928,7 @@ void CUIforETWDlg::StopTracingAndMaybeRecord(bool bSaveTrace)
 			else
 			{
 				outputPrintf(L"Merging the trace took %1.1fs, which is unusually long. This is probably "
-					L"be because renaming of amcache.hve failed. Please try metatrace.bat "
+					L"because renaming of amcache.hve failed. Please try metatrace.bat "
 					L"and share this on "
 					L"https://groups.google.com/forum/#!forum/uiforetw\n", mergeTime);
 			}
