@@ -331,6 +331,9 @@ BOOL CUIforETWDlg::OnInitDialog()
 	wpaPath_ = wptDir_ + L"wpa.exe";
 	gpuViewPath_ = wptDir_ + L"gpuview\\gpuview.exe";
 	wpa10Path_ = wpt10Dir_ + L"wpa.exe";
+	wpaDefaultPath_ = wpaPath_;
+	if (PathFileExists(wpa10Path_.c_str()))
+		wpaDefaultPath_ = wpa10Path_;
 
 	wchar_t documents[MAX_PATH];
 	const BOOL getMyDocsResult = SHGetSpecialFolderPath(*this, documents, CSIDL_MYDOCUMENTS, TRUE);
@@ -911,7 +914,7 @@ void CUIforETWDlg::StopTracingAndMaybeRecord(bool bSaveTrace)
 		PreprocessTrace(traceFilename);
 
 		if (bAutoViewTraces_)
-			LaunchTraceViewer(traceFilename, wpaPath_);
+			LaunchTraceViewer(traceFilename, wpaDefaultPath_);
 		// Record the name so that it gets selected.
 		lastTraceFilename_ = CrackFilePart(traceFilename);
 
@@ -1177,7 +1180,7 @@ void CUIforETWDlg::OnLbnDblclkTracelist()
 	if (selIndex < 0 || selIndex >= (int)traces_.size())
 		return;
 	std::wstring tracename = GetTraceDir() + traces_[selIndex] + L".etl";
-	LaunchTraceViewer(tracename, wpaPath_);
+	LaunchTraceViewer(tracename, wpaDefaultPath_);
 }
 
 void CUIforETWDlg::OnGetMinMaxInfo(MINMAXINFO* lpMMI)
@@ -1430,16 +1433,25 @@ void CUIforETWDlg::OnContextMenu(CWnd* pWnd, CPoint point)
 			// Either 8.1, 10, or both must be installed or else UIforETW won't run.
 			if (wptDir_ == wpt10Dir_)
 			{
-				// If the two variables match then WPT8.1 is not installed, so disable it.
+				// If the two variables match then WPT 8.1 is not installed, so disable it.
 				pContextMenu->SetDefaultItem(ID_TRACES_OPENTRACEIN10WPA);
 				pContextMenu->EnableMenuItem(ID_TRACES_OPENTRACEINWPA, MF_BYCOMMAND | MF_GRAYED);
 			}
 			else
 			{
-				// 8.1 is definitely installed, make it the default, but is 10 installed?
-				pContextMenu->SetDefaultItem(ID_TRACES_OPENTRACEINWPA);
-				if (!PathFileExists(wpa10Path_.c_str()))
+				// 8.1 is definitely installed, but is 10 installed?
+				if (PathFileExists(wpa10Path_.c_str()))
+				{
+					// If WPT 10 is installed then make it the default.
+					pContextMenu->SetDefaultItem(ID_TRACES_OPENTRACEIN10WPA);
+				}
+				else
+				{
+					// If WPT 10 is not installed then disable it and make WPT 8.1
+					// the default.
 					pContextMenu->EnableMenuItem(ID_TRACES_OPENTRACEIN10WPA, MF_BYCOMMAND | MF_GRAYED);
+					pContextMenu->SetDefaultItem(ID_TRACES_OPENTRACEINWPA);
+				}
 			}
 			traceFile = traces_[selIndex];
 			tracePath = GetTraceDir() + traceFile + L".etl";
