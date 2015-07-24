@@ -644,13 +644,3 @@ void CloseValidHandle( _Pre_valid_ _Post_ptr_invalid_ HANDLE handle )
 
 }
 
-
-void FreeLocalAlloc( _Post_ptr_invalid_ HLOCAL alloc )
-{
-	const HLOCAL nullIfFreed = ::LocalFree(alloc);
-	if (nullIfFreed != NULL)
-	{
-		std::terminate( );
-	}
-
-}
