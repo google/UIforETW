@@ -312,6 +312,14 @@ BOOL CUIforETWDlg::OnInitDialog()
 	wpt10Dir_ = windowsKitsDir_ + L"10\\Windows Performance Toolkit\\";
 	if (!PathFileExists(GetXperfPath().c_str()))
 	{
+		if (GetWindowsVersion() <= kWindowsVersion7)
+		{
+			// WPT 10 (at least the 10166 version) doesn't record image ID information
+			// on Windows 7 and below, so the Windows 8.1 version of WPT is needed.
+			AfxMessageBox((GetXperfPath() + L" does not exist. Windows 7 and below require that "
+				L"WPT 8.1 be installed.").c_str());
+			exit(10);
+		}
 		std::wstring oldXperfPath = GetXperfPath();
 		wptDir_ = wpt10Dir_;
 		if (!PathFileExists(GetXperfPath().c_str()))
@@ -856,7 +864,7 @@ void CUIforETWDlg::StopTracingAndMaybeRecord(bool bSaveTrace)
 		}
 	}
 	double saveTime = saveTimer.ElapsedSeconds();
-	if (bShowCommands_)
+	if (bShowCommands_ && bSaveTrace)
 		outputPrintf(L"Trace save took %1.1f s\n", saveTime);
 
 	double mergeTime = 0.0;
@@ -1029,13 +1037,20 @@ void CUIforETWDlg::OnBnClickedShowcommands()
 
 void CUIforETWDlg::SetSamplingSpeed()
 {
-	ChildProcess child(GetXperfPath());
+	std::wstring xperfPath = GetXperfPath();
+	if (GetWindowsVersion() >= kWindowsVersion10)
+	{
+		xperfPath = wpt10Dir_ + L"xperf.exe";
+		if (!PathFileExists(xperfPath.c_str()))
+		{
+			AfxMessageBox(L"Setting the sampling speed on Windows 10+ requires WPT 10, which is not installed.");
+			return;
+		}
+	}
+	ChildProcess child(xperfPath);
 	std::wstring profInt = bFastSampling_ ? L"1221" : L"9001";
 	std::wstring args = L" -setprofint " + profInt + L" cached";
 	child.Run(bShowCommands_, L"xperf.exe" + args);
-	if (child.GetExitCode())
-		outputPrintf(L"Note: Setting the sampling speed with the 8.1 version of WPT fails "
-					L"on Windows 10. The 10.0 version of WPT will correct this.\n");
 }
 
 void CUIforETWDlg::OnBnClickedFastsampling()
