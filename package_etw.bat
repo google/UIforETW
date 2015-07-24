@@ -45,6 +45,7 @@ echo >%destdir%\bin\UIforETW.exe
 echo >%destdir%\bin\UIforETW32.exe
 xcopy %UIforETW%\bin\UIforETWStatic_devrel32.exe %destdir%\bin\UIforETW32.exe /y
 xcopy %UIforETW%\bin\UIforETWStatic_devrel.exe %destdir%\bin\UIforETW.exe /y
+xcopy %destdir%\bin\UIforETW*.exe %~dp0bin /y
 
 python %UIforETW%make_zip_file.py %UIforETW%etwpackage.zip %destdir%
 
