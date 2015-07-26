@@ -48,12 +48,7 @@ namespace {
 	{
 		DWORD bytesNeeded = 0;
 		const BOOL getDetailResult = SetupDiGetDeviceInterfaceDetail(hdev,
-										pdid,
-										0,
-										0,
-										&bytesNeeded,
-										0);
-
+										pdid, 0, 0, &bytesNeeded, 0);
 		UIETWASSERT(!getDetailResult);
 		if (getDetailResult)
 		{
@@ -108,6 +103,8 @@ namespace {
 	}
 
 	struct HDEVINFO_battery final {
+		HDEVINFO_battery( const HDEVINFO_battery& ) = delete;
+		HDEVINFO_battery& operator=( const HDEVINFO_battery& ) = delete;
 		HDEVINFO hdev;
 		HDEVINFO_battery( )
 		{
@@ -153,11 +150,10 @@ namespace {
 				return;
 			}
 			CloseValidHandle( hBattery );
-
 		}
 	};
 
-} //namespace {
+} //namespace
 
 void CPowerStatusMonitor::SampleCPUPowerState()
 {
