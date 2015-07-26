@@ -110,3 +110,6 @@ std::wstring GetEXEBuildTime();
 void SetCurrentThreadName(PCSTR threadName);
 
 void CopyStartupProfiles(const std::wstring& exeDir, bool force);
+
+void CloseValidHandle( _Pre_valid_ _Post_ptr_invalid_ HANDLE handle );
+
