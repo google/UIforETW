@@ -96,7 +96,7 @@ To-do eventually:
 - [ ] ChildProcess or PreprocessTrace should convert from LF to CRLF for the edit control.
 - [ ] Try using the -cancel option for more efficient stopping of traces without recording. See xperf -help stop
 - [X] Give the user a chance to rename trace before launching viewer
-- [ ] Transparent compression/decompression into .zip files. When unzipping use the .zip file name as the base.
+- [ ] Transparent compression/decompression into .zip files. When unzipping use the .zip file name as the base. See https://ixmx.wordpress.com/2009/09/16/how-to-create-a-compress-folder-in-windows-using-win32-api/ or http://stackoverflow.com/questions/118547/creating-a-zip-file-on-windows-xp-2003-in-c-c.
 - [ ] Have the option to copy different startup profiles, for different situations.
 - [ ] Resize output window as well when sizing the window, just a bit.
 Code cleanup:
