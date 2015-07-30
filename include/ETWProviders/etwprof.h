@@ -30,7 +30,7 @@ limitations under the License.
 
 typedef long long int64;
 
-#ifdef	_WIN32
+#if defined(_WIN32) && defined(_MSC_VER) && !defined(ETW_DISABLE)
 // ETW support should be compiled in for all Windows PC platforms. It isn't
 // supported on Windows XP but that is determined at run-time. This #define
 // is used to let the code compile (but do nothing) on other operating systems.
