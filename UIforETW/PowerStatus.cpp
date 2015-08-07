@@ -378,12 +378,12 @@ CPowerStatusMonitor::CPowerStatusMonitor()
 		GetPowerData = (GetPowerData_t)GetProcAddress(energyLib_, "GetPowerData");
 		ReadSample = (ReadSample_t)GetProcAddress(energyLib_, "ReadSample");
 		auto GetMaxTemperature = (GetMaxTemperature_t)GetProcAddress(energyLib_, "GetMaxTemperature");
-		if (GetMaxTemperature)
-			GetMaxTemperature(0, &maxTemperature_);
 		if (IntelEnergyLibInitialize && ReadSample)
 		{
 			if (IntelEnergyLibInitialize())
 			{
+				if (GetMaxTemperature)
+					GetMaxTemperature(0, &maxTemperature_);
 				ReadSample();
 			}
 			else
