@@ -382,13 +382,30 @@ CPowerStatusMonitor::CPowerStatusMonitor()
 			GetMaxTemperature(0, &maxTemperature_);
 		if (IntelEnergyLibInitialize && ReadSample)
 		{
-			IntelEnergyLibInitialize();
-			ReadSample();
+			if (IntelEnergyLibInitialize())
+			{
+				ReadSample();
+			}
+			else
+			{
+				// Mark the library as unavailable if Initialize fails
+				ClearEnergyLibFunctionPointers();
+			}
 		}
 	}
 
 	hExitEvent_ = CreateEvent(nullptr, FALSE, FALSE, nullptr);
 	hThread_ = CreateThread(NULL, 0, StaticPowerMonitorThread, this, 0, nullptr);
+}
+
+void CPowerStatusMonitor::ClearEnergyLibFunctionPointers()
+{
+	IntelEnergyLibInitialize = nullptr;
+	GetNumMsrs = nullptr;
+	GetMsrName = nullptr;
+	GetMsrFunc = nullptr;
+	GetPowerData = nullptr;
+	ReadSample = nullptr;
 }
 
 CPowerStatusMonitor::~CPowerStatusMonitor()
