@@ -310,21 +310,66 @@ BOOL CUIforETWDlg::OnInitDialog()
 	windowsKitsDir_ += L"\\Windows Kits\\";
 	wptDir_ = windowsKitsDir_ + L"8.1\\Windows Performance Toolkit\\";
 	wpt10Dir_ = windowsKitsDir_ + L"10\\Windows Performance Toolkit\\";
+
+	// Install WPT 8.1 and WPT 10 if needed and if available.
+	// The installers are available as part of etwpackage.zip on https://github.com/google/UIforETW/releases
+	if (!PathFileExists(GetXperfPath().c_str()))
+	{
+		// Windows 7 users need to have WPT 8.1 installed.
+		if (GetWindowsVersion() <= kWindowsVersion7)
+		{
+			std::wstring installPath81 = GetExeDir() + L"..\\third_party\\wpt81\\WPTx64-x86_en-us.msi";
+			if (PathFileExists(installPath81.c_str()))
+			{
+				HINSTANCE installResult81 = ShellExecute(m_hWnd, L"open", installPath81.c_str(), nullptr, nullptr, SW_SHOWDEFAULT);
+				if (installResult81 > reinterpret_cast<HINSTANCE>(32))
+				{
+					outputPrintf(L"WPT version 8.1 was installed.\n");
+				}
+				else
+				{
+					outputPrintf(L"Failure code %d while installing WPT 8.1.\n", reinterpret_cast<int>(installResult81));
+				}
+			}
+		}
+	}
+	// Everybody should have WPT 10 installed.
+	if (!PathFileExists((wpt10Dir_ + L"xperf.exe").c_str()))
+	{
+		std::wstring installPath10 = GetExeDir() + L"..\\third_party\\wpt10\\WPTx64-x86_en-us.msi";
+		if (PathFileExists(installPath10.c_str()))
+		{
+			HINSTANCE installResult10 = ShellExecute(m_hWnd, L"open", installPath10.c_str(), nullptr, nullptr, SW_SHOWDEFAULT);
+			if (installResult10 > reinterpret_cast<HINSTANCE>(32))
+			{
+				outputPrintf(L"WPT version 10 was installed.\n");
+			}
+			else
+			{
+				outputPrintf(L"Failure code %d while installing WPT 10.\n", reinterpret_cast<int>(installResult10));
+			}
+		}
+	}
 	if (!PathFileExists(GetXperfPath().c_str()))
 	{
 		if (GetWindowsVersion() <= kWindowsVersion7)
 		{
-			// WPT 10 (at least the 10166 version) doesn't record image ID information
+			// WPT 10 (at least the 10240 version) doesn't record image ID information
 			// on Windows 7 and below, so the Windows 8.1 version of WPT is needed.
 			AfxMessageBox((GetXperfPath() + L" does not exist. Windows 7 and below require that "
-				L"WPT 8.1 be installed.").c_str());
+				L"WPT 8.1 be installed. If you run UIforETW from etwpackage.zip from\n"
+				L"https://github.com/google/UIforETW/releases\n"
+				L"then WPT will be automatically installed.").c_str());
 			exit(10);
 		}
 		std::wstring oldXperfPath = GetXperfPath();
 		wptDir_ = wpt10Dir_;
 		if (!PathFileExists(GetXperfPath().c_str()))
 		{
-			AfxMessageBox((oldXperfPath + L" and " + GetXperfPath() + L" do not exist. Please install WPT 8.1 or 10. Exiting.").c_str());
+			AfxMessageBox((oldXperfPath + L" and " + GetXperfPath() + L" do not exist. Please install WPT 8.1 or 10. Exiting."
+				L" If you run UIforETW from etwpackage.zip from\n"
+				L"https://github.com/google/UIforETW/releases\n"
+				L"then WPT will be automatically installed.").c_str());
 			exit(10);
 		}
 	}
