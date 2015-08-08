@@ -30,8 +30,6 @@ xcopy "%wpt10%Licenses\10.0.10240.0\sdk_license.rtf" %destdir%\third_party\wpt10
 ren %destdir%\third_party\wpt10\sdk_license.rtf LICENSE.rtf
 :nowpt10
 
-exit /b
-
 @rem Add VS tools to the path
 @call "%vs120comntools%vsvars32.bat"
 
