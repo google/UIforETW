@@ -521,16 +521,14 @@ void CUIforETWDlg::RegisterProviders()
 		child.Run(bShowCommands_, L"wevtutil.exe" + args);
 	}
 
-	// Register chrome.dll if the Chrome Developer option is set and some chrome
-	// keywords are selected to be recorded.
-	if (bChromeDeveloper_ && chromeKeywords_ != 0)
+	// Register chrome.dll if some chrome keywords are selected to be recorded.
+	if (chromeKeywords_ != 0)
 	{
 		std::wstring manifestPath = GetExeDir() + L"chrome_events_win.man";
 		std::wstring dllSuffix = L"chrome.dll";
-		// Make sure we have a trailing backslash in the path.
-		if (chromeDllPath_.back() != L'\\')
-			chromeDllPath_ += L'\\';
-		std::wstring chromeDllFullPath = chromeDllPath_ + dllSuffix;
+		// DummyChrome.dll has the Chrome manifest compiled into it which is all that
+		// is actually needed.
+		std::wstring chromeDllFullPath = GetExeDir() + L"DummyChrome.dll";
 		if (!PathFileExists(chromeDllFullPath.c_str()))
 		{
 			outputPrintf(L"Couldn't find %s.\n", chromeDllFullPath.c_str());
@@ -1369,7 +1367,6 @@ void CUIforETWDlg::OnBnClickedSettings()
 {
 	CSettings dlgSettings(nullptr, GetExeDir(), GetWPTDir());
 	dlgSettings.heapTracingExes_ = heapTracingExes_;
-	dlgSettings.chromeDllPath_ = chromeDllPath_;
 	dlgSettings.WSMonitoredProcesses_ = WSMonitoredProcesses_;
 	dlgSettings.bExpensiveWSMonitoring_ = bExpensiveWSMonitoring_;
 	dlgSettings.bChromeDeveloper_ = bChromeDeveloper_;
@@ -1401,8 +1398,6 @@ void CUIforETWDlg::OnBnClickedSettings()
 		}
 
 		// Copy over the remaining settings.
-		chromeDllPath_ = dlgSettings.chromeDllPath_;
-
 		WSMonitoredProcesses_ = dlgSettings.WSMonitoredProcesses_;
 		bExpensiveWSMonitoring_ = dlgSettings.bExpensiveWSMonitoring_;
 		workingSetThread_.SetProcessFilter(WSMonitoredProcesses_, bExpensiveWSMonitoring_);

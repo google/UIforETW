@@ -87,7 +87,6 @@ void CSettings::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_CHROMEDEVELOPER, btChromeDeveloper_);
 	DDX_Control(pDX, IDC_AUTOVIEWTRACES, btAutoViewTraces_);
 	DDX_Control(pDX, IDC_HEAPSTACKS, btHeapStacks_);
-	DDX_Control(pDX, IDC_CHROMEDLLPATH, btChromeDllPath_);
 	DDX_Control(pDX, IDC_WSMONITOREDPROCESSES, btWSMonitoredProcesses_);
 	DDX_Control(pDX, IDC_EXPENSIVEWS, btExpensiveWSMonitoring_);
 	DDX_Control(pDX, IDC_VIRTUALALLOCSTACKS, btVirtualAllocStacks_);
@@ -116,12 +115,10 @@ BOOL CSettings::OnInitDialog()
 	CheckDlgButton(IDC_AUTOVIEWTRACES, bAutoViewTraces_);
 	CheckDlgButton(IDC_HEAPSTACKS, bHeapStacks_);
 	CheckDlgButton(IDC_VIRTUALALLOCSTACKS, bVirtualAllocStacks_);
-	SetDlgItemText(IDC_CHROMEDLLPATH, chromeDllPath_.c_str());
 
 	btExtraProviders_.EnableWindow(FALSE);
 	btExtraStackwalks_.EnableWindow(FALSE);
 	btBufferSizes_.EnableWindow(FALSE);
-	btChromeDllPath_.EnableWindow(bChromeDeveloper_);
 	// A 32-bit process on 64-bit Windows will not be able to read the
 	// full working set of 64-bit processes, so don't even try.
 	if (Is64BitWindows() && !Is64BitBuild())
@@ -153,8 +150,6 @@ BOOL CSettings::OnInitDialog()
 					L"immediately after a trace is recorded.");
 		toolTip_.AddTool(&btHeapStacks_, L"Check this to record call stacks on HeapAlloc, HeapRealloc, "
 					L"and similar calls, when doing heap traces.");
-		toolTip_.AddTool(&btChromeDllPath_, L"Specify the path where chrome.dll resides. This is used "
-					L"to register the Chrome providers if the Chrome developer option is set.");
 		toolTip_.AddTool(&btWSMonitoredProcesses_, L"Names of processes whose working sets will be "
 					L"monitored, separated by semi-colons. An empty string means no monitoring. A '*' means "
 					L"that all processes will be monitored. For instance 'chrome.exe;notepad.exe'");
@@ -192,7 +187,6 @@ BOOL CSettings::OnInitDialog()
 void CSettings::OnOK()
 {
 	heapTracingExes_ = GetEditControlText(btHeapTracingExe_);
-	chromeDllPath_ = GetEditControlText(btChromeDllPath_);
 	WSMonitoredProcesses_ = GetEditControlText(btWSMonitoredProcesses_);
 
 	// Extract the Chrome categories settings and put the result in chromeKeywords_.
@@ -263,7 +257,6 @@ void CSettings::OnBnClickedCopysymboldlls()
 void CSettings::OnBnClickedChromedeveloper()
 {
 	bChromeDeveloper_ = !bChromeDeveloper_;
-	btChromeDllPath_.EnableWindow(bChromeDeveloper_);
 }
 
 

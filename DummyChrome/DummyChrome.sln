@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.31101.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DummyChrome", "DummyChrome.vcxproj", "{ECC4778A-713B-4B02-AAFD-DD09DE29C248}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{ECC4778A-713B-4B02-AAFD-DD09DE29C248}.Debug|Win32.ActiveCfg = Debug|Win32
+		{ECC4778A-713B-4B02-AAFD-DD09DE29C248}.Debug|Win32.Build.0 = Debug|Win32
+		{ECC4778A-713B-4B02-AAFD-DD09DE29C248}.Release|Win32.ActiveCfg = Release|Win32
+		{ECC4778A-713B-4B02-AAFD-DD09DE29C248}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

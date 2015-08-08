@@ -101,7 +101,6 @@ private:
 	int BufferCountBoost(int requestCount) const;
 	CComboBox btTracingMode_;
 	std::wstring heapTracingExes_ = L"chrome.exe";
-	std::wstring chromeDllPath_ = L"C:\\Temp\\";
 	void SetHeapTracing(bool forceOff);
 	bool bVirtualAllocStacks_ = false;
 	// ETW keywords, also known as flags, map to Chrome categories.

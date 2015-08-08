@@ -34,7 +34,6 @@ public:
 
 	// These settings are written and read by the creator of this object.
 	std::wstring heapTracingExes_;
-	std::wstring chromeDllPath_;
 	std::wstring WSMonitoredProcesses_;
 	bool bExpensiveWSMonitoring_ = false;
 	bool bChromeDeveloper_ = false;
@@ -45,7 +44,6 @@ public:
 
 protected:
 	CEdit btHeapTracingExe_;
-	CMFCEditBrowseCtrl btChromeDllPath_;
 	CEdit btWSMonitoredProcesses_;
 	CButton btExpensiveWSMonitoring_;
 	CEdit btExtraProviders_;
