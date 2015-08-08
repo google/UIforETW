@@ -415,4 +415,9 @@ CPowerStatusMonitor::~CPowerStatusMonitor()
 	WaitForSingleObject(hThread_, INFINITE);
 	CloseHandle(hThread_);
 	CloseHandle(hExitEvent_);
+
+	if (energyLib_ != nullptr)
+	{
+		FreeLibrary(energyLib_);
+	}
 }
