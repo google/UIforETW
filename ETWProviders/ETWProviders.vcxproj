@@ -215,16 +215,16 @@
   <ItemGroup>
     <CustomBuild Include="etwproviders.man">
       <FileType>Document</FileType>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">mc.exe -um %(Filename)%(Extension) -z %(Filename)Generated </Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">mc.exe -um %(Filename)%(Extension) -z %(Filename)Generated </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">mc.exe -um %(FullPath) -z %(Filename)Generated</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">mc.exe -um %(FullPath) -z %(Filename)Generated</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename)Generated.h;%(Filename)Generated.rc;%(Filename)GeneratedTemp.bin</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(Filename)Generated.h;%(Filename)Generated.rc;%(Filename)GeneratedTemp.bin</Outputs>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
       </AdditionalInputs>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
       </AdditionalInputs>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">mc.exe -um %(Filename)%(Extension) -z %(Filename)Generated</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">mc.exe -um %(Filename)%(Extension) -z %(Filename)Generated</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">mc.exe -um %(FullPath) -z %(Filename)Generated</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">mc.exe -um %(FullPath) -z %(Filename)Generated</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Compiling ETW manifest file</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Compiling ETW manifest file</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename)Generated.h;%(Filename)Generated.rc;%(Filename)GeneratedTemp.bin</Outputs>

@@ -15,7 +15,70 @@
           resourceFileName="chrome.dll"
           symbol="CHROME"
           >
+        <channels>
+          <importChannel
+              chid="SYSTEM"
+              name="System"
+              />
+        </channels>
+        <templates>
+          <template tid="tid_chrome_event">
+            <data
+                inType="win:AnsiString"
+                name="Name"
+                />
+            <data
+                inType="win:AnsiString"
+                name="Phase"
+                />
+            <data
+                inType="win:AnsiString"
+                name="Arg Name 1"
+                />
+            <data
+                inType="win:AnsiString"
+                name="Arg Value 1"
+                />
+            <data
+                inType="win:AnsiString"
+                name="Arg Name 2"
+                />
+            <data
+                inType="win:AnsiString"
+                name="Arg Value 2"
+                />
+            <data
+                inType="win:AnsiString"
+                name="Arg Name 3"
+                />
+            <data
+                inType="win:AnsiString"
+                name="Arg Value 3"
+                />
+          </template>
+        </templates>
+        <events>
+          <event
+              channel="SYSTEM"
+              level="win:Informational"
+              message="$(string.ChromeEvent.EventMessage)"
+              opcode="win:Info"
+              symbol="ChromeEvent"
+              template="tid_chrome_event"
+              value="1"
+              />
+        </events>
       </provider>
     </events>
   </instrumentation>
+  <localization xmlns="http://schemas.microsoft.com/win/2004/08/events">
+    <resources culture="en-US">
+      <stringTable>
+        <string
+            id="ChromeEvent.EventMessage"
+            value="Chrome Event: %1 (%2)"
+            />
+      </stringTable>
+    </resources>
+  </localization>
 </instrumentationManifest>
