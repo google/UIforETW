@@ -318,7 +318,7 @@ BOOL CUIforETWDlg::OnInitDialog()
 		// Windows 7 users need to have WPT 8.1 installed.
 		if (GetWindowsVersion() <= kWindowsVersion7)
 		{
-			std::wstring installPath81 = GetExeDir() + L"..\\third_party\\wpt81\\WPTx64-x86_en-us.msi";
+			const std::wstring installPath81 = GetExeDir() + L"..\\third_party\\wpt81\\WPTx64-x86_en-us.msi";
 			if (PathFileExists(installPath81.c_str()))
 			{
 				HINSTANCE installResult81 = ShellExecute(m_hWnd, L"open", installPath81.c_str(), nullptr, nullptr, SW_SHOWDEFAULT);
@@ -336,7 +336,7 @@ BOOL CUIforETWDlg::OnInitDialog()
 	// Everybody should have WPT 10 installed.
 	if (!PathFileExists((wpt10Dir_ + L"xperf.exe").c_str()))
 	{
-		std::wstring installPath10 = GetExeDir() + L"..\\third_party\\wpt10\\WPTx64-x86_en-us.msi";
+		const std::wstring installPath10 = GetExeDir() + L"..\\third_party\\wpt10\\WPTx64-x86_en-us.msi";
 		if (PathFileExists(installPath10.c_str()))
 		{
 			HINSTANCE installResult10 = ShellExecute(m_hWnd, L"open", installPath10.c_str(), nullptr, nullptr, SW_SHOWDEFAULT);
