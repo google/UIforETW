@@ -9,10 +9,8 @@ if len(sys.argv) < 3:
 filename = sys.argv[1]
 dirToZip = sys.argv[2]
 
-# Change to the specified directory so that relative paths are added instead
-# of absolute paths.
-os.chdir(dirToZip)
-dirToZip = "."
+# Assume that dirToZip is a relative directory.
+dirToZip = dirToZip
 
 # Request compression
 zf = zipfile.ZipFile(filename, "w", zipfile.ZIP_DEFLATED)
