@@ -13,6 +13,7 @@ Debug/
 Release/
 *DoNotShip/
 ipch/
+symsrv.yes
 
 # GPUView likes to drop these files when run.
 FuncStats.txt
