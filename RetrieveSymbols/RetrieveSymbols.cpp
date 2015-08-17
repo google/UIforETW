@@ -43,7 +43,16 @@ int main(int argc, _Pre_readable_size_(argc) char* argv[])
       return -1;
    }
 
+#pragma warning(suppress : 4996) // C4996: 'getenv': This function or variable may be unsafe. Consider using _dupenv_s instead.
+   const char* symbolPath = getenv("_NT_SYMBOL_PATH");
+   if (symbolPath)
+     printf("_NT_SYMBOL_PATH=%s\n", symbolPath);
+   else
+     printf("_NT_SYMBOL_PATH is not set. Symbol retrieval will probably fail.\n\n");
+
 #ifdef TESTING
+  (void)argc;
+  (void)argv;
    // Set a search path and cache directory. If this isn't set
    // then _NT_SYMBOL_PATH will be used instead.
    // Force setting it here to make sure that the test succeeds.
