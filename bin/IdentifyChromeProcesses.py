@@ -1,4 +1,4 @@
-# Copyright 2015 Google Inc. All Rights Reserved.
+﻿# Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -60,13 +60,16 @@ def main():
   # Sometimes Chrome is launched with a relative path and then it launches
   # child processes with an absolute path. This leads to two 'different'
   # browser instances being detected. As an example one can easily end up with
-  # one at r".\out\Release\chrome.exe" and the other at
-  # r"D:\src\chromium2\src\out\Release\chrome.exe". This loop attempts to
+  # one at r".\out\Release\chrome.exe" or out\Release\chrome.exe and the other
+  # at r"D:\src\chromium2\src\out\Release\chrome.exe". This loop attempts to
   # detect this and fix it up. It's not perfect, but it's better than nothing.
   for exePath in pidsByPath.keys():
-    if exePath.startswith(".\\") and len(exePath) > len(r".\chrome.exe"):
+    if len(exePath) > len(r".\chrome.exe") and exePath[1] != ':':
       # Strip off the leading period
-      subPath = exePath[1:]
+      if exePath.startswith(".\\"):
+        subPath = exePath[1:]
+      else:
+        subPath = exePath
       for otherPath in pidsByPath.keys():
         if otherPath.endswith(subPath):
           # If the end paths match then move the contents of pidsByPath[exePath]
