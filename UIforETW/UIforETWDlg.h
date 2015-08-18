@@ -196,7 +196,7 @@ private:
 	CToolTipCtrl toolTip_;
 
 	// Editable only by the settings dialog.
-	bool bChromeDeveloper_ = true;
+	bool bChromeDeveloper_ = false;
 	bool bAutoViewTraces_ = false;
 
 	std::pair<uint64_t, uint64_t> CompressTrace(const std::wstring& tracePath) const;
