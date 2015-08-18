@@ -160,8 +160,9 @@ BOOL CSettings::OnInitDialog()
 		toolTip_.AddTool(&btVirtualAllocStacks_, L"Check this to record call stacks on VirtualAlloc on all "
 					L"traces instead of just heap traces.");
 		toolTip_.AddTool(&btChromeCategories_, L"Check the chrome tracing categories that you want Chrome "
-					L"to emit ETW events for. This requires running Chrome version 45 or later, with "
-					L"--trace-export-events-to-etw on the command-line.");
+					L"to emit ETW events for. This requires running Chrome version 46 or later, and "
+					L"using chrome://flags/ to \"Enable exporting of tracing events to ETW\" - search for "
+					L"trace-export on the chrome://flags/ page.");
 	}
 
 	// Initialize the list of check boxes with all of the Chrome categories which
