@@ -484,7 +484,7 @@ std::wstring FindPython()
 	}
 
 #pragma warning(suppress:4996)	
-    const wchar_t* path = _wgetenv(L"path");
+	const wchar_t* path = _wgetenv(L"path");
 	if (path)
 	{
 		std::vector<std::wstring> pathParts = split(path, ';');

@@ -67,7 +67,7 @@ DWORD DirectoryMonitor::DirectoryMonitorThread()
 			break;
 		}
 	}
-  // Unreachable.
+	// Unreachable.
 }
 
 _Pre_satisfies_(this->hThread_ == 0)

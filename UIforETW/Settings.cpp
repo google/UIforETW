@@ -218,7 +218,7 @@ BOOL CSettings::PreTranslateMessage(MSG* pMsg)
 
 void CSettings::OnBnClickedCopystartupprofile()
 {
-  CopyStartupProfiles(exeDir_, true);
+	CopyStartupProfiles(exeDir_, true);
 }
 
 
