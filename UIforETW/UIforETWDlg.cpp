@@ -1279,6 +1279,7 @@ void CUIforETWDlg::SaveNotesIfNeeded()
 		{
 			WriteTextAsFile(traceNoteFilename_, editedNotes);
 		}
+		traceNotes_ = editedNotes;
 	}
 }
 
@@ -1513,6 +1514,7 @@ void CUIforETWDlg::OnContextMenu(CWnd* pWnd, CPoint point)
 				//ID_TRACES_ZIPCOMPRESSALLTRACES,
 				//ID_TRACES_BROWSEFOLDER,
 				ID_TRACES_STRIPCHROMESYMBOLS,
+				ID_TRACES_IDENTIFYCHROMEPROCESSES,
 				ID_TRACES_TRACEPATHTOCLIPBOARD,
 			};
 
@@ -1567,6 +1569,12 @@ void CUIforETWDlg::OnContextMenu(CWnd* pWnd, CPoint point)
 			case ID_TRACES_STRIPCHROMESYMBOLS:
 				outputPrintf(L"\n");
 				StripChromeSymbols(tracePath);
+				break;
+			case ID_TRACES_IDENTIFYCHROMEPROCESSES:
+				SaveNotesIfNeeded();
+				outputPrintf(L"\n");
+				IdentifyChromeProcesses(tracePath);
+				UpdateNotesState();
 				break;
 			case ID_TRACES_TRACEPATHTOCLIPBOARD:
 				// Comma delimited for easy pasting into DOS commands.
@@ -1746,81 +1754,34 @@ void CUIforETWDlg::StripChromeSymbols(const std::wstring& traceFilename)
 }
 
 
+void CUIforETWDlg::IdentifyChromeProcesses(const std::wstring& traceFilename)
+{
+	outputPrintf(L"Preprocessing trace to identify Chrome processes...\n");
+	// There was a version of this that was written in C++. See the history for details.
+	std::wstring pythonPath = FindPython();
+	if (!pythonPath.empty())
+	{
+		ChildProcess child(pythonPath);
+		std::wstring args = L" -u \"" + GetExeDir() + L"IdentifyChromeProcesses.py\" \"" + traceFilename + L"\"";
+		child.Run(bShowCommands_, L"python.exe" + args);
+		std::wstring output = child.GetOutput();
+		// The output of the script is appended to the trace description file.
+		std::wstring textFilename = StripExtensionFromPath(traceFilename) + L".txt";
+		std::wstring data = LoadFileAsText(textFilename) + output;
+		WriteTextAsFile(textFilename, data);
+	}
+	else
+	{
+		outputPrintf(L"Couldn't find python.\n");
+	}
+}
+
+
 void CUIforETWDlg::PreprocessTrace(const std::wstring& traceFilename)
 {
 	if (bChromeDeveloper_)
 	{
-		outputPrintf(L"Preprocessing trace to identify Chrome processes...\n");
-    // The script now has more features than the C++ code, and is simpler.
-#define IDENTIFY_CHROME_PROCESSES_IN_PYTHON
-#ifdef IDENTIFY_CHROME_PROCESSES_IN_PYTHON
-		std::wstring pythonPath = FindPython();
-		if (!pythonPath.empty())
-		{
-			outputPrintf(L"Preprocessing Chrome trace...\n");
-			ChildProcess child(pythonPath);
-			std::wstring args = L" -u \"" + GetExeDir() + L"IdentifyChromeProcesses.py\" \"" + traceFilename + L"\"";
-			child.Run(bShowCommands_, L"python.exe" + args);
-			std::wstring output = child.GetOutput();
-			// The output of the script is written to the trace description file.
-			// Ideally it would be appended, but good enough for now.
-			std::wstring textFilename = StripExtensionFromPath(traceFilename) + L".txt";
-			WriteTextAsFile(textFilename, output);
-		}
-#else
-		ChildProcess child(GetXperfPath());
-		// Typical output of the process action looks like this (large parts
-		// elided):
-		// ... chrome.exe (3456), ... \chrome.exe" --type=renderer ...
-		std::wstring args = L" -i \"" + traceFilename + L"\" -tle -tti -a process -withcmdline";
-		child.Run(bShowCommands_, L"xperf.exe" + args);
-		std::wstring output = child.GetOutput();
-		std::map<std::wstring, std::vector<DWORD>> pidsByType;
-		for (const auto& line : split(output, '\n'))
-		{
-			if (wcsstr(line.c_str(), L"chrome.exe"))
-			{
-				std::wstring type = L"browser";
-				const wchar_t* typeLabel = L" --type=";
-				const wchar_t* typeFound = wcsstr(line.c_str(), typeLabel);
-				if (typeFound)
-				{
-					typeFound += wcslen(typeLabel);
-					const wchar_t* typeEnd = wcschr(typeFound, ' ');
-					if (typeEnd)
-					{
-						type = std::wstring(typeFound).substr(0, typeEnd - typeFound);
-					}
-				}
-				DWORD pid = 0;
-				const wchar_t* pidstr = wcschr(line.c_str(), '(');
-				if (pidstr)
-				{
-					swscanf_s(pidstr + 1, L"%lu", &pid);
-				}
-				if (pid)
-				{
-					pidsByType[type].emplace_back(pid);
-				}
-			}
-		}
-#pragma warning(suppress : 4996)
-		FILE* pFile = _wfopen((StripExtensionFromPath(traceFilename) + L".txt").c_str(), L"a");
-		if (pFile)
-		{
-			fwprintf(pFile, L"Chrome PIDs by process type:\n");
-			for (const auto& types : pidsByType)
-			{
-				fwprintf(pFile, L"%-10s:", types.first.c_str());
-				for (const auto& pid : types.second)
-				{
-					fwprintf(pFile, L" %lu", pid);
-				}
-				fwprintf(pFile, L"\n");
-			}
-			fclose(pFile);
-		}
-#endif
+		IdentifyChromeProcesses(traceFilename);
 	}
 }
 

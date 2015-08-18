@@ -83,13 +83,14 @@
 #define ID_TRACES_OPENTRACEIN10WPA      32801
 #define ID_ACCELERATOR32802             32802
 #define ID_PASTEOVERRIDE                32805
+#define ID_TRACES_IDENTIFYCHROMEPROCESSES 32807
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        136
-#define _APS_NEXT_COMMAND_VALUE         32807
+#define _APS_NEXT_COMMAND_VALUE         32808
 #define _APS_NEXT_CONTROL_VALUE         1034
 #define _APS_NEXT_SYMED_VALUE           101
 #endif

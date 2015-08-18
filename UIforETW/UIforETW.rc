@@ -248,7 +248,8 @@ BEGIN
         MENUITEM "ETW Compress all &traces (8.0+)", ID_TRACES_COMPRESSTRACES
         MENUITEM "Zip compress all traces",     ID_TRACES_ZIPCOMPRESSALLTRACES
         MENUITEM "&Browse folder",              ID_TRACES_BROWSEFOLDER
-        MENUITEM "&Strip chrome symbols",       ID_TRACES_STRIPCHROMESYMBOLS
+        MENUITEM "&Strip Chrome symbols",       ID_TRACES_STRIPCHROMESYMBOLS
+        MENUITEM "&Identify Chrome processes",  ID_TRACES_IDENTIFYCHROMEPROCESSES
         MENUITEM "Trace path to &clipboard\tCtrl+C", ID_TRACES_TRACEPATHTOCLIPBOARD
     END
 END
