@@ -202,6 +202,58 @@
     <ModifiedGraphs>
       <GraphSchema Guid="b186f02d-8d06-4bbb-9ad1-abf7985fb61a" HelpText="{}{\rtf1\ansi\ansicpg1252\uc1\htmautsp\deff2{\fonttbl{\f0\fcharset0 Times New Roman;}{\f2\fcharset0 Segoe UI;}}{\colortbl\red0\green0\blue0;\red255\green255\blue255;}\loch\hich\dbch\pard\plain\ltrpar\itap0{\lang1033\fs18\f2\cf0 \cf0\ql{\f2 {\ltrch Shows the duration (from beginning to end in seconds) of the process, hosted service (if applicable), and the command used to initiate the process.}\li0\ri0\sa0\sb0\fi0\ql\par}&#xD;&#xA;}&#xD;&#xA;}">
         <ModifiedPresets>
+          <Preset Name="Randomascii Commandline by Process" BarGraphIntervalCount="50" GraphColumnCount="30" KeyColumnCount="12" LeftFrozenColumnCount="17" RightFrozenColumnCount="29" InitialFilterShouldKeep="true">
+            <MetadataEntries>
+              <MetadataEntry Guid="36c00ec5-61f8-5f89-a066-641288a34ca9" Name="Start Time" ColumnMetadata="StartTime" />
+              <MetadataEntry Guid="19fb5aa9-a5fc-5f14-cb83-fad0691e92a8" Name="End Time" ColumnMetadata="EndTime" />
+            </MetadataEntries>
+            <HighlightEntries />
+            <Columns>
+              <Column Guid="0b34b57d-f3cd-519a-4584-b182e0088701" Name="Process Name" SortPriority="1" Width="146" IsVisible="true" />
+              <Column Guid="5f381ee6-ad8e-5906-7de0-4b678b7d78f1" Name="Process ID" SortPriority="2" TextAlignment="Right" Width="80" />
+              <Column Guid="226170ea-7139-5ea5-ef82-c7b8eb950467" Name="Session ID" SortPriority="3" TextAlignment="Right" Width="60" />
+              <Column Guid="32ba004c-d028-5def-cc60-016892805d03" Name="Parent Process ID" SortPriority="4" TextAlignment="Right" Width="80" />
+              <Column Guid="1ba44c8d-e138-5cfa-c4d8-49580277ab41" Name="Lifetime" SortPriority="5" Width="80" />
+              <Column Guid="0edbeee1-8d7b-5652-6639-86415222c6e0" Name="Process" SortPriority="6" Width="200" IsVisible="true" />
+              <Column Guid="d8e83424-bba6-55cf-41b7-d164f0cd3c7a" Name="Creation Stack Tag" SortPriority="7" Width="200">
+                <StackOptionsParameter Mode="StackTag" FrameTagFold="True" />
+              </Column>
+              <Column Guid="d8e83424-bba6-55cf-41b7-d164f0cd3c7a" Name="Creation Stack (Frame Tags)" SortPriority="8" Width="200">
+                <StackOptionsParameter Mode="FrameTags" FrameTagFold="True" />
+              </Column>
+              <Column Guid="d8e83424-bba6-55cf-41b7-d164f0cd3c7a" Name="Creation Stack" SortPriority="9" Width="200">
+                <StackOptionsParameter FrameTagFold="True" />
+              </Column>
+              <Column Guid="1b57a82a-5597-58e4-eddf-46d996048180" Name="Destruction Stack Tag" SortPriority="10" Width="200">
+                <StackOptionsParameter Mode="StackTag" FrameTagFold="True" />
+              </Column>
+              <Column Guid="1b57a82a-5597-58e4-eddf-46d996048180" Name="Destruction Stack (Frame Tags)" SortPriority="11" Width="200">
+                <StackOptionsParameter Mode="FrameTags" FrameTagFold="True" />
+              </Column>
+              <Column Guid="1b57a82a-5597-58e4-eddf-46d996048180" Name="Destruction Stack" SortPriority="12" Width="200">
+                <StackOptionsParameter FrameTagFold="True" />
+              </Column>
+              <Column Guid="cb796d44-2927-5ac1-d231-4b71904c18f5" Name="Thread Name" SortPriority="13" Width="80" />
+              <Column Guid="82ddfdff-ee93-5f35-08ac-4705069618dc" Name="Thread Activity Tag" SortPriority="14" Width="80" />
+              <Column Guid="2818954f-2d30-5569-4510-dade0a5a605c" Name="Annotation" SortPriority="15" Width="80" />
+              <Column Guid="26dd2129-e3d6-57aa-c56b-34b5a5b79fcb" Name="Count" AggregationMode="Count" SortOrder="Descending" TextAlignment="Right" Width="60" IsVisible="true" />
+              <Column Guid="c4cf3680-7ab6-5b50-a66e-bb282e861842" Name="Duration" AggregationMode="Sum" SortPriority="17" TextAlignment="Right" Width="120" />
+              <Column Guid="3546d491-9447-5abe-f1ea-c8363af9b77f" Name="Avg Duration" AggregationMode="Average" SortPriority="18" TextAlignment="Right" Width="120" />
+              <Column Guid="fd1c6bea-5148-5a94-f0d2-720385dfddf6" Name="Min Duration" AggregationMode="Min" SortPriority="19" TextAlignment="Right" Width="120" />
+              <Column Guid="fa105ddf-fff0-57fb-8472-3b02066ee626" Name="Max Duration" AggregationMode="Max" SortPriority="20" TextAlignment="Right" Width="120" />
+              <Column Guid="7b96de49-17c2-5b21-e879-cd3fa850202f" Name="Permanent Count" AggregationMode="Sum" SortPriority="21" TextAlignment="Right" Width="80" />
+              <Column Guid="a5e0fdb2-8afa-59e2-91e7-5ade1195b805" Name="Package Full Name" SortPriority="22" Width="200" />
+              <Column Guid="a38e516d-6cf2-5659-97f7-5b4d7b128289" Name="Package Relative Application Id" SortPriority="23" Width="150" />
+              <Column Guid="7c8085f1-33de-5a34-b975-ff02c3a942fb" Name="Modern Application Friendly Name" SortPriority="24" Width="150" />
+              <Column Guid="a876035b-24bc-564f-3f6a-cede5f8c8918" Name="Hosted Services" SortPriority="25" Width="102" />
+              <Column Guid="1093bbae-e3f8-570d-d300-fe006ec801fe" Name="Command Line" SortPriority="26" Width="999" IsVisible="true" />
+              <Column Guid="ce84d427-a0a7-58d9-0fde-e8d2e84770bc" Name="Table" SortPriority="27" Width="80" />
+              <Column Guid="36c00ec5-61f8-5f89-a066-641288a34ca9" Name="Start Time" AggregationMode="Min" SortPriority="28" TextAlignment="Right" Width="120" IsVisible="true" />
+              <Column Guid="19fb5aa9-a5fc-5f14-cb83-fad0691e92a8" Name="End Time" AggregationMode="Max" SortPriority="29" TextAlignment="Right" Width="120" IsVisible="true" />
+            </Columns>
+          </Preset>
+        </ModifiedPresets>
+        <PersistedPresets>
           <Preset Name="Randomascii Commandline by Process" BarGraphIntervalCount="50" GraphColumnCount="30" KeyColumnCount="12" LeftFrozenColumnCount="17" RightFrozenColumnCount="29" InitialFilterShouldKeep="true" InitialExpansionQuery="Lifetime:=Transient">
             <MetadataEntries>
               <MetadataEntry Guid="36c00ec5-61f8-5f89-a066-641288a34ca9" Name="Start Time" ColumnMetadata="StartTime" />
@@ -209,51 +261,50 @@
             </MetadataEntries>
             <HighlightEntries />
             <Columns>
-              <Column Guid="0b34b57d-f3cd-519a-4584-b182e0088701" Name="Process Name" SortPriority="5" Width="146" IsVisible="true" />
-              <Column Guid="5f381ee6-ad8e-5906-7de0-4b678b7d78f1" Name="Process ID" SortPriority="6" TextAlignment="Right" Width="80" />
-              <Column Guid="226170ea-7139-5ea5-ef82-c7b8eb950467" Name="Session ID" SortPriority="7" TextAlignment="Right" Width="60" />
-              <Column Guid="32ba004c-d028-5def-cc60-016892805d03" Name="Parent Process ID" SortPriority="8" TextAlignment="Right" Width="80" />
-              <Column Guid="1ba44c8d-e138-5cfa-c4d8-49580277ab41" Name="Lifetime" SortPriority="9" Width="80" />
-              <Column Guid="0edbeee1-8d7b-5652-6639-86415222c6e0" Name="Process" SortPriority="10" Width="200" IsVisible="true" />
-              <Column Guid="d8e83424-bba6-55cf-41b7-d164f0cd3c7a" Name="Creation Stack" SortPriority="11" Width="200">
+              <Column Guid="0b34b57d-f3cd-519a-4584-b182e0088701" Name="Process Name" SortPriority="1" Width="146" IsVisible="true" />
+              <Column Guid="5f381ee6-ad8e-5906-7de0-4b678b7d78f1" Name="Process ID" SortPriority="2" TextAlignment="Right" Width="80" />
+              <Column Guid="226170ea-7139-5ea5-ef82-c7b8eb950467" Name="Session ID" SortPriority="3" TextAlignment="Right" Width="60" />
+              <Column Guid="32ba004c-d028-5def-cc60-016892805d03" Name="Parent Process ID" SortPriority="4" TextAlignment="Right" Width="80" />
+              <Column Guid="1ba44c8d-e138-5cfa-c4d8-49580277ab41" Name="Lifetime" SortPriority="5" Width="80" />
+              <Column Guid="0edbeee1-8d7b-5652-6639-86415222c6e0" Name="Process" SortPriority="6" Width="200" IsVisible="true" />
+              <Column Guid="d8e83424-bba6-55cf-41b7-d164f0cd3c7a" Name="Creation Stack Tag" SortPriority="7" Width="200">
                 <StackOptionsParameter Mode="StackTag" FrameTagFold="True" />
               </Column>
-              <Column Guid="d8e83424-bba6-55cf-41b7-d164f0cd3c7a" Name="Creation Stack" SortPriority="12" Width="200">
+              <Column Guid="d8e83424-bba6-55cf-41b7-d164f0cd3c7a" Name="Creation Stack (Frame Tags)" SortPriority="8" Width="200">
                 <StackOptionsParameter Mode="FrameTags" FrameTagFold="True" />
               </Column>
-              <Column Guid="d8e83424-bba6-55cf-41b7-d164f0cd3c7a" Name="Creation Stack" SortPriority="13" Width="200">
+              <Column Guid="d8e83424-bba6-55cf-41b7-d164f0cd3c7a" Name="Creation Stack" SortPriority="9" Width="200">
                 <StackOptionsParameter FrameTagFold="True" />
               </Column>
-              <Column Guid="1b57a82a-5597-58e4-eddf-46d996048180" Name="Destruction Stack" SortPriority="14" Width="200">
+              <Column Guid="1b57a82a-5597-58e4-eddf-46d996048180" Name="Destruction Stack Tag" SortPriority="10" Width="200">
                 <StackOptionsParameter Mode="StackTag" FrameTagFold="True" />
               </Column>
-              <Column Guid="1b57a82a-5597-58e4-eddf-46d996048180" Name="Destruction Stack" SortPriority="15" Width="200">
+              <Column Guid="1b57a82a-5597-58e4-eddf-46d996048180" Name="Destruction Stack (Frame Tags)" SortPriority="11" Width="200">
                 <StackOptionsParameter Mode="FrameTags" FrameTagFold="True" />
               </Column>
-              <Column Guid="1b57a82a-5597-58e4-eddf-46d996048180" Name="Destruction Stack" SortPriority="16" Width="200">
+              <Column Guid="1b57a82a-5597-58e4-eddf-46d996048180" Name="Destruction Stack" SortPriority="12" Width="200">
                 <StackOptionsParameter FrameTagFold="True" />
               </Column>
-              <Column Guid="cb796d44-2927-5ac1-d231-4b71904c18f5" Name="Thread Name" Width="80" />
-              <Column Guid="82ddfdff-ee93-5f35-08ac-4705069618dc" Name="Thread Activity Tag" SortPriority="1" Width="80" />
-              <Column Guid="2818954f-2d30-5569-4510-dade0a5a605c" Name="Annotation" SortPriority="2" Width="80" />
-              <Column Guid="26dd2129-e3d6-57aa-c56b-34b5a5b79fcb" Name="Count" AggregationMode="Count" SortPriority="17" TextAlignment="Right" Width="60" />
-              <Column Guid="c4cf3680-7ab6-5b50-a66e-bb282e861842" Name="Duration" AggregationMode="Sum" SortPriority="18" TextAlignment="Right" Width="120" />
-              <Column Guid="3546d491-9447-5abe-f1ea-c8363af9b77f" Name="Avg Duration" AggregationMode="Average" SortPriority="19" TextAlignment="Right" Width="120" />
-              <Column Guid="fd1c6bea-5148-5a94-f0d2-720385dfddf6" Name="Min Duration" AggregationMode="Min" SortPriority="20" TextAlignment="Right" Width="120" />
-              <Column Guid="fa105ddf-fff0-57fb-8472-3b02066ee626" Name="Max Duration" AggregationMode="Max" SortPriority="21" TextAlignment="Right" Width="120" />
-              <Column Guid="7b96de49-17c2-5b21-e879-cd3fa850202f" Name="Permanent Count" AggregationMode="Sum" SortPriority="22" TextAlignment="Right" Width="80" />
-              <Column Guid="a5e0fdb2-8afa-59e2-91e7-5ade1195b805" Name="Package Full Name" SortPriority="23" Width="200" />
-              <Column Guid="a38e516d-6cf2-5659-97f7-5b4d7b128289" Name="Package Relative Application Id" SortPriority="24" Width="150" />
-              <Column Guid="7c8085f1-33de-5a34-b975-ff02c3a942fb" Name="Modern Application Friendly Name" SortPriority="25" Width="150" />
-              <Column Guid="a876035b-24bc-564f-3f6a-cede5f8c8918" Name="Hosted Services" SortPriority="26" Width="102" />
-              <Column Guid="1093bbae-e3f8-570d-d300-fe006ec801fe" Name="Command Line" SortPriority="27" Width="999" IsVisible="true" />
-              <Column Guid="ce84d427-a0a7-58d9-0fde-e8d2e84770bc" Name="Table" SortPriority="28" Width="80" />
-              <Column Guid="36c00ec5-61f8-5f89-a066-641288a34ca9" Name="Start Time" AggregationMode="Min" SortOrder="Ascending" SortPriority="3" TextAlignment="Right" Width="120" />
-              <Column Guid="19fb5aa9-a5fc-5f14-cb83-fad0691e92a8" Name="End Time" AggregationMode="Max" SortOrder="Ascending" SortPriority="4" TextAlignment="Right" Width="120" />
+              <Column Guid="cb796d44-2927-5ac1-d231-4b71904c18f5" Name="Thread Name" SortPriority="13" Width="80" />
+              <Column Guid="82ddfdff-ee93-5f35-08ac-4705069618dc" Name="Thread Activity Tag" SortPriority="14" Width="80" />
+              <Column Guid="2818954f-2d30-5569-4510-dade0a5a605c" Name="Annotation" SortPriority="15" Width="80" />
+              <Column Guid="26dd2129-e3d6-57aa-c56b-34b5a5b79fcb" Name="Count" AggregationMode="Count" SortOrder="Descending" TextAlignment="Right" Width="60" IsVisible="true" />
+              <Column Guid="c4cf3680-7ab6-5b50-a66e-bb282e861842" Name="Duration" AggregationMode="Sum" SortPriority="17" TextAlignment="Right" Width="120" />
+              <Column Guid="3546d491-9447-5abe-f1ea-c8363af9b77f" Name="Avg Duration" AggregationMode="Average" SortPriority="18" TextAlignment="Right" Width="120" />
+              <Column Guid="fd1c6bea-5148-5a94-f0d2-720385dfddf6" Name="Min Duration" AggregationMode="Min" SortPriority="19" TextAlignment="Right" Width="120" />
+              <Column Guid="fa105ddf-fff0-57fb-8472-3b02066ee626" Name="Max Duration" AggregationMode="Max" SortPriority="20" TextAlignment="Right" Width="120" />
+              <Column Guid="7b96de49-17c2-5b21-e879-cd3fa850202f" Name="Permanent Count" AggregationMode="Sum" SortPriority="21" TextAlignment="Right" Width="80" />
+              <Column Guid="a5e0fdb2-8afa-59e2-91e7-5ade1195b805" Name="Package Full Name" SortPriority="22" Width="200" />
+              <Column Guid="a38e516d-6cf2-5659-97f7-5b4d7b128289" Name="Package Relative Application Id" SortPriority="23" Width="150" />
+              <Column Guid="7c8085f1-33de-5a34-b975-ff02c3a942fb" Name="Modern Application Friendly Name" SortPriority="24" Width="150" />
+              <Column Guid="a876035b-24bc-564f-3f6a-cede5f8c8918" Name="Hosted Services" SortPriority="25" Width="102" />
+              <Column Guid="1093bbae-e3f8-570d-d300-fe006ec801fe" Name="Command Line" SortPriority="26" Width="999" IsVisible="true" />
+              <Column Guid="ce84d427-a0a7-58d9-0fde-e8d2e84770bc" Name="Table" SortPriority="27" Width="80" />
+              <Column Guid="36c00ec5-61f8-5f89-a066-641288a34ca9" Name="Start Time" AggregationMode="Min" SortPriority="28" TextAlignment="Right" Width="120" IsVisible="true" />
+              <Column Guid="19fb5aa9-a5fc-5f14-cb83-fad0691e92a8" Name="End Time" AggregationMode="Max" SortPriority="29" TextAlignment="Right" Width="120" IsVisible="true" />
             </Columns>
           </Preset>
-        </ModifiedPresets>
-        <PersistedPresets />
+        </PersistedPresets>
       </GraphSchema>
       <GraphSchema Guid="c58f5fea-0319-4046-932d-e695ebe20b47" HelpText="{}{\rtf1\ansi\ansicpg1252\uc1\htmautsp\deff2{\fonttbl{\f0\fcharset0 Times New Roman;}{\f2\fcharset0 Segoe UI;}}{\colortbl\red0\green0\blue0;\red255\green255\blue255;}\loch\hich\dbch\pard\plain\ltrpar\itap0{\lang1033\fs18\f2\cf0 \cf0\ql{\f2 {\ltrch Uses context switch events to provide a precise view of CPU usage in the trace. You can view a timeline of when threads are switched in and out, a graph of usage, and many other visualizations.}\li0\ri0\sa0\sb0\fi0\ql\par}&#xD;&#xA;{\f2 \li0\ri0\sa0\sb0\fi0\ql\par}&#xD;&#xA;{\f2 {\ltrch More on context switching }\li0\ri0\sa0\sb0\fi0\ql\par}&#xD;&#xA;{\f2 {\ltrch Because the number of processors in a system is limited, all threads cannot run at the same time. Windows uses processor time-sharing, which allows a thread to run for a period of time before the processor switches to another thread. Switching between threads is called a context-switch and it is performed by a Windows component called the dispatcher. The dispatcher makes thread scheduling decisions based on priority, ideal processor and affinity, quantum, and state. This graph captures the data by the dispatcher.}\li0\ri0\sa0\sb0\fi0\ql\par}&#xD;&#xA;}&#xD;&#xA;}">
         <ModifiedPresets>
