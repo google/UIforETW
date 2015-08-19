@@ -243,9 +243,9 @@ BEGIN
         MENUITEM "Open trace in &GPUView\tCtrl+G", ID_TRACES_OPENTRACEINGPUVIEW
         MENUITEM "&Delete trace\tDelete",       ID_TRACES_DELETETRACE
         MENUITEM "&Rename trace\tF2",           ID_TRACES_RENAMETRACE
-        MENUITEM "&ETW compress trace (8.0+)",  ID_TRACES_COMPRESSTRACE
+        MENUITEM "&ETW compress trace (Win 8.0+)", ID_TRACES_COMPRESSTRACE
         MENUITEM "&Zip compress trace",         ID_TRACES_ZIPCOMPRESSTRACE
-        MENUITEM "ETW Compress all &traces (8.0+)", ID_TRACES_COMPRESSTRACES
+        MENUITEM "ETW Compress all &traces (Win 8.0+)", ID_TRACES_COMPRESSTRACES
         MENUITEM "Zip compress all traces",     ID_TRACES_ZIPCOMPRESSALLTRACES
         MENUITEM "&Browse folder",              ID_TRACES_BROWSEFOLDER
         MENUITEM "&Strip Chrome symbols",       ID_TRACES_STRIPCHROMESYMBOLS
