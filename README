@@ -1,28 +1,40 @@
-This directory contains resources associated with using ETW/xperf.
-Most of these resources are associated with blog posts on:
-https://randomascii.wordpress.com/category/xperf/
+UIforETW is a user interface for recording ETW (Event Tracing for
+Windows) traces, which allow amazingly deep investigations of
+performance problems on Windows. Its goals include:
+ - making recording ETW traces easy for non-developers
+ - making it easy to record additional contextual data such as user
+input and CPU temperature in order to make trace analysis easier
+ - making trace management easier for developers
+ - working around bugs in WPT (Windows Performance Toolkit)
 
 For specific details on this project see this post which includes
 some documentation and an explanation for why this project was
 created:
 https://randomascii.wordpress.com/2015/04/14/uiforetw-windows-performance-made-easier/
 
-The core project is UIforETW which is a graphical user interface for
-recording and managing ETW traces. It makes it much easier to control
-how traces are recorded than using batch files or Microsoft's wprui.
-UIforETW also works around numerous problems with ETW tracing (fixing
-symbol loading issues) and adds extra features such as categorizing
-chrome processes.
+UIforETW makes it much easier to control how traces are recorded than
+using batch files or Microsoft's wprui. UIforETW also works around
+numerous problems with ETW tracing (fixing symbol loading issues)
+and adds extra features such as categorizing chrome processes,
+monitoring working sets, etc.
 
 UIforETW also lists all the recorded traces and displays editable notes
-associated with each on.
+associated with each one.
 
-UIforETW is somewhat biased towards Chrome development - it has some
-features that are specific to Chrome developers - but it is fully
-functional for non-Chrome developers as well.
+UIforETW has some features that are specific to Chrome developers - but
+it is fully functional for non-Chrome developers as well.
 
-To use UIforETW you have to install the Windows Performance Toolkit
-(version 8.1 is currently the latest version) and then run UIforETW.exe.
+If you want to use UIforETW then you should download the latest
+etwpackage.zip from the releases page at:
+https://github.com/google/UIforETW/releases
+
+If you want to build or modify UIforETW then you should clone the repo
+and then build UIforETW\UIforETW.sln.
+
+Pull requests are welcomed. For information on contributing see the
+CONTRIBUTING file. When writing commit messages try following the
+general guidelines from here:
+http://chris.beams.io/posts/git-commit/
 
 This is not an official Google project and is not supported by Google
 in any way.
