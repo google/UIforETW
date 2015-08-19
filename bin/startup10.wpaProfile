@@ -537,6 +537,76 @@
               <Column Guid="a9f52228-f099-5da9-3a9e-172bd80080b7" Name="Package Full Name" SortOrder="Ascending" SortPriority="2" Width="200" />
               <Column Guid="38029f88-349c-52ec-8012-f0b20d084a4c" Name="Package Relative Application Id" SortOrder="Ascending" SortPriority="6" Width="150" />
               <Column Guid="56285b40-3c27-5ac7-3ff8-32bff9cac735" Name="Modern Application Friendly Name" SortOrder="Ascending" SortPriority="7" Width="150" />
+              <Column Guid="26b77cb5-b290-5151-5b9a-184315cef673" Name="Load Stack Tag" SortOrder="Ascending" SortPriority="21" Width="200">
+                <StackOptionsParameter Mode="StackTag" FrameTagFold="True" />
+              </Column>
+              <Column Guid="26b77cb5-b290-5151-5b9a-184315cef673" Name="Load Stack (Frame Tags)" SortOrder="Ascending" SortPriority="22" Width="200">
+                <StackOptionsParameter Mode="FrameTags" FrameTagFold="True" />
+              </Column>
+              <Column Guid="26b77cb5-b290-5151-5b9a-184315cef673" Name="Load Stack" SortOrder="Ascending" SortPriority="23" Width="200">
+                <StackOptionsParameter FrameTagFold="True" />
+              </Column>
+              <Column Guid="930bf401-5d98-54a9-13cd-91c398a78e3b" Name="Unload Stack Tag" SortOrder="Ascending" SortPriority="25" Width="200">
+                <StackOptionsParameter Mode="StackTag" FrameTagFold="True" />
+              </Column>
+              <Column Guid="930bf401-5d98-54a9-13cd-91c398a78e3b" Name="Unload Stack (Frame Tags)" SortOrder="Ascending" SortPriority="26" Width="200">
+                <StackOptionsParameter Mode="FrameTags" FrameTagFold="True" />
+              </Column>
+              <Column Guid="930bf401-5d98-54a9-13cd-91c398a78e3b" Name="Unload Stack" SortOrder="Ascending" SortPriority="27" Width="200">
+                <StackOptionsParameter FrameTagFold="True" />
+              </Column>
+              <Column Guid="805996ba-9555-5226-f229-e3a3c0625e12" Name="Image Name" SortPriority="11" Width="200" IsVisible="true" />
+              <Column Guid="cb796d44-2927-5ac1-d231-4b71904c18f5" Name="Thread Name" SortPriority="3" Width="80" />
+              <Column Guid="82ddfdff-ee93-5f35-08ac-4705069618dc" Name="Thread Activity Tag" SortPriority="4" Width="80" />
+              <Column Guid="2818954f-2d30-5569-4510-dade0a5a605c" Name="Annotation" SortPriority="5" Width="80" />
+              <Column Guid="756d7d5a-a03f-5d80-6eba-c3aa94cfe34b" Name="Count" AggregationMode="Count" SortPriority="13" TextAlignment="Right" Width="60" />
+              <Column Guid="a3ca869a-9c38-5325-e8cd-e6b0d562a72a" Name="ImageSize" SortPriority="14" TextAlignment="Right" Width="80" CellFormat="x" />
+              <Column Guid="fe9aa432-96fb-56d4-f221-98b60b6d279e" Name="Permanent Count" AggregationMode="Sum" SortPriority="30" TextAlignment="Right" Width="80" />
+              <Column Guid="0589bb5f-5460-50ed-0d7e-352718606f24" Name="Duration" AggregationMode="Sum" SortOrder="Descending" SortPriority="31" TextAlignment="Right" Width="120" />
+              <Column Guid="9cd45b59-f1ea-5ee5-b5fb-726a806326f0" Name="Avg Duration" AggregationMode="Average" SortOrder="Descending" SortPriority="32" TextAlignment="Right" Width="120" />
+              <Column Guid="f054b0c8-52c0-583f-4291-77489e70fc0d" Name="Min Duration" AggregationMode="Min" SortOrder="Ascending" SortPriority="33" TextAlignment="Right" Width="120" />
+              <Column Guid="5740b5cd-f995-5b9d-7633-cb68b3eeee06" Name="Max Duration" AggregationMode="Max" SortOrder="Descending" SortPriority="34" TextAlignment="Right" Width="120" />
+              <Column Guid="33087cd0-ab1d-5261-d793-d264dd520f42" Name="Default Start Address" SortOrder="Ascending" SortPriority="35" TextAlignment="Right" Width="140" CellFormat="x" />
+              <Column Guid="542dbdbb-e4f1-5cb0-f70a-2da71320e1ce" Name="Start Address" AggregationMode="Min" SortPriority="16" TextAlignment="Right" Width="140" CellFormat="x" />
+              <Column Guid="2b724277-8050-5de3-b33f-997462ea0eed" Name="End Address" AggregationMode="Max" SortPriority="17" TextAlignment="Right" Width="140" CellFormat="x" />
+              <Column Guid="3a9fa0d1-876d-5b93-009a-2cbb3b5e1448" Name="Relocated Count" AggregationMode="Sum" SortOrder="Descending" SortPriority="36" TextAlignment="Right" Width="80" />
+              <Column Guid="d38d1a9d-9ffd-5665-3401-7ffcbc88c471" Name="Checksum" SortPriority="19" TextAlignment="Right" Width="80" CellFormat="x" />
+              <Column Guid="8db8684a-9af9-5134-8fac-ea61c4f2cee1" Name="Image Path" SortOrder="Ascending" SortPriority="1" Width="300" IsVisible="true" />
+              <Column Guid="16e51d5d-f040-5d0f-072e-0242ec3890ca" Name="TimeDateStamp" SortPriority="20" TextAlignment="Right" Width="80" CellFormat="x" IsVisible="true" />
+              <Column Guid="c7098106-0b9a-56e6-95b0-dcb676c96856" Name="Process Command Line" SortPriority="37" Width="999" />
+              <Column Guid="53836370-15a4-5b6d-9cbd-0e4c23a36846" Name="Original File Name" SortPriority="38" Width="200" />
+              <Column Guid="79c9c924-a76c-57f7-8a45-9570d12a6a0c" Name="File Description" SortPriority="39" Width="300" />
+              <Column Guid="0ffcc6cd-c664-593b-f363-92d7bfd0de4f" Name="File Version" SortPriority="24" Width="300" IsVisible="true" />
+              <Column Guid="1bb546b1-4cfa-5df2-5bab-117e0722236d" Name="Binary File Version" SortPriority="40" Width="120" />
+              <Column Guid="01757d8f-61a8-5e7b-4a7b-c85150b23570" Name="Version Language" SortPriority="41" Width="120" />
+              <Column Guid="c8949297-aeab-589f-06a0-39b5912b525a" Name="Product Name" SortPriority="42" Width="250" />
+              <Column Guid="4cfbf4ef-4d37-5805-a53a-53d60d46f323" Name="Company Name" SortPriority="43" Width="200" />
+              <Column Guid="fd3a50be-1505-5e37-7b71-fd7f2f1e0963" Name="Product Version" SortPriority="44" Width="120" />
+              <Column Guid="6eebad00-0ee0-5d2f-3064-9cc95674349c" Name="FileId" SortPriority="45" Width="300" />
+              <Column Guid="dc33568b-d4cb-5c04-e92b-08afaa892116" Name="ProgramId" SortPriority="46" Width="300" />
+              <Column Guid="ce84d427-a0a7-58d9-0fde-e8d2e84770bc" Name="Table" SortPriority="8" Width="80" />
+              <Column Guid="84fa7f2c-c8bb-575c-e607-9b03f2839a2d" Name="Start Time" AggregationMode="Min" SortOrder="Ascending" SortPriority="9" TextAlignment="Right" Width="120" IsVisible="true" />
+              <Column Guid="b5b4978f-1421-5920-14e0-f4edbe844cd6" Name="End Time" AggregationMode="Max" SortPriority="28" TextAlignment="Right" Width="120" IsVisible="true" />
+            </Columns>
+          </Preset>
+        </ModifiedPresets>
+        <PersistedPresets>
+          <Preset Name="Randomascii Image Path" BarGraphIntervalCount="50" GraphColumnCount="48" KeyColumnCount="16" LeftFrozenColumnCount="17" RightFrozenColumnCount="47" InitialFilterShouldKeep="true">
+            <MetadataEntries>
+              <MetadataEntry Guid="84fa7f2c-c8bb-575c-e607-9b03f2839a2d" Name="Start Time" ColumnMetadata="StartTime" />
+              <MetadataEntry Guid="b5b4978f-1421-5920-14e0-f4edbe844cd6" Name="End Time" ColumnMetadata="EndTime" />
+            </MetadataEntries>
+            <HighlightEntries />
+            <Columns>
+              <Column Guid="1088f617-20a8-53a7-9952-3eabefc445cf" Name="Process Name" SortOrder="Ascending" Width="200" IsVisible="true" />
+              <Column Guid="f84ccf4e-afa5-5a62-4a56-6a9eca9ed590" Name="Lifetime" SortOrder="Descending" SortPriority="29" Width="80" />
+              <Column Guid="63f64d61-d8b1-5fe8-661a-4e48aaf8c613" Name="Process" SortPriority="10" Width="200" IsVisible="true" />
+              <Column Guid="88a2f1cd-806a-5d1c-2ce6-589ab1528f78" Name="Process ID" SortOrder="Ascending" SortPriority="12" TextAlignment="Right" Width="80" />
+              <Column Guid="7a2ec259-c797-5968-d0a4-c21af6274215" Name="Session ID" SortOrder="Ascending" SortPriority="15" TextAlignment="Right" Width="60" />
+              <Column Guid="813414b6-dc1b-594f-6c6b-b1fdc69300b4" Name="Parent Process ID" SortOrder="Ascending" SortPriority="18" TextAlignment="Right" Width="80" />
+              <Column Guid="a9f52228-f099-5da9-3a9e-172bd80080b7" Name="Package Full Name" SortOrder="Ascending" SortPriority="2" Width="200" />
+              <Column Guid="38029f88-349c-52ec-8012-f0b20d084a4c" Name="Package Relative Application Id" SortOrder="Ascending" SortPriority="6" Width="150" />
+              <Column Guid="56285b40-3c27-5ac7-3ff8-32bff9cac735" Name="Modern Application Friendly Name" SortOrder="Ascending" SortPriority="7" Width="150" />
               <Column Guid="26b77cb5-b290-5151-5b9a-184315cef673" Name="Load Stack" SortOrder="Ascending" SortPriority="21" Width="200">
                 <StackOptionsParameter Mode="StackTag" FrameTagFold="True" />
               </Column>
@@ -585,12 +655,11 @@
               <Column Guid="6eebad00-0ee0-5d2f-3064-9cc95674349c" Name="FileId" SortPriority="45" Width="300" />
               <Column Guid="dc33568b-d4cb-5c04-e92b-08afaa892116" Name="ProgramId" SortPriority="46" Width="300" />
               <Column Guid="ce84d427-a0a7-58d9-0fde-e8d2e84770bc" Name="Table" SortPriority="8" Width="80" />
-              <Column Guid="84fa7f2c-c8bb-575c-e607-9b03f2839a2d" Name="Start Time" AggregationMode="Min" SortOrder="Ascending" SortPriority="9" TextAlignment="Right" Width="120" />
-              <Column Guid="b5b4978f-1421-5920-14e0-f4edbe844cd6" Name="End Time" AggregationMode="Max" SortPriority="28" TextAlignment="Right" Width="120" />
+              <Column Guid="84fa7f2c-c8bb-575c-e607-9b03f2839a2d" Name="Start Time" AggregationMode="Min" SortOrder="Ascending" SortPriority="9" TextAlignment="Right" Width="120" IsVisible="true" />
+              <Column Guid="b5b4978f-1421-5920-14e0-f4edbe844cd6" Name="End Time" AggregationMode="Max" SortPriority="28" TextAlignment="Right" Width="120" IsVisible="true" />
             </Columns>
           </Preset>
-        </ModifiedPresets>
-        <PersistedPresets />
+        </PersistedPresets>
       </GraphSchema>
       <GraphSchema Guid="04f69f98-176e-4d1c-b44e-97f734996ab8" HelpText="{}{\rtf1\ansi\ansicpg1252\uc1\htmautsp\deff2{\fonttbl{\f0\fcharset0 Times New Roman;}{\f2\fcharset0 Segoe UI;}}{\colortbl\red0\green0\blue0;\red255\green255\blue255;}\loch\hich\dbch\pard\plain\ltrpar\itap0{\lang1033\fs18\f2\cf0 \cf0\ql{\f2 {\ltrch Shows every event in the trace, including the associated payload fields.}\li0\ri0\sa0\sb0\fi0\ql\par}&#xD;&#xA;{\f2 \li0\ri0\sa0\sb0\fi0\ql\par}&#xD;&#xA;{\f2 {\ltrch New capability - graph payload fields!}\li0\ri0\sa0\sb0\fi0\ql\par}&#xD;&#xA;{\f2 \li0\ri0\sa0\sb0\fi0\ql\par}&#xD;&#xA;{\f2 {\ltrch 1. Filter down to the event with the payload field you want to graph.}\li0\ri0\sa0\sb0\fi0\ql\par}&#xD;&#xA;{\f2 {\ltrch 2. Drag the column corresponding to the payload field you want to graph to the right of the blue bar.}\li0\ri0\sa0\sb0\fi0\ql\par}&#xD;&#xA;{\f2 {\ltrch 3. If the automatic graphing isn't representing your data correctly, go to View Editor and:}\li0\ri0\sa0\sb0\fi0\ql\par}&#xD;&#xA;{\f2 {\ltrch a. Adjust the aggregation mode for your column, or}\li0\ri0\sa0\sb0\fi0\ql\par}&#xD;&#xA;{\f2 {\ltrch b. Go to Advanced &gt; Graph Configuration and change your graphing aggregation mode.}\li0\ri0\sa0\sb0\fi0\ql\par}&#xD;&#xA;}&#xD;&#xA;}">
         <ModifiedPresets>
