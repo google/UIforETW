@@ -50,6 +50,10 @@ const int kFlagDoubleClick = 100;
 #endif
 #include <sal.h> // For _Printf_format_string_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // Insert a single event to mark a point in an ETW trace.
 PLATFORM_INTERFACE void __cdecl ETWMark(_In_z_ PCSTR pMessage);
 // ETWWorkerMark is identical to ETWMark but goes through a different provider,
@@ -103,6 +107,9 @@ PLATFORM_INTERFACE void __cdecl ETWMouseMove(unsigned flags, int nX, int nY);
 PLATFORM_INTERFACE void __cdecl ETWMouseWheel(unsigned flags, int zDelta, int nX, int nY);
 PLATFORM_INTERFACE void __cdecl ETWKeyDown(unsigned nChar, _In_opt_z_ const char* keyName, unsigned nRepCnt, unsigned flags);
 
+#ifdef __cplusplus
+} // end of extern "C"
+
 // This class calls the ETW Begin and End functions in order to insert a
 // pair of events to bracket some work.
 class CETWScope
@@ -125,6 +132,7 @@ private:
 	_Field_z_ PCSTR m_pMessage;
 	int64 m_nStartTime;
 };
+#endif // __cplusplus
 
 #else
 
@@ -156,6 +164,7 @@ inline void ETWMouseMove( unsigned int flags, int nX, int nY ) {}
 inline void ETWMouseWheel( unsigned int flags, int zDelta, int nX, int nY ) {}
 inline void ETWKeyDown( unsigned nChar, const char* keyName, unsigned nRepCnt, unsigned flags ) {}
 
+#ifdef __cplusplus
 // This class calls the ETW Begin and End functions in order to insert a
 // pair of events to bracket some work.
 class CETWScope
@@ -169,6 +178,7 @@ private:
 	CETWScope( const CETWScope& rhs ) = delete;
 	CETWScope& operator=( const CETWScope& rhs ) = delete;
 };
+#endif // __cplusplus
 
 #endif
 
