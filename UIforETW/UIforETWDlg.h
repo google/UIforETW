@@ -66,12 +66,14 @@ private:
 	bool bFastSampling_ = false;
 	bool bGPUTracing_ = false;
 	bool bShowCommands_ = false;
+	bool bDotNETStacks_ = false;
 	CButton btCompress_;
 	CButton btCswitchStacks_;
 	CButton btSampledStacks_;
 	CButton btFastSampling_;
 	CButton btGPUTracing_;
 	CButton btShowCommands_;
+	CButton btDotNETStacks_;
 
 	bool bHeapStacks_ = true;
 
@@ -174,6 +176,7 @@ private:
 	std::wstring GetKernelFile() const { return CUIforETWDlg::GetTempTraceDir() + L"kernel.etl"; }
 	std::wstring GetUserFile() const { return GetTempTraceDir() + L"user.etl"; }
 	std::wstring GetHeapFile() const { return GetTempTraceDir() + L"heap.etl"; }
+	std::wstring GetCLRRundownFile() const { return GetTempTraceDir() + L"clrrundown.etl"; }
 
 	// Get session name for kernel logger
 	const std::wstring kernelLogger_ = L"\"NT Kernel Logger\"";
@@ -224,6 +227,7 @@ private:
 	afx_msg void OnBnClickedContextswitchcallstacks();
 	afx_msg void OnBnClickedShowcommands();
 	afx_msg void OnBnClickedFastsampling();
+	afx_msg void OnBnClickedDotNETstacks();
 	afx_msg void OnCbnSelchangeInputtracing();
 	afx_msg LRESULT UpdateTraceListHandler(WPARAM wParam, LPARAM lParam);
 	afx_msg void OnLbnDblclkTracelist();

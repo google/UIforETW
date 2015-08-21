@@ -160,6 +160,7 @@ void CUIforETWDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_FASTSAMPLING, btFastSampling_);
 	DDX_Control(pDX, IDC_GPUTRACING, btGPUTracing_);
 	DDX_Control(pDX, IDC_SHOWCOMMANDS, btShowCommands_);
+	DDX_Control(pDX, IDC_DOTNETSTACKS, btDotNETStacks_);
 
 	DDX_Control(pDX, IDC_INPUTTRACING, btInputTracing_);
 	DDX_Control(pDX, IDC_INPUTTRACING_LABEL, btInputTracingLabel_);
@@ -184,6 +185,7 @@ BEGIN_MESSAGE_MAP(CUIforETWDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_CONTEXTSWITCHCALLSTACKS, &CUIforETWDlg::OnBnClickedContextswitchcallstacks)
 	ON_BN_CLICKED(IDC_SHOWCOMMANDS, &CUIforETWDlg::OnBnClickedShowcommands)
 	ON_BN_CLICKED(IDC_FASTSAMPLING, &CUIforETWDlg::OnBnClickedFastsampling)
+	ON_BN_CLICKED(IDC_DOTNETSTACKS, &CUIforETWDlg::OnBnClickedDotNETstacks)
 	ON_CBN_SELCHANGE(IDC_INPUTTRACING, &CUIforETWDlg::OnCbnSelchangeInputtracing)
 	ON_MESSAGE(WM_UPDATETRACELIST, UpdateTraceListHandler)
 	ON_LBN_DBLCLK(IDC_TRACELIST, &CUIforETWDlg::OnLbnDblclkTracelist)
@@ -419,6 +421,7 @@ BOOL CUIforETWDlg::OnInitDialog()
 	CheckDlgButton(IDC_FASTSAMPLING, bFastSampling_);
 	CheckDlgButton(IDC_GPUTRACING, bGPUTracing_);
 	CheckDlgButton(IDC_SHOWCOMMANDS, bShowCommands_);
+	CheckDlgButton(IDC_DOTNETSTACKS, bDotNETStacks_);
 
 	// If a fast sampling speed is requested then set it now. Note that
 	// this assumes that the speed will otherwise be normal.
@@ -811,6 +814,12 @@ void CUIforETWDlg::OnBnClickedStarttracing()
 		}
 	}
 
+	if (bDotNETStacks_)
+	{
+		// Per https://msdn.microsoft.com/en-us/library/ff357718(v=vs.110).aspx
+		userProviders += L"+e13c0d23-ccbc-4e12-931b-d9cc2eee27e4:0x1CCBD:0x5";
+	}
+
 	// Increase the user buffer sizes when doing graphics tracing.
 	const int numUserBuffers = BufferCountBoost(bGPUTracing_ ? 200 : 100);
 	std::wstring userBuffers = stringPrintf(L" -buffersize 1024 -minbuffers %d -maxbuffers %d", numUserBuffers, numUserBuffers);
@@ -889,6 +898,26 @@ void CUIforETWDlg::StopTracingAndMaybeRecord(bool bSaveTrace)
 
 	ElapsedTimer saveTimer;
 	{
+		// If the user wants .NET stacks, and if they started the tracing after the process
+		// they are interested in, we need to capture rundown events so we can get names of
+		// methods that were jitted before we started tracing.
+		// https://msdn.microsoft.com/en-us/library/ff357718(v=vs.110).aspx
+		// This may take a moment, so if they want, they can uncheck the box before
+		// they stop tracing.
+		if (bSaveTrace && bDotNETStacks_)
+		{
+			ChildProcess rundownXperf(GetXperfPath());
+			std::wstring args = L" -start UIforETWSessionCLRRundown -on A669021C-C450-4609-A035-5AF59AF4DF18:0xB8:0x5 -f \"" + GetCLRRundownFile() + L"\"";
+			rundownXperf.Run(bShowCommands_, L"xperf.exe" + args);
+			// Until somebody comes up with a better way of doing this, just sleep for a few seconds.
+			// We'll try 15, the docs vaguely say "between 30 and 60".
+			Sleep(15000);
+
+			ChildProcess stopRundownXperf(GetXperfPath());
+			std::wstring stopRundownArgs = L" -stop UIforETWSessionCLRRundown";
+			stopRundownXperf.Run(bShowCommands_, L"xperf.exe" + stopRundownArgs);
+		}
+
 		// Stop the kernel and user sessions.
 		ChildProcess child(GetXperfPath());
 		if (bSaveTrace && tracingMode_ == kTracingToMemory)
@@ -925,6 +954,8 @@ void CUIforETWDlg::StopTracingAndMaybeRecord(bool bSaveTrace)
 			std::wstring args = L" -merge \"" + GetKernelFile() + L"\" \"" + GetUserFile() + L"\"";
 			if (tracingMode_ == kHeapTracingToFile)
 				args += L" \"" + GetHeapFile() + L"\"";
+			if (bDotNETStacks_)
+				args += L" \"" + GetCLRRundownFile() + L"\"";
 			args += L" \"" + traceFilename + L"\"";
 			if (bCompress_)
 				args += L" -compress";
@@ -943,6 +974,8 @@ void CUIforETWDlg::StopTracingAndMaybeRecord(bool bSaveTrace)
 	DeleteFile(GetUserFile().c_str());
 	if (tracingMode_ == kHeapTracingToFile)
 		DeleteFile(GetHeapFile().c_str());
+	if (bDotNETStacks_)
+		DeleteFile(GetCLRRundownFile().c_str());
 
 	if (!bSaveTrace || tracingMode_ != kTracingToMemory)
 	{
@@ -1121,6 +1154,10 @@ void CUIforETWDlg::OnBnClickedGPUtracing()
 	bGPUTracing_ = !bGPUTracing_;
 }
 
+void CUIforETWDlg::OnBnClickedDotNETstacks()
+{
+	bDotNETStacks_ = !bDotNETStacks_;
+}
 
 void CUIforETWDlg::OnCbnSelchangeInputtracing()
 {
