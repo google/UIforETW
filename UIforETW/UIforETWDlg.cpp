@@ -906,16 +906,17 @@ void CUIforETWDlg::StopTracingAndMaybeRecord(bool bSaveTrace)
 		// they stop tracing.
 		if (bSaveTrace && bDotNETStacks_)
 		{
-			ChildProcess rundownXperf(GetXperfPath());
-			std::wstring args = L" -start UIforETWSessionCLRRundown -on A669021C-C450-4609-A035-5AF59AF4DF18:0xB8:0x5 -f \"" + GetCLRRundownFile() + L"\"";
-			rundownXperf.Run(bShowCommands_, L"xperf.exe" + args);
-			// Until somebody comes up with a better way of doing this, just sleep for a few seconds.
-			// We'll try 15, the docs vaguely say "between 30 and 60".
-			Sleep(15000);
-
-			ChildProcess stopRundownXperf(GetXperfPath());
-			std::wstring stopRundownArgs = L" -stop UIforETWSessionCLRRundown";
-			stopRundownXperf.Run(bShowCommands_, L"xperf.exe" + stopRundownArgs);
+			{
+				ChildProcess rundownXperf(GetXperfPath());
+				std::wstring args = L" -start UIforETWSessionCLRRundown -on A669021C-C450-4609-A035-5AF59AF4DF18:0xB8:0x5 -f \"" + GetCLRRundownFile() + L"\"";
+				rundownXperf.Run(bShowCommands_, L"xperf.exe" + args);
+			}
+			if (false) Sleep(15000);
+			{
+				ChildProcess stopRundownXperf(GetXperfPath());
+				std::wstring stopRundownArgs = L" -stop UIforETWSessionCLRRundown";
+				stopRundownXperf.Run(bShowCommands_, L"xperf.exe" + stopRundownArgs);
+			}
 		}
 
 		// Stop the kernel and user sessions.
