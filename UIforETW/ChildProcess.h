@@ -23,26 +23,29 @@ limitations under the License.
 //   ChildProcess child(fullPathToExecutable);
 //   std::wstring args = L" -go";
 //   child.Run(bShowCommands_, L"exename.exe" + args);
-// The destructor will wait for the process to exit,
-// calling the global outputPrintf function with output from
-// the child process as it arrives. The calling code can
-// optionally retrieve the exit code, which also waits for
-// the process to exit.
-//   DWORD exitCode = child.GetExitCode();
+// Run returns immediately. The destructor, GetExitCode(), and
+// GetOutput() will all wait for the process to exit. The
+// destructor and GetExitCode() both print all output as it
+// arrives using the global outputPrintf function, whereas
+// GetOutput returns the output.
 
 class ChildProcess
 {
 public:
 	ChildProcess(std::wstring exePath);
+	// This waits for the child process to terminate, and prints
+	// output with outputPrintf as it arrives.
 	~ChildProcess();
 
-	// Returns true if the process started.
+	// Returns true if the process started. This function returns
+	// immediately without waiting for process completion.
 	_Pre_satisfies_(!(this->hProcess_))
 	bool Run(bool showCommand, std::wstring args);
 
 	// This can be called even if the process doesn't start, but
 	// it will return zero. If the process is still running it
 	// will wait until the process returns and then get the exit code.
+	// This function will print output as it arrives with outputPrintf.
 	DWORD GetExitCode();
 
 	// Normally all output is printed as it is received. If this function
