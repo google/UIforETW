@@ -380,6 +380,15 @@ BOOL CUIforETWDlg::OnInitDialog()
 	if (PathFileExists(wpa10Path_.c_str()))
 		wpaDefaultPath_ = wpa10Path_;
 
+	// The Media Experience Analyzer is a 64-bit installer, so we look for it in
+	// ProgramFiles.
+	wchar_t* progFilesDir = nullptr;
+	if (SUCCEEDED(SHGetKnownFolderPath(FOLDERID_ProgramFiles, 0, NULL, &progFilesDir)))
+	{
+		mxaPath_ = progFilesDir;
+		mxaPath_ += L"\\Media eXperience Analyzer\\XA.exe";
+	}
+
 	wchar_t documents[MAX_PATH];
 	const BOOL getMyDocsResult = SHGetSpecialFolderPath(*this, documents, CSIDL_MYDOCUMENTS, TRUE);
 	UIETWASSERT(getMyDocsResult);
@@ -1494,6 +1503,10 @@ void CUIforETWDlg::OnContextMenu(CWnd* pWnd, CPoint point)
 					pContextMenu->SetDefaultItem(ID_TRACES_OPENTRACEINWPA);
 				}
 			}
+			if (!PathFileExists(mxaPath_.c_str()))
+			{
+				pContextMenu->EnableMenuItem(ID_TRACES_OPENTRACEINEXPERIENCEANALYZER, MF_BYCOMMAND | MF_GRAYED);
+			}
 			traceFile = traces_[selIndex];
 			tracePath = GetTraceDir() + traceFile + L".etl";
 		}
@@ -1506,6 +1519,7 @@ void CUIforETWDlg::OnContextMenu(CWnd* pWnd, CPoint point)
 				ID_TRACES_OPENTRACEINWPA,
 				ID_TRACES_OPENTRACEIN10WPA,
 				ID_TRACES_OPENTRACEINGPUVIEW,
+				ID_TRACES_OPENTRACEINEXPERIENCEANALYZER,
 				ID_TRACES_DELETETRACE,
 				ID_TRACES_RENAMETRACE,
 				ID_TRACES_COMPRESSTRACE,
@@ -1544,6 +1558,9 @@ void CUIforETWDlg::OnContextMenu(CWnd* pWnd, CPoint point)
 				break;
 			case ID_TRACES_OPENTRACEINGPUVIEW:
 				LaunchTraceViewer(tracePath, gpuViewPath_);
+				break;
+			case ID_TRACES_OPENTRACEINEXPERIENCEANALYZER:
+				LaunchTraceViewer(tracePath, mxaPath_);
 				break;
 			case ID_TRACES_DELETETRACE:
 				DeleteTrace();

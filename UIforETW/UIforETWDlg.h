@@ -141,6 +141,8 @@ private:
 	std::wstring gpuViewPath_;
 	std::wstring wpa10Path_;
 	std::wstring wpaDefaultPath_; // Default viewer.
+	// MXA is available from http://www.microsoft.com/en-us/download/confirmation.aspx?id=43105
+	std::wstring mxaPath_; // Media Experience Analyzer path
 
 	std::wstring windowsDir_; // C:\Windows\, or some-such.
 	std::string systemDrive_; // C:\, or something like that, ANSI.

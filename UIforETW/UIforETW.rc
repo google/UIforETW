@@ -241,6 +241,7 @@ BEGIN
         MENUITEM "Open trace in 8.1 &WPA\tCtrl+W", ID_TRACES_OPENTRACEINWPA
         MENUITEM "Open trace in &10.0 WPA\tCtrl+E", ID_TRACES_OPENTRACEIN10WPA
         MENUITEM "Open trace in &GPUView\tCtrl+G", ID_TRACES_OPENTRACEINGPUVIEW
+        MENUITEM "Open trace in Media e&Xperience Analyzer", ID_TRACES_OPENTRACEINEXPERIENCEANALYZER
         MENUITEM "&Delete trace\tDelete",       ID_TRACES_DELETETRACE
         MENUITEM "&Rename trace\tF2",           ID_TRACES_RENAMETRACE
         MENUITEM "&ETW compress trace (Win 8.0+)", ID_TRACES_COMPRESSTRACE
