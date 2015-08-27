@@ -903,6 +903,7 @@ void CUIforETWDlg::StopTracingAndMaybeRecord(bool bSaveTrace)
 		if (bSaveTrace && tracingMode_ == kTracingToMemory)
 		{
 			ETWMark("Flushing trace buffers to disk.");
+			ETWMark("Tracing type was circular buffer tracing.");
 			// If we are in memory tracing mode then don't actually stop tracing,
 			// just flush the buffers to disk.
 			std::wstring args = L" -flush " + GetKernelLogger() + L" -f \"" + GetKernelFile() + L"\" -flush UIforETWSession -f \"" + GetUserFile() + L"\"";
@@ -913,9 +914,15 @@ void CUIforETWDlg::StopTracingAndMaybeRecord(bool bSaveTrace)
 			if (bSaveTrace)
 				ETWMark("Stopping tracing.");
 			if (tracingMode_ == kHeapTracingToFile)
+			{
+				ETWMark("Tracing type was heap tracing to file.");
 				child.Run(bShowCommands_, L"xperf.exe -stop xperfHeapSession -stop UIforETWSession -stop " + GetKernelLogger());
+			}
 			else
+			{
+				ETWMark("Tracing type was tracing to file.");
 				child.Run(bShowCommands_, L"xperf.exe -stop UIforETWSession -stop " + GetKernelLogger());
+			}
 		}
 	}
 	double saveTime = saveTimer.ElapsedSeconds();
