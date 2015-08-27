@@ -80,6 +80,9 @@ Adjust that to match your games actual install path.
           <template tid="T_Mark">
             <data inType="win:AnsiString" name="Description" />
           </template>
+          <template tid="T_MarkW">
+            <data inType="win:UnicodeString" name="Description" />
+          </template>
           <template tid="T_Mark1I">
             <data inType="win:AnsiString" name="Description" />
             <data inType="win:Int32" name="Data1" />
@@ -169,6 +172,7 @@ Adjust that to match your games actual install path.
           <event symbol="MarkCPUPower" template="T_Power" value="111" task="PowerStatus" opcode="Information" keywords="NormalFrequency" />
           <event symbol="MarkCPUTemp" template="T_Temp" value="112" task="TempStatus" opcode="Information" keywords="NormalFrequency" />
           <event symbol="MarkTimerInterval" template="T_Interval" value="113" task="TimerStatus" opcode="Information" keywords="NormalFrequency" />
+          <event symbol="MarkW" template="T_MarkW" value="114" task="Block" opcode="Mark" keywords="NormalFrequency" />
         </events>
       </provider>
 

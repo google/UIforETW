@@ -172,6 +172,11 @@ void ETWMark( _In_z_ PCSTR pMessage )
 	EventWriteMark( pMessage );
 }
 
+void ETWMarkW(_In_z_ PCWSTR pMessage)
+{
+	EventWriteMarkW(pMessage);
+}
+
 void ETWMark1I(_In_z_ PCSTR pMessage, int data1)
 {
 	EventWriteMark1I( pMessage, data1 );

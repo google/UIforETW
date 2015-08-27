@@ -52,6 +52,8 @@ const int kFlagDoubleClick = 100;
 
 // Insert a single event to mark a point in an ETW trace.
 PLATFORM_INTERFACE void __cdecl ETWMark(_In_z_ PCSTR pMessage);
+// Wide character mark function.
+PLATFORM_INTERFACE void __cdecl ETWMarkW(_In_z_ PCWSTR pMessage);
 // ETWWorkerMark is identical to ETWMark but goes through a different provider,
 // for different grouping.
 PLATFORM_INTERFACE void __cdecl ETWWorkerMark(_In_z_ PCSTR pMessage);
@@ -131,6 +133,7 @@ private:
 // Portability macros to allow compiling on non-Windows platforms
 
 inline void ETWMark( const char* ) {}
+inline void ETWMarkW(_In_z_ PCWSTR pMessage) {}
 inline void ETWWorkerMark( const char *pMessage ) {}
 inline void ETWMark1I(const char* pMessage, int data1) {}
 inline void ETWMark2I(const char* pMessage, int data1, int data2) {}
