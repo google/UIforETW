@@ -900,6 +900,11 @@ void CUIforETWDlg::StopTracingAndMaybeRecord(bool bSaveTrace)
 	{
 		// Stop the kernel and user sessions.
 		ChildProcess child(GetXperfPath());
+		if (bSaveTrace)
+		{
+			if (useChromeProviders_)
+				ETWMarkPrintf("Chrome ETW events were requested with keyword 0x%llx", chromeKeywords_);
+		}
 		if (bSaveTrace && tracingMode_ == kTracingToMemory)
 		{
 			ETWMark("Flushing trace buffers to disk.");
