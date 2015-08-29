@@ -218,6 +218,28 @@ void ETWMarkPrintf( _Printf_format_string_ _In_z_ PCSTR pMessage, ... )
 	EventWriteMark( buffer );
 }
 
+void ETWMarkWPrintf(_Printf_format_string_ _In_z_ PCWSTR pMessage, ...)
+{
+	// If we are running on Windows XP or if our providers have not been enabled
+	// (by xperf or other) then this will be false and we can early out.
+	// Be sure to check the appropriate context for the event. This is only
+	// worth checking if there is some cost beyond the EventWrite that we can
+	// avoid -- the redirectors in this file guarantee that EventWrite is always
+	// safe to call.
+	if (!MULTI_MAIN_Context.IsEnabled)
+	{
+		return;
+	}
+
+	wchar_t buffer[1000];
+	va_list args;
+	va_start(args, pMessage);
+	vswprintf_s(buffer, pMessage, args);
+	va_end(args);
+
+	EventWriteMarkW(buffer);
+}
+
 void ETWMarkWorkingSet(_In_z_ PCWSTR pProcessName, _In_z_ PCWSTR pProcess, unsigned counter, unsigned privateWS, unsigned PSS, unsigned workingSet)
 {
 	EventWriteMarkWorkingSet(pProcessName, pProcess, counter, privateWS, PSS, workingSet);

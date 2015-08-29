@@ -936,7 +936,7 @@ void CUIforETWDlg::StopTracingAndMaybeRecord(bool bSaveTrace)
 			if (useChromeProviders_)
 				ETWMarkPrintf("Chrome ETW events were requested with keyword 0x%llx", chromeKeywords_);
 			// Record the entire xperf startup command to the trace.
-			ETWMarkW(startupCommand_.c_str());
+			ETWMarkWPrintf(L"Tracing startup command was: %s", startupCommand_.c_str());
 		}
 		if (bSaveTrace && tracingMode_ == kTracingToMemory)
 		{

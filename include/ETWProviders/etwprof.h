@@ -70,6 +70,7 @@ PLATFORM_INTERFACE void __cdecl ETWMark2F(_In_z_ PCSTR pMessage, float data1, fl
 
 // _Printf_format_string_ is used by /analyze
 PLATFORM_INTERFACE void __cdecl ETWMarkPrintf(_Printf_format_string_ _In_z_ PCSTR pMessage, ...);
+PLATFORM_INTERFACE void __cdecl ETWMarkWPrintf(_Printf_format_string_ _In_z_ PCWSTR pMessage, ...);
 PLATFORM_INTERFACE void __cdecl ETWWorkerMarkPrintf(_Printf_format_string_ _In_z_ PCSTR pMessage, ...);
 
 // Private Working Set, Proportional Set Size (shared memory charged proportionally, and total Working Set
@@ -141,14 +142,15 @@ private:
 // Portability macros to allow compiling on non-Windows platforms
 
 inline void ETWMark( const char* ) {}
-inline void ETWMarkW(_In_z_ PCWSTR pMessage) {}
-inline void ETWWorkerMark( const char *pMessage ) {}
+inline void ETWMarkW(_In_z_ wchar_t* pMessage) {}
+inline void ETWWorkerMark( const char* pMessage ) {}
 inline void ETWMark1I(const char* pMessage, int data1) {}
 inline void ETWMark2I(const char* pMessage, int data1, int data2) {}
 inline void ETWMark1F(const char* pMessage, float data1) {}
 inline void ETWMark2F(const char* pMessage, float data1, float data2) {}
 inline void ETWMarkPrintf( const char *pMessage, ... ) {}
-inline void ETWWorkerMarkPrintf( const char *pMessage, ... ) {}
+inline void ETWMarkWPrintf( const wchar_t *pMessage, ... ) {}
+inline void ETWWorkerMarkPrintf( const char* pMessage, ... ) {}
 inline void ETWMarkWorkingSet(const wchar_t* pProcessName, const wchar_t* pProcess, unsigned counter, unsigned privateWS, unsigned PSS, unsigned workingSet) {}
 inline void ETWMarkBatteryStatus(_In_z_ PCSTR powerState, float batteryPercentage, _In_z_ PCSTR rate) {}
 inline void ETWMarkCPUFrequency(_In_z_ PCSTR MSRName, double frequencyMHz) {}
