@@ -847,10 +847,12 @@ void CUIforETWDlg::OnBnClickedStarttracing()
 	DWORD exitCode = 0;
 	{
 		ChildProcess child(GetXperfPath());
+
 		if (tracingMode_ == kHeapTracingToFile)
-			child.Run(bShowCommands_, L"xperf.exe" + kernelArgs + userArgs + heapArgs);
+			startupCommand_ = L"xperf.exe" + kernelArgs + userArgs + heapArgs;
 		else
-			child.Run(bShowCommands_, L"xperf.exe" + kernelArgs + userArgs);
+			startupCommand_ = L"xperf.exe" + kernelArgs + userArgs;
+		child.Run(bShowCommands_, startupCommand_);
 
 		exitCode = child.GetExitCode();
 		if (exitCode)
@@ -933,6 +935,8 @@ void CUIforETWDlg::StopTracingAndMaybeRecord(bool bSaveTrace)
 		{
 			if (useChromeProviders_)
 				ETWMarkPrintf("Chrome ETW events were requested with keyword 0x%llx", chromeKeywords_);
+			// Record the entire xperf startup command to the trace.
+			ETWMarkW(startupCommand_.c_str());
 		}
 		if (bSaveTrace && tracingMode_ == kTracingToMemory)
 		{

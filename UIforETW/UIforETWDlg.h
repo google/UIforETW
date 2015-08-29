@@ -147,8 +147,12 @@ private:
 	std::wstring windowsDir_; // C:\Windows\, or some-such.
 	std::string systemDrive_; // C:\, or something like that, ANSI.
 
+	// These holds the output of running xperf and other commands.
 	std::wstring output_;
 	CEdit btOutput_;
+
+	// The xperf command line used to start tracing.
+	std::wstring startupCommand_;
 
 	// General purpose keyboard accelerators.
 	HACCEL hAccelTable_ = NULL;
