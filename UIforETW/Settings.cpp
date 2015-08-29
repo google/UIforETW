@@ -79,7 +79,9 @@ CSettings::~CSettings()
 void CSettings::DoDataExchange(CDataExchange* pDX)
 {
 	DDX_Control(pDX, IDC_HEAPEXE, btHeapTracingExe_);
-	DDX_Control(pDX, IDC_EXTRAPROVIDERS, btExtraProviders_);
+	DDX_Control(pDX, IDC_WSMONITOREDPROCESSES, btWSMonitoredProcesses_);
+	DDX_Control(pDX, IDC_EXPENSIVEWS, btExpensiveWSMonitoring_);
+	DDX_Control(pDX, IDC_EXTRAKERNELFLAGS, btExtraKernelFlags_);
 	DDX_Control(pDX, IDC_EXTRASTACKWALKS, btExtraStackwalks_);
 	DDX_Control(pDX, IDC_BUFFERSIZES, btBufferSizes_);
 	DDX_Control(pDX, IDC_COPYSTARTUPPROFILE, btCopyStartupProfile_);
@@ -87,8 +89,6 @@ void CSettings::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_CHROMEDEVELOPER, btChromeDeveloper_);
 	DDX_Control(pDX, IDC_AUTOVIEWTRACES, btAutoViewTraces_);
 	DDX_Control(pDX, IDC_HEAPSTACKS, btHeapStacks_);
-	DDX_Control(pDX, IDC_WSMONITOREDPROCESSES, btWSMonitoredProcesses_);
-	DDX_Control(pDX, IDC_EXPENSIVEWS, btExpensiveWSMonitoring_);
 	DDX_Control(pDX, IDC_VIRTUALALLOCSTACKS, btVirtualAllocStacks_);
 	DDX_Control(pDX, IDC_CHROME_CATEGORIES, btChromeCategories_);
 
@@ -116,8 +116,6 @@ BOOL CSettings::OnInitDialog()
 	CheckDlgButton(IDC_HEAPSTACKS, bHeapStacks_);
 	CheckDlgButton(IDC_VIRTUALALLOCSTACKS, bVirtualAllocStacks_);
 
-	btExtraProviders_.EnableWindow(FALSE);
-	btExtraStackwalks_.EnableWindow(FALSE);
 	btBufferSizes_.EnableWindow(FALSE);
 	// A 32-bit process on 64-bit Windows will not be able to read the
 	// full working set of 64-bit processes, so don't even try.
@@ -126,6 +124,8 @@ BOOL CSettings::OnInitDialog()
 	else
 		SetDlgItemText(IDC_WSMONITOREDPROCESSES, WSMonitoredProcesses_.c_str());
 	CheckDlgButton(IDC_EXPENSIVEWS, bExpensiveWSMonitoring_);
+	btExtraKernelFlags_.SetWindowTextW(extraKernelFlags_.c_str());
+	btExtraStackwalks_.SetWindowTextW(extraKernelStacks_.c_str());
 
 	if (toolTip_.Create(this))
 	{
@@ -136,6 +136,21 @@ BOOL CSettings::OnInitDialog()
 					L"separated by semi-colons. "
 					L"Enter just the file parts (with the .exe extension) not a full path. For example, "
 					L"'chrome.exe;notepad.exe'. This is for use with the heap-tracing-to-file mode.");
+		toolTip_.AddTool(&btExtraKernelFlags_, L"Extra kernel flags, separated by '+', such as "
+					L"\"REGISTRY+PERF_COUNTER\". See \"xperf -providers k\" for the full list. "
+					L"Note that incorrect kernel flags will cause tracing to fail to start.");
+		toolTip_.AddTool(&btExtraStackwalks_, L"List of extra stacks to collect from the kernel "
+					L"kernel provider. For example, \"DiskReadInit+DiskWriteInit+DiskFlushInit\". "
+					L"Run \"xperf -help stackwalk\" to see the full list. Note that incorrect stack "
+					L"walk flags will cause tracing to fail to start. Note also that stack walk flags "
+					L"are ignored if the corresponding kernel flag is not enabled.");
+		toolTip_.AddTool(&btWSMonitoredProcesses_, L"Names of processes whose working sets will be "
+					L"monitored, separated by semi-colons. An empty string means no monitoring. A '*' means "
+					L"that all processes will be monitored. For instance 'chrome.exe;notepad.exe'");
+		toolTip_.AddTool(&btExpensiveWSMonitoring_, L"Check this to have private working set and PSS "
+					L"(proportional set size) calculated for monitored processes. This may consume "
+					L"dozens or hundreds of ms each time. Without this checked only full working "
+					L"set is calculated, which is cheap.");
 		toolTip_.AddTool(&btCopyStartupProfile_, L"Copies startup.wpaProfile files for WPA 8.1 and "
 					L"10 to the appropriate destinations so that the next time WPA starts up it will have "
 					L"reasonable analysis defaults.");
@@ -150,13 +165,6 @@ BOOL CSettings::OnInitDialog()
 					L"immediately after a trace is recorded.");
 		toolTip_.AddTool(&btHeapStacks_, L"Check this to record call stacks on HeapAlloc, HeapRealloc, "
 					L"and similar calls, when doing heap traces.");
-		toolTip_.AddTool(&btWSMonitoredProcesses_, L"Names of processes whose working sets will be "
-					L"monitored, separated by semi-colons. An empty string means no monitoring. A '*' means "
-					L"that all processes will be monitored. For instance 'chrome.exe;notepad.exe'");
-		toolTip_.AddTool(&btExpensiveWSMonitoring_, L"Check this to have private working set and PSS "
-					L"(proportional set size) calculated for monitored processes. This may consume "
-					L"dozens or hundreds of ms each time. Without this checked only full working "
-					L"set is calculated, which is cheap.");
 		toolTip_.AddTool(&btVirtualAllocStacks_, L"Check this to record call stacks on VirtualAlloc on all "
 					L"traces instead of just heap traces.");
 		toolTip_.AddTool(&btChromeCategories_, L"Check the chrome tracing categories that you want Chrome "
@@ -189,6 +197,8 @@ void CSettings::OnOK()
 {
 	heapTracingExes_ = GetEditControlText(btHeapTracingExe_);
 	WSMonitoredProcesses_ = GetEditControlText(btWSMonitoredProcesses_);
+	extraKernelStacks_ = GetEditControlText(btExtraStackwalks_);
+	extraKernelFlags_ = GetEditControlText(btExtraKernelFlags_);
 
 	// Extract the Chrome categories settings and put the result in chromeKeywords_.
 	chromeKeywords_ = 0;

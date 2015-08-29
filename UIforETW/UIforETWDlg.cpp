@@ -755,7 +755,9 @@ void CUIforETWDlg::OnBnClickedStarttracing()
 	else
 		UIETWASSERT(0);
 
-	std::wstring kernelProviders = L" Latency+POWER+DISPATCHER+FILE_IO+FILE_IO_INIT+VIRT_ALLOC+MEMINFO";
+	std::wstring kernelProviders = L" Latency+POWER+DISPATCHER+DISK_IO+FILE_IO+FILE_IO_INIT+VIRT_ALLOC+MEMINFO";
+	if (!extraKernelFlags_.empty())
+		kernelProviders += L"+" + extraKernelFlags_;
 	std::wstring kernelStackWalk;
 	// Record CPU sampling call stacks, from the PROFILE provider
 	if (bSampledStacks_)
@@ -768,6 +770,9 @@ void CUIforETWDlg::OnBnClickedStarttracing()
 	// also record VirtualFree.
 	if (bVirtualAllocStacks_ || tracingMode_ == kHeapTracingToFile)
 		kernelStackWalk += L"+VirtualAlloc";
+	// Add in any manually requested call stack flags.
+	if (!extraKernelStacks_.empty())
+		kernelStackWalk += L"+" + extraKernelStacks_;
 	// Set up a -stackwalk configuration, removing the leading '+' sign.
 	if (!kernelStackWalk.empty())
 		kernelStackWalk = L" -stackwalk " + kernelStackWalk.substr(1);
@@ -839,6 +844,7 @@ void CUIforETWDlg::OnBnClickedStarttracing()
 		heapStackWalk = L" -stackwalk HeapCreate+HeapDestroy+HeapAlloc+HeapRealloc";
 	std::wstring heapArgs = L" -start xperfHeapSession -heap -Pids 0" + heapStackWalk + heapBuffers + heapFile;
 
+	DWORD exitCode = 0;
 	{
 		ChildProcess child(GetXperfPath());
 		if (tracingMode_ == kHeapTracingToFile)
@@ -846,10 +852,30 @@ void CUIforETWDlg::OnBnClickedStarttracing()
 		else
 			child.Run(bShowCommands_, L"xperf.exe" + kernelArgs + userArgs);
 
-		DWORD exitCode = child.GetExitCode();
+		exitCode = child.GetExitCode();
 		if (exitCode)
 		{
 			outputPrintf(L"Error starting tracing. Try stopping tracing and then starting it again?\n");
+			//  NT Kernel Logger: Cannot create a file when that file already exists. (0xb7).
+			if (exitCode == 0x800700b7)
+			{
+				outputPrintf(L"The kernel logger is already running. Probably some other program such as procmon is using it.\n");
+			}
+			// NT Kernel Logger: Invalid flags. (0x3ec).
+			if (exitCode == 0x800703ec)
+			{
+				if (!extraKernelFlags_.empty())
+				{
+					outputPrintf(L"Check your extra kernel flags in the settings dialog for typos.\n");
+				}
+			}
+			if (exitCode == 0x8000ffff)
+			{
+				if (!extraKernelStacks_.empty())
+				{
+					outputPrintf(L"Check your extra kernel stack walks in the settings dialog for typos.\n");
+				}
+			}
 		}
 		else
 		{
@@ -857,6 +883,9 @@ void CUIforETWDlg::OnBnClickedStarttracing()
 		}
 	}
 
+	// Don't run the -capturestate step unless the previous step succeeded.
+	// Otherwise the error messages build up and get ever more confusing.
+	if (exitCode == 0)
 	{
 		// Run -capturestate on the user-mode loggers, for reliable captures.
 		// If this step is skipped then GPU usage data will not be recorded on
@@ -1436,6 +1465,8 @@ void CUIforETWDlg::OnBnClickedSettings()
 	dlgSettings.heapTracingExes_ = heapTracingExes_;
 	dlgSettings.WSMonitoredProcesses_ = WSMonitoredProcesses_;
 	dlgSettings.bExpensiveWSMonitoring_ = bExpensiveWSMonitoring_;
+	dlgSettings.extraKernelFlags_ = extraKernelFlags_;
+	dlgSettings.extraKernelStacks_ = extraKernelStacks_;
 	dlgSettings.bChromeDeveloper_ = bChromeDeveloper_;
 	dlgSettings.bAutoViewTraces_ = bAutoViewTraces_;
 	dlgSettings.bHeapStacks_ = bHeapStacks_;
@@ -1467,6 +1498,8 @@ void CUIforETWDlg::OnBnClickedSettings()
 		// Copy over the remaining settings.
 		WSMonitoredProcesses_ = dlgSettings.WSMonitoredProcesses_;
 		bExpensiveWSMonitoring_ = dlgSettings.bExpensiveWSMonitoring_;
+		extraKernelFlags_ = dlgSettings.extraKernelFlags_;
+		extraKernelStacks_ = dlgSettings.extraKernelStacks_;
 		workingSetThread_.SetProcessFilter(WSMonitoredProcesses_, bExpensiveWSMonitoring_);
 
 		bAutoViewTraces_ = dlgSettings.bAutoViewTraces_;

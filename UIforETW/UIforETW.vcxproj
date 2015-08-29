@@ -254,6 +254,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <Text Include="ReadMe.md" />
+    <Text Include="StackWalkFlags.txt" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="About.h" />

@@ -107,5 +107,6 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.md" />
+    <Text Include="StackWalkFlags.txt" />
   </ItemGroup>
 </Project>

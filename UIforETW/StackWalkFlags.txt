@@ -1,0 +1,211 @@
+This file attempts to map from kernel flags to call stack flags, in
+order to allow ensuring that the appropriate kernel flag is enabled
+when a call stack flag is specified. Here are the available kernel
+flags from "xperf -providers k":
+
+PROC_THREAD    : Process and Thread create/delete
+LOADER         : Kernel and user mode Image Load/Unload events
+PROFILE        : CPU Sample profile
+CSWITCH        : Context Switch
+COMPACT_CSWITCH: Compact Context Switch
+DISPATCHER     : CPU Scheduler
+DPC            : DPC Events
+INTERRUPT      : Interrupt events
+INTERRUPT_STEER: Interrupt Steering events
+WDF_DPC        : WDF DPC events
+WDF_INTERRUPT  : WDF Interrupt events
+SYSCALL        : System calls
+PRIORITY       : Priority change events
+SPINLOCK       : Spinlock Collisions
+KQUEUE         : Kernel Queue Enqueue/Dequeue
+ALPC           : Advanced Local Procedure Call
+PERF_COUNTER   : Process Perf Counters
+DISK_IO        : Disk I/O
+DISK_IO_INIT   : Disk I/O Initiation
+FILE_IO        : File system operation end times and results
+FILE_IO_INIT   : File system operation (create/open/close/read/write)
+HARD_FAULTS    : Hard Page Faults
+FILENAME       : FileName (e.g., FileName create/delete/rundown)
+SPLIT_IO       : Split I/O
+REGISTRY       : Registry tracing
+REG_HIVE       : Registry hive tracing
+DRIVERS        : Driver events
+POWER          : Power management events
+CC             : Cache manager events
+NETWORKTRACE   : Network events (e.g., tcp/udp send/receive)
+VIRT_ALLOC     : Virtual allocation reserve and release
+MEMINFO        : Memory List Info
+ALL_FAULTS     : All page faults including hard, Copy on write, demand zero faults, etc.
+MEMINFO_WS     : Working set Info
+VAMAP          : MapFile info
+FOOTPRINT      : Support footprint analysis
+MEMORY         : Memory tracing
+REFSET         : Support footprint analysis
+HIBERRUNDOWN   : Rundown(s) during hibernate
+CONTMEMGEN     : Contiguous Memory Generation
+POOL           : Pool tracing
+CPU_CONFIG     : NUMA topology, Processor Group and Processor Index to Number mapping. By default it is always enabled.
+SESSION        : Session rundown/create/delete events.
+IDLE_STATES    : CPU Idle States
+TIMER          : Timer settings and its expiration
+CLOCKINT       : Clock Interrupt Events
+IPI            : Inter-processor Interrupt Events
+OPTICAL_IO     : Optical I/O
+OPTICAL_IO_INIT: Optical I/O Initiation
+FLT_IO_INIT    : Minifilter callback initiation
+FLT_IO         : Minifilter callback completion
+FLT_FASTIO     : Minifilter fastio callback completion
+FLT_IO_FAILURE : Minifilter callback completion with failure
+KE_CLOCK       : Clock Configuration events
+PMC_PROFILE    : PMC sampling events
+
+Here are the stack walk flags from "xperf -help stackwalk". The
+indented names are the stack walk flags and the non-indented names
+are the kernel flags that are believed to be required for each block.
+
+PROC_THREAD
+	ProcessCreate
+	ProcessDelete
+	ThreadCreate
+	ThreadDelete
+LOADER
+	ImageLoad
+	ImageUnload
+CSWITCH or COMPACT_CSWITCH
+	CSwitch
+DISPATCHER
+	ReadyThread
+	ThreadSetPriority
+	ThreadSetBasePriority
+??????
+	KernelQueueEnqueue
+	KernelQueueDequeue
+	Mark
+	SyscallEnter
+	SyscallExit
+PROFILE
+	Profile
+??????
+	ProfileSetInterval
+	TimerSetPeriodic
+	TimerSetOneShot
+	PmcInterrupt
+DISK_IO_INIT
+	DiskReadInit
+	DiskWriteInit
+	DiskFlushInit
+FILE_IO? But these events don't seem to show up in File I/O tables
+	FileCreate
+	FileCleanup
+	FileClose
+	FileRead
+	FileWrite
+	FileSetInformation
+	FileDelete
+	FileRename
+	FileDirEnum
+	FileFlush
+	FileQueryInformation
+	FileFSCTL
+	FileDirNotify
+	FileOpEnd
+??????
+	MapFile
+	UnMapFile
+	MiniFilterPreOpInit
+	MiniFilterPostOpInit
+	SplitIO
+REGISTRY
+	RegQueryKey
+	RegEnumerateKey
+	RegEnumerateValueKey
+	RegDeleteKey
+	RegCreateKey
+	RegOpenKey
+	RegSetValue
+	RegDeleteValue
+	RegQueryValue
+	RegQueryMultipleValue
+	RegSetInformation
+	RegFlush
+	RegKcbCreate
+	RegKcbDelete
+	RegVirtualize
+	RegCloseKey
+	RegHiveInit
+	RegHiveDestroy
+	RegHiveLink
+	RegHiveDirty
+HARD_FAULTS
+	HardFault
+??????
+	PagefaultTransition
+	PagefaultDemandZero
+	PagefaultCopyOnWrite
+	PagefaultCopyOnWrite
+	PagefaultGuard
+	PagefaultHard
+	PagefaultAV
+VIRT_ALLOC
+	VirtualAlloc
+	VirtualFree
+??????
+	PagefileMappedSectionCreate
+	PagefileMappedSectionDelete
+	PageAccess
+	PageRelease
+	PageAccessEx
+	PageRemovedfromWorkingSet
+	PageRangeAccess
+	PageRangeRelease
+	PagefileBackedImageMapping
+	ContiguousMemoryGeneration
+	HeapRangeCreate
+	HeapRangeReserve
+	HeapRangeRelease
+	HeapRangeDestroy
+	AlpcSendMessage
+	AlpcReceiveMessage
+	AlpcWaitForReply
+	AlpcWaitForNewMessage
+	AlpcUnwait
+	AlpcConnectRequest
+	AlpcConnectSuccess
+	AlpcConnectFail
+	AlpcClosePort
+	ThreadPoolCallbackEnqueue
+	ThreadPoolCallbackDequeue
+	ThreadPoolCallbackStart
+	ThreadPoolCallbackStop
+	ThreadPoolCallbackCancel
+	ThreadPoolCreate
+	ThreadPoolClose
+	ThreadPoolSetMinThreads
+	ThreadPoolSetMaxThreads
+	PowerSetPowerAction
+	PowerSetPowerActionReturn
+	PowerSetDevicesState
+	PowerSetDevicesStateReturn
+	PowerDeviceNotify
+	PowerDeviceNotifyComplete
+	PowerSessionCallout
+	PowerSessionCalloutReturn
+	PowerPreSleep
+	PowerPostSleep
+	PowerPerfStateChange
+	PowerIdleStateChange
+	PowerThermalConstraint
+	ExecutiveResource
+	CcWorkitemEnqueue
+	CcWorkitemDequeue
+	CcWorkitemComplete
+	CcReadAhead
+	CcWriteBehind
+	CcLazyWriteScan
+	CcCanIWriteFail
+	CcFlushCache
+	CcFlushSection
+	PoolAlloc
+	PoolAllocSession
+	PoolFree
+	PoolFreeSession

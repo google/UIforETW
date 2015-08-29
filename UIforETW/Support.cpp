@@ -126,6 +126,8 @@ void CUIforETWDlg::TransferSettings(bool saving)
 	{
 		{ L"HeapProfiledProcess", &heapTracingExes_ },
 		{ L"WSMonitoredProcesses", &WSMonitoredProcesses_ },
+		{ L"ExtraKernelFlags", &extraKernelFlags_ },
+		{ L"ExtraStackWalks", &extraKernelStacks_},
 	};
 
 	for (auto& m : strings)

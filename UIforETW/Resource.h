@@ -36,6 +36,7 @@
 #define IDC_HEAPEXE                     1018
 #define IDC_TRACEDIR                    1019
 #define IDC_EXTRAPROVIDERS              1019
+#define IDC_EXTRAKERNELFLAGS            1019
 #define IDC_BUTTON1                     1020
 #define IDC_EXTRASTACKWALKS             1020
 #define IDC_TEMPTRACEDIR                1021

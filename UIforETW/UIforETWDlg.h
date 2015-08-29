@@ -200,6 +200,8 @@ private:
 	// Editable only by the settings dialog.
 	bool bChromeDeveloper_ = false;
 	bool bAutoViewTraces_ = false;
+	std::wstring extraKernelFlags_;
+	std::wstring extraKernelStacks_;
 
 	std::pair<uint64_t, uint64_t> CompressTrace(const std::wstring& tracePath) const;
 	void CompressAllTraces() const;
