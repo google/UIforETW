@@ -825,8 +825,8 @@ void CUIforETWDlg::OnBnClickedStarttracing()
 		}
 	}
 
-	// Increase the user buffer sizes when doing graphics tracing.
-	const int numUserBuffers = BufferCountBoost(bGPUTracing_ ? 200 : 100);
+	// Increase the user buffer sizes when doing graphics tracing or Chrome tracing.
+	const int numUserBuffers = BufferCountBoost(bGPUTracing_ ? 200 : 100) + BufferCountBoost(useChromeProviders_ ? 300 : 0);
 	std::wstring userBuffers = stringPrintf(L" -buffersize 1024 -minbuffers %d -maxbuffers %d", numUserBuffers, numUserBuffers);
 	std::wstring userFile = L" -f \"" + GetUserFile() + L"\"";
 	if (tracingMode_ == kTracingToMemory)
