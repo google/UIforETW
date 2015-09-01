@@ -21,14 +21,12 @@ mkdir %destdir%\third_party\wpt81
 xcopy "%wpt81%%wptredistmsi%" %destdir%\third_party\wpt81
 xcopy "%wpt81%sdk_license.rtf" %destdir%\third_party\wpt81
 ren %destdir%\third_party\wpt81\sdk_license.rtf LICENSE.rtf
-:nowpt81
 
 if not exist "%wpt10%%wptredistmsi%" goto nowpt10
 mkdir %destdir%\third_party\wpt10
 xcopy "%wpt10%%wptredistmsi%" %destdir%\third_party\wpt10
 xcopy "%wpt10%Licenses\10.0.10240.0\sdk_license.rtf" %destdir%\third_party\wpt10
 ren %destdir%\third_party\wpt10\sdk_license.rtf LICENSE.rtf
-:nowpt10
 
 @rem Add VS tools to the path
 @call "%vs120comntools%vsvars32.bat"
@@ -76,4 +74,12 @@ python %UIforETW%make_zip_file.py %UIforETW%etwpackage.zip etwpackage
 
 :pleasecloseSomething
 @echo Something is running with ETWProviders.dll loaded. Please close it and try again.
+@exit /b
+
+:nowpt81
+@echo WPT 8.1 redistributables not found. Aborting.
+@exit /b
+
+:nowpt10
+@echo WPT 10 redistributables not found. Aborting.
 @exit /b
