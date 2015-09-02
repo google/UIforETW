@@ -23,8 +23,11 @@ def main():
     print("Usage: %s tracename" % sys.argv[0])
     sys.exit(0)
 
+  # Typical output of -a process -withcmdline looks like:
+  #        MIN,   24656403, Process, 0XA1141C60,       chrome.exe ( 748),      10760,          1, 0x11e8c260, "C:\...\chrome.exe" --type=renderer ...
+  # Find the PID and ParentPID
+  pidsRe = re.compile(r".*\(([\d ]*)\), *(\d*),.*")
   # Find the space-terminated word after 'type='
-  pidRe = re.compile(r".*\(([\d ]*)\),.*")
   processTypeRe = re.compile(r".*.exe\" --type=([^ ]*) .*")
 
   tracename = sys.argv[1]
@@ -33,8 +36,13 @@ def main():
   #-a process = show process, thread, image information (see xperf -help processing)
   #-withcmdline = show command line in process reports (see xperf -help process)
   command = 'xperf -i "%s" -tle -tti -a process -withcmdline' % tracename
-  # Group all of the chrome.exe processes by exePath, then by type.
-  pidsByPath = {}
+  # Group all of the chrome.exe processes by browser Pid, then by type.
+  # pathByBrowserPid just maps from the browser Pid to the disk path to chrome.exe
+  pathByBrowserPid = {}
+  # pidsByParent is a dictionary that is indexed by the browser Pid. It contains
+  # a dictionary that is indexed by process type with each entry's payload
+  # being a list of Pids (for example, a list of renderer processes).
+  pidsByParent = {}
   for line in os.popen(command).readlines():
     # Split the commandline from the .csv data and then extract the exePath.
     # It may or may not be quoted.
@@ -46,47 +54,35 @@ def main():
       else:
         exePath = commandLine.split(" ")[0]
       if exePath.count("chrome.exe") > 0:
+        pids = pidsRe.match(line)
+        pid = int(pids.groups()[0])
+        parentPid = int(pids.groups()[1])
         match = processTypeRe.match(line)
-        type = "browser"
         if match:
           type = match.groups()[0]
-        pid = int(pidRe.match(line).groups()[0])
-        pidsByType = pidsByPath.get(exePath, {})
+          browserPid = parentPid
+        else:
+          type = "browser"
+          browserPid = pid
+          pathByBrowserPid[browserPid] = exePath
+        # Retrieve or create the list of processes associated with this
+        # browser (parent) pid.
+        pidsByType = pidsByParent.get(browserPid, {})
         pidList = list(pidsByType.get(type, []))
         pidList.append(pid)
         pidsByType[type] = pidList
-        pidsByPath[exePath] = pidsByType
-
-  # Sometimes Chrome is launched with a relative path and then it launches
-  # child processes with an absolute path. This leads to two 'different'
-  # browser instances being detected. As an example one can easily end up with
-  # one at r".\out\Release\chrome.exe" or out\Release\chrome.exe and the other
-  # at r"D:\src\chromium2\src\out\Release\chrome.exe". This loop attempts to
-  # detect this and fix it up. It's not perfect, but it's better than nothing.
-  for exePath in pidsByPath.keys():
-    if len(exePath) > len(r".\chrome.exe") and exePath[1] != ':':
-      # Strip off the leading period
-      if exePath.startswith(".\\"):
-        subPath = exePath[1:]
-      else:
-        subPath = exePath
-      for otherPath in pidsByPath.keys():
-        if otherPath.endswith(subPath):
-          # If the end paths match then move the contents of pidsByPath[exePath]
-          # over to pidsByPath[otherPath]
-          for key in pidsByPath[exePath]:
-            pidsByPath[otherPath][key] = pidsByPath[exePath][key]
-          pidsByPath[exePath] = {}
-          break
+        pidsByParent[browserPid] = pidsByType
 
   print("Chrome PIDs by process type:\r")
-  for exePath in pidsByPath.keys():
+  for browserPid in pidsByParent.keys():
+    exePath = pathByBrowserPid[browserPid]
     # Any paths with no entries in them should be ignored.
-    if len(pidsByPath[exePath]) == 0:
+    pidsByType = pidsByParent[browserPid]
+    if len(pidsByType) == 0:
+      assert False
       continue
-    if len(pidsByPath.keys()) > 1:
-      print("%s\r" % exePath)
-    pidsByType = pidsByPath[exePath]
+    if len(pidsByParent.keys()) > 1:
+      print("%s (%d)\r" % (exePath, browserPid))
     keys = list(pidsByType.keys())
     keys.sort()
     # Note the importance of printing the '\r' so that the
