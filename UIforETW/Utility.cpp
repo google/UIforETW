@@ -488,46 +488,17 @@ std::wstring FindPython()
 	if (path)
 	{
 		std::vector<std::wstring> pathParts = split(path, ';');
-		for (const auto& part : pathParts)
+		// First look for python.exe. If that isn't found then look for
+		// python.bat, part of Chromium's depot_tools
+		for (const auto& exeName : { L"\\python.exe", L"\\python.bat" })
 		{
-			// Look for python.bat as provided by Chromium's depot_tools
-			std::wstring pythonPath = part + L"\\python.bat";
-			if (PathFileExists(pythonPath.c_str()))
+			for (const auto& part : pathParts)
 			{
-				std::ifstream f;
-				f.open(pythonPath.c_str());
-				if (f)
+				std::wstring pythonPath = part + exeName;
+				if (PathFileExists(pythonPath.c_str()))
 				{
-					for (std::string line; std::getline(f, line); /**/)
-					{
-						const static char prefix[] = "\"%~dp0";
-						const static char suffix[] = "\" %*";
-						if (line.size() >= sizeof(prefix) + sizeof(suffix))
-						{
-							if (line.substr(0, sizeof(prefix) - 1) == prefix)
-							{
-								if (line.substr(line.size() - (sizeof(suffix) - 1)) == suffix)
-								{
-									pythonPath = part + L"\\";
-									for (size_t i = sizeof(prefix) - 1; i <= line.size() - sizeof(suffix); ++i)
-										pythonPath += line[i];
-									if (PathFileExists(pythonPath.c_str()))
-									{
-										return pythonPath;
-									}
-								}
-							}
-						}
-					}
+					return pythonPath;
 				}
-			}
-		}
-		for (const auto& part : pathParts)
-		{
-			std::wstring pythonPath = part + L"\\python.exe";
-			if (PathFileExists(pythonPath.c_str()))
-			{
-				return pythonPath;
 			}
 		}
 	}

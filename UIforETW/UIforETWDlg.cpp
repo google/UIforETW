@@ -1808,7 +1808,7 @@ void CUIforETWDlg::StripChromeSymbols(const std::wstring& traceFilename)
 			// Must pass -u to disable Python's output buffering when printing to
 			// a pipe, in order to get timely feedback.
 			std::wstring args = L" -u \"" + GetExeDir() + L"StripChromeSymbols.py\" \"" + traceFilename + L"\"";
-			child.Run(bShowCommands_, L"python.exe" + args);
+			child.Run(bShowCommands_, GetFilePart(pythonPath) + args);
 		}
 		if (bShowCommands_)
 			outputPrintf(L"Stripping Chrome symbols took %1.1f s\n", stripTimer.ElapsedSeconds());
@@ -1829,7 +1829,7 @@ void CUIforETWDlg::IdentifyChromeProcesses(const std::wstring& traceFilename)
 	{
 		ChildProcess child(pythonPath);
 		std::wstring args = L" -u \"" + GetExeDir() + L"IdentifyChromeProcesses.py\" \"" + traceFilename + L"\"";
-		child.Run(bShowCommands_, L"python.exe" + args);
+		child.Run(bShowCommands_, GetFilePart(pythonPath) + args);
 		std::wstring output = child.GetOutput();
 		// The output of the script is appended to the trace description file.
 		std::wstring textFilename = StripExtensionFromPath(traceFilename) + L".txt";
