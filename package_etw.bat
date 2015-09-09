@@ -47,20 +47,16 @@ rmdir x64\Release /s/q
 del UIforETWStatic.vcxproj
 del UIforETWStatic.sln
 
-xcopy %UIforETW%\bin %destdir%\bin /s
-del %destdir%\bin\*.lastcodeanalysissucceeded
-del %destdir%\bin\*.pdb
-xcopy %UIforETW%\include %destdir%\include /s
-xcopy %UIforETW%\lib %destdir%\lib /s
-xcopy %UIforETW%\third_party %destdir%\third_party /s
-del %destdir%\bin\.gitignore
-del %destdir%\bin\UIforETW*_dev*.*
+xcopy /exclude:%~dp0excludecopy.txt %UIforETW%\bin %destdir%\bin /s
+xcopy /exclude:%~dp0excludecopy.txt %UIforETW%\include %destdir%\include /s
+xcopy /exclude:%~dp0excludecopy.txt %UIforETW%\lib %destdir%\lib /s
+xcopy /exclude:%~dp0excludecopy.txt %UIforETW%\third_party %destdir%\third_party /s
 @rem Get the destinations to exist so that the xcopy proceeds without a question.
 echo >%destdir%\bin\UIforETW.exe
 echo >%destdir%\bin\UIforETW32.exe
 xcopy %UIforETW%\bin\UIforETWStatic_devrel32.exe %destdir%\bin\UIforETW32.exe /y
 xcopy %UIforETW%\bin\UIforETWStatic_devrel.exe %destdir%\bin\UIforETW.exe /y
-xcopy %destdir%\bin\UIforETW*.exe %~dp0bin /y
+xcopy /exclude:%~dp0excludecopy.txt %destdir%\bin\UIforETW*.exe %~dp0bin /y
 
 cd /d %UIforETW%
 python %UIforETW%make_zip_file.py %UIforETW%etwpackage.zip etwpackage

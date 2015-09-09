@@ -1,0 +1,17 @@
+.user
+.suo
+.sdf
+.aps
+.opensdf
+.exp
+.ilk
+.pdb
+symsrv.yes
+FuncStats.txt
+GuidStats.txt
+Log.txt
+present.txt
+.lastcodeanalysissucceeded
+.csv
+.gitignore
+_dev
