@@ -29,7 +29,7 @@ typedef _Return_type_success_(return >= 0) LONG NTSTATUS;
 
 // How many ms to wait between sampling the CPU speeds. Don't sample
 // 'too' fast or it will waste power and affect the results.
-const DWORD kSamplingInterval = 1000;
+const DWORD kSamplingInterval = 3000;
 // Do this many samples each time and take the fastest. That helps to
 // avoid problems where an interrupt or other blip causes a CPU to miss
 // some cycles occasionally. This should be set as low as possible.
@@ -37,7 +37,7 @@ const int kRetryCount = 5;
 // How many iterations of SpinALot to make each time. This should be
 // set as low as possible.
 // A spin count of 10,000 implies 500,000 cycles for each call to
-// GetFrequency() which at 800 MHz is 0.625 ms. If kRetryCount is 7
+// MeasureFrequencyOnce() which at 800 MHz is 0.625 ms. If kRetryCount is 7
 // then that is 4.375 ms which may be enough to trigger raising the
 // CPU frequency and perturbing what we are measuring. A spin count
 // of 2,000 should complete in under a ms when the CPU is at its
@@ -49,27 +49,27 @@ const int kSpinCount = 2000;
 extern "C" void SpinALot(int spinCount);
 const int kSpinsPerLoop = 50;
 
-// Calculate the frequency of the current CPU in GHz, one time.
-static float GetFrequency()
+// Calculate the frequency of the current CPU in MHz, one time.
+static float MeasureFrequencyOnce()
 {
 	QPCElapsedTimer timer;
 	// Spin for kSpinsPerLoop * kSpinCount cycles. This should
 	// be fast enough to usually avoid any interrupts.
 	SpinALot(kSpinCount);
 	auto elapsed = timer.ElapsedSeconds();
-	// Calculate the frequency in GHz.
-	auto frequency = ((kSpinCount * kSpinsPerLoop) / elapsed) / 1e9;
+	// Calculate the frequency in MHz.
+	auto frequency = ((kSpinCount * kSpinsPerLoop) / elapsed) / 1e6;
 	return static_cast<float>(frequency);
 }
 
 // Calculate the current CPU frequency multiple times and
 // return the largest frequency seen.
-static float GetSampledFrequency(int iterations)
+static float MeasureFrequency(int iterations)
 {
 	float maxFrequency = 0.0;
 	for (int i = 0; i < iterations; ++i)
 	{
-		float QPCFrequency = GetFrequency();
+		float QPCFrequency = MeasureFrequencyOnce();
 		if (QPCFrequency > maxFrequency)
 			maxFrequency = QPCFrequency;
 	}
@@ -85,7 +85,7 @@ void CCPUFrequencyMonitor::PerCPUSamplingThread(int cpuNumber)
 		if (quit_)
 			break;
 
-		float frequency = GetSampledFrequency(kRetryCount);
+		float frequency = MeasureFrequency(kRetryCount);
 		threads_[cpuNumber].frequency = frequency;
 
 		ReleaseSemaphore(resultsDoneSemaphore_, 1, nullptr);
@@ -168,19 +168,13 @@ void CCPUFrequencyMonitor::Sample()
 		maxActualFreq = std::max(maxActualFreq, threads_[i].frequency);
 	}
 
-	float freqPercentage = maxActualFreq / (maxPromisedMHz * 1e-5f);
-	ETWMark4F("Initial measured, measured, promised, percentage", startFrequency_, maxActualFreq, maxPromisedMHz * 1e-3f, freqPercentage);
-	ETWMark2F("CPU Frequency (GHz) and percentage", maxActualFreq, freqPercentage);
+	float freqPercentage = maxActualFreq * 100.f / maxPromisedMHz;
 	wchar_t* pStatus = L"Normal";
 	if (freqPercentage < 75)
 		pStatus = L"Probably modest thermal throttling";
 	if (freqPercentage < 50)
 		pStatus = L"Probably significant thermal throttling";
-	ETWMarkCPUThrottling(startFrequency_ * 1000, maxActualFreq * 1000, static_cast<float>(maxPromisedMHz), freqPercentage, pStatus);
-	//debugPrintf(L"Windows reports CPU frequency from %f GHz to %f GHz\n", MinCurrentMHz * 1e-3, maxPromisedMHz * 1e-3);
-	//debugPrintf(L"CPU Frequency (GHz) and percentage (%f, %f)\n", maxActualFreq, freqPercentage);
-	debugPrintf(L"Windows CPU frequency %1.2f GHz, actually %1.2f GHz, %1.1f%%\n",
-		maxPromisedMHz * 1e-3, maxActualFreq, freqPercentage);
+	ETWMarkCPUThrottling(startFrequency_, maxActualFreq, static_cast<float>(maxPromisedMHz), freqPercentage, pStatus);
 }
 
 void CCPUFrequencyMonitor::MonitorThread()
@@ -243,11 +237,10 @@ CCPUFrequencyMonitor::CCPUFrequencyMonitor()
 	QPCElapsedTimer timer;
 	// Run the test long enough so that the OS will ramp up the CPU to
 	// full speed.
-	startFrequency_ = GetSampledFrequency(600);
+	startFrequency_ = MeasureFrequency(600);
 	float testElapsed = static_cast<float>(timer.ElapsedSeconds());
 
-	ETWMark2F("Frequency (GHz) and measurement time (s)", startFrequency_, testElapsed);
-	debugPrintf(L"Frequency (GHz) and measurement time (s) (%f, %f)\n", startFrequency_, testElapsed);
+	ETWMark2F("Startup CPU frequency (MHz) and measurement time (s)", startFrequency_, testElapsed);
 
 	// Once the monitor thread is created the other threads will start
 	// being told to do measurements occasionally.
