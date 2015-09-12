@@ -786,16 +786,21 @@ void CUIforETWDlg::OnBnClickedStarttracing()
 	std::wstring kernelArgs = L" -start " + GetKernelLogger() + L" -on" + kernelProviders + kernelStackWalk + kernelBuffers + kernelFile;
 
 	WindowsVersion winver = GetWindowsVersion();
-	// 0xFFFFFF is an experimentally determined mask value for the Microsoft-Windows-Win32k
-	// provider. Having no mask specified causes ReleaseUserCrit, ExclusiveUserCrit, and
-	// SharedUserCrit to generate 75% of the messages for this provider - 33,000/s in one
-	// test. This fills up the user buffers and pushes out other messages that are more
-	// useful such as the window-in-focus, UI Delays, and UIforETW messages!
-	// 0xFFFF contains the window-in-focus messages. 0xFF0000 contains the AppMessagePump
-	// messages which are presumed to generate the UI Delays graphs.
-	// Getting rid of the *Crit messages appears to be equivalent to quadrupling the size of
-	// the user buffers.
-	std::wstring userProviders = L"Microsoft-Windows-Win32k:0xFFFFFF";
+	// The ReleaseUserCrit, ExclusiveUserCrit, and SharedUserCrit events generate
+	// 75% of the events for this provider - 33,000/s in one test. They account for
+	// more than 75% of the space used, according to System Configuration-> Trace
+	// Statistics. That table also shows their Keyword (aka flags) which are
+	// 0x0200000010000000. By specifying a flag of ~0x0200000010000000 we can
+	// reduce the fill-rate of the user buffers by a factor of four, allowing much
+	// longer time periods to be captured with lower overhead.
+	// This avoids the problem where the user buffers wrap around so quickly that
+	// their timer period doesn't overlap that of the kernel buffers. Specifying
+	// this flag is equivalent to quadrupling the size of the user buffers!
+	// This should also make the UI Delays and window-in-focus graphs more
+	// reliable, by not having them lose messages so frequently, although it is not
+	// clear that it actually helps.
+	const uint64_t kCritFlags = 0x0200000010000000;
+	std::wstring userProviders = stringPrintf(L"Microsoft-Windows-Win32k:0x%llx", ~kCritFlags);
 	if (winver <= kWindowsVersionVista)
 		userProviders = L"Microsoft-Windows-LUA"; // Because Microsoft-Windows-Win32k doesn't work on Vista.
 	userProviders += L"+Multi-MAIN+Multi-FrameRate+Multi-Input+Multi-Worker";
