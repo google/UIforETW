@@ -23,6 +23,7 @@ limitations under the License.
 #include "DirectoryMonitor.h"
 #include "WorkingSet.h"
 #include "PowerStatus.h"
+#include "CPUFrequency.h"
 
 enum TracingMode
 {
@@ -120,6 +121,9 @@ private:
 
 	// This starts and stops a thread that monitors battery status.
 	CPowerStatusMonitor PowerMonitor_;
+
+	// This starts and stops threads for monitoring CPU frequency.
+	CCPUFrequencyMonitor CPUFrequencyMonitor_;
 
 	// This contains the notes for the selected trace, as loaded from disk.
 	std::wstring traceNotes_;

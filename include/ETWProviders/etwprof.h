@@ -65,8 +65,12 @@ PLATFORM_INTERFACE void __cdecl ETWWorkerMark(_In_z_ PCSTR pMessage);
 // Insert events with one or more generic int or float data fields
 PLATFORM_INTERFACE void __cdecl ETWMark1I(_In_z_ PCSTR pMessage, int data1);
 PLATFORM_INTERFACE void __cdecl ETWMark2I(_In_z_ PCSTR pMessage, int data1, int data2);
+PLATFORM_INTERFACE void __cdecl ETWMark3I(_In_z_ PCSTR pMessage, int data1, int data2, int data3);
+PLATFORM_INTERFACE void __cdecl ETWMark4I(_In_z_ PCSTR pMessage, int data1, int data2, int data3, int data4);
 PLATFORM_INTERFACE void __cdecl ETWMark1F(_In_z_ PCSTR pMessage, float data1);
 PLATFORM_INTERFACE void __cdecl ETWMark2F(_In_z_ PCSTR pMessage, float data1, float data2);
+PLATFORM_INTERFACE void __cdecl ETWMark3F(_In_z_ PCSTR pMessage, float data1, float data2, float data3);
+PLATFORM_INTERFACE void __cdecl ETWMark4F(_In_z_ PCSTR pMessage, float data1, float data2, float data3, float data4);
 
 // _Printf_format_string_ is used by /analyze
 PLATFORM_INTERFACE void __cdecl ETWMarkPrintf(_Printf_format_string_ _In_z_ PCSTR pMessage, ...);
@@ -80,6 +84,11 @@ PLATFORM_INTERFACE void __cdecl ETWMarkWorkingSet(_In_z_ PCWSTR pProcessName, _I
 // Record powerState (charging/discharging/AC), batteryPercentage (of total capacity) and
 // discharge rate from struct BATTERY_STATUS.
 PLATFORM_INTERFACE void __cdecl ETWMarkBatteryStatus(_In_z_ PCSTR powerState, float batteryPercentage, _In_z_ PCSTR rate);
+
+// Record CPU frequency data as measured occasionally by running code. This can
+// detect thermal throttling of all types on all processors, however the data is
+// slightly noisy.
+PLATFORM_INTERFACE void __cdecl ETWMarkCPUThrottling(float initialMHz, float measuredMHz, float promisedMHz, float percentage, _In_z_ PCWSTR status);
 
 // Record CPU/package frequency, power usage, and temperature. Currently Intel only.
 PLATFORM_INTERFACE void __cdecl ETWMarkCPUFrequency(_In_z_ PCWSTR MSRName, double frequencyMHz);
@@ -146,13 +155,18 @@ inline void ETWMarkW(PCWSTR) {}
 inline void ETWWorkerMark(PCSTR) {}
 inline void ETWMark1I(PCSTR, int) {}
 inline void ETWMark2I(PCSTR, int, int) {}
+inline void ETWMark3I(PCSTR, int, int, int) {}
+inline void ETWMark4I(PCSTR, int, int, int, int) {}
 inline void ETWMark1F(PCSTR, float) {}
 inline void ETWMark2F(PCSTR, float, float) {}
+inline void ETWMark3F(PCSTR, float, float, float) {}
+inline void ETWMark4F(PCSTR, float, float, float, float) {}
 inline void ETWMarkPrintf(PCSTR, ...) {}
 inline void ETWMarkWPrintf(PCWSTR, ...) {}
 inline void ETWWorkerMarkPrintf(PCSTR, ...) {}
 inline void ETWMarkWorkingSet(PCWSTR, PCWSTR, unsigned, unsigned, unsigned, unsigned) {}
 inline void ETWMarkBatteryStatus(PCSTR, float, PCSTR) {}
+inline void ETWMarkCPUThrottling(float, float, float, float, PCWSTR) {}
 inline void ETWMarkCPUFrequency(PCWSTR, double) {}
 inline void ETWMarkCPUPower(PCWSTR, double, double) {}
 inline void ETWMarkCPUTemp(PCWSTR, double, double) {}

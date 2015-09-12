@@ -187,13 +187,34 @@ void ETWMark2I(_In_z_ PCSTR pMessage, int data1, int data2)
 	EventWriteMark2I( pMessage, data1, data2 );
 }
 
+void ETWMark3I(_In_z_ PCSTR pMessage, int data1, int data2, int data3)
+{
+	EventWriteMark3I(pMessage, data1, data2, data3);
+}
+
+void ETWMark4I(_In_z_ PCSTR pMessage, int data1, int data2, int data3, int data4)
+{
+	EventWriteMark4I(pMessage, data1, data2, data3, data4);
+}
+
 void ETWMark1F(_In_z_ PCSTR pMessage, float data1)
 {
 	EventWriteMark1F( pMessage, data1 );
 }
+
 void ETWMark2F(_In_z_ PCSTR pMessage, float data1, float data2)
 {
 	EventWriteMark2F( pMessage, data1, data2 );
+}
+
+void ETWMark3F(_In_z_ PCSTR pMessage, float data1, float data2, float data3)
+{
+	EventWriteMark3F(pMessage, data1, data2, data3);
+}
+
+void ETWMark4F(_In_z_ PCSTR pMessage, float data1, float data2, float data3, float data4)
+{
+	EventWriteMark4F(pMessage, data1, data2, data3, data4);
 }
 
 void ETWMarkPrintf( _Printf_format_string_ _In_z_ PCSTR pMessage, ... )
@@ -248,6 +269,11 @@ void ETWMarkWorkingSet(_In_z_ PCWSTR pProcessName, _In_z_ PCWSTR pProcess, unsig
 void ETWMarkBatteryStatus(_In_z_ PCSTR powerState, float batteryPercentage, _In_z_ PCSTR rate)
 {
 	EventWriteMarkBatteryStatus(powerState, batteryPercentage, rate);
+}
+
+PLATFORM_INTERFACE void ETWMarkCPUThrottling(float initialMHz, float measuredMHz, float promisedMHz, float percentage, _In_z_ PCWSTR status)
+{
+	EventWriteMarkCPUThrottling(initialMHz, measuredMHz, promisedMHz, percentage, status);
 }
 
 PLATFORM_INTERFACE void ETWMarkCPUFrequency(_In_z_ PCWSTR MSRName, double frequencyMHz)

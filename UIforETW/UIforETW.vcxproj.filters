@@ -54,6 +54,9 @@
     <ClInclude Include="PowerStatus.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="CPUFrequency.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="UIforETW.cpp">
@@ -89,6 +92,9 @@
     <ClCompile Include="PowerStatus.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="CPUFrequency.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="UIforETW.rc">
@@ -98,6 +104,12 @@
   <ItemGroup>
     <None Include="res\UIforETW.rc2">
       <Filter>Resource Files</Filter>
+    </None>
+    <None Include="SpinALot.asm">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="SpinALot64.asm">
+      <Filter>Source Files</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

@@ -92,6 +92,7 @@ WindowsVersion GetWindowsVersion();
 
 std::wstring FindPython(); // Returns a full path to python.exe or nothing.
 
+// Helpful timer class using trendy C++ 11 features.
 class ElapsedTimer
 {
 public:
@@ -103,6 +104,28 @@ public:
 	}
 private:
 	std::chrono::steady_clock::time_point start_ = std::chrono::steady_clock::now();
+};
+
+// High-precision timer class using QueryPerformanceCounter.
+// This may make ElapsedTimer unnecessary.
+class QPCElapsedTimer
+{
+public:
+	QPCElapsedTimer()
+	{
+		QueryPerformanceCounter(&start_);
+	}
+	double ElapsedSeconds() const
+	{
+		LARGE_INTEGER stop;
+		QueryPerformanceCounter(&stop);
+		LARGE_INTEGER frequency;
+		QueryPerformanceFrequency(&frequency);
+
+		return (stop.QuadPart - start_.QuadPart) / float(frequency.QuadPart);
+	}
+private:
+	LARGE_INTEGER start_;
 };
 
 std::wstring GetEXEBuildTime();
