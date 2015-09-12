@@ -786,7 +786,16 @@ void CUIforETWDlg::OnBnClickedStarttracing()
 	std::wstring kernelArgs = L" -start " + GetKernelLogger() + L" -on" + kernelProviders + kernelStackWalk + kernelBuffers + kernelFile;
 
 	WindowsVersion winver = GetWindowsVersion();
-	std::wstring userProviders = L"Microsoft-Windows-Win32k";
+	// 0xFFFFFF is an experimentally determined mask value for the Microsoft-Windows-Win32k
+	// provider. Having no mask specified causes ReleaseUserCrit, ExclusiveUserCrit, and
+	// SharedUserCrit to generate 75% of the messages for this provider - 33,000/s in one
+	// test. This fills up the user buffers and pushes out other messages that are more
+	// useful such as the window-in-focus, UI Delays, and UIforETW messages!
+	// 0xFFFF contains the window-in-focus messages. 0xFF0000 contains the AppMessagePump
+	// messages which are presumed to generate the UI Delays graphs.
+	// Getting rid of the *Crit messages appears to be equivalent to quadrupling the size of
+	// the user buffers.
+	std::wstring userProviders = L"Microsoft-Windows-Win32k:0xFFFFFF";
 	if (winver <= kWindowsVersionVista)
 		userProviders = L"Microsoft-Windows-LUA"; // Because Microsoft-Windows-Win32k doesn't work on Vista.
 	userProviders += L"+Multi-MAIN+Multi-FrameRate+Multi-Input+Multi-Worker";
