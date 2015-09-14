@@ -169,7 +169,7 @@ void CCPUFrequencyMonitor::Sample()
 	}
 
 	float freqPercentage = maxActualFreq * 100.f / maxPromisedMHz;
-	wchar_t* pStatus = L"Normal";
+	PCWSTR pStatus = L"Normal";
 	if (freqPercentage < 75)
 		pStatus = L"Probably modest thermal throttling";
 	if (freqPercentage < 50)
