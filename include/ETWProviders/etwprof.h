@@ -34,7 +34,9 @@ typedef long long int64;
 // ETW support should be compiled in for all Windows PC platforms. It isn't
 // supported on Windows XP but that is determined at run-time. This #define
 // is used to let the code compile (but do nothing) on other operating systems.
+#ifndef DISABLE_ETW_MARKS
 #define	ETW_MARKS_ENABLED
+#endif
 #endif
 
 // Flag to indicate that a mouse-down actually corresponds to a double-click.
