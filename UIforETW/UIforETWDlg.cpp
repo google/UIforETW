@@ -910,7 +910,7 @@ void CUIforETWDlg::StopTracingAndMaybeRecord(bool bSaveTrace)
 
 			{
 				ChildProcess rundownXperf(GetXperfPath());
-				std::wstring args = L" -start UIforETWSessionCLRRundown -on A669021C-C450-4609-A035-5AF59AF4DF18:0xB8:0x5 -f \"" + clrRundownpath + L"\"";
+				std::wstring args = L" -start UIforETWSessionCLRRundown -on A669021C-C450-4609-A035-5AF59AF4DF18 -f \"" + clrRundownpath + L"\"";
 				rundownXperf.Run(bShowCommands_, L"xperf.exe" + args);
 			}
 			
