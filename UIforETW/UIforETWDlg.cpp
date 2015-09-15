@@ -906,12 +906,39 @@ void CUIforETWDlg::StopTracingAndMaybeRecord(bool bSaveTrace)
 		// they stop tracing.
 		if (bSaveTrace && bDotNETStacks_)
 		{
+			std::wstring const clrRundownpath = GetCLRRundownFile();
+
 			{
 				ChildProcess rundownXperf(GetXperfPath());
-				std::wstring args = L" -start UIforETWSessionCLRRundown -on A669021C-C450-4609-A035-5AF59AF4DF18:0xB8:0x5 -f \"" + GetCLRRundownFile() + L"\"";
+				std::wstring args = L" -start UIforETWSessionCLRRundown -on A669021C-C450-4609-A035-5AF59AF4DF18:0xB8:0x5 -f \"" + clrRundownpath + L"\"";
 				rundownXperf.Run(bShowCommands_, L"xperf.exe" + args);
 			}
-			if (false) Sleep(15000);
+			
+			// We've started the rundown process. We'll now wait for the size of the rundown etl to stop growing
+			// or for 120 seconds, whichever happens first.
+
+			{
+				auto const deadline = GetTickCount64() + 120000;
+				__int64 oldSize = 0;
+				while (GetTickCount64() < deadline)
+				{
+					Sleep(1000);
+					__int64 fileSize = GetFileSize(clrRundownpath);
+
+					if (fileSize)
+					{
+						outputPrintf(L"CLR rundown file size is %lld\n", fileSize);
+
+						if (fileSize == oldSize)
+						{
+							break; // Hasn't grown, assume rundown has completed
+						}
+
+						oldSize = fileSize;
+					}
+				}
+			}
+
 			{
 				ChildProcess stopRundownXperf(GetXperfPath());
 				std::wstring stopRundownArgs = L" -stop UIforETWSessionCLRRundown";
