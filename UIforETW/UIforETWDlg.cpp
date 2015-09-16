@@ -786,7 +786,7 @@ void CUIforETWDlg::OnBnClickedStarttracing()
 	std::wstring kernelArgs = L" -start " + GetKernelLogger() + L" -on" + kernelProviders + kernelStackWalk + kernelBuffers + kernelFile;
 
 	WindowsVersion winver = GetWindowsVersion();
-	// The ReleaseUserCrit, ExclusiveUserCrit, and SharedUserCrit events generate
+	// The Windows 10 ReleaseUserCrit, ExclusiveUserCrit, and SharedUserCrit events generate
 	// 75% of the events for this provider - 33,000/s in one test. They account for
 	// more than 75% of the space used, according to System Configuration-> Trace
 	// Statistics. That table also shows their Keyword (aka flags) which are
@@ -794,7 +794,7 @@ void CUIforETWDlg::OnBnClickedStarttracing()
 	// reduce the fill-rate of the user buffers by a factor of four, allowing much
 	// longer time periods to be captured with lower overhead.
 	// This avoids the problem where the user buffers wrap around so quickly that
-	// their timer period doesn't overlap that of the kernel buffers. Specifying
+	// their time period doesn't overlap that of the kernel buffers. Specifying
 	// this flag is equivalent to quadrupling the size of the user buffers!
 	// This should also make the UI Delays and window-in-focus graphs more
 	// reliable, by not having them lose messages so frequently, although it is not
