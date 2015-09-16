@@ -42,6 +42,7 @@ LRESULT CALLBACK LowLevelKeyboardHook(int nCode, WPARAM wParam, LPARAM lParam)
 		char buffer[20];
 		const char* pLabel = buffer;
 		DWORD code = pKbdLLHook->vkCode;
+
 		if ((code >= 'A' && code <= 'Z') || (code >= '0' && code <= '9') || code == ' ')
 		{
 			if (!g_LogKeyboardDetails)
@@ -115,7 +116,11 @@ LRESULT CALLBACK LowLevelKeyboardHook(int nCode, WPARAM wParam, LPARAM lParam)
 				pLabel = ".";
 				break;
 			default:
-				pLabel = "<unknown key>";
+				// Handle miscellaneous keys that are otherwise missed.
+				if (UINT translated = MapVirtualKey(code, MAPVK_VK_TO_CHAR))
+					sprintf_s(buffer, "%c", translated);
+				else
+					pLabel = "<unknown key>";
 				break;
 			}
 		}
