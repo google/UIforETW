@@ -33,6 +33,7 @@ std::wstring GetDocumentsFolderPath()
 		if (docsPathResult == E_INVALIDARG)
 		{
 			debugPrintf(L"SHGetKnownFolderPath (for Documents) failed to retrieve the path with E_INVALIDARG\n");
+			std::terminate();
 		}
 		else if (docsPathResult == E_FAIL)
 		{
@@ -70,20 +71,35 @@ void copyWPAProfileToDocuments(const bool force)
 	const BOOL destinationExists = ::PathFileExistsW(dest.c_str());
 	if (force || !destinationExists)
 	{
-		(void)_wmkdir(destDir.c_str());
-		if (::CopyFileW(source.c_str(), dest.c_str(), FALSE))
+		const BOOL makeDirResult = ::CreateDirectoryW(destDir.c_str(), NULL);
+		if (makeDirResult == 0)
 		{
-			if (force)
-				outputPrintf(L"Copied Startup.wpaProfile to the WPA Files directory.\n");
-		}
-		else
-		{
-			if (force)
+			const DWORD lastErr = ::GetLastError();
+
+			//ERROR_ALREADY_EXISTS is reasonable.
+			if (lastErr != ERROR_ALREADY_EXISTS)
 			{
-				outputPrintf(L"Failed to copy Startup.wpaProfile to the WPA Files directory.\n");
-				outputLastError();
+				outputPrintf(L"Something went wrong when copying the WPA profile to the documents folder.\n");
+				outputLastError(lastErr);
+				return;
 			}
 		}
+		const BOOL copyResult = ::CopyFileW(source.c_str(), dest.c_str(), FALSE);
+		if (copyResult)
+		{
+			//why does the message depend on forced copy?
+			if (force)
+				outputPrintf(L"Copied Startup.wpaProfile to the WPA Files directory.\n");
+			return;
+		}
+		if (force)
+		{
+			outputPrintf(L"Failed to copy Startup.wpaProfile to the WPA Files directory.\n");
+			outputLastError();
+			return;
+		}
+		debugPrintf(L"Failed to copy Startup.wpaProfile to the WPA Files directory.\n");
+		debugLastError();
 	}
 }
 
@@ -102,19 +118,31 @@ void copyWPAProfileToLocalAppData(const std::wstring& exeDir, const bool force)
 	std::wstring dest = destDir + WPAStartupFileName;
 	if (force || !::PathFileExistsW(dest.c_str()))
 	{
-		(void)_wmkdir(destDir.c_str());
+
+		const BOOL makeDirResult = ::CreateDirectoryW(destDir.c_str(), NULL);
+		if (makeDirResult == 0)
+		{
+			const DWORD lastErr = ::GetLastError();
+
+			//ERROR_ALREADY_EXISTS is reasonable.
+			if (lastErr != ERROR_ALREADY_EXISTS)
+			{
+				outputPrintf(L"Something went wrong when copying the WPA profile to the AppData/Local folder.\n");
+				outputLastError(lastErr);
+				return;
+			}
+		}
+
 		if (::CopyFileW(source.c_str(), dest.c_str(), FALSE))
 		{
 			if (force)
 				outputPrintf(L"%s", L"Copied Startup.10wpaProfile to %localappdata%\\Windows Performance Analyzer\n");
+			return;
 		}
-		else
+		if (force)
 		{
-			if (force)
-			{
-				outputPrintf(L"%s", L"Failed to copy Startup.10wpaProfile to %localappdata%\\Windows Performance Analyzer\n");
-				outputLastError();
-			}
+			outputPrintf(L"%s", L"Failed to copy Startup.10wpaProfile to %localappdata%\\Windows Performance Analyzer\n");
+			outputLastError();
 		}
 	}
 
@@ -217,6 +245,9 @@ std::vector<std::wstring> GetFileList(const std::wstring& pattern, const bool fu
 // an embedded NUL then the resulting string will be truncated.
 std::wstring LoadFileAsText(const std::wstring& fileName)
 {
+	if (!::PathFileExistsW(fileName.c_str()))
+		return L"";
+
 	std::ifstream f;
 	f.open(fileName, std::ios_base::binary);
 	if (!f)
