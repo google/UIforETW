@@ -219,8 +219,7 @@ void CUIforETWDlg::SetSymbolPath()
 {
 	// Make sure that the symbol paths are set.
 
-#pragma warning(suppress : 4996)
-	if (bManageSymbolPath_ || !getenv("_NT_SYMBOL_PATH"))
+	if (bManageSymbolPath_ || GetEnvironmentVariableString("_NT_SYMBOL_PATH").empty())
 	{
 		bManageSymbolPath_ = true;
 		std::string symbolPath = "SRV*" + systemDrive_ + "symbols*https://msdl.microsoft.com/download/symbols";
@@ -231,9 +230,8 @@ void CUIforETWDlg::SetSymbolPath()
 			L"Set _NT_SYMBOL_PATH yourself or toggle 'Chrome developer' if you want different defaults.\n",
 			AnsiToUnicode(symbolPath).c_str(), bChromeDeveloper_ ? L" plus Chrome" : L"");
 	}
-#pragma warning(suppress : 4996)
-	const char* symCachePath = getenv("_NT_SYMCACHE_PATH");
-	if (!symCachePath)
+	const std::string symCachePath = GetEnvironmentVariableString("_NT_SYMCACHE_PATH");
+	if (symCachePath.empty())
 		(void)_putenv(("_NT_SYMCACHE_PATH=" + systemDrive_ + "symcache").c_str());
 }
 
@@ -282,7 +280,7 @@ BOOL CUIforETWDlg::OnInitDialog()
 		}
 	}
 
-	if (GetWindowsVersion() == kWindowsVersionXP)
+	if (IsWindowsXPOrLesser())
 	{
 		AfxMessageBox(L"ETW tracing requires Windows Vista or above.");
 		exit(10);
@@ -316,7 +314,7 @@ BOOL CUIforETWDlg::OnInitDialog()
 	if (!PathFileExists(GetXperfPath().c_str()))
 	{
 		// Windows 7 users need to have WPT 8.1 installed.
-		if (GetWindowsVersion() <= kWindowsVersion7)
+		if (IsWindowsSevenOrLesser())
 		{
 			const std::wstring installPath81 = GetExeDir() + L"..\\third_party\\wpt81\\WPTx64-x86_en-us.msi";
 			if (PathFileExists(installPath81.c_str()))
@@ -352,7 +350,7 @@ BOOL CUIforETWDlg::OnInitDialog()
 	}
 	if (!PathFileExists(GetXperfPath().c_str()))
 	{
-		if (GetWindowsVersion() <= kWindowsVersion7)
+		if (IsWindowsSevenOrLesser())
 		{
 			// WPT 10 (at least the 10240 version) doesn't record image ID information
 			// on Windows 7 and below, so the Windows 8.1 version of WPT is needed.
@@ -415,8 +413,7 @@ BOOL CUIforETWDlg::OnInitDialog()
 	SetIcon(m_hIcon, TRUE);			// Set big icon
 	SetIcon(m_hIcon, FALSE);		// Set small icon
 
-	WindowsVersion winver = GetWindowsVersion();
-	if (winver <= kWindowsVersion7)
+	if (IsWindowsSevenOrLesser())
 	{
 		bCompress_ = false; // ETW trace compression requires Windows 8.0
 		SmartEnableWindow(btCompress_.m_hWnd, false);
@@ -511,13 +508,12 @@ BOOL CUIforETWDlg::OnInitDialog()
 	return TRUE; // return TRUE unless you set the focus to a control
 }
 
-std::wstring CUIforETWDlg::GetDirectory(const wchar_t* env, const std::wstring& default)
+std::wstring CUIforETWDlg::GetDirectory(PCWSTR env, const std::wstring& default)
 {
 	// Get a directory (from an environment variable, if set) and make sure it exists.
 	std::wstring result = default;
-#pragma warning(suppress : 4996)
-	const wchar_t* traceDir = _wgetenv(env);
-	if (traceDir)
+	const std::wstring traceDir = GetEnvironmentVariableString(env);
+	if (!traceDir.empty())
 	{
 		result = traceDir;
 	}
@@ -550,9 +546,8 @@ void CUIforETWDlg::RegisterProviders()
 		dllSource += L"ETWProviders64.dll";
 	else
 		dllSource += L"ETWProviders.dll";
-#pragma warning(suppress:4996)
-	const wchar_t* temp = _wgetenv(L"temp");
-	if (!temp)
+	const std::wstring temp = GetEnvironmentVariableString(L"temp");
+	if (temp.empty())
 		return;
 	std::wstring dllDest = temp;
 	dllDest += L"\\ETWProviders.dll";
@@ -712,10 +707,7 @@ std::wstring CUIforETWDlg::GenerateResultFilename() const
 	_strdate_s(date);
 	int hour, min, sec;
 	int year, month, day;
-#pragma warning(suppress : 4996)
-	const wchar_t* username = _wgetenv(L"USERNAME");
-	if (!username)
-		username = L"";
+	const std::wstring username = GetEnvironmentVariableString(L"USERNAME");
 	wchar_t fileName[MAX_PATH];
 	// Hilarious /analyze warning on this line from bug in _strtime_s annotation!
 	// warning C6054: String 'time' might not be zero-terminated.
@@ -724,7 +716,7 @@ std::wstring CUIforETWDlg::GenerateResultFilename() const
 		3 == sscanf_s(date, "%d/%d/%d", &month, &day, &year))
 	{
 		// The filenames are chosen to sort by date, with username as the LSB.
-		swprintf_s(fileName, L"%04d-%02d-%02d_%02d-%02d-%02d_%s", year + 2000, month, day, hour, min, sec, username);
+		swprintf_s(fileName, L"%04d-%02d-%02d_%02d-%02d-%02d_%s", year + 2000, month, day, hour, min, sec, username.c_str());
 	}
 	else
 	{
@@ -785,9 +777,22 @@ void CUIforETWDlg::OnBnClickedStarttracing()
 		kernelFile = L" -buffering";
 	std::wstring kernelArgs = L" -start " + GetKernelLogger() + L" -on" + kernelProviders + kernelStackWalk + kernelBuffers + kernelFile;
 
-	WindowsVersion winver = GetWindowsVersion();
-	std::wstring userProviders = L"Microsoft-Windows-Win32k";
-	if (winver <= kWindowsVersionVista)
+	// The Windows 10 ReleaseUserCrit, ExclusiveUserCrit, and SharedUserCrit events generate
+	// 75% of the events for this provider - 33,000/s in one test. They account for
+	// more than 75% of the space used, according to System Configuration-> Trace
+	// Statistics. That table also shows their Keyword (aka flags) which are
+	// 0x0200000010000000. By specifying a flag of ~0x0200000010000000 we can
+	// reduce the fill-rate of the user buffers by a factor of four, allowing much
+	// longer time periods to be captured with lower overhead.
+	// This avoids the problem where the user buffers wrap around so quickly that
+	// their time period doesn't overlap that of the kernel buffers. Specifying
+	// this flag is equivalent to quadrupling the size of the user buffers!
+	// This should also make the UI Delays and window-in-focus graphs more
+	// reliable, by not having them lose messages so frequently, although it is not
+	// clear that it actually helps.
+	const uint64_t kCritFlags = 0x0200000010000000;
+	std::wstring userProviders = stringPrintf(L"Microsoft-Windows-Win32k:0x%llx", ~kCritFlags);
+	if (IsWindowsVistaOrLesser())
 		userProviders = L"Microsoft-Windows-LUA"; // Because Microsoft-Windows-Win32k doesn't work on Vista.
 	userProviders += L"+Multi-MAIN+Multi-FrameRate+Multi-Input+Multi-Worker";
 
@@ -801,13 +806,13 @@ void CUIforETWDlg::OnBnClickedStarttracing()
 	// some of Chrome's categories (keywords/flags) then add chrome:flags to the list of user
 	// providers to monitor. See https://codereview.chromium.org/1176243016 for details.
 	if (useChromeProviders_)
-		userProviders += stringPrintf(L"+chrome:0x%llx", 0x8000000000000000 | chromeKeywords_);
+		userProviders += stringPrintf(L"+chrome:0x%llx", (0x8000000000000000 | chromeKeywords_));
 
 	if (bGPUTracing_)
 	{
 		// Apparently we need a different provider for graphics profiling
 		// on Windows 8 and above.
-		if (winver >= kWindowsVersion8)
+		if (IsWindows8OrGreater())
 		{
 			// This provider is needed for GPU profiling on Windows 8+
 			userProviders += L"+Microsoft-Windows-DxgKrnl:0xFFFF:5";
@@ -1138,7 +1143,7 @@ void CUIforETWDlg::OnBnClickedShowcommands()
 void CUIforETWDlg::SetSamplingSpeed()
 {
 	std::wstring xperfPath = GetXperfPath();
-	if (GetWindowsVersion() >= kWindowsVersion10)
+	if (IsWindowsTenOrGreater())
 	{
 		xperfPath = wpt10Dir_ + L"xperf.exe";
 		if (!PathFileExists(xperfPath.c_str()))
@@ -1211,8 +1216,8 @@ void CUIforETWDlg::UpdateTraceList()
 
 	// Note that these will also pull in files like *.etlabc and *.zipabc.
 	// I don't want that. Filter them out later?
-	auto tempTraces = GetFileList(GetTraceDir() + L"\\*.etl");
-	auto tempZips = GetFileList(GetTraceDir() + L"\\*.zip");
+	auto tempTraces = GetFileList(GetTraceDir() + L"*.etl");
+	auto tempZips = GetFileList(GetTraceDir() + L"*.zip");
 	// Why can't I use += to concatenate these?
 	tempTraces.insert(tempTraces.end(), tempZips.begin(), tempZips.end());
 	std::sort(tempTraces.begin(), tempTraces.end());
@@ -1585,7 +1590,7 @@ void CUIforETWDlg::OnContextMenu(CWnd* pWnd, CPoint point)
 				pContextMenu->EnableMenuItem(id, MF_BYCOMMAND | MF_GRAYED);
 		}
 
-		if (GetWindowsVersion() < kWindowsVersion8)
+		if (IsWindowsSevenOrLesser())
 		{
 			// Disable ETW trace compress options on Windows 7 and below
 			// since they don't work there.

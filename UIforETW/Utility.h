@@ -39,11 +39,23 @@ void CreateRegistryKey(HKEY root, const std::wstring& subkey, const std::wstring
 std::wstring GetEditControlText(HWND hwnd);
 std::wstring AnsiToUnicode(const std::string& text);
 
+
+//MultiByteToWideChar: https://msdn.microsoft.com/en-us/library/windows/desktop/dd319072.aspx
+//
+//Remarks:
+//As mentioned in the caution above,
+//the output buffer can easily be overrun
+//if this function is not first called with cchWideChar set to 0
+//in order to obtain the required size. 
+int RequiredNumberOfWideChars(const std::string& text);
+
 // Return a string from a format string and some printf-style arguments.
 // Maximum output size is 4 K - larger outputs will be truncated.
-std::wstring stringPrintf(_Printf_format_string_ const wchar_t* pFormat, ...);
+std::wstring stringPrintf(_Printf_format_string_ PCWSTR const pFormat, ...);
 // Call OutputDebugString with a format string and some printf-style arguments.
-void debugPrintf(_Printf_format_string_ const wchar_t* pFormat, ...);
+void debugPrintf(_Printf_format_string_ PCWSTR const pFormat, ...);
+void outputLastError(DWORD lastErr = ::GetLastError());
+void debugLastError(DWORD lastErr = ::GetLastError());
 
 // This function checks to see whether a control has focus before
 // disabling it. If it does have focus then it moves the focus, to
@@ -76,33 +88,53 @@ int64_t GetFileSize(const std::wstring& path);
 void SetClipboardText(const std::wstring& text);
 std::wstring GetClipboardText();
 
-enum WindowsVersion
-{
-	kWindowsVersionXP,
-	kWindowsVersionVista,
-	kWindowsVersion7,
-	kWindowsVersion8,
-	kWindowsVersion8_1,
-	kWindowsVersion10,
-};
+std::wstring GetEnvironmentVariableString(_In_z_ PCWSTR variable);
+std::string GetEnvironmentVariableString(_In_z_ PCSTR variable);
 
 bool Is64BitWindows();
 bool Is64BitBuild();
-WindowsVersion GetWindowsVersion();
+bool IsWindowsTenOrGreater();
+bool IsWindowsXPOrLesser();
+bool IsWindowsSevenOrLesser();
+bool IsWindowsVistaOrLesser();
 
 std::wstring FindPython(); // Returns a full path to python.exe or nothing.
 
-class ElapsedTimer
+// Helpful timer class using trendy C++ 11 features.
+class ElapsedTimer final
 {
 public:
 	double ElapsedSeconds() const
 	{
-		auto duration = std::chrono::steady_clock::now() - start_;
-		auto microseconds = std::chrono::duration_cast<std::chrono::microseconds>(duration);
+		const auto duration = std::chrono::steady_clock::now() - start_;
+		const auto microseconds =
+			std::chrono::duration_cast<std::chrono::microseconds>(duration);
 		return microseconds.count() / 1e6;
 	}
 private:
 	std::chrono::steady_clock::time_point start_ = std::chrono::steady_clock::now();
+};
+
+// High-precision timer class using QueryPerformanceCounter.
+// This may make ElapsedTimer unnecessary.
+class QPCElapsedTimer final
+{
+public:
+	QPCElapsedTimer()
+	{
+		ATLVERIFY(QueryPerformanceCounter(&start_));
+	}
+	double ElapsedSeconds() const
+	{
+		LARGE_INTEGER stop = {};
+		ATLVERIFY(QueryPerformanceCounter(&stop));
+		LARGE_INTEGER frequency = {};
+		ATLVERIFY(QueryPerformanceFrequency(&frequency));
+
+		return (stop.QuadPart - start_.QuadPart) / float(frequency.QuadPart);
+	}
+private:
+	LARGE_INTEGER start_ = {};
 };
 
 std::wstring GetEXEBuildTime();
@@ -111,4 +143,5 @@ void SetCurrentThreadName(PCSTR threadName);
 
 void CopyStartupProfiles(const std::wstring& exeDir, bool force);
 
-void CloseValidHandle( _Pre_valid_ _Post_ptr_invalid_ HANDLE handle );
+void CloseValidHandle(_In_ _Pre_valid_ _Post_ptr_invalid_ HANDLE handle);
+
