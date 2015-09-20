@@ -219,8 +219,7 @@ void CUIforETWDlg::SetSymbolPath()
 {
 	// Make sure that the symbol paths are set.
 
-#pragma warning(suppress : 4996)
-	if (bManageSymbolPath_ || !getenv("_NT_SYMBOL_PATH"))
+	if (bManageSymbolPath_ || GetCharEnvironmentVariable("_NT_SYMBOL_PATH").empty())
 	{
 		bManageSymbolPath_ = true;
 		std::string symbolPath = "SRV*" + systemDrive_ + "symbols*https://msdl.microsoft.com/download/symbols";
@@ -231,9 +230,8 @@ void CUIforETWDlg::SetSymbolPath()
 			L"Set _NT_SYMBOL_PATH yourself or toggle 'Chrome developer' if you want different defaults.\n",
 			AnsiToUnicode(symbolPath).c_str(), bChromeDeveloper_ ? L" plus Chrome" : L"");
 	}
-#pragma warning(suppress : 4996)
-	const char* symCachePath = getenv("_NT_SYMCACHE_PATH");
-	if (!symCachePath)
+	const std::string symCachePath = GetCharEnvironmentVariable("_NT_SYMCACHE_PATH");
+	if (symCachePath.empty())
 		(void)_putenv(("_NT_SYMCACHE_PATH=" + systemDrive_ + "symcache").c_str());
 }
 
@@ -511,13 +509,12 @@ BOOL CUIforETWDlg::OnInitDialog()
 	return TRUE; // return TRUE unless you set the focus to a control
 }
 
-std::wstring CUIforETWDlg::GetDirectory(const wchar_t* env, const std::wstring& default)
+std::wstring CUIforETWDlg::GetDirectory(PCWSTR env, const std::wstring& default)
 {
 	// Get a directory (from an environment variable, if set) and make sure it exists.
 	std::wstring result = default;
-#pragma warning(suppress : 4996)
-	const wchar_t* traceDir = _wgetenv(env);
-	if (traceDir)
+	const std::wstring traceDir = GetWideEnvironmentVariable(env);
+	if (!traceDir.empty())
 	{
 		result = traceDir;
 	}
@@ -551,8 +548,8 @@ void CUIforETWDlg::RegisterProviders()
 	else
 		dllSource += L"ETWProviders.dll";
 #pragma warning(suppress:4996)
-	const wchar_t* temp = _wgetenv(L"temp");
-	if (!temp)
+	const std::wstring temp = GetWideEnvironmentVariable(L"temp");
+	if (temp.empty())
 		return;
 	std::wstring dllDest = temp;
 	dllDest += L"\\ETWProviders.dll";
@@ -712,10 +709,8 @@ std::wstring CUIforETWDlg::GenerateResultFilename() const
 	_strdate_s(date);
 	int hour, min, sec;
 	int year, month, day;
-#pragma warning(suppress : 4996)
-	const wchar_t* username = _wgetenv(L"USERNAME");
-	if (!username)
-		username = L"";
+
+	const std::wstring username = GetWideEnvironmentVariable(L"USERNAME");
 	wchar_t fileName[MAX_PATH];
 	// Hilarious /analyze warning on this line from bug in _strtime_s annotation!
 	// warning C6054: String 'time' might not be zero-terminated.

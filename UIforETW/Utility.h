@@ -41,9 +41,13 @@ std::wstring AnsiToUnicode(const std::string& text);
 
 // Return a string from a format string and some printf-style arguments.
 // Maximum output size is 4 K - larger outputs will be truncated.
-std::wstring stringPrintf(_Printf_format_string_ const wchar_t* pFormat, ...);
+std::wstring stringPrintf(_Printf_format_string_ PCWSTR const pFormat, ...);
 // Call OutputDebugString with a format string and some printf-style arguments.
-void debugPrintf(_Printf_format_string_ const wchar_t* pFormat, ...);
+void debugPrintf(_Printf_format_string_ PCWSTR const pFormat, ...);
+
+void outputLastError(DWORD lastErr = ::GetLastError());
+
+void debugLastError(DWORD lastErr = ::GetLastError());
 
 // This function checks to see whether a control has focus before
 // disabling it. If it does have focus then it moves the focus, to
@@ -75,6 +79,9 @@ int64_t GetFileSize(const std::wstring& path);
 
 void SetClipboardText(const std::wstring& text);
 std::wstring GetClipboardText();
+
+std::wstring GetWideEnvironmentVariable(_In_z_ PCWSTR variable);
+std::string GetCharEnvironmentVariable(_In_z_ PCSTR variable);
 
 enum WindowsVersion
 {
@@ -135,3 +142,5 @@ void SetCurrentThreadName(PCSTR threadName);
 void CopyStartupProfiles(const std::wstring& exeDir, bool force);
 
 void CloseValidHandle( _Pre_valid_ _Post_ptr_invalid_ HANDLE handle );
+
+void CloseRegKey( _Pre_valid_ _Post_ptr_invalid_ HKEY key, PCWSTR const keyName );
