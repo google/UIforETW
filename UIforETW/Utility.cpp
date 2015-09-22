@@ -23,7 +23,7 @@ void outputLastError(const DWORD lastErr)
 {
 	const DWORD errMsgSize = 1024u;
 	wchar_t errBuff[errMsgSize] = {0};
-	const DWORD ret = FormatMessageW(
+	const DWORD ret = ::FormatMessageW(
 		(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS),
 		NULL, lastErr, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
 		errBuff, errMsgSize, NULL);
@@ -38,7 +38,7 @@ void debugLastError(const DWORD lastErr)
 {
 	const DWORD errMsgSize = 1024u;
 	wchar_t errBuff[errMsgSize] = {0};
-	const DWORD ret = FormatMessageW(
+	const DWORD ret = ::FormatMessageW(
 		(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS),
 		NULL, lastErr, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
 		errBuff, errMsgSize, NULL);
@@ -69,7 +69,7 @@ std::vector<std::wstring> split(const std::wstring& s, char c)
 	return result;
 }
 
-std::vector<std::wstring> GetFileList(const std::wstring& pattern, bool fullPaths)
+std::vector<std::wstring> GetFileList(const std::wstring& pattern, const bool fullPaths)
 {
 	const std::wstring directory = (fullPaths ? GetDirPart( pattern ) : L"");
 
@@ -78,17 +78,17 @@ std::vector<std::wstring> GetFileList(const std::wstring& pattern, bool fullPath
 	UIETWASSERT(pattern.length() > 0);
 
 
-	//string passed to FindFirstFileEx may not end in a backslash
+	//string passed to FindFirstFileEx must not end in a backslash
 	UIETWASSERT(pattern.back() != L'\\');
 
 	WIN32_FIND_DATA findData;
-	HANDLE hFindFile = FindFirstFileExW(pattern.c_str(), FindExInfoBasic,
+	HANDLE hFindFile = ::FindFirstFileExW(pattern.c_str(), FindExInfoBasic,
 				&findData, FindExSearchNameMatch, NULL, 0);
 
 	std::vector<std::wstring> result;
 	if (hFindFile == INVALID_HANDLE_VALUE)
 	{
-		outputPrintf(L"failed to get file list for directory: `%s`\n", directory.c_str());
+		outputPrintf(L"failed to get file list for directory: `%s`\n", pattern.c_str());
 		debugLastError();
 		return result;
 	}
@@ -96,21 +96,16 @@ std::vector<std::wstring> GetFileList(const std::wstring& pattern, bool fullPath
 	do
 	{
 		result.emplace_back(directory + findData.cFileName);
-	} while (FindNextFile(hFindFile, &findData));
+	} while (::FindNextFileW(hFindFile, &findData));
 
 	const DWORD lastErr = ::GetLastError();
 	if (lastErr != ERROR_NO_MORE_FILES)
 	{
-		outputPrintf(L"FindNextFile (for directory: `%s`) failed in an unexpected manner.\n", directory.c_str());
+		outputPrintf(L"FindNextFile (for directory: `%s`) failed in an unexpected manner.\n", pattern.c_str());
 		debugLastError(lastErr);
 	}
 
-	const BOOL findClose = ::FindClose(hFindFile);
-	if (findClose == 0)
-	{
-		outputPrintf(L"FindClose (for directory: `%s`) failed.\n", directory.c_str());
-		debugLastError();
-	}
+	CloseFindHandle(hFindFile, directory.c_str());
 	return result;
 }
 
@@ -149,7 +144,9 @@ std::wstring LoadFileAsText(const std::wstring& fileName)
 	data[length] = 0;
 	data[length+1] = 0;
 
+	
 	const wchar_t bom = 0xFEFF;
+	UIETWASSERT(data.size( ) > sizeof(bom));
 	if (memcmp(&bom, &data[0], sizeof(bom)) == 0)
 	{
 		// Assume UTF-16, strip bom, and return.
@@ -196,13 +193,11 @@ std::wstring ConvertToCRLF(const std::wstring& input)
 void SetRegistryDWORD(HKEY root, const std::wstring& subkey, const std::wstring& valueName, DWORD value)
 {
 	HKEY key;
-	const LONG openResult = ::RegOpenKeyExW(root, subkey.c_str(), 0, KEY_ALL_ACCESS, &key);
-	if (openResult != ERROR_SUCCESS)
+	if (!OpenRegKey(&key, root, subkey.c_str()))
 	{
-		outputPrintf(L"Failed to open registry key `%s`.\n", subkey.c_str());
-		debugLastError();
 		return;
 	}
+
 	const LONG setResult = ::RegSetValueExW(key, valueName.c_str(), 0, REG_DWORD, reinterpret_cast<const BYTE*>(&value), sizeof(value));
 	if (setResult != ERROR_SUCCESS)
 	{
@@ -212,23 +207,20 @@ void SetRegistryDWORD(HKEY root, const std::wstring& subkey, const std::wstring&
 	}
 
 	CloseRegKey(key, subkey.c_str());
-
 }
 
 void CreateRegistryKey(HKEY root, const std::wstring& subkey, const std::wstring& newKey)
 {
 	HKEY key;
-	const LONG openResult = ::RegOpenKeyExW(root, subkey.c_str(), 0, KEY_ALL_ACCESS, &key);
-	if (openResult != ERROR_SUCCESS)
+	if (!OpenRegKey(&key, root, subkey.c_str()))
 	{
-		outputPrintf(L"Failed to open registry key `%s`.\n", subkey.c_str());
-		debugLastError();
 		return;
 	}
+
 	HKEY resultKey;
 
 	//TODO: RegCreateKey is depreciated.
-	const LONG createResult = RegCreateKeyW(key, newKey.c_str(), &resultKey);
+	const LONG createResult = ::RegCreateKeyW(key, newKey.c_str(), &resultKey);
 	if (createResult != ERROR_SUCCESS)
 	{
 		outputPrintf(L"Failed to create registry key `%s`.\n", newKey.c_str());
@@ -244,7 +236,7 @@ void CreateRegistryKey(HKEY root, const std::wstring& subkey, const std::wstring
 
 std::wstring GetEditControlText(HWND hEdit)
 {
-	const int length = GetWindowTextLengthW(hEdit);
+	const int length = ::GetWindowTextLengthW(hEdit);
 	std::vector<wchar_t> buffer(length + 1);
 	
 	
@@ -258,15 +250,16 @@ std::wstring GetEditControlText(HWND hEdit)
 	//or if the window or control handle is invalid,
 	//the return value is zero. 
 	
-	const int charsWritten = GetWindowTextW(hEdit, &buffer[0], static_cast<int>(buffer.size()));
+	const int charsWritten = ::GetWindowTextW(hEdit, &buffer[0], static_cast<int>(buffer.size()));
 	if (charsWritten == 0)
 	{
 		if (length > 0)
 			debugLastError();
 		return L"";
 	}
-	UIETWASSERT(charsWritten < length);
-	UIETWASSERT(buffer[charsWritten+1] == 0);
+	UIETWASSERT(charsWritten == length);
+	UIETWASSERT((charsWritten) < (int)buffer.size());
+	UIETWASSERT(buffer[charsWritten] == 0);
 	// Double-verify that the buffer is null-terminated.
 	buffer[buffer.size() - 1] = 0;
 	return &buffer[0];
@@ -318,7 +311,8 @@ std::wstring AnsiToUnicode(const std::string& text)
 		std::terminate( );
 	}
 
-	UIETWASSERT(buffer[multiToWideResult] == 0);
+	UIETWASSERT(multiToWideResult > 0);
+	UIETWASSERT(buffer[multiToWideResult - 1] == 0);
 	// Double-verify that the buffer is null-terminated.
 	buffer[buffer.size() - 1] = 0;
 	std::wstring result = &buffer[0];
@@ -357,31 +351,31 @@ static bool ControlOK(HWND win)
 {
 	if (!win)
 		return false;
-	if (!IsWindowEnabled(win))
+	if (!::IsWindowEnabled(win))
 		return false;
-	if (!(GetWindowLong(win, GWL_STYLE) & WS_TABSTOP))
+	if (!(::GetWindowLong(win, GWL_STYLE) & WS_TABSTOP))
 		return false;
 	// You have to check for visibility of the parent window because during dialog
 	// creation the parent window is invisible, which renders the child windows
 	// all invisible - not good.
-	HWND parent = GetParent(win);
+	HWND parent = ::GetParent(win);
 	UIETWASSERT(parent);
-	if (!IsWindowVisible(win) && IsWindowVisible(parent))
+	if (!::IsWindowVisible(win) && ::IsWindowVisible(parent))
 		return false;
 	return true;
 }
 
-static HWND GetNextDlgItem(HWND win, bool Wrap)
+static HWND GetNextDlgItem(HWND win, const bool Wrap)
 {
-	HWND next = GetWindow(win, GW_HWNDNEXT);
-	while (next != win && !ControlOK(next))
+	HWND next = ::GetWindow(win, GW_HWNDNEXT);
+	while (next != win && !::ControlOK(next))
 	{
 		if (next)
-			next = GetWindow(next, GW_HWNDNEXT);
+			next = ::GetWindow(next, GW_HWNDNEXT);
 		else
 		{
 			if (Wrap)
-				next = GetWindow(win, GW_HWNDFIRST);
+				next = ::GetWindow(win, GW_HWNDFIRST);
 			else
 				return 0;
 		}
@@ -397,14 +391,14 @@ void SmartEnableWindow(HWND Win, BOOL Enable)
 	if (!Enable)
 	{
 		bool FocusProblem = false;
-		for (HWND focuscopy = GetFocus(); focuscopy; focuscopy = (GetParent)(focuscopy))
+		for (HWND focuscopy = ::GetFocus(); focuscopy; focuscopy = ::GetParent(focuscopy))
 			if (focuscopy == Win)
 				FocusProblem = true;
 		if (FocusProblem)
 		{
-			HWND nextctrl = GetNextDlgItem(Win, true);
+			HWND nextctrl = ::GetNextDlgItem(Win, true);
 			if (nextctrl)
-				SetFocus(nextctrl);
+				::SetFocus(nextctrl);
 		}
 	}
 	::EnableWindow(Win, Enable);
@@ -419,12 +413,6 @@ std::wstring GetFilePart(const std::wstring& path)
 	
 	// If there's no slash then the file part is the entire string.
 	return path;
-
-	//HOW DID THIS CODE WORK??!?
-	//('\\' is NOT a wide-character literal)
-	//const wchar_t* pLastSlash = wcsrchr(path.c_str(), '\\');
-	//if (pLastSlash)
-		//return pLastSlash + 1;
 }
 
 std::wstring GetFileExt(const std::wstring& path)
@@ -434,26 +422,32 @@ std::wstring GetFileExt(const std::wstring& path)
 	if (lastPeriod != std::wstring::npos)
 		return filePart.substr(lastPeriod);
 
+	// If there's no period then there's no extension.
 	return L"";
 }
 
 std::wstring GetDirPart(const std::wstring& path)
 {
 	UIETWASSERT(path.size() > 0);
-	const wchar_t* pLastSlash = wcsrchr(path.c_str(), '\\');
-	if (pLastSlash)
-		return path.substr(0, pLastSlash + 1 - path.c_str());
+	const size_t lastSlash = path.find_last_of( L'\\' );
+	if (lastSlash != std::wstring::npos)
+	{
+		UIETWASSERT(path.at( lastSlash ) != path.back());
+		return path.substr(0, lastSlash+1);
+	}
+
 	// If there's no slash then there is no directory.
 	return L"";
 }
 
 std::wstring CrackFilePart(const std::wstring& path)
 {
-	std::wstring filePart = GetFilePart(path);
+	const std::wstring filePart = GetFilePart(path);
 	const std::wstring extension = GetFileExt(filePart);
+	UIETWASSERT(filePart.size() >= extension.size());
 	if (!extension.empty())
 	{
-		filePart = filePart.substr(0, filePart.size() - extension.size());
+		return filePart.substr(0, filePart.size() - extension.size());
 	}
 
 	return filePart;
@@ -498,14 +492,14 @@ int DeleteFiles(HWND hwnd, const std::vector<std::wstring>& paths)
 	};
 	// Delete using the recycle bin.
 	//TODO: IFileOperation?
-	const int result = SHFileOperationW(&fileOp);
+	const int result = ::SHFileOperationW(&fileOp);
 
 	return result;
 }
 
 void SetClipboardText(const std::wstring& text)
 {
-	const BOOL openClip = ::OpenClipboard(GetDesktopWindow());
+	const BOOL openClip = ::OpenClipboard(::GetDesktopWindow());
 	if (!openClip)
 	{
 		outputPrintf(L"Failed to open clipboard!\n");
@@ -528,6 +522,7 @@ void SetClipboardText(const std::wstring& text)
 		outputPrintf(L"Couldn't allocate memory to set clipboard text!\n");
 		outputLastError();
 		ClipboardClose();
+		return;
 	}
 	void* const ptr = ::GlobalLock(hmem);
 	if (ptr == NULL)
@@ -539,6 +534,7 @@ void SetClipboardText(const std::wstring& text)
 		const HGLOBAL freeRes = ::GlobalFree(hmem);
 		if (freeRes != NULL)
 			std::terminate();//Logic bug!
+		return;
 	}
 
 	memcpy_s(ptr, length, text.c_str(), length);
@@ -599,7 +595,7 @@ std::wstring GetClipboardText()
 
 
 	PCWSTR const text = static_cast<PCWSTR>(ptr);
-	const size_t bytes = GlobalSize(hClip);
+	const size_t bytes = ::GlobalSize(hClip);
 	if (bytes == 0)
 	{
 		outputPrintf(L"Failed to get size of string!\n");
@@ -634,8 +630,8 @@ std::wstring GetClipboardText()
 
 int64_t GetFileSize(const std::wstring& path)
 {
-	LARGE_INTEGER result;
-	HANDLE hFile = CreateFileW(path.c_str(), GENERIC_READ,
+	LARGE_INTEGER result = {0};
+	HANDLE hFile = ::CreateFileW(path.c_str(), GENERIC_READ,
 		(FILE_SHARE_READ | FILE_SHARE_WRITE), NULL, OPEN_EXISTING,
 		FILE_ATTRIBUTE_NORMAL, NULL);
 	if (hFile == INVALID_HANDLE_VALUE)
@@ -645,7 +641,7 @@ int64_t GetFileSize(const std::wstring& path)
 		return 0;
 	}
 
-	if (GetFileSizeEx(hFile, &result))
+	if (::GetFileSizeEx(hFile, &result))
 	{
 		CloseValidHandle(hFile);
 		return result.QuadPart;
@@ -658,7 +654,7 @@ bool Is64BitWindows()
 {
 	// http://blogs.msdn.com/b/oldnewthing/archive/2005/02/01/364563.aspx
 	BOOL f64 = FALSE;
-	const bool bIsWin64 = IsWow64Process(GetCurrentProcess(), &f64) && f64;
+	const bool bIsWin64 = ( ::IsWow64Process(::GetCurrentProcess(), &f64) && f64 );
 	return bIsWin64;
 }
 
@@ -667,39 +663,12 @@ bool Is64BitBuild()
 	return sizeof(void*) == 8;
 }
 
-WindowsVersion GetWindowsVersion()
+bool IsWindowsTenOrGreater()
 {
-	OSVERSIONINFO verInfo = { sizeof(OSVERSIONINFO) };
-	// warning C4996: 'GetVersionExA': was declared deprecated
-	// warning C28159: Consider using 'IsWindows*' instead of 'GetVersionExW'.Reason : Deprecated.Use VerifyVersionInfo* or IsWindows* macros from VersionHelpers.
-#pragma warning(suppress : 4996)
-#pragma warning(suppress : 28159)
-	GetVersionEx(&verInfo);
-
-	// Windows 10 preview has major version 10, if you have a compatibility
-	// manifest for that OS, which this program should have.
-	if (verInfo.dwMajorVersion > 6)
-		return kWindowsVersion10;	// Or higher, I guess.
-
-	// Windows 8.1 will only be returned if there is an appropriate
-	// compatibility manifest.
-	if (verInfo.dwMajorVersion == 6 && verInfo.dwMinorVersion >= 3)
-		return kWindowsVersion8_1;
-
-	if (verInfo.dwMajorVersion == 6 && verInfo.dwMinorVersion >= 2)
-		return kWindowsVersion8;
-
-	if (verInfo.dwMajorVersion == 6 && verInfo.dwMinorVersion >= 1)
-		return kWindowsVersion7;
-
-	if (verInfo.dwMajorVersion == 6)
-		return kWindowsVersionVista;
-
-	return kWindowsVersionXP;
+	return IsWindowsVersionOrGreater(10, 0, 0);
 }
 
-
-std::wstring GetWideEnvironmentVariable(_In_z_ PCWSTR variable)
+std::wstring GetEnvironmentVariableString(_In_z_ PCWSTR variable)
 {
 	const rsize_t bufferSize = 512u;
 	wchar_t buffer[bufferSize] = {0};
@@ -710,7 +679,7 @@ std::wstring GetWideEnvironmentVariable(_In_z_ PCWSTR variable)
 	return L"";
 }
 
-std::string GetCharEnvironmentVariable(_In_z_ PCSTR variable)
+std::string GetEnvironmentVariableString(_In_z_ PCSTR variable)
 {
 	const rsize_t bufferSize = 512u;
 	char buffer[bufferSize] = {0};
@@ -718,13 +687,13 @@ std::string GetCharEnvironmentVariable(_In_z_ PCSTR variable)
 	const errno_t result = getenv_s(&sizeRequired, buffer, variable);
 	if (result == 0)
 		return buffer;
-	return L"";
+	return "";
 
 }
 
 std::wstring FindPython()
 {
-	const std::wstring pytwoseven = GetWideEnvironmentVariable( L"python27" );
+	const std::wstring pytwoseven = GetEnvironmentVariableString( L"python27" );
 	
 	//Some people, like me, (Alexander Riccio) have an environment variable 
 	//that specifically points to Python 2.7.
@@ -735,24 +704,28 @@ std::wstring FindPython()
 		return pytwoseven;
 	}
 
-	const std::wstring path = GetWideEnvironmentVariable(L"path");
-	if (!path.empty())
+	const std::wstring path = GetEnvironmentVariableString(L"path");
+	if (path.empty())
 	{
-		std::vector<std::wstring> pathParts = split(path, ';');
-		// First look for python.exe. If that isn't found then look for
-		// python.bat, part of Chromium's depot_tools
-		for (const auto& exeName : { L"\\python.exe", L"\\python.bat" })
+		// No python found.
+		return L"";
+	}
+
+	std::vector<std::wstring> pathParts = split(path, ';');
+	// First look for python.exe. If that isn't found then look for
+	// python.bat, part of Chromium's depot_tools
+	for (const auto& exeName : { L"\\python.exe", L"\\python.bat" })
+	{
+		for (const auto& part : pathParts)
 		{
-			for (const auto& part : pathParts)
+			const std::wstring pythonPath = part + exeName;
+			if (::PathFileExistsW(pythonPath.c_str()))
 			{
-				std::wstring pythonPath = part + exeName;
-				if (PathFileExists(pythonPath.c_str()))
-				{
-					return pythonPath;
-				}
+				return pythonPath;
 			}
 		}
 	}
+
 	// No python found.
 	return L"";
 }
@@ -762,8 +735,8 @@ std::wstring GetBuildTimeFromAddress(_In_ const void* const codeAddress)
 	// Get the base of the address reservation. This lets this
 	// function be passed any function or global variable address
 	// in a DLL or EXE.
-	MEMORY_BASIC_INFORMATION memoryInfo;
-	if (VirtualQuery(codeAddress, &memoryInfo, sizeof(memoryInfo)) != sizeof(memoryInfo))
+	MEMORY_BASIC_INFORMATION memoryInfo = {0};
+	if (::VirtualQuery(codeAddress, &memoryInfo, sizeof(memoryInfo)) != sizeof(memoryInfo))
 	{
 		UIETWASSERT(0);
 		return L"";
@@ -777,8 +750,9 @@ std::wstring GetBuildTimeFromAddress(_In_ const void* const codeAddress)
 		UIETWASSERT(0);
 		return L"";
 	}
-	const IMAGE_NT_HEADERS *NTHeader = reinterpret_cast<const IMAGE_NT_HEADERS*>(
-		(reinterpret_cast<const char*>(DosHeader)) + DosHeader->e_lfanew);
+	const IMAGE_NT_HEADERS* const NTHeader = 
+		reinterpret_cast<const IMAGE_NT_HEADERS*>(
+			reinterpret_cast<const char*>(DosHeader) + DosHeader->e_lfanew);
 	if (IMAGE_NT_SIGNATURE != NTHeader->Signature)
 	{
 		UIETWASSERT(0);
@@ -790,9 +764,9 @@ std::wstring GetBuildTimeFromAddress(_In_ const void* const codeAddress)
 	// Print out the module information. The %.24s is necessary to trim
 	// the new line character off of the date string returned by asctime().
 	// _wasctime_s requires a 26-character buffer.
-	wchar_t ascTimeBuf[26];
+	wchar_t ascTimeBuf[26] = {0};
 	_wasctime_s(ascTimeBuf, &linkTime);
-	wchar_t	buffer[100];
+	wchar_t	buffer[100] = {0};
 	swprintf_s(buffer, L"%.24s GMT (%08lx)", ascTimeBuf, NTHeader->FileHeader.TimeDateStamp);
 	// Return buffer+4 because we don't need the day of the week.
 	return buffer + 4;
@@ -800,7 +774,7 @@ std::wstring GetBuildTimeFromAddress(_In_ const void* const codeAddress)
 
 std::wstring GetEXEBuildTime()
 {
-	const HMODULE ModuleHandle = GetModuleHandle(nullptr);
+	const HMODULE ModuleHandle = ::GetModuleHandle(nullptr);
 	return GetBuildTimeFromAddress(ModuleHandle);
 }
 
@@ -827,16 +801,11 @@ typedef struct tagTHREADNAME_INFO
 
 void SetCurrentThreadName(PCSTR threadName)
 {
-	const DWORD dwThreadID = GetCurrentThreadId();
-	THREADNAME_INFO info;
-	info.dwType = 0x1000;
-	info.szName = threadName;
-	info.dwThreadID = dwThreadID;
-	info.dwFlags = 0;
-
+	const DWORD dwThreadID = ::GetCurrentThreadId();
+	THREADNAME_INFO info = { 0x1000, threadName, dwThreadID, 0 };
 	__try
 	{
-		RaiseException(MS_VC_EXCEPTION, 0, sizeof(info) / sizeof(ULONG_PTR), (ULONG_PTR*)&info);
+		::RaiseException(MS_VC_EXCEPTION, 0, sizeof(info) / sizeof(ULONG_PTR), reinterpret_cast<ULONG_PTR*>(&info));
 	}
 	__except (EXCEPTION_EXECUTE_HANDLER)
 	{
@@ -845,25 +814,25 @@ void SetCurrentThreadName(PCSTR threadName)
 #pragma warning(pop)
 
 
-void CopyStartupProfiles(const std::wstring& exeDir, bool force)
+void CopyStartupProfiles(const std::wstring& exeDir, const bool force)
 {
-	const wchar_t* fileName = L"\\Startup.wpaProfile";
+	PCWSTR const fileName = L"\\Startup.wpaProfile";
 
 	// First copy the WPA 8.1 startup.wpaProfile file
-	wchar_t documents[MAX_PATH];
-	const BOOL getMyDocsResult = SHGetSpecialFolderPathW(NULL, documents, CSIDL_MYDOCUMENTS, TRUE);
+	wchar_t documents[MAX_PATH] = {0};
+	const BOOL getMyDocsResult = ::SHGetSpecialFolderPathW(NULL, documents, CSIDL_MYDOCUMENTS, TRUE);
 	UIETWASSERT(getMyDocsResult);
 	if (force)
 		outputPrintf(L"\n");
 	if (getMyDocsResult)
 	{
-		std::wstring source = exeDir + fileName;
-		std::wstring destDir = documents + std::wstring(L"\\WPA Files");
-		std::wstring dest = destDir + fileName;
-		if (force || !PathFileExists(dest.c_str()))
+		const std::wstring source = exeDir + fileName;
+		const std::wstring destDir = documents + std::wstring(L"\\WPA Files");
+		const std::wstring dest = destDir + fileName;
+		if (force || !::PathFileExistsW(dest.c_str()))
 		{
 			(void)_wmkdir(destDir.c_str());
-			if (CopyFile(source.c_str(), dest.c_str(), FALSE))
+			if (::CopyFileW(source.c_str(), dest.c_str(), FALSE))
 			{
 				if (force)
 					outputPrintf(L"Copied Startup.wpaProfile to the WPA Files directory.\n");
@@ -877,16 +846,16 @@ void CopyStartupProfiles(const std::wstring& exeDir, bool force)
 	}
 
 	// Then copy the WPA 10 startup.wpaProfile file
-	const std::wstring localAppData = GetWideEnvironmentVariable(L"localappdata");
+	const std::wstring localAppData = GetEnvironmentVariableString(L"localappdata");
 	if (!localAppData.empty())
 	{
 		std::wstring source = exeDir + L"\\startup10.wpaProfile";
 		std::wstring destDir = std::wstring(localAppData) + L"\\Windows Performance Analyzer";
 		std::wstring dest = destDir + fileName;
-		if (force || !PathFileExists(dest.c_str()))
+		if (force || !::PathFileExistsW(dest.c_str()))
 		{
 			(void)_wmkdir(destDir.c_str());
-			if (CopyFile(source.c_str(), dest.c_str(), FALSE))
+			if (::CopyFileW(source.c_str(), dest.c_str(), FALSE))
 			{
 				if (force)
 					outputPrintf(L"%s", L"Copied Startup.10wpaProfile to %localappdata%\\Windows Performance Analyzer\n");
@@ -897,6 +866,30 @@ void CopyStartupProfiles(const std::wstring& exeDir, bool force)
 					outputPrintf(L"%s", L"Failed to copy Startup.10wpaProfile to %localappdata%\\Windows Performance Analyzer\n");
 			}
 		}
+	}
+}
+
+_Success_(return)
+bool OpenRegKey( _Out_ HKEY* const key, _In_ const HKEY root, PCWSTR const subkey )
+{
+	const LONG openResult = ::RegOpenKeyExW(root, subkey, 0, KEY_ALL_ACCESS, key);
+	if (openResult != ERROR_SUCCESS)
+	{
+		outputPrintf(L"Failed to open registry key `%s`.\n", subkey);
+		debugLastError();
+		return false;
+	}
+	return true;
+}
+
+void CloseFindHandle(_Pre_valid_ _Post_ptr_invalid_ HANDLE handle, PCWSTR const directory)
+{
+	const BOOL findClose = ::FindClose(handle);
+	if (findClose == 0)
+	{
+		outputPrintf(L"FindClose (for directory: `%s`) failed.\n", directory);
+		debugLastError();
+		std::terminate();
 	}
 }
 
@@ -925,7 +918,10 @@ void CloseRegKey(_Pre_valid_ _Post_ptr_invalid_ HKEY key, PCWSTR const keyName)
 void ClipboardClose()
 {
 	const BOOL closeResult = ::CloseClipboard( );
-	debugPrintf(L"Failed to close the clipboard!\n");
-	debugLastError( );
+	if (!closeResult)
+	{
+		debugPrintf(L"Failed to close the clipboard!\n");
+		debugLastError( );
+	}
 }
 

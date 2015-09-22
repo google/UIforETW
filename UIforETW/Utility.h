@@ -21,6 +21,8 @@ limitations under the License.
 #include <chrono>
 
 std::vector<std::wstring> split(const std::wstring& s, char c);
+
+
 // If fullPaths == true then the names returned will be full Paths to the files. Otherwise
 // they will just be the file portions.
 std::vector<std::wstring> GetFileList(const std::wstring& pattern, bool fullPaths = false);
@@ -80,8 +82,8 @@ int64_t GetFileSize(const std::wstring& path);
 void SetClipboardText(const std::wstring& text);
 std::wstring GetClipboardText();
 
-std::wstring GetWideEnvironmentVariable(_In_z_ PCWSTR variable);
-std::string GetCharEnvironmentVariable(_In_z_ PCSTR variable);
+std::wstring GetEnvironmentVariableString(_In_z_ PCWSTR variable);
+std::string GetEnvironmentVariableString(_In_z_ PCSTR variable);
 
 enum WindowsVersion
 {
@@ -95,18 +97,19 @@ enum WindowsVersion
 
 bool Is64BitWindows();
 bool Is64BitBuild();
-WindowsVersion GetWindowsVersion();
+
+bool IsWindowsTenOrGreater();
 
 std::wstring FindPython(); // Returns a full path to python.exe or nothing.
 
 // Helpful timer class using trendy C++ 11 features.
-class ElapsedTimer
+class ElapsedTimer final
 {
 public:
 	double ElapsedSeconds() const
 	{
-		auto duration = std::chrono::steady_clock::now() - start_;
-		auto microseconds = std::chrono::duration_cast<std::chrono::microseconds>(duration);
+		const auto duration = std::chrono::steady_clock::now() - start_;
+		const auto microseconds = std::chrono::duration_cast<std::chrono::microseconds>(duration);
 		return microseconds.count() / 1e6;
 	}
 private:
@@ -115,24 +118,24 @@ private:
 
 // High-precision timer class using QueryPerformanceCounter.
 // This may make ElapsedTimer unnecessary.
-class QPCElapsedTimer
+class QPCElapsedTimer final
 {
 public:
 	QPCElapsedTimer()
 	{
-		QueryPerformanceCounter(&start_);
+		ATLVERIFY(QueryPerformanceCounter(&start_));
 	}
 	double ElapsedSeconds() const
 	{
-		LARGE_INTEGER stop;
-		QueryPerformanceCounter(&stop);
-		LARGE_INTEGER frequency;
-		QueryPerformanceFrequency(&frequency);
+		LARGE_INTEGER stop = {0};
+		ATLVERIFY(QueryPerformanceCounter(&stop));
+		LARGE_INTEGER frequency = {0};
+		ATLVERIFY(QueryPerformanceFrequency(&frequency));
 
 		return (stop.QuadPart - start_.QuadPart) / float(frequency.QuadPart);
 	}
 private:
-	LARGE_INTEGER start_;
+	LARGE_INTEGER start_ = {};
 };
 
 std::wstring GetEXEBuildTime();
@@ -141,6 +144,13 @@ void SetCurrentThreadName(PCSTR threadName);
 
 void CopyStartupProfiles(const std::wstring& exeDir, bool force);
 
+void CloseFindHandle(_Pre_valid_ _Post_ptr_invalid_ HANDLE handle, PCWSTR directory);
+
 void CloseValidHandle( _Pre_valid_ _Post_ptr_invalid_ HANDLE handle );
 
 void CloseRegKey( _Pre_valid_ _Post_ptr_invalid_ HKEY key, PCWSTR const keyName );
+
+_Success_(return)
+bool OpenRegKey( _Out_ HKEY* key, _In_ HKEY root, PCWSTR const subkey );
+
+void ClipboardClose();
