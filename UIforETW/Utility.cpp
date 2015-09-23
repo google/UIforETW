@@ -31,7 +31,6 @@ void outputLastError(const DWORD lastErr)
 	if (ret == 0)
 		std::terminate();//FormatMessageW failed.
 	outputPrintf(errBuff);
-
 }
 
 void debugLastError(const DWORD lastErr)
@@ -49,7 +48,7 @@ void debugLastError(const DWORD lastErr)
 }
 
 
-std::vector<std::wstring> split(const std::wstring& s, char c)
+std::vector<std::wstring> split(const std::wstring& s, const char c)
 {
 	std::wstring::size_type i = 0;
 	std::wstring::size_type j = s.find(c);
@@ -190,7 +189,7 @@ std::wstring ConvertToCRLF(const std::wstring& input)
 	return result;
 }
 
-void SetRegistryDWORD(HKEY root, const std::wstring& subkey, const std::wstring& valueName, DWORD value)
+void SetRegistryDWORD(const HKEY root, const std::wstring& subkey, const std::wstring& valueName, const DWORD value)
 {
 	HKEY key;
 	if (!OpenRegKey(&key, root, subkey.c_str()))
@@ -209,7 +208,7 @@ void SetRegistryDWORD(HKEY root, const std::wstring& subkey, const std::wstring&
 	CloseRegKey(key, subkey.c_str());
 }
 
-void CreateRegistryKey(HKEY root, const std::wstring& subkey, const std::wstring& newKey)
+void CreateRegistryKey(const HKEY root, const std::wstring& subkey, const std::wstring& newKey)
 {
 	HKEY key;
 	if (!OpenRegKey(&key, root, subkey.c_str()))
@@ -234,7 +233,7 @@ void CreateRegistryKey(HKEY root, const std::wstring& subkey, const std::wstring
 
 }
 
-std::wstring GetEditControlText(HWND hEdit)
+std::wstring GetEditControlText(const HWND hEdit)
 {
 	const int length = ::GetWindowTextLengthW(hEdit);
 	std::vector<wchar_t> buffer(length + 1);
@@ -265,45 +264,38 @@ std::wstring GetEditControlText(HWND hEdit)
 	return &buffer[0];
 }
 
-std::wstring AnsiToUnicode(const std::string& text)
+int RequiredNumberOfWideChars(const std::string& text)
 {
-	//if the string is empty, then we can return early, and avoid
-	//confusing return values (from MultiByteToWideChar)
-	if (text.empty())
-	{
-		return L"";
-	}
-	// Determine number of wide characters to be allocated for the
-	// Unicode string.
-	const size_t cCharacters = text.size() + 1;
+	static_assert( sizeof(std::string::value_type) == 1 == sizeof(text[0]),
+		"bad assumptions!");
 
-	static_assert( sizeof(std::string::value_type) == 1 == sizeof(text[0]), "bad assumptions!");
+	const int multiCharCount = ::MultiByteToWideChar(CP_ACP, 0, text.c_str(),
+		static_cast<int>(text.size() + 1), NULL, 0);
 
-
-	//MultiByteToWideChar: https://msdn.microsoft.com/en-us/library/windows/desktop/dd319072.aspx
-	//
-	//Remarks:
-	//
-	//As mentioned in the caution above,
-	//the output buffer can easily be overrun
-	//if this function is not first called with cchWideChar set to 0
-	//in order to obtain the required size. 
-
-	const int multiCharCount = ::MultiByteToWideChar(CP_ACP, 0, text.c_str(), static_cast<int>(cCharacters), NULL, 0);
 	if (multiCharCount == 0)
 	{
 		//No reasonable way for MultiByteToWideChar to fail.
 		debugLastError( );
 		std::terminate( );
 	}
+	return multiCharCount;
+}
+
+std::wstring AnsiToUnicode(const std::string& text)
+{
+	//if the string is empty, then we can return early, and avoid
+	//confusing return values (from MultiByteToWideChar)
+	if (text.empty())
+		return L"";
+
+	// Determine number of wide characters to be allocated for the
+	// Unicode string.
+	const int multiCharCount = RequiredNumberOfWideChars(text);
 
 	std::vector<wchar_t> buffer(multiCharCount);
 
-
-
 	// Convert to Unicode.
-	
-	const int multiToWideResult = ::MultiByteToWideChar(CP_ACP, 0, text.c_str(), static_cast<int>(cCharacters), &buffer[0], multiCharCount);
+	const int multiToWideResult = ::MultiByteToWideChar(CP_ACP, 0, text.c_str(), static_cast<int>(text.size() + 1), &buffer[0], multiCharCount);
 	if (multiToWideResult == 0)
 	{
 		//No reasonable way for MultiByteToWideChar to fail.
@@ -313,10 +305,10 @@ std::wstring AnsiToUnicode(const std::string& text)
 
 	UIETWASSERT(multiToWideResult > 0);
 	UIETWASSERT(buffer[multiToWideResult - 1] == 0);
+
 	// Double-verify that the buffer is null-terminated.
 	buffer[buffer.size() - 1] = 0;
 	std::wstring result = &buffer[0];
-
 	return result;
 }
 
@@ -347,7 +339,7 @@ void debugPrintf(_Printf_format_string_ PCWSTR const pFormat, ...)
 // Get the next/previous dialog item (next/prev in window order and tab order) allowing
 // for disabled controls, invisible controls, and wrapping at the end of the tab order.
 
-static bool ControlOK(HWND win)
+static bool ControlOK(const HWND win)
 {
 	if (!win)
 		return false;
@@ -365,7 +357,7 @@ static bool ControlOK(HWND win)
 	return true;
 }
 
-static HWND GetNextDlgItem(HWND win, const bool Wrap)
+static HWND GetNextDlgItem(const HWND win, const bool Wrap)
 {
 	HWND next = ::GetWindow(win, GW_HWNDNEXT);
 	while (next != win && !::ControlOK(next))
@@ -385,7 +377,7 @@ static HWND GetNextDlgItem(HWND win, const bool Wrap)
 }
 
 _Pre_satisfies_(Win != NULL)
-void SmartEnableWindow(HWND Win, BOOL Enable)
+void SmartEnableWindow(const HWND Win, const BOOL Enable)
 {
 	UIETWASSERT(Win);
 	if (!Enable)
@@ -461,13 +453,13 @@ std::wstring StripExtensionFromPath(const std::wstring& path)
 	return path.substr(0, path.size() - ext.size());
 }
 
-int DeleteOneFile(HWND hwnd, const std::wstring& path)
+int DeleteOneFile(const HWND hwnd, const std::wstring& path)
 {
 	//{path} uses std::vector list initialization
 	return DeleteFiles(hwnd, {path});
 }
 
-int DeleteFiles(HWND hwnd, const std::vector<std::wstring>& paths)
+int DeleteFiles(const HWND hwnd, const std::vector<std::wstring>& paths)
 {
 	UIETWASSERT(paths.size() > 0);
 
@@ -641,12 +633,10 @@ int64_t GetFileSize(const std::wstring& path)
 		return 0;
 	}
 
-	if (::GetFileSizeEx(hFile, &result))
-	{
-		CloseValidHandle(hFile);
-		return result.QuadPart;
-	}
+	const BOOL gfsResult = ::GetFileSizeEx(hFile, &result);
 	CloseValidHandle(hFile);
+	if (gfsResult)
+		return result.QuadPart;
 	return 0;
 }
 
@@ -668,7 +658,7 @@ bool IsWindowsTenOrGreater()
 	return IsWindowsVersionOrGreater(10, 0, 0);
 }
 
-std::wstring GetEnvironmentVariableString(_In_z_ PCWSTR variable)
+std::wstring GetEnvironmentVariableString(_In_z_ PCWSTR const variable)
 {
 	const rsize_t bufferSize = 512u;
 	wchar_t buffer[bufferSize] = {0};
@@ -679,7 +669,7 @@ std::wstring GetEnvironmentVariableString(_In_z_ PCWSTR variable)
 	return L"";
 }
 
-std::string GetEnvironmentVariableString(_In_z_ PCSTR variable)
+std::string GetEnvironmentVariableString(_In_z_ PCSTR const variable)
 {
 	const rsize_t bufferSize = 512u;
 	char buffer[bufferSize] = {0};
@@ -711,7 +701,7 @@ std::wstring FindPython()
 		return L"";
 	}
 
-	std::vector<std::wstring> pathParts = split(path, ';');
+	const std::vector<std::wstring> pathParts = split(path, ';');
 	// First look for python.exe. If that isn't found then look for
 	// python.bat, part of Chromium's depot_tools
 	for (const auto& exeName : { L"\\python.exe", L"\\python.bat" })
@@ -799,7 +789,7 @@ typedef struct tagTHREADNAME_INFO
 // warning C6320 : Exception - filter expression is the constant EXCEPTION_EXECUTE_HANDLER.This might mask exceptions that were not intended to be handled.
 // warning C6322 : Empty _except block.
 
-void SetCurrentThreadName(PCSTR threadName)
+void SetCurrentThreadName(PCSTR const threadName)
 {
 	const DWORD dwThreadID = ::GetCurrentThreadId();
 	THREADNAME_INFO info = { 0x1000, threadName, dwThreadID, 0 };
@@ -882,7 +872,7 @@ bool OpenRegKey( _Out_ HKEY* const key, _In_ const HKEY root, PCWSTR const subke
 	return true;
 }
 
-void CloseFindHandle(_Pre_valid_ _Post_ptr_invalid_ HANDLE handle, PCWSTR const directory)
+void CloseFindHandle(_Pre_valid_ _Post_ptr_invalid_ const HANDLE handle, PCWSTR const directory)
 {
 	const BOOL findClose = ::FindClose(handle);
 	if (findClose == 0)
@@ -893,7 +883,7 @@ void CloseFindHandle(_Pre_valid_ _Post_ptr_invalid_ HANDLE handle, PCWSTR const 
 	}
 }
 
-void CloseValidHandle(_Pre_valid_ _Post_ptr_invalid_ HANDLE handle)
+void CloseValidHandle(_Pre_valid_ _Post_ptr_invalid_ const HANDLE handle)
 {
 	const BOOL handleClosed = ::CloseHandle(handle);
 	if (handleClosed == 0)
@@ -903,7 +893,7 @@ void CloseValidHandle(_Pre_valid_ _Post_ptr_invalid_ HANDLE handle)
 
 }
 
-void CloseRegKey(_Pre_valid_ _Post_ptr_invalid_ HKEY key, PCWSTR const keyName)
+void CloseRegKey(_Pre_valid_ _Post_ptr_invalid_ const HKEY key, PCWSTR const keyName)
 {
 	const LONG closeKey = ::RegCloseKey(key);
 	if (closeKey != ERROR_SUCCESS)

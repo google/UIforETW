@@ -41,6 +41,17 @@ void CreateRegistryKey(HKEY root, const std::wstring& subkey, const std::wstring
 std::wstring GetEditControlText(HWND hwnd);
 std::wstring AnsiToUnicode(const std::string& text);
 
+
+//MultiByteToWideChar: https://msdn.microsoft.com/en-us/library/windows/desktop/dd319072.aspx
+//
+//Remarks:
+//
+//As mentioned in the caution above,
+//the output buffer can easily be overrun
+//if this function is not first called with cchWideChar set to 0
+//in order to obtain the required size. 
+int RequiredNumberOfWideChars(const std::string& text);
+
 // Return a string from a format string and some printf-style arguments.
 // Maximum output size is 4 K - larger outputs will be truncated.
 std::wstring stringPrintf(_Printf_format_string_ PCWSTR const pFormat, ...);
@@ -85,16 +96,6 @@ std::wstring GetClipboardText();
 std::wstring GetEnvironmentVariableString(_In_z_ PCWSTR variable);
 std::string GetEnvironmentVariableString(_In_z_ PCSTR variable);
 
-enum WindowsVersion
-{
-	kWindowsVersionXP,
-	kWindowsVersionVista,
-	kWindowsVersion7,
-	kWindowsVersion8,
-	kWindowsVersion8_1,
-	kWindowsVersion10,
-};
-
 bool Is64BitWindows();
 bool Is64BitBuild();
 
@@ -109,7 +110,8 @@ public:
 	double ElapsedSeconds() const
 	{
 		const auto duration = std::chrono::steady_clock::now() - start_;
-		const auto microseconds = std::chrono::duration_cast<std::chrono::microseconds>(duration);
+		const auto microseconds =
+			std::chrono::duration_cast<std::chrono::microseconds>(duration);
 		return microseconds.count() / 1e6;
 	}
 private:
