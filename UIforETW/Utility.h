@@ -45,7 +45,6 @@ std::wstring AnsiToUnicode(const std::string& text);
 //MultiByteToWideChar: https://msdn.microsoft.com/en-us/library/windows/desktop/dd319072.aspx
 //
 //Remarks:
-//
 //As mentioned in the caution above,
 //the output buffer can easily be overrun
 //if this function is not first called with cchWideChar set to 0
@@ -59,7 +58,6 @@ std::wstring stringPrintf(_Printf_format_string_ PCWSTR const pFormat, ...);
 void debugPrintf(_Printf_format_string_ PCWSTR const pFormat, ...);
 
 void outputLastError(DWORD lastErr = ::GetLastError());
-
 void debugLastError(DWORD lastErr = ::GetLastError());
 
 // This function checks to see whether a control has focus before
@@ -98,7 +96,6 @@ std::string GetEnvironmentVariableString(_In_z_ PCSTR variable);
 
 bool Is64BitWindows();
 bool Is64BitBuild();
-
 bool IsWindowsTenOrGreater();
 
 std::wstring FindPython(); // Returns a full path to python.exe or nothing.
@@ -147,12 +144,9 @@ void SetCurrentThreadName(PCSTR threadName);
 void CopyStartupProfiles(const std::wstring& exeDir, bool force);
 
 void CloseFindHandle(_Pre_valid_ _Post_ptr_invalid_ HANDLE handle, PCWSTR directory);
-
 void CloseValidHandle( _Pre_valid_ _Post_ptr_invalid_ HANDLE handle );
-
 void CloseRegKey( _Pre_valid_ _Post_ptr_invalid_ HKEY key, PCWSTR const keyName );
 
 _Success_(return)
 bool OpenRegKey( _Out_ HKEY* key, _In_ HKEY root, PCWSTR const subkey );
-
 void ClipboardClose();

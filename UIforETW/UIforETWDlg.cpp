@@ -548,7 +548,6 @@ void CUIforETWDlg::RegisterProviders()
 		dllSource += L"ETWProviders64.dll";
 	else
 		dllSource += L"ETWProviders.dll";
-#pragma warning(suppress:4996)
 	const std::wstring temp = GetEnvironmentVariableString(L"temp");
 	if (temp.empty())
 		return;
@@ -710,7 +709,6 @@ std::wstring CUIforETWDlg::GenerateResultFilename() const
 	_strdate_s(date);
 	int hour, min, sec;
 	int year, month, day;
-
 	const std::wstring username = GetEnvironmentVariableString(L"USERNAME");
 	wchar_t fileName[MAX_PATH];
 	// Hilarious /analyze warning on this line from bug in _strtime_s annotation!
@@ -797,8 +795,6 @@ void CUIforETWDlg::OnBnClickedStarttracing()
 	// clear that it actually helps.
 	const uint64_t kCritFlags = 0x0200000010000000;
 	std::wstring userProviders = stringPrintf(L"Microsoft-Windows-Win32k:0x%llx", ~kCritFlags);
-	
-	
 	if (!IsWindows7OrGreater())
 		userProviders = L"Microsoft-Windows-LUA"; // Because Microsoft-Windows-Win32k doesn't work on Vista.
 	userProviders += L"+Multi-MAIN+Multi-FrameRate+Multi-Input+Multi-Worker";
@@ -1597,7 +1593,6 @@ void CUIforETWDlg::OnContextMenu(CWnd* pWnd, CPoint point)
 				pContextMenu->EnableMenuItem(id, MF_BYCOMMAND | MF_GRAYED);
 		}
 
-		
 		if (IsWindows8OrGreater())
 		{
 			// Disable ETW trace compress options on Windows 7 and below

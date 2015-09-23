@@ -72,10 +72,8 @@ std::vector<std::wstring> GetFileList(const std::wstring& pattern, const bool fu
 {
 	const std::wstring directory = (fullPaths ? GetDirPart( pattern ) : L"");
 
-
 	//may not pass an empty string to FindFirstFileEx
 	UIETWASSERT(pattern.length() > 0);
-
 
 	//string passed to FindFirstFileEx must not end in a backslash
 	UIETWASSERT(pattern.back() != L'\\');
@@ -185,7 +183,6 @@ std::wstring ConvertToCRLF(const std::wstring& input)
 		if (c != '\r')
 			result += c;
 	}
-
 	return result;
 }
 
@@ -193,9 +190,7 @@ void SetRegistryDWORD(const HKEY root, const std::wstring& subkey, const std::ws
 {
 	HKEY key;
 	if (!OpenRegKey(&key, root, subkey.c_str()))
-	{
 		return;
-	}
 
 	const LONG setResult = ::RegSetValueExW(key, valueName.c_str(), 0, REG_DWORD, reinterpret_cast<const BYTE*>(&value), sizeof(value));
 	if (setResult != ERROR_SUCCESS)
@@ -204,7 +199,6 @@ void SetRegistryDWORD(const HKEY root, const std::wstring& subkey, const std::ws
 		debugLastError();
 		return;
 	}
-
 	CloseRegKey(key, subkey.c_str());
 }
 
@@ -212,9 +206,7 @@ void CreateRegistryKey(const HKEY root, const std::wstring& subkey, const std::w
 {
 	HKEY key;
 	if (!OpenRegKey(&key, root, subkey.c_str()))
-	{
 		return;
-	}
 
 	HKEY resultKey;
 
@@ -438,10 +430,7 @@ std::wstring CrackFilePart(const std::wstring& path)
 	const std::wstring extension = GetFileExt(filePart);
 	UIETWASSERT(filePart.size() >= extension.size());
 	if (!extension.empty())
-	{
 		return filePart.substr(0, filePart.size() - extension.size());
-	}
-
 	return filePart;
 }
 
@@ -551,7 +540,6 @@ void SetClipboardText(const std::wstring& text)
 		ClipboardClose();
 		return;
 	}
-
 	ClipboardClose();
 }
 
@@ -565,7 +553,6 @@ std::wstring GetClipboardText()
 		debugLastError();
 		return result;
 	}
-
 
 	const HANDLE hClip = ::GetClipboardData(CF_UNICODETEXT);
 	if (hClip == NULL)
@@ -584,7 +571,6 @@ std::wstring GetClipboardText()
 		ClipboardClose();
 		return result;
 	}
-
 
 	PCWSTR const text = static_cast<PCWSTR>(ptr);
 	const size_t bytes = ::GlobalSize(hClip);
@@ -616,7 +602,6 @@ std::wstring GetClipboardText()
 	}
 
 	ClipboardClose();
-
 	return result;
 }
 
@@ -678,7 +663,6 @@ std::string GetEnvironmentVariableString(_In_z_ PCSTR const variable)
 	if (result == 0)
 		return buffer;
 	return "";
-
 }
 
 std::wstring FindPython()
@@ -690,9 +674,7 @@ std::wstring FindPython()
 	//As a workaround for issue #13, we'll use that version of Python.
 	//See the issue: https://github.com/google/UIforETW/issues/13
 	if ( !pytwoseven.empty() )
-	{
 		return pytwoseven;
-	}
 
 	const std::wstring path = GetEnvironmentVariableString(L"path");
 	if (path.empty())
@@ -863,55 +845,45 @@ _Success_(return)
 bool OpenRegKey( _Out_ HKEY* const key, _In_ const HKEY root, PCWSTR const subkey )
 {
 	const LONG openResult = ::RegOpenKeyExW(root, subkey, 0, KEY_ALL_ACCESS, key);
-	if (openResult != ERROR_SUCCESS)
-	{
-		outputPrintf(L"Failed to open registry key `%s`.\n", subkey);
-		debugLastError();
-		return false;
-	}
-	return true;
+	if (openResult == ERROR_SUCCESS)
+		return true;
+	outputPrintf(L"Failed to open registry key `%s`.\n", subkey);
+	debugLastError();
+	return false;
 }
 
 void CloseFindHandle(_Pre_valid_ _Post_ptr_invalid_ const HANDLE handle, PCWSTR const directory)
 {
 	const BOOL findClose = ::FindClose(handle);
-	if (findClose == 0)
-	{
-		outputPrintf(L"FindClose (for directory: `%s`) failed.\n", directory);
-		debugLastError();
-		std::terminate();
-	}
+	if (findClose)
+		return;
+	outputPrintf(L"FindClose (for directory: `%s`) failed.\n", directory);
+	debugLastError();
+	std::terminate();
 }
 
 void CloseValidHandle(_Pre_valid_ _Post_ptr_invalid_ const HANDLE handle)
 {
 	const BOOL handleClosed = ::CloseHandle(handle);
 	if (handleClosed == 0)
-	{
-		std::terminate( );
-	}
-
+		std::terminate();//Logic bug!
 }
 
 void CloseRegKey(_Pre_valid_ _Post_ptr_invalid_ const HKEY key, PCWSTR const keyName)
 {
 	const LONG closeKey = ::RegCloseKey(key);
-	if (closeKey != ERROR_SUCCESS)
-	{
-		outputPrintf(L"Failed to close registry key `%s`.\n", keyName);
-		debugLastError();
+	if (closeKey == ERROR_SUCCESS)
 		return;
-	}
-
+	outputPrintf(L"Failed to close registry key `%s`.\n", keyName);
+	debugLastError();
 }
 
 void ClipboardClose()
 {
 	const BOOL closeResult = ::CloseClipboard( );
-	if (!closeResult)
-	{
-		debugPrintf(L"Failed to close the clipboard!\n");
-		debugLastError( );
-	}
+	if (closeResult)
+		return;
+	debugPrintf(L"Failed to close the clipboard!\n");
+	debugLastError( );
 }
 
