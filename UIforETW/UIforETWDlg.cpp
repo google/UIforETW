@@ -280,7 +280,6 @@ BOOL CUIforETWDlg::OnInitDialog()
 		}
 	}
 
-	
 	if (!IsWindowsVistaOrGreater())
 	{
 		AfxMessageBox(L"ETW tracing requires Windows Vista or above.");
@@ -314,7 +313,6 @@ BOOL CUIforETWDlg::OnInitDialog()
 	// The installers are available as part of etwpackage.zip on https://github.com/google/UIforETW/releases
 	if (!PathFileExists(GetXperfPath().c_str()))
 	{
-		
 		// Windows 7 users need to have WPT 8.1 installed.
 		if (!IsWindows8OrGreater())
 		{
@@ -779,7 +777,6 @@ void CUIforETWDlg::OnBnClickedStarttracing()
 		kernelFile = L" -buffering";
 	std::wstring kernelArgs = L" -start " + GetKernelLogger() + L" -on" + kernelProviders + kernelStackWalk + kernelBuffers + kernelFile;
 
-	//WindowsVersion winver = GetWindowsVersion();
 	// The Windows 10 ReleaseUserCrit, ExclusiveUserCrit, and SharedUserCrit events generate
 	// 75% of the events for this provider - 33,000/s in one test. They account for
 	// more than 75% of the space used, according to System Configuration-> Trace

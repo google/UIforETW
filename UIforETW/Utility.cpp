@@ -47,7 +47,6 @@ void debugLastError(const DWORD lastErr)
 	debugPrintf(L"UIforETW encountered an error: %s\r\n", errBuff);
 }
 
-
 std::vector<std::wstring> split(const std::wstring& s, const char c)
 {
 	std::wstring::size_type i = 0;
@@ -141,7 +140,6 @@ std::wstring LoadFileAsText(const std::wstring& fileName)
 	data[length] = 0;
 	data[length+1] = 0;
 
-	
 	const wchar_t bom = 0xFEFF;
 	UIETWASSERT(data.size( ) > sizeof(bom));
 	if (memcmp(&bom, &data[0], sizeof(bom)) == 0)
@@ -209,7 +207,6 @@ void CreateRegistryKey(const HKEY root, const std::wstring& subkey, const std::w
 		return;
 
 	HKEY resultKey;
-
 	//TODO: RegCreateKey is depreciated.
 	const LONG createResult = ::RegCreateKeyW(key, newKey.c_str(), &resultKey);
 	if (createResult != ERROR_SUCCESS)
@@ -222,14 +219,12 @@ void CreateRegistryKey(const HKEY root, const std::wstring& subkey, const std::w
 		CloseRegKey(resultKey, newKey.c_str());
 	}
 	CloseRegKey(key, subkey.c_str());
-
 }
 
 std::wstring GetEditControlText(const HWND hEdit)
 {
 	const int length = ::GetWindowTextLengthW(hEdit);
 	std::vector<wchar_t> buffer(length + 1);
-	
 	
 	//GetWindowText https://msdn.microsoft.com/en-us/library/windows/desktop/ms633520.aspx
 	//If [GetWindowTextW] succeeds, the return value is the length,
@@ -525,7 +520,6 @@ void SetClipboardText(const std::wstring& text)
 		const DWORD lastErr = ::GetLastError();
 		if (lastErr != NO_ERROR)
 			std::terminate( );//Logic bug!
-
 	}
 
 	const HANDLE dataHandle = ::SetClipboardData(CF_UNICODETEXT, hmem);
@@ -584,7 +578,6 @@ std::wstring GetClipboardText()
 			const DWORD lastErr = ::GetLastError();
 			if (lastErr != NO_ERROR)
 				std::terminate( );//Logic bug!
-
 		}
 		ClipboardClose();
 		return result;
@@ -598,7 +591,6 @@ std::wstring GetClipboardText()
 		const DWORD lastErr = ::GetLastError();
 		if (lastErr != NO_ERROR)
 			std::terminate( );//Logic bug!
-
 	}
 
 	ClipboardClose();
@@ -692,12 +684,9 @@ std::wstring FindPython()
 		{
 			const std::wstring pythonPath = part + exeName;
 			if (::PathFileExistsW(pythonPath.c_str()))
-			{
 				return pythonPath;
-			}
 		}
 	}
-
 	// No python found.
 	return L"";
 }
