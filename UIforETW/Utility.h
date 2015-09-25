@@ -21,8 +21,6 @@ limitations under the License.
 #include <chrono>
 
 std::vector<std::wstring> split(const std::wstring& s, char c);
-
-
 // If fullPaths == true then the names returned will be full Paths to the files. Otherwise
 // they will just be the file portions.
 std::vector<std::wstring> GetFileList(const std::wstring& pattern, bool fullPaths = false);
@@ -56,7 +54,6 @@ int RequiredNumberOfWideChars(const std::string& text);
 std::wstring stringPrintf(_Printf_format_string_ PCWSTR const pFormat, ...);
 // Call OutputDebugString with a format string and some printf-style arguments.
 void debugPrintf(_Printf_format_string_ PCWSTR const pFormat, ...);
-
 void outputLastError(DWORD lastErr = ::GetLastError());
 void debugLastError(DWORD lastErr = ::GetLastError());
 
@@ -143,10 +140,31 @@ void SetCurrentThreadName(PCSTR threadName);
 
 void CopyStartupProfiles(const std::wstring& exeDir, bool force);
 
-void CloseFindHandle(_Pre_valid_ _Post_ptr_invalid_ HANDLE handle, PCWSTR directory);
-void CloseValidHandle( _Pre_valid_ _Post_ptr_invalid_ HANDLE handle );
-void CloseRegKey( _Pre_valid_ _Post_ptr_invalid_ HKEY key, PCWSTR const keyName );
+void CloseFindHandle(_In_ _Pre_valid_ _Post_ptr_invalid_ HANDLE handle, PCWSTR directory);
+void CloseValidHandle(_In_ _Pre_valid_ _Post_ptr_invalid_ HANDLE handle);
+void CloseRegKey( _In_ _Pre_valid_ _Post_ptr_invalid_ HKEY key, PCWSTR const keyName );
 
 _Success_(return)
 bool OpenRegKey( _Out_ HKEY* key, _In_ HKEY root, PCWSTR const subkey );
 void ClipboardClose();
+bool ClipboardOpen();
+bool ClipboardEmpty();
+
+_Success_(return)
+bool ClipboardSetUnicode(_In_ const HGLOBAL hmem);
+
+_Success_(return)
+bool ClipboardGetUnicode(_Out_ _Post_valid_ HANDLE* const hClip);
+
+_Success_(return)
+bool AllocGlobalMemoryForString(const std::wstring& text, _Out_ _Post_valid_ HGLOBAL* const hmem);
+
+void FreeGlobalMemory(_Frees_ptr_opt_ const HGLOBAL hmem);
+
+_Success_(return)
+bool LockGlobalMemory(_In_ _Pre_valid_ const HGLOBAL hmem, _Outptr_ PVOID* const ptrMem);
+
+void UnlockGlobalMemory(_In_ const HGLOBAL hmem);
+
+_Success_(return)
+bool SizeGlobalMemory(_In_ _Pre_valid_ const HGLOBAL hmem, _Out_ size_t* const sizeBytes);
