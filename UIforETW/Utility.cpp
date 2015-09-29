@@ -43,7 +43,6 @@ std::wstring GetDocumentsFolderPath()
 			debugPrintf(L"SHGetKnownFolderPath (for Documents) failed to retrieve the path with an unknown error: 0x%08I32x \n", docsPathResult);
 		}
 		UIETWASSERT(docsPathTemp == NULL);
-		CoTaskMemFree(docsPathTemp);
 		return L"";
 	}
 	std::wstring docsPath(docsPathTemp);
