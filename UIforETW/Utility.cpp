@@ -19,6 +19,110 @@ limitations under the License.
 #include <fstream>
 #include <direct.h>
 
+
+namespace {
+PCWSTR const WPAStartupFileName = L"\\Startup.wpaProfile";
+
+std::wstring GetDocumentsFolderPath()
+{
+	//must CoTaskMemFree when done!
+	PWSTR docsPathTemp = NULL;
+	const HRESULT docsPathResult = ::SHGetKnownFolderPath(FOLDERID_Documents, KF_FLAG_NO_ALIAS, NULL, &docsPathTemp);
+	if (FAILED(docsPathResult))
+	{
+		if (docsPathResult == E_INVALIDARG)
+		{
+			debugPrintf(L"SHGetKnownFolderPath (for Documents) failed to retrieve the path with E_INVALIDARG\n");
+		}
+		else if (docsPathResult == E_FAIL)
+		{
+			debugPrintf(L"SHGetKnownFolderPath (for Documents) failed to retrieve the path with E_FAIL\n");
+		}
+		else
+		{
+			debugPrintf(L"SHGetKnownFolderPath (for Documents) failed to retrieve the path with an unknown error: 0x%08I32x \n", docsPathResult);
+		}
+		UIETWASSERT(docsPathTemp == NULL);
+		CoTaskMemFree(docsPathTemp);
+		return L"";
+	}
+	std::wstring docsPath(docsPathTemp);
+	CoTaskMemFree(docsPathTemp);
+	return docsPath;
+}
+
+void copyWPAProfileToDocuments(const bool force)
+{
+	// First copy the WPA 8.1 startup.wpaProfile file
+	std::wstring docsPath(GetDocumentsFolderPath());
+
+	if (force)
+		outputPrintf(L"\n");
+
+	if (docsPath.empty())
+	{
+		outputPrintf( L"Failed to copy WPA profile to documents. See debugger output for details.\n" );
+		return;
+	}
+
+	const std::wstring source = docsPath + WPAStartupFileName;
+	const std::wstring destDir = docsPath + std::wstring(L"\\WPA Files");
+	const std::wstring dest = destDir + WPAStartupFileName;
+	const BOOL destinationExists = ::PathFileExistsW(dest.c_str());
+	if (force || !destinationExists)
+	{
+		(void)_wmkdir(destDir.c_str());
+		if (::CopyFileW(source.c_str(), dest.c_str(), FALSE))
+		{
+			if (force)
+				outputPrintf(L"Copied Startup.wpaProfile to the WPA Files directory.\n");
+		}
+		else
+		{
+			if (force)
+			{
+				outputPrintf(L"Failed to copy Startup.wpaProfile to the WPA Files directory.\n");
+				outputLastError();
+			}
+		}
+	}
+}
+
+void copyWPAProfileToLocalAppData(const std::wstring& exeDir, const bool force)
+{
+	PCWSTR const localAppDataEnvVar = L"localappdata";
+	// Then copy the WPA 10 startup.wpaProfile file
+	const std::wstring localAppData = GetEnvironmentVariableString(localAppDataEnvVar);
+	if (localAppData.empty())
+	{
+		outputPrintf(L"the `%s` environment variable didn't contain a valid path. Failed to copy WPA 10 profile.\n", localAppDataEnvVar);
+		return;
+	}
+	std::wstring source = exeDir + L"\\startup10.wpaProfile";
+	std::wstring destDir = std::wstring(localAppData) + L"\\Windows Performance Analyzer";
+	std::wstring dest = destDir + WPAStartupFileName;
+	if (force || !::PathFileExistsW(dest.c_str()))
+	{
+		(void)_wmkdir(destDir.c_str());
+		if (::CopyFileW(source.c_str(), dest.c_str(), FALSE))
+		{
+			if (force)
+				outputPrintf(L"%s", L"Copied Startup.10wpaProfile to %localappdata%\\Windows Performance Analyzer\n");
+		}
+		else
+		{
+			if (force)
+			{
+				outputPrintf(L"%s", L"Failed to copy Startup.10wpaProfile to %localappdata%\\Windows Performance Analyzer\n");
+				outputLastError();
+			}
+		}
+	}
+
+}
+
+}
+
 void outputLastError(const DWORD lastErr)
 {
 	const DWORD errMsgSize = 1024u;
@@ -84,8 +188,14 @@ std::vector<std::wstring> GetFileList(const std::wstring& pattern, const bool fu
 	std::vector<std::wstring> result;
 	if (hFindFile == INVALID_HANDLE_VALUE)
 	{
-		outputPrintf(L"failed to get file list for directory: `%s`\n", pattern.c_str());
-		debugLastError();
+		//If there are NO matching files, then FindFirstFileExW returns
+		//INVALID_HANDLE_VALUE and the last error is ERROR_FILE_NOT_FOUND.
+		const DWORD lastErr = ::GetLastError();
+		if (lastErr != ERROR_FILE_NOT_FOUND)
+		{
+			outputPrintf(L"failed to get file list for directory: `%s`\n", pattern.c_str());
+			debugLastError(lastErr);
+		}
 		return result;
 	}
 	do
@@ -733,57 +843,11 @@ void SetCurrentThreadName(PCSTR const threadName)
 
 void CopyStartupProfiles(const std::wstring& exeDir, const bool force)
 {
-	PCWSTR const fileName = L"\\Startup.wpaProfile";
 
-	// First copy the WPA 8.1 startup.wpaProfile file
-	wchar_t documents[MAX_PATH] = {0};
-	const BOOL getMyDocsResult = ::SHGetSpecialFolderPathW(NULL, documents, CSIDL_MYDOCUMENTS, TRUE);
-	UIETWASSERT(getMyDocsResult);
-	if (force)
-		outputPrintf(L"\n");
-	if (getMyDocsResult)
-	{
-		const std::wstring source = exeDir + fileName;
-		const std::wstring destDir = documents + std::wstring(L"\\WPA Files");
-		const std::wstring dest = destDir + fileName;
-		if (force || !::PathFileExistsW(dest.c_str()))
-		{
-			(void)_wmkdir(destDir.c_str());
-			if (::CopyFileW(source.c_str(), dest.c_str(), FALSE))
-			{
-				if (force)
-					outputPrintf(L"Copied Startup.wpaProfile to the WPA Files directory.\n");
-			}
-			else
-			{
-				if (force)
-					outputPrintf(L"Failed to copy Startup.wpaProfile to the WPA Files directory.\n");
-			}
-		}
-	}
+	// WPA 8.1 stores startup.wpaProfile file in Documents/WPA Files
+	copyWPAProfileToDocuments(force);
 
-	// Then copy the WPA 10 startup.wpaProfile file
-	const std::wstring localAppData = GetEnvironmentVariableString(L"localappdata");
-	if (!localAppData.empty())
-	{
-		std::wstring source = exeDir + L"\\startup10.wpaProfile";
-		std::wstring destDir = std::wstring(localAppData) + L"\\Windows Performance Analyzer";
-		std::wstring dest = destDir + fileName;
-		if (force || !::PathFileExistsW(dest.c_str()))
-		{
-			(void)_wmkdir(destDir.c_str());
-			if (::CopyFileW(source.c_str(), dest.c_str(), FALSE))
-			{
-				if (force)
-					outputPrintf(L"%s", L"Copied Startup.10wpaProfile to %localappdata%\\Windows Performance Analyzer\n");
-			}
-			else
-			{
-				if (force)
-					outputPrintf(L"%s", L"Failed to copy Startup.10wpaProfile to %localappdata%\\Windows Performance Analyzer\n");
-			}
-		}
-	}
+	copyWPAProfileToLocalAppData(exeDir, force);
 }
 
 _Success_(return)
