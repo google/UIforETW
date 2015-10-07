@@ -198,7 +198,7 @@ private:
 	void SetSymbolPath();
 	// Call this to retrieve a directory from an environment variable, or use
 	// a default, and make sure it exists.
-	std::wstring GetDirectory(const wchar_t* env, const std::wstring& default);
+	std::wstring GetDirectory(PCWSTR env, const std::wstring& default);
 	void CUIforETWDlg::UpdateTraceList();
 	void RegisterProviders();
 	void DisablePagingExecutive();
