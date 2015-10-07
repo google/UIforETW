@@ -33,7 +33,8 @@ https://codereview.chromium.org/1176243016
 */
 
 // Copied from Chrome's trace_event_etw_export_win.cc. This file can be found by
-// searching for "f:trace_event_etw_export_win.cc" in https://code.google.com/p/chromium/codesearch#/.
+// searching for "f:trace_event_etw_export_win.cc" or kFilteredEventGroupNames
+// in https://code.google.com/p/chromium/codesearch#/.
 const PCWSTR filtered_event_group_names[] =
 {
 	L"benchmark",                                       // 0x1
@@ -50,6 +51,7 @@ const PCWSTR filtered_event_group_names[] =
 	L"disabled-by-default-cc.debug",                    // 0x800
 	L"disabled-by-default-cc.debug.picture",            // 0x1000
 	L"disabled-by-default-toplevel.flow",               // 0x2000
+	L"startup",                                         // 0x4000
 };
 
 // 1ULL << 61 and 1ULL << 62 are special values that indicate to Chrome to
