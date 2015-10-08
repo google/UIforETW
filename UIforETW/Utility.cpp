@@ -425,10 +425,14 @@ int64_t GetFileSize(const std::wstring& path)
 
 bool Is64BitWindows()
 {
+#if defined(_WIN64)
+	return true;
+#else
 	// http://blogs.msdn.com/b/oldnewthing/archive/2005/02/01/364563.aspx
 	BOOL f64 = FALSE;
 	bool bIsWin64 = IsWow64Process(GetCurrentProcess(), &f64) && f64;
 	return bIsWin64;
+#endif
 }
 
 bool Is64BitBuild()
