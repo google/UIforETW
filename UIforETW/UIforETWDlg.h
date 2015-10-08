@@ -139,7 +139,7 @@ private:
 	std::wstring traceDir_;
 	std::wstring tempTraceDir_;
 	std::wstring windowsKitsDir_; // C:\\Program Files (x86)\\Windows Kits
-	std::wstring wptDir_;
+	std::wstring wptDir_; // This points to the WPT 8.1 directory if it exists, else WPT 10
 	std::wstring wpt10Dir_;
 	std::wstring wpaPath_;
 	std::wstring gpuViewPath_;

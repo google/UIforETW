@@ -26,7 +26,7 @@ class CSettings : public CDialogEx
 	DECLARE_DYNAMIC(CSettings)
 
 public:
-	CSettings(CWnd* pParent, const std::wstring& exeDir, const std::wstring& wptDir);   // standard constructor
+	CSettings(CWnd* pParent, const std::wstring& exeDir, const std::wstring& wptDir, const std::wstring& wpt10Dir);   // standard constructor
 	virtual ~CSettings();
 
 // Dialog Data
@@ -67,7 +67,9 @@ protected:
 	virtual BOOL OnInitDialog() override;
 
 	const std::wstring exeDir_;
+	// Same meaning as in CUIforETWDlg
 	const std::wstring wptDir_;
+	const std::wstring wpt10Dir_;
 
 	DECLARE_MESSAGE_MAP()
 	afx_msg void OnOK();
