@@ -1614,6 +1614,7 @@ void CUIforETWDlg::OnContextMenu(CWnd* pWnd, CPoint point)
 				ID_TRACES_STRIPCHROMESYMBOLS,
 				ID_TRACES_IDENTIFYCHROMEPROCESSES,
 				ID_TRACES_TRACEPATHTOCLIPBOARD,
+				ID_SCRIPTS_CREATEFLAMEGRAPH,
 			};
 
 			for (const auto& id : disableList)
@@ -1676,6 +1677,9 @@ void CUIforETWDlg::OnContextMenu(CWnd* pWnd, CPoint point)
 				outputPrintf(L"\n");
 				IdentifyChromeProcesses(tracePath);
 				UpdateNotesState();
+				break;
+			case ID_SCRIPTS_CREATEFLAMEGRAPH:
+				CreateFlameGraph(tracePath);
 				break;
 			case ID_TRACES_TRACEPATHTOCLIPBOARD:
 				// Comma delimited for easy pasting into DOS commands.
@@ -1870,6 +1874,23 @@ void CUIforETWDlg::IdentifyChromeProcesses(const std::wstring& traceFilename)
 		std::wstring textFilename = StripExtensionFromPath(traceFilename) + L".txt";
 		std::wstring data = LoadFileAsText(textFilename) + output;
 		WriteTextAsFile(textFilename, data);
+	}
+	else
+	{
+		outputPrintf(L"Couldn't find python.\n");
+	}
+}
+
+
+void CUIforETWDlg::CreateFlameGraph(const std::wstring& traceFilename)
+{
+	outputPrintf(L"\nCreating CPU Usage (Sampled) flame graph of busiest process ((requires python, perl and flamegraph.pl)...\n");
+	std::wstring pythonPath = FindPython();
+	if (!pythonPath.empty())
+	{
+		ChildProcess child(pythonPath);
+		std::wstring args = L" -u \"" + GetExeDir() + L"xperf_to_collapsedstacks.py\" \"" + traceFilename + L"\"";
+		child.Run(bShowCommands_, GetFilePart(pythonPath) + args);
 	}
 	else
 	{

@@ -219,6 +219,7 @@ private:
 	void StripChromeSymbols(const std::wstring& traceFilename);
 	void IdentifyChromeProcesses(const std::wstring& traceFilename);
 	void PreprocessTrace(const std::wstring& traceFilename);
+	void CreateFlameGraph(const std::wstring& traceFilename);
 	void LaunchTraceViewer(const std::wstring traceFilename, const std::wstring viewerPath);
 	void SaveNotesIfNeeded();
 	void ShutdownTasks();

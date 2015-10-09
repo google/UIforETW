@@ -7,3 +7,6 @@ symsrv.dll
 # setting, even though it seems like it should.
 *.iobj
 *.ipdb
+
+# Exclude flamegraph.pl so that users can install it
+flamegraph.pl

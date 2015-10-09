@@ -57,28 +57,38 @@ import re
 import os
 
 # How many threads to create collapsed stacks for.
-numToShow = 5
+numToShow = 1
 
-if len(sys.argv) < 4:
-	print "Usage: %s trace.etl begin end"
+scriptPath = os.path.abspath(sys.argv[0])
+scriptDir = os.path.split(scriptPath)[0]
+flameGraphPath = os.path.join(scriptDir, "flamegraph.pl")
+if not os.path.exists(flameGraphPath):
+	print "Couldn't find %s. Download it from https://github.com/brendangregg/FlameGraph/blob/master/flamegraph.pl" % flameGraphPath
+
+if len(sys.argv) < 2:
+	print "Usage: %s trace.etl begin end" % sys.argv[0]
 	print "Begin and end specify the time range to be processed, in seconds."
 	sys.exit(0)
 
 etlFilename = sys.argv[1]
 textFilename = os.path.join(os.environ["temp"], os.path.split(etlFilename)[1])
-begin = int(float(sys.argv[2])*1e6)
-end = int(float(sys.argv[3])*1e6)
-textFilename = textFilename.replace(".etl", "_%d_%d.txt" % (begin, end))
+if len(sys.argv) >= 4:
+	begin = int(float(sys.argv[2])*1e6)
+	end = int(float(sys.argv[3])*1e6)
+	textFilename = textFilename.replace(".etl", "_%d_%d.txt" % (begin, end))
+	command = 'xperf -i "%s" -symbols -o "%s" -a dumper -stacktimeshifting -range %d %d' % (etlFilename, textFilename, begin, end)
+else:
+	textFilename = textFilename.replace(".etl", ".txt")
+	command = 'xperf -i "%s" -symbols -o "%s" -a dumper -stacktimeshifting' % (etlFilename, textFilename)
 
 # Optimization for when working on the script -- don't reprocess the xperf
 # trace if the parameters haven't changed.
-if True or not os.path.exists(textFilename):
-	command = 'xperf -i "%s" -symbols -o "%s" -a dumper -stacktimeshifting -range %d %d' % (etlFilename, textFilename, begin, end)
+if not os.path.exists(textFilename):
 	print command
 	for line in os.popen(command).readlines():
 		print line
 else:
-	print "Using existing intermediate file - '%s'." % textFilename
+	print "Using cached xperf results in '%s'." % textFilename
 
 # Create regular expressions for parsing the SampledProfile and Stack lines.
 # SampledProfile,  TimeStamp,     Process Name ( PID),   ThreadID,           PrgrmCtr, CPU, ThreadStartImage!Function,            Image!Function, Count, SampledProfile type
@@ -134,7 +144,10 @@ for line in open(textFilename).readlines() + ["\n"]:
 				process = unresolvedSamples.pop(key)
 				# Create a fully specified process and thread name under which these
 				# samples will be stored.
-				processAndThread = "%s(%d)" % (process.replace(" ", "_"), ThreadID)
+				#processAndThread = "%s(%d)" % (process.replace(" ", "_"), ThreadID)
+				processAndThread = "%s_%d" % (process.replace(" ", "_"), ThreadID)
+				processAndThread = processAndThread.replace("(", "")
+				processAndThread = processAndThread.replace(")", "")
 				# Convert the array of stack lines to a single call stack string.
 				stackSummary = []
 				for entry in stack:
@@ -195,10 +208,14 @@ sortedThreads.reverse() # Put the thread with the most samples first
 
 print "Found %d samples from %d threads." % (totalSamples, len(samples))
 
+tempDir = os.environ["temp"]
+count = 0
 for numSamples, processAndThread in sortedThreads[:numToShow]:
 	threadSamples = samples[processAndThread]
-	outputName = "%s_collapse.txt" % processAndThread
-	print "Writing %d samples to %s" % (numSamples, outputName)
+	#outputName = "%s_collapse.txt" % processAndThread
+	outputName = os.path.join(tempDir, "collapsed_stacks_%d.txt" % count)
+	count += 1
+	print "Writing %d samples to temporary file %s" % (numSamples, outputName)
 	sortedStacks = []
 	for stack in threadSamples:
 		sortedStacks.append("%s %d\n" % (stack, threadSamples[stack]))
@@ -206,3 +223,17 @@ for numSamples, processAndThread in sortedThreads[:numToShow]:
 	out = open(outputName, "wt")
 	for stack in sortedStacks:
 		out.write(stack)
+
+
+	destPath = os.path.join(tempDir, "%s.svg" % processAndThread)
+	title = "CPU Usage flame graph of %s" % processAndThread
+	perlCommand = 'perl "%s" --title="%s" "%s" >"%s"' % (flameGraphPath, title, outputName, destPath)
+	#print perlCommand
+	for line in os.popen(perlCommand).readlines():
+		print line
+	resultSize = os.path.getsize(destPath)
+	if resultSize < 100: # Arbitrary sane minimum
+		print "Result size is %d bytes - is perl in your path?" % resultSize
+	else:
+		os.popen(destPath)
+		print "Results are in '%s' - they should be auto-opened in the default SVG viewer." % destPath
