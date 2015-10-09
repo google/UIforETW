@@ -1471,7 +1471,8 @@ void CUIforETWDlg::SetHeapTracing(bool forceOff)
 		CreateRegistryKey(HKEY_LOCAL_MACHINE, targetKey, tracingName);
 		targetKey += L"\\" + tracingName;
 		SetRegistryDWORD(HKEY_LOCAL_MACHINE, targetKey, L"TracingFlags", tracingFlags);
-		outputPrintf(L"\"TracingFlags\" in \"HKEY_LOCAL_MACHINE\\%s\" set to %lu.\n", targetKey.c_str(), tracingFlags);
+		if (tracingFlags)
+			outputPrintf(L"\"TracingFlags\" in \"HKEY_LOCAL_MACHINE\\%s\" set to %lu.\n", targetKey.c_str(), tracingFlags);
 	}
 }
 
