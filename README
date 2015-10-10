@@ -29,7 +29,8 @@ etwpackage.zip from the releases page at:
 https://github.com/google/UIforETW/releases
 
 If you want to build or modify UIforETW then you should clone the repo
-and then build UIforETW\UIforETW.sln.
+from https://github.com/google/UIforETW.git and then build
+UIforETW\UIforETW.sln.
 
 Pull requests are welcomed. For information on contributing see the
 CONTRIBUTING file. When writing commit messages try following the

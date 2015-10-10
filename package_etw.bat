@@ -36,8 +36,7 @@ cd UIforETW
 @rem Modify the UIforETW project to be statically linked and build that version
 @rem so that it will run without any extra install requirements.
 sed "s/UIforETW.vcxproj/UIforETWStatic.vcxproj/" <UIforETW.sln >UIforETWStatic.sln
-@rem First do a test build with ETW marks disabled to test the inline
-@rem functions.
+@echo First do a test build with ETW marks disabled to test the inline functions.
 sed "s/_WINDOWS/_WINDOWS;DISABLE_ETW_MARKS/" <UIforETW.vcxproj >UIforETWStatic.vcxproj
 devenv /rebuild "release|Win32" UIforETWStatic.sln
 @if ERRORLEVEL 1 goto BuildFailure
@@ -56,15 +55,21 @@ rmdir x64\Release /s/q
 del UIforETWStatic.vcxproj
 del UIforETWStatic.sln
 
-xcopy /exclude:%~dp0excludecopy.txt %UIforETW%\bin %destdir%\bin /s
-xcopy /exclude:%~dp0excludecopy.txt %UIforETW%\include %destdir%\include /s
-xcopy /exclude:%~dp0excludecopy.txt %UIforETW%\lib %destdir%\lib /s
-xcopy /exclude:%~dp0excludecopy.txt %UIforETW%\third_party %destdir%\third_party /s
+xcopy %UIforETW%CONTRIBUTING %destdir%
+xcopy %UIforETW%CONTRIBUTORS %destdir%
+xcopy %UIforETW%AUTHORS %destdir%
+xcopy %UIforETW%LICENSE %destdir%
+xcopy %UIforETW%README %destdir%
+
+xcopy /exclude:%~dp0excludecopy.txt %UIforETW%bin %destdir%\bin /s
+xcopy /exclude:%~dp0excludecopy.txt %UIforETW%include %destdir%\include /s
+xcopy /exclude:%~dp0excludecopy.txt %UIforETW%lib %destdir%\lib /s
+xcopy /exclude:%~dp0excludecopy.txt %UIforETW%third_party %destdir%\third_party /s
 @rem Get the destinations to exist so that the xcopy proceeds without a question.
 echo >%destdir%\bin\UIforETW.exe
 echo >%destdir%\bin\UIforETW32.exe
-xcopy %UIforETW%\bin\UIforETWStatic_devrel32.exe %destdir%\bin\UIforETW32.exe /y
-xcopy %UIforETW%\bin\UIforETWStatic_devrel.exe %destdir%\bin\UIforETW.exe /y
+xcopy %UIforETW%bin\UIforETWStatic_devrel32.exe %destdir%\bin\UIforETW32.exe /y
+xcopy %UIforETW%bin\UIforETWStatic_devrel.exe %destdir%\bin\UIforETW.exe /y
 xcopy /exclude:%~dp0excludecopy.txt %destdir%\bin\UIforETW*.exe %~dp0bin /y
 
 cd /d %UIforETW%
