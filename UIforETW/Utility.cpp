@@ -23,6 +23,158 @@ limitations under the License.
 namespace {
 PCWSTR const WPAStartupFileName = L"\\Startup.wpaProfile";
 
+_Success_(return)
+bool AllocGlobalMemoryForString(const std::wstring& text, _Out_ _Post_valid_ HGLOBAL* const hmem)
+{
+	const size_t length = (text.size() + 1) * sizeof(text[0]);
+	const HANDLE mem = ::GlobalAlloc(GMEM_MOVEABLE, length);
+	if (!mem)
+	{
+		outputPrintf(L"Couldn't allocate memory to set clipboard text!\n");
+		outputLastError();
+		return false;
+	}
+	(*hmem) = mem;
+	return true;
+}
+
+void FreeGlobalMemory(_Frees_ptr_opt_ const HGLOBAL hmem)
+{
+		//If [GlobalFree] succeeds, the return value is NULL.
+		const HGLOBAL freeRes = ::GlobalFree(hmem);
+		if (freeRes != NULL)
+			std::terminate();//Logic bug!
+}
+
+_Success_(return)
+bool LockGlobalMemory(_In_ _Pre_valid_ const HGLOBAL hmem, _Outptr_ PVOID* const ptrMem)
+{
+	void* const ptr = ::GlobalLock(hmem);
+	if (ptr == NULL)
+	{
+		outputPrintf(L"Failed to lock memory for clipboard text!\n");
+		outputLastError();
+		return false;
+	}
+	(*ptrMem) = ptr;
+	return true;
+}
+
+void UnlockGlobalMemory(_In_ const HGLOBAL hmem)
+{
+	const BOOL unlockRes = ::GlobalUnlock(hmem);
+	if (!unlockRes)
+	{
+		const DWORD lastErr = ::GetLastError();
+		if (lastErr != NO_ERROR)
+			std::terminate( );//Logic bug!
+	}
+}
+
+_Success_(return)
+bool SizeGlobalMemory(_In_ _Pre_valid_ const HGLOBAL hmem, _Out_ size_t* const sizeBytes)
+{
+	const size_t bytes = ::GlobalSize(hmem);
+	if (bytes == 0)
+	{
+		outputPrintf(L"Failed to get size of globally-allocated memory!\n");
+		outputLastError();
+		return false;
+	}
+	(*sizeBytes) = bytes;
+	return true;
+}
+
+_Success_(return)
+bool ClipboardGetUnicode(_Out_ _Post_valid_ HANDLE* const hClipboard)
+{
+	const HANDLE hClip = ::GetClipboardData(CF_UNICODETEXT);
+	if (hClip == NULL)
+	{
+		outputPrintf(L"Failed to get clipboard data!\n");
+		outputLastError();
+		return false;
+	}
+	(*hClipboard) = hClip;
+	return true;
+}
+
+_Success_(return)
+bool ClipboardSetUnicode(_In_ const HGLOBAL hmem)
+{
+	const HANDLE dataHandle = ::SetClipboardData(CF_UNICODETEXT, hmem);
+	if (dataHandle == NULL)
+	{
+		outputPrintf(L"Failed to set clipboard data!\n");
+		outputLastError();
+		return false;
+	}
+	return true;
+}
+
+void closeClipboard()
+{
+	const BOOL closeResult = ::CloseClipboard( );
+	if (closeResult)
+		return;
+	debugPrintf(L"Failed to close the clipboard!\n");
+	debugLastError( );
+}
+
+bool openClipboard()
+{
+	const BOOL openClip = ::OpenClipboard(::GetDesktopWindow());
+	if (!openClip)
+	{
+		outputPrintf(L"Failed to open clipboard!\n");
+		debugLastError();
+		return false;
+	}
+	return true;
+}
+
+bool emptyClipboard()
+{
+	const BOOL emptyClip = ::EmptyClipboard();
+	if (!emptyClip)
+	{
+		outputPrintf(L"Failed to empty clipboard!\n");
+		debugLastError();
+		return false;
+	}
+	return true;
+}
+
+_Success_(return)
+bool OpenRegKey( _Out_ HKEY* const key, _In_ const HKEY root, PCWSTR const subkey )
+{
+	const LONG openResult = ::RegOpenKeyExW(root, subkey, 0, KEY_ALL_ACCESS, key);
+	if (openResult == ERROR_SUCCESS)
+		return true;
+	outputPrintf(L"Failed to open registry key `%s`.\n", subkey);
+	debugLastError();
+	return false;
+}
+
+void CloseRegKey(_In_ _Pre_valid_ _Post_ptr_invalid_ const HKEY key, PCWSTR const keyName)
+{
+	const LONG closeKey = ::RegCloseKey(key);
+	if (closeKey == ERROR_SUCCESS)
+		return;
+	outputPrintf(L"Failed to close registry key `%s`.\n", keyName);
+	debugLastError();
+}
+
+void CloseFindHandle(_In_ _Pre_valid_ _Post_ptr_invalid_ const HANDLE handle, PCWSTR const directory)
+{
+	const BOOL findClose = ::FindClose(handle);
+	if (findClose)
+		return;
+	outputPrintf(L"FindClose (for directory: `%s`) failed.\n", directory);
+	debugLastError();
+	std::terminate();
+}
+
 std::wstring GetDocumentsFolderPath()
 {
 	//must CoTaskMemFree when done!
@@ -30,21 +182,8 @@ std::wstring GetDocumentsFolderPath()
 	const HRESULT docsPathResult = ::SHGetKnownFolderPath(FOLDERID_Documents, KF_FLAG_NO_ALIAS, NULL, &docsPathTemp);
 	if (FAILED(docsPathResult))
 	{
-		if (docsPathResult == E_INVALIDARG)
-		{
-			debugPrintf(L"SHGetKnownFolderPath (for Documents) failed to retrieve the path with E_INVALIDARG\n");
-			std::terminate();
-		}
-		else if (docsPathResult == E_FAIL)
-		{
-			debugPrintf(L"SHGetKnownFolderPath (for Documents) failed to retrieve the path with E_FAIL\n");
-		}
-		else
-		{
-			debugPrintf(L"SHGetKnownFolderPath (for Documents) failed to retrieve the path with an unknown error: 0x%08I32x \n", docsPathResult);
-		}
-		UIETWASSERT(docsPathTemp == NULL);
-		return L"";
+		debugPrintf(L"SHGetKnownFolderPath (for Documents) failed to retrieve the path.\n");
+		std::terminate();
 	}
 	std::wstring docsPath(docsPathTemp);
 	CoTaskMemFree(docsPathTemp);
@@ -611,19 +750,19 @@ int DeleteFiles(const HWND hwnd, const std::vector<std::wstring>& paths)
 
 void SetClipboardText(const std::wstring& text)
 {
-	if (!ClipboardOpen())
+	if (!openClipboard())
 		return;
 
-	if (!ClipboardEmpty())
+	if (!emptyClipboard())
 	{
-		ClipboardClose();
+		closeClipboard();
 		return;
 	}
 
 	HANDLE hmem_temp = FALSE;
 	if (!AllocGlobalMemoryForString(text, &hmem_temp))
 	{
-		ClipboardClose();
+		closeClipboard();
 		return;
 	}
 	const HANDLE& hmem = hmem_temp;
@@ -632,7 +771,7 @@ void SetClipboardText(const std::wstring& text)
 	if (!LockGlobalMemory(hmem, &ptr_temp))
 	{
 		FreeGlobalMemory(hmem);
-		ClipboardClose();
+		closeClipboard();
 		return;
 	}
 
@@ -645,22 +784,22 @@ void SetClipboardText(const std::wstring& text)
 	if (!ClipboardSetUnicode(hmem))
 	{
 		FreeGlobalMemory(hmem);
-		ClipboardClose();
+		closeClipboard();
 		return;
 	}
-	ClipboardClose();
+	closeClipboard();
 }
 
 std::wstring GetClipboardText()
 {
 	std::wstring result;
-	if (!ClipboardOpen())
+	if (!openClipboard())
 		return result;
 
 	HANDLE hClip_temp = NULL;
 	if (!ClipboardGetUnicode(&hClip_temp))
 	{
-		ClipboardClose();
+		closeClipboard();
 		return result;
 	}
 
@@ -669,7 +808,7 @@ std::wstring GetClipboardText()
 	void* ptr = nullptr;
 	if (!LockGlobalMemory(hClip, &ptr))
 	{
-		ClipboardClose();
+		closeClipboard();
 		return result;
 	}
 
@@ -679,7 +818,7 @@ std::wstring GetClipboardText()
 	if (!SizeGlobalMemory(hClip, &bytes_temp))
 	{
 		UnlockGlobalMemory(hClip);
-		ClipboardClose();
+		closeClipboard();
 		return result;
 	}
 
@@ -688,7 +827,7 @@ std::wstring GetClipboardText()
 	result.insert(result.begin(), text, text + bytes / sizeof(wchar_t));
 
 	UnlockGlobalMemory(hClip);
-	ClipboardClose();
+	closeClipboard();
 	return result;
 }
 
@@ -729,6 +868,21 @@ bool Is64BitBuild()
 bool IsWindowsTenOrGreater()
 {
 	return IsWindowsVersionOrGreater(10, 0, 0);
+}
+
+bool IsWindowsXPOrLesser()
+{
+	return !IsWindowsVistaOrGreater();
+}
+
+bool IsWindowsSevenOrLesser()
+{
+	return !IsWindows8OrGreater();
+}
+
+bool IsWindowsVistaOrLesser()
+{
+	return !IsWindows7OrGreater();
 }
 
 std::wstring GetEnvironmentVariableString(_In_z_ PCWSTR const variable)
@@ -880,26 +1034,7 @@ void CopyStartupProfiles(const std::wstring& exeDir, const bool force)
 	copyWPAProfileToLocalAppData(exeDir, force);
 }
 
-_Success_(return)
-bool OpenRegKey( _Out_ HKEY* const key, _In_ const HKEY root, PCWSTR const subkey )
-{
-	const LONG openResult = ::RegOpenKeyExW(root, subkey, 0, KEY_ALL_ACCESS, key);
-	if (openResult == ERROR_SUCCESS)
-		return true;
-	outputPrintf(L"Failed to open registry key `%s`.\n", subkey);
-	debugLastError();
-	return false;
-}
 
-void CloseFindHandle(_In_ _Pre_valid_ _Post_ptr_invalid_ const HANDLE handle, PCWSTR const directory)
-{
-	const BOOL findClose = ::FindClose(handle);
-	if (findClose)
-		return;
-	outputPrintf(L"FindClose (for directory: `%s`) failed.\n", directory);
-	debugLastError();
-	std::terminate();
-}
 
 void CloseValidHandle(_In_ _Pre_valid_ _Post_ptr_invalid_ const HANDLE handle)
 {
@@ -908,134 +1043,4 @@ void CloseValidHandle(_In_ _Pre_valid_ _Post_ptr_invalid_ const HANDLE handle)
 		std::terminate();//Logic bug!
 }
 
-void CloseRegKey(_In_ _Pre_valid_ _Post_ptr_invalid_ const HKEY key, PCWSTR const keyName)
-{
-	const LONG closeKey = ::RegCloseKey(key);
-	if (closeKey == ERROR_SUCCESS)
-		return;
-	outputPrintf(L"Failed to close registry key `%s`.\n", keyName);
-	debugLastError();
-}
-
-void ClipboardClose()
-{
-	const BOOL closeResult = ::CloseClipboard( );
-	if (closeResult)
-		return;
-	debugPrintf(L"Failed to close the clipboard!\n");
-	debugLastError( );
-}
-
-bool ClipboardOpen()
-{
-	const BOOL openClip = ::OpenClipboard(::GetDesktopWindow());
-	if (!openClip)
-	{
-		outputPrintf(L"Failed to open clipboard!\n");
-		debugLastError();
-		return false;
-	}
-	return true;
-}
-
-bool ClipboardEmpty()
-{
-	const BOOL emptyClip = ::EmptyClipboard();
-	if (!emptyClip)
-	{
-		outputPrintf(L"Failed to empty clipboard!\n");
-		debugLastError();
-		return false;
-	}
-	return true;
-}
-
-_Success_(return)
-bool AllocGlobalMemoryForString(const std::wstring& text, _Out_ _Post_valid_ HGLOBAL* const hmem)
-{
-	const size_t length = (text.size() + 1) * sizeof(text[0]);
-	const HANDLE mem = ::GlobalAlloc(GMEM_MOVEABLE, length);
-	if (!mem)
-	{
-		outputPrintf(L"Couldn't allocate memory to set clipboard text!\n");
-		outputLastError();
-		return false;
-	}
-	(*hmem) = mem;
-	return true;
-}
-
-void FreeGlobalMemory(_Frees_ptr_opt_ const HGLOBAL hmem)
-{
-		//If [GlobalFree] succeeds, the return value is NULL.
-		const HGLOBAL freeRes = ::GlobalFree(hmem);
-		if (freeRes != NULL)
-			std::terminate();//Logic bug!
-}
-
-_Success_(return)
-bool LockGlobalMemory(_In_ _Pre_valid_ const HGLOBAL hmem, _Outptr_ PVOID* const ptrMem)
-{
-	void* const ptr = ::GlobalLock(hmem);
-	if (ptr == NULL)
-	{
-		outputPrintf(L"Failed to lock memory for clipboard text!\n");
-		outputLastError();
-		return false;
-	}
-	(*ptrMem) = ptr;
-	return true;
-}
-
-void UnlockGlobalMemory(_In_ const HGLOBAL hmem)
-{
-	const BOOL unlockRes = ::GlobalUnlock(hmem);
-	if (!unlockRes)
-	{
-		const DWORD lastErr = ::GetLastError();
-		if (lastErr != NO_ERROR)
-			std::terminate( );//Logic bug!
-	}
-}
-
-_Success_(return)
-bool ClipboardSetUnicode(_In_ const HGLOBAL hmem)
-{
-	const HANDLE dataHandle = ::SetClipboardData(CF_UNICODETEXT, hmem);
-	if (dataHandle == NULL)
-	{
-		outputPrintf(L"Failed to set clipboard data!\n");
-		outputLastError();
-		return false;
-	}
-	return true;
-}
-
-_Success_(return)
-bool ClipboardGetUnicode(_Out_ _Post_valid_ HANDLE* const hClipboard)
-{
-	const HANDLE hClip = ::GetClipboardData(CF_UNICODETEXT);
-	if (hClip == NULL)
-	{
-		outputPrintf(L"Failed to get clipboard data!\n");
-		outputLastError();
-		return false;
-	}
-	(*hClipboard) = hClip;
-	return true;
-}
-
-_Success_(return)
-bool SizeGlobalMemory(_In_ _Pre_valid_ const HGLOBAL hmem, _Out_ size_t* const sizeBytes)
-{
-	const size_t bytes = ::GlobalSize(hmem);
-	if (bytes == 0)
-	{
-		outputPrintf(L"Failed to get size of globally-allocated memory!\n");
-		outputLastError();
-		return false;
-	}
-	(*sizeBytes) = bytes;
-	return true;
-}
 

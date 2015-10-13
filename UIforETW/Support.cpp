@@ -167,7 +167,7 @@ int CUIforETWDlg::BufferCountBoost(int requestCount) const
 	if (!GlobalMemoryStatusEx(&memoryStatus))
 		return requestCount;
 
-	const int64_t oneGB = 1024i64 * 1024i64 * 1024i64;
+	const int64_t oneGB = int64_t(1024) * 1024 * 1024;
 	const int64_t physicalRam = memoryStatus.ullTotalPhys;
 	if (physicalRam > 15 * oneGB)
 	{

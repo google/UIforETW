@@ -94,6 +94,9 @@ std::string GetEnvironmentVariableString(_In_z_ PCSTR variable);
 bool Is64BitWindows();
 bool Is64BitBuild();
 bool IsWindowsTenOrGreater();
+bool IsWindowsXPOrLesser();
+bool IsWindowsSevenOrLesser();
+bool IsWindowsVistaOrLesser();
 
 std::wstring FindPython(); // Returns a full path to python.exe or nothing.
 
@@ -123,9 +126,9 @@ public:
 	}
 	double ElapsedSeconds() const
 	{
-		LARGE_INTEGER stop = {0};
+		LARGE_INTEGER stop = {};
 		ATLVERIFY(QueryPerformanceCounter(&stop));
-		LARGE_INTEGER frequency = {0};
+		LARGE_INTEGER frequency = {};
 		ATLVERIFY(QueryPerformanceFrequency(&frequency));
 
 		return (stop.QuadPart - start_.QuadPart) / float(frequency.QuadPart);
@@ -140,31 +143,5 @@ void SetCurrentThreadName(PCSTR threadName);
 
 void CopyStartupProfiles(const std::wstring& exeDir, bool force);
 
-void CloseFindHandle(_In_ _Pre_valid_ _Post_ptr_invalid_ HANDLE handle, PCWSTR directory);
 void CloseValidHandle(_In_ _Pre_valid_ _Post_ptr_invalid_ HANDLE handle);
-void CloseRegKey( _In_ _Pre_valid_ _Post_ptr_invalid_ HKEY key, PCWSTR const keyName );
 
-_Success_(return)
-bool OpenRegKey( _Out_ HKEY* key, _In_ HKEY root, PCWSTR const subkey );
-void ClipboardClose();
-bool ClipboardOpen();
-bool ClipboardEmpty();
-
-_Success_(return)
-bool ClipboardSetUnicode(_In_ const HGLOBAL hmem);
-
-_Success_(return)
-bool ClipboardGetUnicode(_Out_ _Post_valid_ HANDLE* const hClip);
-
-_Success_(return)
-bool AllocGlobalMemoryForString(const std::wstring& text, _Out_ _Post_valid_ HGLOBAL* const hmem);
-
-void FreeGlobalMemory(_Frees_ptr_opt_ const HGLOBAL hmem);
-
-_Success_(return)
-bool LockGlobalMemory(_In_ _Pre_valid_ const HGLOBAL hmem, _Outptr_ PVOID* const ptrMem);
-
-void UnlockGlobalMemory(_In_ const HGLOBAL hmem);
-
-_Success_(return)
-bool SizeGlobalMemory(_In_ _Pre_valid_ const HGLOBAL hmem, _Out_ size_t* const sizeBytes);
