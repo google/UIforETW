@@ -1885,7 +1885,9 @@ void CUIforETWDlg::IdentifyChromeProcesses(const std::wstring& traceFilename)
 
 void CUIforETWDlg::CreateFlameGraph(const std::wstring& traceFilename)
 {
-	outputPrintf(L"\nCreating CPU Usage (Sampled) flame graph of busiest process ((requires python, perl and flamegraph.pl)...\n");
+	outputPrintf(L"\nCreating CPU Usage (Sampled) flame graph of busiest process in %s "
+				 L"(requires python, perl and flamegraph.pl). UIforETW will hang while "
+				 L"this is calculated...\n");
 	std::wstring pythonPath = FindPython();
 	if (!pythonPath.empty())
 	{
