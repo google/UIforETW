@@ -1,4 +1,4 @@
-# Copyright 2015 Google Inc. All Rights Reserved.
+﻿# Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -156,7 +156,10 @@ for numSamples, processAndThread in sortedThreads[:numToShow]:
 	for stack in threadSamples:
 		sortedStacks.append("%s %d\n" % (stack, threadSamples[stack]))
 	sortedStacks.sort()
-	out = open(outputName, "wt")
+	# Some versions of perl (the version that ships with Chromium's depot_tools
+	# for one) can't handle reading files with CRLF line endings, so write the
+	# file as binary to avoid line-ending translation.
+	out = open(outputName, "wb")
 	for stack in sortedStacks:
 		out.write(stack)
 	# Force the file closed so that the results will be available when we the

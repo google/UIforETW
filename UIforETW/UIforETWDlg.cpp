@@ -1891,7 +1891,7 @@ void CUIforETWDlg::CreateFlameGraph(const std::wstring& traceFilename)
 {
 	outputPrintf(L"\nCreating CPU Usage (Sampled) flame graph of busiest process in %s "
 				 L"(requires python, perl and flamegraph.pl). UIforETW will hang while "
-				 L"this is calculated...\n");
+				 L"this is calculated...\n", traceFilename.c_str());
 	std::wstring pythonPath = FindPython();
 	if (!pythonPath.empty())
 	{
