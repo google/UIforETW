@@ -168,10 +168,9 @@ for numSamples, processAndThread in sortedThreads[:numToShow]:
 	perlCommand = 'perl "%s" --title="%s" "%s"' % (flameGraphPath, title, outputName)
 	print "> %s" % perlCommand
 	svgOutput = subprocess.check_output(perlCommand)
-	open(destPath, "wt").write(svgOutput)
-	resultSize = os.path.getsize(destPath)
-	if resultSize < 100: # Arbitrary sane minimum
-		print "Result size is %d bytes - is perl in your path?" % resultSize
-	else:
+	if len(svgOutput) > 100:
+		open(destPath, "wt").write(svgOutput)
 		os.popen(destPath)
-		print "Results are in "%s" - they should be auto-opened in the default SVG viewer." % destPath
+		print 'Results are in "%s" - they should be auto-opened in the default SVG viewer.' % destPath
+	else:
+		print "Result size is %d bytes - is perl in your path?" % len(svgOutput)
