@@ -396,9 +396,6 @@ BOOL CUIforETWDlg::OnInitDialog()
 	wpaPath_ = wptDir_ + L"wpa.exe";
 	gpuViewPath_ = wptDir_ + L"gpuview\\gpuview.exe";
 	wpa10Path_ = wpt10Dir_ + L"wpa.exe";
-	wpaDefaultPath_ = wpaPath_;
-	if (PathFileExists(wpa10Path_.c_str()))
-		wpaDefaultPath_ = wpa10Path_;
 
 	// The Media Experience Analyzer is a 64-bit installer, so we look for it in
 	// ProgramFiles.
@@ -529,6 +526,13 @@ BOOL CUIforETWDlg::OnInitDialog()
 	SetTimer(0, 1000, nullptr);
 
 	return TRUE; // return TRUE unless you set the focus to a control
+}
+
+std::wstring CUIforETWDlg::wpaDefaultPath() const
+{
+	if (PathFileExists(wpa10Path_.c_str()))
+		return wpa10Path_;
+	return wpaPath_;
 }
 
 std::wstring CUIforETWDlg::GetDirectory(const wchar_t* env, const std::wstring& default)
@@ -1045,7 +1049,7 @@ void CUIforETWDlg::StopTracingAndMaybeRecord(bool bSaveTrace)
 		PreprocessTrace(traceFilename);
 
 		if (bAutoViewTraces_)
-			LaunchTraceViewer(traceFilename, wpaDefaultPath_);
+			LaunchTraceViewer(traceFilename, wpaDefaultPath());
 		// Record the name so that it gets selected.
 		lastTraceFilename_ = CrackFilePart(traceFilename);
 
@@ -1311,7 +1315,7 @@ void CUIforETWDlg::OnLbnDblclkTracelist()
 	if (selIndex < 0 || selIndex >= (int)traces_.size())
 		return;
 	std::wstring tracename = GetTraceDir() + traces_[selIndex] + L".etl";
-	LaunchTraceViewer(tracename, wpaDefaultPath_);
+	LaunchTraceViewer(tracename, wpaDefaultPath());
 }
 
 void CUIforETWDlg::OnGetMinMaxInfo(MINMAXINFO* lpMMI)
