@@ -539,8 +539,11 @@ std::wstring GetBuildTimeFromAddress(void* codeAddress)
 		return L"";
 	}
 
+	// TimeDateStamp is 32 bits and time_t is 64 bits. That will have to be dealt
+	// with when TimeDateStamp wraps in February 2106.
+	const time_t timeDateStamp = NTHeader->FileHeader.TimeDateStamp;
 	tm linkTime = {};
-	gmtime_s(&linkTime, (time_t*)&NTHeader->FileHeader.TimeDateStamp);
+	gmtime_s(&linkTime, &timeDateStamp);
 	// Print out the module information. The %.24s is necessary to trim
 	// the new line character off of the date string returned by asctime().
 	// _wasctime_s requires a 26-character buffer.
