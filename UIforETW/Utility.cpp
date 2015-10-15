@@ -18,6 +18,7 @@ limitations under the License.
 #include "Utility.h"
 #include <fstream>
 #include <direct.h>
+#include <ShlObj.h>
 
 std::vector<std::wstring> split(const std::wstring& s, char c)
 {

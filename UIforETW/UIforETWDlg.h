@@ -32,7 +32,7 @@ enum TracingMode
 	kHeapTracingToFile
 };
 
-class CUIforETWDlg : public CDialogEx
+class CUIforETWDlg : public CDialog
 {
 public:
 	CUIforETWDlg(CWnd* pParent = NULL);	// standard constructor

@@ -19,7 +19,6 @@ limitations under the License.
 #include "UIforETWDlg.h"
 
 #include "About.h"
-#include "afxdialogex.h"
 #include "ChildProcess.h"
 #include "Settings.h"
 #include "Utility.h"
@@ -30,6 +29,7 @@ limitations under the License.
 #include <ETWProviders\etwprof.h>
 #include <vector>
 #include <map>
+#include <ShlObj.h>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -82,7 +82,7 @@ void CUIforETWDlg::vprintf(const wchar_t* pFormat, va_list args)
 
 
 CUIforETWDlg::CUIforETWDlg(CWnd* pParent /*=NULL*/)
-	: CDialogEx(CUIforETWDlg::IDD, pParent)
+	: CDialog(CUIforETWDlg::IDD, pParent)
 	, monitorThread_(this)
 {
 	pMainWindow = this;
@@ -169,11 +169,11 @@ void CUIforETWDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_OUTPUT, btOutput_);
 	DDX_Control(pDX, IDC_TRACENAMEEDIT, btTraceNameEdit_);
 
-	CDialogEx::DoDataExchange(pDX);
+	CDialog::DoDataExchange(pDX);
 }
 
 // Hook up functions to messages from buttons, menus, etc.
-BEGIN_MESSAGE_MAP(CUIforETWDlg, CDialogEx)
+BEGIN_MESSAGE_MAP(CUIforETWDlg, CDialog)
 	ON_WM_SYSCOMMAND()
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
@@ -240,7 +240,7 @@ void CUIforETWDlg::SetSymbolPath()
 
 BOOL CUIforETWDlg::OnInitDialog()
 {
-	CDialogEx::OnInitDialog();
+	CDialog::OnInitDialog();
 
 	// Load the F2 (rename) and ESC (silently swallow ESC) accelerators
 	hAccelTable_ = LoadAccelerators(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDR_ACCELERATORS));
@@ -669,7 +669,7 @@ void CUIforETWDlg::OnSysCommand(UINT nID, LPARAM lParam)
 	}
 	else
 	{
-		CDialogEx::OnSysCommand(nID, lParam);
+		CDialog::OnSysCommand(nID, lParam);
 	}
 }
 
@@ -698,7 +698,7 @@ void CUIforETWDlg::OnPaint()
 	}
 	else
 	{
-		CDialogEx::OnPaint();
+		CDialog::OnPaint();
 	}
 }
 

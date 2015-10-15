@@ -18,7 +18,6 @@ limitations under the License.
 #include "UIforETW.h"
 #include "Settings.h"
 #include "Utility.h"
-#include "afxdialogex.h"
 
 /*
 When doing Chrome profilng it is possible to ask various Chrome tracing
@@ -64,10 +63,10 @@ uint64_t disabled_other_events_keyword_bit = 1ULL << 62;
 
 // CSettings dialog
 
-IMPLEMENT_DYNAMIC(CSettings, CDialogEx)
+IMPLEMENT_DYNAMIC(CSettings, CDialog)
 
 CSettings::CSettings(CWnd* pParent /*=NULL*/, const std::wstring& exeDir, const std::wstring& wptDir, const std::wstring& wpt10Dir)
-	: CDialogEx(CSettings::IDD, pParent)
+	: CDialog(CSettings::IDD, pParent)
 	, exeDir_(exeDir)
 	, wptDir_(wptDir)
 	, wpt10Dir_(wpt10Dir)
@@ -95,11 +94,11 @@ void CSettings::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_VIRTUALALLOCSTACKS, btVirtualAllocStacks_);
 	DDX_Control(pDX, IDC_CHROME_CATEGORIES, btChromeCategories_);
 
-	CDialogEx::DoDataExchange(pDX);
+	CDialog::DoDataExchange(pDX);
 }
 
 
-BEGIN_MESSAGE_MAP(CSettings, CDialogEx)
+BEGIN_MESSAGE_MAP(CSettings, CDialog)
 	ON_BN_CLICKED(IDC_COPYSTARTUPPROFILE, &CSettings::OnBnClickedCopystartupprofile)
 	ON_BN_CLICKED(IDC_COPYSYMBOLDLLS, &CSettings::OnBnClickedCopysymboldlls)
 	ON_BN_CLICKED(IDC_CHROMEDEVELOPER, &CSettings::OnBnClickedChromedeveloper)
@@ -111,7 +110,7 @@ END_MESSAGE_MAP()
 
 BOOL CSettings::OnInitDialog()
 {
-	CDialogEx::OnInitDialog();
+	CDialog::OnInitDialog();
 
 	SetDlgItemText(IDC_HEAPEXE, heapTracingExes_.c_str());
 	CheckDlgButton(IDC_CHROMEDEVELOPER, bChromeDeveloper_);
