@@ -81,8 +81,7 @@ def main():
     if len(pidsByType) == 0:
       assert False
       continue
-    if len(pidsByParent.keys()) > 1:
-      print("%s (%d)\r" % (exePath, browserPid))
+    print("%s (%d)\r" % (exePath, browserPid))
     keys = list(pidsByType.keys())
     keys.sort()
     # Note the importance of printing the '\r' so that the

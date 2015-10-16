@@ -18,6 +18,7 @@ limitations under the License.
 #include "Utility.h"
 #include <fstream>
 #include <direct.h>
+#include <ShlObj.h>
 
 
 namespace {
@@ -853,10 +854,14 @@ int64_t GetFileSize(const std::wstring& path)
 
 bool Is64BitWindows()
 {
+#if defined(_WIN64)
+	return true;
+#else
 	// http://blogs.msdn.com/b/oldnewthing/archive/2005/02/01/364563.aspx
 	BOOL f64 = FALSE;
 	const bool bIsWin64 = ( ::IsWow64Process(::GetCurrentProcess(), &f64) && f64 );
 	return bIsWin64;
+#endif
 }
 
 bool Is64BitBuild()
@@ -970,8 +975,11 @@ std::wstring GetBuildTimeFromAddress(_In_ const void* const codeAddress)
 		return L"";
 	}
 
+	// TimeDateStamp is 32 bits and time_t is 64 bits. That will have to be dealt
+	// with when TimeDateStamp wraps in February 2106.
+	const time_t timeDateStamp = NTHeader->FileHeader.TimeDateStamp;
 	tm linkTime = {};
-	gmtime_s(&linkTime, reinterpret_cast<const time_t*>(&NTHeader->FileHeader.TimeDateStamp));
+	gmtime_s(&linkTime, &timeDateStamp);
 	// Print out the module information. The %.24s is necessary to trim
 	// the new line character off of the date string returned by asctime().
 	// _wasctime_s requires a 26-character buffer.

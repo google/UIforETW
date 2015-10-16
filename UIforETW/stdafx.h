@@ -19,6 +19,11 @@ limitations under the License.
 // Include this first so that the requested version is known.
 #include "targetver.h"
 
+// disable the MFC "feature pack" controls
+// they end up bringing dependencies on DLLs that are not 
+// documented as available on the Server Core SKUs.
+#define _AFX_NO_MFC_CONTROLS_IN_DIALOGS
+
 #ifndef VC_EXTRALEAN
 #define VC_EXTRALEAN            // Exclude rarely-used stuff from Windows headers
 #endif
@@ -39,7 +44,8 @@ limitations under the License.
 #include <afxcmn.h>             // MFC support for Windows Common Controls
 #endif // _AFX_NO_AFXCMN_SUPPORT
 
-#include <afxcontrolbars.h>     // MFC support for ribbons and control bars
+#include <afxmt.h>
+
 #include <atlwin.h>
 #include <sal.h>
 #include <VersionHelpers.h>

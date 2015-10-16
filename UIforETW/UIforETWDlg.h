@@ -23,6 +23,7 @@ limitations under the License.
 #include "DirectoryMonitor.h"
 #include "WorkingSet.h"
 #include "PowerStatus.h"
+#include "CPUFrequency.h"
 
 enum TracingMode
 {
@@ -31,7 +32,7 @@ enum TracingMode
 	kHeapTracingToFile
 };
 
-class CUIforETWDlg : public CDialogEx
+class CUIforETWDlg : public CDialog
 {
 public:
 	CUIforETWDlg(CWnd* pParent = NULL);	// standard constructor
@@ -52,7 +53,7 @@ private:
 	// Auto-save trace if tracing to a file runs for longer than this length of time.
 	// Otherwise the trace files can fill hard drives and be unusably large.
 	// This should be configurable. But it is not.
-	const ULONGLONG kMaxFileTraceMs = 120000;
+	const ULONGLONG kMaxFileTraceMs = 300000;
 
 	CButton btStartTracing_;
 	CButton btSaveTraceBuffers_;
@@ -121,6 +122,9 @@ private:
 	// This starts and stops a thread that monitors battery status.
 	CPowerStatusMonitor PowerMonitor_;
 
+	// This starts and stops threads for monitoring CPU frequency.
+	CCPUFrequencyMonitor CPUFrequencyMonitor_;
+
 	// This contains the notes for the selected trace, as loaded from disk.
 	std::wstring traceNotes_;
 	std::wstring traceNoteFilename_;
@@ -135,12 +139,12 @@ private:
 	std::wstring traceDir_;
 	std::wstring tempTraceDir_;
 	std::wstring windowsKitsDir_; // C:\\Program Files (x86)\\Windows Kits
-	std::wstring wptDir_;
+	std::wstring wptDir_; // This points to the WPT 8.1 directory if it exists, else WPT 10
 	std::wstring wpt10Dir_;
 	std::wstring wpaPath_;
 	std::wstring gpuViewPath_;
 	std::wstring wpa10Path_;
-	std::wstring wpaDefaultPath_; // Default viewer.
+	std::wstring wpaDefaultPath() const; // Default viewer.
 	// MXA is available from http://www.microsoft.com/en-us/download/confirmation.aspx?id=43105
 	std::wstring mxaPath_; // Media Experience Analyzer path
 
@@ -215,6 +219,7 @@ private:
 	void StripChromeSymbols(const std::wstring& traceFilename);
 	void IdentifyChromeProcesses(const std::wstring& traceFilename);
 	void PreprocessTrace(const std::wstring& traceFilename);
+	void CreateFlameGraph(const std::wstring& traceFilename);
 	void LaunchTraceViewer(const std::wstring traceFilename, const std::wstring viewerPath);
 	void SaveNotesIfNeeded();
 	void ShutdownTasks();

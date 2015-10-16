@@ -15,3 +15,4 @@ present.txt
 .csv
 .gitignore
 _dev
+flamegraph.pl

@@ -34,6 +34,10 @@ limitations under the License.
 const int kSamplingInterval = 200;
 
 // These correspond to the funcID values returned by GetMsrFunc
+// The are documented here:
+// https://software.intel.com/en-us/blogs/2014/01/07/using-the-intel-power-gadget-30-api-on-windows
+// Sample code from there was used to help create the Power Gadget API
+// code.
 const int MSR_FUNC_FREQ = 0;
 const int MSR_FUNC_POWER = 1;
 const int MSR_FUNC_TEMP = 2;

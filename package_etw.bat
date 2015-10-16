@@ -35,27 +35,41 @@ cd /d %UIforETW%
 cd UIforETW
 @rem Modify the UIforETW project to be statically linked and build that version
 @rem so that it will run without any extra install requirements.
-sed "s/UseOfMfc>Dynamic/UseOfMfc>Static/" <UIforETW.vcxproj >UIforETWStatic.vcxproj
 sed "s/UIforETW.vcxproj/UIforETWStatic.vcxproj/" <UIforETW.sln >UIforETWStatic.sln
+@echo First do a test build with ETW marks disabled to test the inline functions.
+sed "s/_WINDOWS/_WINDOWS;DISABLE_ETW_MARKS/" <UIforETW.vcxproj >UIforETWStatic.vcxproj
+devenv /rebuild "release|Win32" UIforETWStatic.sln
+@if ERRORLEVEL 1 goto BuildFailure
+
+@rem Now prepare for the real builds
+sed "s/UseOfMfc>Dynamic/UseOfMfc>Static/" <UIforETW.vcxproj >UIforETWStatic.vcxproj
 rmdir Release /s/q
 rmdir x64\Release /s/q
 devenv /rebuild "release|Win32" UIforETWStatic.sln
+@if ERRORLEVEL 1 goto BuildFailure
 devenv /rebuild "release|x64" UIforETWStatic.sln
+@if ERRORLEVEL 1 goto BuildFailure
 @rem Clean up after building the static version.
 rmdir Release /s/q
 rmdir x64\Release /s/q
 del UIforETWStatic.vcxproj
 del UIforETWStatic.sln
 
-xcopy /exclude:%~dp0excludecopy.txt %UIforETW%\bin %destdir%\bin /s
-xcopy /exclude:%~dp0excludecopy.txt %UIforETW%\include %destdir%\include /s
-xcopy /exclude:%~dp0excludecopy.txt %UIforETW%\lib %destdir%\lib /s
-xcopy /exclude:%~dp0excludecopy.txt %UIforETW%\third_party %destdir%\third_party /s
+xcopy %UIforETW%CONTRIBUTING %destdir%
+xcopy %UIforETW%CONTRIBUTORS %destdir%
+xcopy %UIforETW%AUTHORS %destdir%
+xcopy %UIforETW%LICENSE %destdir%
+xcopy %UIforETW%README %destdir%
+
+xcopy /exclude:%~dp0excludecopy.txt %UIforETW%bin %destdir%\bin /s
+xcopy /exclude:%~dp0excludecopy.txt %UIforETW%include %destdir%\include /s
+xcopy /exclude:%~dp0excludecopy.txt %UIforETW%lib %destdir%\lib /s
+xcopy /exclude:%~dp0excludecopy.txt %UIforETW%third_party %destdir%\third_party /s
 @rem Get the destinations to exist so that the xcopy proceeds without a question.
 echo >%destdir%\bin\UIforETW.exe
 echo >%destdir%\bin\UIforETW32.exe
-xcopy %UIforETW%\bin\UIforETWStatic_devrel32.exe %destdir%\bin\UIforETW32.exe /y
-xcopy %UIforETW%\bin\UIforETWStatic_devrel.exe %destdir%\bin\UIforETW.exe /y
+xcopy %UIforETW%bin\UIforETWStatic_devrel32.exe %destdir%\bin\UIforETW32.exe /y
+xcopy %UIforETW%bin\UIforETWStatic_devrel.exe %destdir%\bin\UIforETW.exe /y
 xcopy /exclude:%~dp0excludecopy.txt %destdir%\bin\UIforETW*.exe %~dp0bin /y
 
 cd /d %UIforETW%
@@ -78,4 +92,8 @@ python %UIforETW%make_zip_file.py %UIforETW%etwpackage.zip etwpackage
 
 :nowpt10
 @echo WPT 10 redistributables not found. Aborting.
+@exit /b
+
+:BuildFailure
+@echo Build failure of some sort. Aborting.
 @exit /b

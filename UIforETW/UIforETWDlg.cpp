@@ -19,7 +19,6 @@ limitations under the License.
 #include "UIforETWDlg.h"
 
 #include "About.h"
-#include "afxdialogex.h"
 #include "ChildProcess.h"
 #include "Settings.h"
 #include "Utility.h"
@@ -30,6 +29,7 @@ limitations under the License.
 #include <ETWProviders\etwprof.h>
 #include <vector>
 #include <map>
+#include <ShlObj.h>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -82,7 +82,7 @@ void CUIforETWDlg::vprintf(const wchar_t* pFormat, va_list args)
 
 
 CUIforETWDlg::CUIforETWDlg(CWnd* pParent /*=NULL*/)
-	: CDialogEx(CUIforETWDlg::IDD, pParent)
+	: CDialog(CUIforETWDlg::IDD, pParent)
 	, monitorThread_(this)
 {
 	pMainWindow = this;
@@ -169,11 +169,11 @@ void CUIforETWDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_OUTPUT, btOutput_);
 	DDX_Control(pDX, IDC_TRACENAMEEDIT, btTraceNameEdit_);
 
-	CDialogEx::DoDataExchange(pDX);
+	CDialog::DoDataExchange(pDX);
 }
 
 // Hook up functions to messages from buttons, menus, etc.
-BEGIN_MESSAGE_MAP(CUIforETWDlg, CDialogEx)
+BEGIN_MESSAGE_MAP(CUIforETWDlg, CDialog)
 	ON_WM_SYSCOMMAND()
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
@@ -238,7 +238,7 @@ void CUIforETWDlg::SetSymbolPath()
 
 BOOL CUIforETWDlg::OnInitDialog()
 {
-	CDialogEx::OnInitDialog();
+	CDialog::OnInitDialog();
 
 	// Load the F2 (rename) and ESC (silently swallow ESC) accelerators
 	hAccelTable_ = LoadAccelerators(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDR_ACCELERATORS));
@@ -309,42 +309,45 @@ BOOL CUIforETWDlg::OnInitDialog()
 	wptDir_ = windowsKitsDir_ + L"8.1\\Windows Performance Toolkit\\";
 	wpt10Dir_ = windowsKitsDir_ + L"10\\Windows Performance Toolkit\\";
 
-	// Install WPT 8.1 and WPT 10 if needed and if available.
-	// The installers are available as part of etwpackage.zip on https://github.com/google/UIforETW/releases
-	if (!PathFileExists(GetXperfPath().c_str()))
+	if (Is64BitWindows())
 	{
-		// Windows 7 users need to have WPT 8.1 installed.
-		if (IsWindowsSevenOrLesser())
+		// Install 64-bit WPT 8.1 and WPT 10 if needed and if available.
+		// The installers are available as part of etwpackage.zip on https://github.com/google/UIforETW/releases
+		if (!PathFileExists(GetXperfPath().c_str()))
 		{
-			const std::wstring installPath81 = GetExeDir() + L"..\\third_party\\wpt81\\WPTx64-x86_en-us.msi";
-			if (PathFileExists(installPath81.c_str()))
+			// Windows 7 users need to have WPT 8.1 installed.
+			if (IsWindowsSevenOrLesser())
 			{
-				HINSTANCE installResult81 = ShellExecute(m_hWnd, L"open", installPath81.c_str(), nullptr, nullptr, SW_SHOWDEFAULT);
-				if (installResult81 > reinterpret_cast<HINSTANCE>(32))
+				const std::wstring installPath81 = GetExeDir() + L"..\\third_party\\wpt81\\WPTx64-x86_en-us.msi";
+				if (PathFileExists(installPath81.c_str()))
 				{
-					outputPrintf(L"WPT version 8.1 was installed.\n");
-				}
-				else
-				{
-					outputPrintf(L"Failure code %d while installing WPT 8.1.\n", reinterpret_cast<int>(installResult81));
+					HINSTANCE installResult81 = ShellExecute(m_hWnd, L"open", installPath81.c_str(), nullptr, nullptr, SW_SHOWDEFAULT);
+					if (installResult81 > reinterpret_cast<HINSTANCE>(32))
+					{
+						outputPrintf(L"WPT version 8.1 was installed.\n");
+					}
+					else
+					{
+						outputPrintf(L"Failure code %d while installing WPT 8.1.\n", reinterpret_cast<int>(installResult81));
+					}
 				}
 			}
 		}
-	}
-	// Everybody should have WPT 10 installed.
-	if (!PathFileExists((wpt10Dir_ + L"xperf.exe").c_str()))
-	{
-		const std::wstring installPath10 = GetExeDir() + L"..\\third_party\\wpt10\\WPTx64-x86_en-us.msi";
-		if (PathFileExists(installPath10.c_str()))
+		// Everybody should have WPT 10 installed.
+		if (!PathFileExists((wpt10Dir_ + L"xperf.exe").c_str()))
 		{
-			HINSTANCE installResult10 = ShellExecute(m_hWnd, L"open", installPath10.c_str(), nullptr, nullptr, SW_SHOWDEFAULT);
-			if (installResult10 > reinterpret_cast<HINSTANCE>(32))
+			const std::wstring installPath10 = GetExeDir() + L"..\\third_party\\wpt10\\WPTx64-x86_en-us.msi";
+			if (PathFileExists(installPath10.c_str()))
 			{
-				outputPrintf(L"WPT version 10 was installed.\n");
-			}
-			else
-			{
-				outputPrintf(L"Failure code %d while installing WPT 10.\n", reinterpret_cast<int>(installResult10));
+				HINSTANCE installResult10 = ShellExecute(m_hWnd, L"open", installPath10.c_str(), nullptr, nullptr, SW_SHOWDEFAULT);
+				if (installResult10 > reinterpret_cast<HINSTANCE>(32))
+				{
+					outputPrintf(L"WPT version 10 was installed.\n");
+				}
+				else
+				{
+					outputPrintf(L"Failure code %d while installing WPT 10.\n", reinterpret_cast<int>(installResult10));
+				}
 			}
 		}
 	}
@@ -354,29 +357,43 @@ BOOL CUIforETWDlg::OnInitDialog()
 		{
 			// WPT 10 (at least the 10240 version) doesn't record image ID information
 			// on Windows 7 and below, so the Windows 8.1 version of WPT is needed.
-			AfxMessageBox((GetXperfPath() + L" does not exist. Windows 7 and below require that "
-				L"WPT 8.1 be installed. If you run UIforETW from etwpackage.zip from\n"
-				L"https://github.com/google/UIforETW/releases\n"
-				L"then WPT will be automatically installed.").c_str());
+			if (Is64BitWindows())
+			{
+				AfxMessageBox((GetXperfPath() + L" does not exist. Windows 7 and below require that "
+					L"WPT 8.1 be installed. If you run UIforETW from etwpackage.zip from\n"
+					L"https://github.com/google/UIforETW/releases\n"
+					L"then WPT will be automatically installed. Exiting.").c_str());
+			}
+			else
+			{
+				AfxMessageBox((GetXperfPath() + L" does not exist. Windows 7 and below require that "
+					L"WPT 8.1 be installed. You'll need to find the installer in the Windows "
+					L"8.1 SDK. Exiting.").c_str());
+			}
 			exit(10);
 		}
 		std::wstring oldXperfPath = GetXperfPath();
 		wptDir_ = wpt10Dir_;
 		if (!PathFileExists(GetXperfPath().c_str()))
 		{
-			AfxMessageBox((oldXperfPath + L" and " + GetXperfPath() + L" do not exist. Please install WPT 8.1 or 10. Exiting."
-				L" If you run UIforETW from etwpackage.zip from\n"
-				L"https://github.com/google/UIforETW/releases\n"
-				L"then WPT will be automatically installed.").c_str());
+			if (Is64BitWindows())
+			{
+				AfxMessageBox((oldXperfPath + L" and " + GetXperfPath() + L" do not exist. Please install WPT 8.1 or 10. "
+					L"If you run UIforETW from etwpackage.zip from\n"
+					L"https://github.com/google/UIforETW/releases\n"
+					L"then WPT will be automatically installed. Exiting.").c_str());
+			}
+			else
+			{
+				AfxMessageBox((oldXperfPath + L" and " + GetXperfPath() + L" do not exist. Please install WPT 8.1 or 10. "
+					L"You'll need to find the installers in the Windows 8.1 or 10 SDKs. Exiting.").c_str());
+			}
 			exit(10);
 		}
 	}
 	wpaPath_ = wptDir_ + L"wpa.exe";
 	gpuViewPath_ = wptDir_ + L"gpuview\\gpuview.exe";
 	wpa10Path_ = wpt10Dir_ + L"wpa.exe";
-	wpaDefaultPath_ = wpaPath_;
-	if (PathFileExists(wpa10Path_.c_str()))
-		wpaDefaultPath_ = wpa10Path_;
 
 	// The Media Experience Analyzer is a 64-bit installer, so we look for it in
 	// ProgramFiles.
@@ -506,6 +523,13 @@ BOOL CUIforETWDlg::OnInitDialog()
 	SetTimer(0, 1000, nullptr);
 
 	return TRUE; // return TRUE unless you set the focus to a control
+}
+
+std::wstring CUIforETWDlg::wpaDefaultPath() const
+{
+	if (PathFileExists(wpa10Path_.c_str()))
+		return wpa10Path_;
+	return wpaPath_;
 }
 
 std::wstring CUIforETWDlg::GetDirectory(PCWSTR env, const std::wstring& default)
@@ -640,7 +664,7 @@ void CUIforETWDlg::OnSysCommand(UINT nID, LPARAM lParam)
 	}
 	else
 	{
-		CDialogEx::OnSysCommand(nID, lParam);
+		CDialog::OnSysCommand(nID, lParam);
 	}
 }
 
@@ -669,7 +693,7 @@ void CUIforETWDlg::OnPaint()
 	}
 	else
 	{
-		CDialogEx::OnPaint();
+		CDialog::OnPaint();
 	}
 }
 
@@ -831,7 +855,7 @@ void CUIforETWDlg::OnBnClickedStarttracing()
 	}
 
 	// Increase the user buffer sizes when doing graphics tracing or Chrome tracing.
-	const int numUserBuffers = BufferCountBoost(bGPUTracing_ ? 200 : 100) + BufferCountBoost(useChromeProviders_ ? 300 : 0);
+	const int numUserBuffers = BufferCountBoost(bGPUTracing_ ? 200 : 100) + BufferCountBoost(useChromeProviders_ ? 100 : 0);
 	std::wstring userBuffers = stringPrintf(L" -buffersize 1024 -minbuffers %d -maxbuffers %d", numUserBuffers, numUserBuffers);
 	std::wstring userFile = L" -f \"" + GetUserFile() + L"\"";
 	if (tracingMode_ == kTracingToMemory)
@@ -1016,7 +1040,7 @@ void CUIforETWDlg::StopTracingAndMaybeRecord(bool bSaveTrace)
 		PreprocessTrace(traceFilename);
 
 		if (bAutoViewTraces_)
-			LaunchTraceViewer(traceFilename, wpaDefaultPath_);
+			LaunchTraceViewer(traceFilename, wpaDefaultPath());
 		// Record the name so that it gets selected.
 		lastTraceFilename_ = CrackFilePart(traceFilename);
 
@@ -1282,7 +1306,7 @@ void CUIforETWDlg::OnLbnDblclkTracelist()
 	if (selIndex < 0 || selIndex >= (int)traces_.size())
 		return;
 	std::wstring tracename = GetTraceDir() + traces_[selIndex] + L".etl";
-	LaunchTraceViewer(tracename, wpaDefaultPath_);
+	LaunchTraceViewer(tracename, wpaDefaultPath());
 }
 
 void CUIforETWDlg::OnGetMinMaxInfo(MINMAXINFO* lpMMI)
@@ -1442,6 +1466,8 @@ void CUIforETWDlg::SetHeapTracing(bool forceOff)
 		CreateRegistryKey(HKEY_LOCAL_MACHINE, targetKey, tracingName);
 		targetKey += L"\\" + tracingName;
 		SetRegistryDWORD(HKEY_LOCAL_MACHINE, targetKey, L"TracingFlags", tracingFlags);
+		if (tracingFlags)
+			outputPrintf(L"\"TracingFlags\" in \"HKEY_LOCAL_MACHINE\\%s\" set to %lu.\n", targetKey.c_str(), tracingFlags);
 	}
 }
 
@@ -1470,7 +1496,7 @@ void CUIforETWDlg::OnCbnSelchangeTracingmode()
 
 void CUIforETWDlg::OnBnClickedSettings()
 {
-	CSettings dlgSettings(nullptr, GetExeDir(), GetWPTDir());
+	CSettings dlgSettings(nullptr, GetExeDir(), GetWPTDir(), wpt10Dir_);
 	dlgSettings.heapTracingExes_ = heapTracingExes_;
 	dlgSettings.WSMonitoredProcesses_ = WSMonitoredProcesses_;
 	dlgSettings.bExpensiveWSMonitoring_ = bExpensiveWSMonitoring_;
@@ -1584,6 +1610,7 @@ void CUIforETWDlg::OnContextMenu(CWnd* pWnd, CPoint point)
 				ID_TRACES_STRIPCHROMESYMBOLS,
 				ID_TRACES_IDENTIFYCHROMEPROCESSES,
 				ID_TRACES_TRACEPATHTOCLIPBOARD,
+				ID_SCRIPTS_CREATEFLAMEGRAPH,
 			};
 
 			for (const auto& id : disableList)
@@ -1646,6 +1673,9 @@ void CUIforETWDlg::OnContextMenu(CWnd* pWnd, CPoint point)
 				outputPrintf(L"\n");
 				IdentifyChromeProcesses(tracePath);
 				UpdateNotesState();
+				break;
+			case ID_SCRIPTS_CREATEFLAMEGRAPH:
+				CreateFlameGraph(tracePath);
 				break;
 			case ID_TRACES_TRACEPATHTOCLIPBOARD:
 				// Comma delimited for easy pasting into DOS commands.
@@ -1840,6 +1870,25 @@ void CUIforETWDlg::IdentifyChromeProcesses(const std::wstring& traceFilename)
 		std::wstring textFilename = StripExtensionFromPath(traceFilename) + L".txt";
 		std::wstring data = LoadFileAsText(textFilename) + output;
 		WriteTextAsFile(textFilename, data);
+	}
+	else
+	{
+		outputPrintf(L"Couldn't find python.\n");
+	}
+}
+
+
+void CUIforETWDlg::CreateFlameGraph(const std::wstring& traceFilename)
+{
+	outputPrintf(L"\nCreating CPU Usage (Sampled) flame graph of busiest process in %s "
+				 L"(requires python, perl and flamegraph.pl). UIforETW will hang while "
+				 L"this is calculated...\n", traceFilename.c_str());
+	std::wstring pythonPath = FindPython();
+	if (!pythonPath.empty())
+	{
+		ChildProcess child(pythonPath);
+		std::wstring args = L" -u \"" + GetExeDir() + L"xperf_to_collapsedstacks.py\" \"" + traceFilename + L"\"";
+		child.Run(bShowCommands_, GetFilePart(pythonPath) + args);
 	}
 	else
 	{

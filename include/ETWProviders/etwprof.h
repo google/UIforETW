@@ -24,7 +24,7 @@ limitations under the License.
 
 #ifndef ETWPROF_H
 #define ETWPROF_H
-#if defined( _MSC_VER )
+#if defined(_MSC_VER)
 #pragma once
 #endif
 
@@ -34,7 +34,9 @@ typedef long long int64;
 // ETW support should be compiled in for all Windows PC platforms. It isn't
 // supported on Windows XP but that is determined at run-time. This #define
 // is used to let the code compile (but do nothing) on other operating systems.
+#ifndef DISABLE_ETW_MARKS
 #define	ETW_MARKS_ENABLED
+#endif
 #endif
 
 // Flag to indicate that a mouse-down actually corresponds to a double-click.
@@ -65,8 +67,12 @@ PLATFORM_INTERFACE void __cdecl ETWWorkerMark(_In_z_ PCSTR pMessage);
 // Insert events with one or more generic int or float data fields
 PLATFORM_INTERFACE void __cdecl ETWMark1I(_In_z_ PCSTR pMessage, int data1);
 PLATFORM_INTERFACE void __cdecl ETWMark2I(_In_z_ PCSTR pMessage, int data1, int data2);
+PLATFORM_INTERFACE void __cdecl ETWMark3I(_In_z_ PCSTR pMessage, int data1, int data2, int data3);
+PLATFORM_INTERFACE void __cdecl ETWMark4I(_In_z_ PCSTR pMessage, int data1, int data2, int data3, int data4);
 PLATFORM_INTERFACE void __cdecl ETWMark1F(_In_z_ PCSTR pMessage, float data1);
 PLATFORM_INTERFACE void __cdecl ETWMark2F(_In_z_ PCSTR pMessage, float data1, float data2);
+PLATFORM_INTERFACE void __cdecl ETWMark3F(_In_z_ PCSTR pMessage, float data1, float data2, float data3);
+PLATFORM_INTERFACE void __cdecl ETWMark4F(_In_z_ PCSTR pMessage, float data1, float data2, float data3, float data4);
 
 // _Printf_format_string_ is used by /analyze
 PLATFORM_INTERFACE void __cdecl ETWMarkPrintf(_Printf_format_string_ _In_z_ PCSTR pMessage, ...);
@@ -80,6 +86,11 @@ PLATFORM_INTERFACE void __cdecl ETWMarkWorkingSet(_In_z_ PCWSTR pProcessName, _I
 // Record powerState (charging/discharging/AC), batteryPercentage (of total capacity) and
 // discharge rate from struct BATTERY_STATUS.
 PLATFORM_INTERFACE void __cdecl ETWMarkBatteryStatus(_In_z_ PCSTR powerState, float batteryPercentage, _In_z_ PCSTR rate);
+
+// Record CPU frequency data as measured occasionally by running code. This can
+// detect thermal throttling of all types on all processors, however the data is
+// slightly noisy.
+PLATFORM_INTERFACE void __cdecl ETWMarkCPUThrottling(float initialMHz, float measuredMHz, float promisedMHz, float percentage, _In_z_ PCWSTR status);
 
 // Record CPU/package frequency, power usage, and temperature. Currently Intel only.
 PLATFORM_INTERFACE void __cdecl ETWMarkCPUFrequency(_In_z_ PCWSTR MSRName, double frequencyMHz);
@@ -108,7 +119,7 @@ PLATFORM_INTERFACE void __cdecl ETWMouseDown(int nWhichButton, unsigned flags, i
 PLATFORM_INTERFACE void __cdecl ETWMouseUp(int nWhichButton, unsigned flags, int nX, int nY);
 PLATFORM_INTERFACE void __cdecl ETWMouseMove(unsigned flags, int nX, int nY);
 PLATFORM_INTERFACE void __cdecl ETWMouseWheel(unsigned flags, int zDelta, int nX, int nY);
-PLATFORM_INTERFACE void __cdecl ETWKeyDown(unsigned nChar, _In_opt_z_ const char* keyName, unsigned nRepCnt, unsigned flags);
+PLATFORM_INTERFACE void __cdecl ETWKeyDown(unsigned nChar, _In_opt_z_ PCSTR keyName, unsigned nRepCnt, unsigned flags);
 
 #ifdef __cplusplus
 } // end of extern "C"
@@ -118,19 +129,19 @@ PLATFORM_INTERFACE void __cdecl ETWKeyDown(unsigned nChar, _In_opt_z_ const char
 class CETWScope
 {
 public:
-	CETWScope( _In_z_ PCSTR pMessage )
-		: m_pMessage( pMessage )
+	CETWScope(_In_z_ PCSTR pMessage)
+		: m_pMessage(pMessage)
 	{
-		m_nStartTime = ETWBegin( pMessage );
+		m_nStartTime = ETWBegin(pMessage);
 	}
 	~CETWScope()
 	{
-		ETWEnd( m_pMessage, m_nStartTime );
+		ETWEnd(m_pMessage, m_nStartTime);
 	}
 private:
 	// disable copying.
-	CETWScope( const CETWScope& rhs ) = delete;
-	CETWScope& operator=( const CETWScope& rhs ) = delete;
+	CETWScope(const CETWScope& rhs) = delete;
+	CETWScope& operator=(const CETWScope& rhs) = delete;
 
 	_Field_z_ PCSTR m_pMessage;
 	int64 m_nStartTime;
@@ -141,33 +152,39 @@ private:
 
 // Portability macros to allow compiling on non-Windows platforms
 
-inline void ETWMark( const char* ) {}
-inline void ETWMarkW(_In_z_ wchar_t* pMessage) {}
-inline void ETWWorkerMark( const char* pMessage ) {}
-inline void ETWMark1I(const char* pMessage, int data1) {}
-inline void ETWMark2I(const char* pMessage, int data1, int data2) {}
-inline void ETWMark1F(const char* pMessage, float data1) {}
-inline void ETWMark2F(const char* pMessage, float data1, float data2) {}
-inline void ETWMarkPrintf( const char *pMessage, ... ) {}
-inline void ETWMarkWPrintf( const wchar_t *pMessage, ... ) {}
-inline void ETWWorkerMarkPrintf( const char* pMessage, ... ) {}
-inline void ETWMarkWorkingSet(const wchar_t* pProcessName, const wchar_t* pProcess, unsigned counter, unsigned privateWS, unsigned PSS, unsigned workingSet) {}
-inline void ETWMarkBatteryStatus(_In_z_ PCSTR powerState, float batteryPercentage, _In_z_ PCSTR rate) {}
-inline void ETWMarkCPUFrequency(_In_z_ PCSTR MSRName, double frequencyMHz) {}
-inline void ETWMarkCPUPower(_In_z_ PCSTR MSRName, double powerW, double energymWh) {}
-inline void ETWMarkCPUTemp(_In_z_ PCSTR MSRName, double tempC, double maxTempC) {}
-inline int64 ETWBegin( const char* ) { return 0; }
-inline int64 ETWWorkerBegin( const char* ) { return 0; }
-inline int64 ETWEnd( const char*, int64 ) { return 0; }
-inline int64 ETWWorkerEnd( const char*, int64 ) { return 0; }
+inline void ETWMark(PCSTR) {}
+inline void ETWMarkW(PCWSTR) {}
+inline void ETWWorkerMark(PCSTR) {}
+inline void ETWMark1I(PCSTR, int) {}
+inline void ETWMark2I(PCSTR, int, int) {}
+inline void ETWMark3I(PCSTR, int, int, int) {}
+inline void ETWMark4I(PCSTR, int, int, int, int) {}
+inline void ETWMark1F(PCSTR, float) {}
+inline void ETWMark2F(PCSTR, float, float) {}
+inline void ETWMark3F(PCSTR, float, float, float) {}
+inline void ETWMark4F(PCSTR, float, float, float, float) {}
+inline void ETWMarkPrintf(PCSTR, ...) {}
+inline void ETWMarkWPrintf(PCWSTR, ...) {}
+inline void ETWWorkerMarkPrintf(PCSTR, ...) {}
+inline void ETWMarkWorkingSet(PCWSTR, PCWSTR, unsigned, unsigned, unsigned, unsigned) {}
+inline void ETWMarkBatteryStatus(PCSTR, float, PCSTR) {}
+inline void ETWMarkCPUThrottling(float, float, float, float, PCWSTR) {}
+inline void ETWMarkCPUFrequency(PCWSTR, double) {}
+inline void ETWMarkCPUPower(PCWSTR, double, double) {}
+inline void ETWMarkCPUTemp(PCWSTR, double, double) {}
+inline void ETWMarkTimerInterval(double) {}
+inline int64 ETWBegin(PCSTR) { return 0; }
+inline int64 ETWWorkerBegin(PCSTR) { return 0; }
+inline int64 ETWEnd(PCSTR, int64) { return 0; }
+inline int64 ETWWorkerEnd(PCSTR, int64) { return 0; }
 inline void ETWRenderFrameMark() {}
 inline int ETWGetRenderFrameNumber() { return 0; }
 
-inline void ETWMouseDown( int nWhichButton, unsigned int flags, int nX, int nY ) {}
-inline void ETWMouseUp( int nWhichButton, unsigned int flags, int nX, int nY ) {}
-inline void ETWMouseMove( unsigned int flags, int nX, int nY ) {}
-inline void ETWMouseWheel( unsigned int flags, int zDelta, int nX, int nY ) {}
-inline void ETWKeyDown( unsigned nChar, const char* keyName, unsigned nRepCnt, unsigned flags ) {}
+inline void ETWMouseDown(int, unsigned int, int, int) {}
+inline void ETWMouseUp(int, unsigned int, int, int) {}
+inline void ETWMouseMove(unsigned int, int, int) {}
+inline void ETWMouseWheel(unsigned int, int, int, int) {}
+inline void ETWKeyDown(unsigned, PCSTR, unsigned, unsigned) {}
 
 #ifdef __cplusplus
 // This class calls the ETW Begin and End functions in order to insert a
@@ -175,13 +192,13 @@ inline void ETWKeyDown( unsigned nChar, const char* keyName, unsigned nRepCnt, u
 class CETWScope
 {
 public:
-	CETWScope( const char* )
+	CETWScope(PCSTR)
 	{
 	}
 private:
 	// disable copying.
-	CETWScope( const CETWScope& rhs ) = delete;
-	CETWScope& operator=( const CETWScope& rhs ) = delete;
+	CETWScope(const CETWScope& rhs) = delete;
+	CETWScope& operator=(const CETWScope& rhs) = delete;
 };
 #endif // __cplusplus
 

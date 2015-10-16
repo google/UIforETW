@@ -122,15 +122,14 @@ class QPCElapsedTimer final
 public:
 	QPCElapsedTimer()
 	{
-		ATLVERIFY(QueryPerformanceCounter(&start_));
+		QueryPerformanceCounter(&start_);
 	}
 	double ElapsedSeconds() const
 	{
-		LARGE_INTEGER stop = {};
-		ATLVERIFY(QueryPerformanceCounter(&stop));
-		LARGE_INTEGER frequency = {};
-		ATLVERIFY(QueryPerformanceFrequency(&frequency));
-
+		LARGE_INTEGER stop;
+		QueryPerformanceCounter(&stop);
+		LARGE_INTEGER frequency;
+		QueryPerformanceFrequency(&frequency);
 		return (stop.QuadPart - start_.QuadPart) / float(frequency.QuadPart);
 	}
 private:

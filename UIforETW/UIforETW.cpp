@@ -188,17 +188,6 @@ BOOL CUIforETWApp::InitInstance()
 
 	CWinApp::InitInstance();
 
-
-	AfxEnableControlContainer();
-
-	// Create the shell manager, in case the dialog contains
-	// any shell tree view or shell list view controls.
-	// Code mysteriously inserted by MFC.
-	auto pShellManager = std::make_unique<CShellManager>();
-
-	// Activate "Windows Native" visual manager for enabling themes in MFC controls
-	CMFCVisualManager::SetDefaultManager(RUNTIME_CLASS(CMFCVisualManagerWindows));
-
 	SetRegistryKey(L"RandomASCII");
 
 	HWND prevWindow = FindWindow(NULL, L"UI for ETW");
