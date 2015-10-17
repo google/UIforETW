@@ -137,9 +137,6 @@ void copyWPAProfileToLocalAppData(const std::wstring& exeDir, const bool force)
 	{
 
 		const BOOL makeDirResult = ::CreateDirectoryW(destDir.c_str(), NULL);
-		if (makeDirResult == 0)
-			debugLastError();
-
 		if (::CopyFileW(source.c_str(), dest.c_str(), FALSE))
 		{
 			if (force)
@@ -154,8 +151,7 @@ void copyWPAProfileToLocalAppData(const std::wstring& exeDir, const bool force)
 	}
 
 }
-
-}
+} //namespace {
 
 void outputLastError(const DWORD lastErr)
 {
@@ -227,7 +223,7 @@ std::vector<std::wstring> GetFileList(const std::wstring& pattern, const bool fu
 		const DWORD lastErr = ::GetLastError();
 		if (lastErr != ERROR_FILE_NOT_FOUND)
 		{
-			outputPrintf(L"failed to get file list for directory: `%s`\n", pattern.c_str());
+			debugPrintf(L"failed to get file list for directory: `%s`\n", pattern.c_str());
 			debugLastError(lastErr);
 		}
 		return result;
@@ -237,13 +233,7 @@ std::vector<std::wstring> GetFileList(const std::wstring& pattern, const bool fu
 		result.emplace_back(directory + findData.cFileName);
 	} while (::FindNextFileW(hFindFile, &findData));
 
-	const DWORD lastErr = ::GetLastError();
-	if (lastErr != ERROR_NO_MORE_FILES)
-	{
-		outputPrintf(L"FindNextFile (for directory: `%s`) failed in an unexpected manner.\n", pattern.c_str());
-		debugLastError(lastErr);
-	}
-
+	UIETWASSERT(::GetLastError() == ERROR_NO_MORE_FILES);
 	CloseFindHandle(hFindFile);
 	return result;
 }
@@ -355,13 +345,11 @@ void CreateRegistryKey(const HKEY root, const std::wstring& subkey, const std::w
 	const LONG createResult = ::RegCreateKeyW(key, newKey.c_str(), &resultKey);
 	if (createResult != ERROR_SUCCESS)
 	{
-		outputPrintf(L"Failed to create registry key `%s`.\n", newKey.c_str());
+		debugPrintf(L"Failed to create registry key `%s`.\n", newKey.c_str());
 		debugLastError();
 	}
 	else
-	{
 		CloseRegKey(resultKey);
-	}
 	CloseRegKey(key);
 }
 
