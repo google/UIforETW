@@ -40,13 +40,6 @@ std::wstring GetEditControlText(HWND hwnd);
 std::wstring AnsiToUnicode(const std::string& text);
 
 
-//MultiByteToWideChar: https://msdn.microsoft.com/en-us/library/windows/desktop/dd319072.aspx
-//
-//Remarks:
-//As mentioned in the caution above,
-//the output buffer can easily be overrun
-//if this function is not first called with cchWideChar set to 0
-//in order to obtain the required size. 
 int RequiredNumberOfWideChars(const std::string& text);
 
 // Return a string from a format string and some printf-style arguments.
@@ -133,7 +126,7 @@ public:
 		return (stop.QuadPart - start_.QuadPart) / float(frequency.QuadPart);
 	}
 private:
-	LARGE_INTEGER start_ = {};
+	LARGE_INTEGER start_;
 };
 
 std::wstring GetEXEBuildTime();
