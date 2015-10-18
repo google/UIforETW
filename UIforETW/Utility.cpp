@@ -29,40 +29,25 @@ void UnlockGlobalMemory(_In_ const HGLOBAL hmem)
 	const BOOL unlockRes = ::GlobalUnlock(hmem);
 	if (!unlockRes)
 	{
-		const DWORD lastErr = ::GetLastError();
-		if (lastErr != NO_ERROR)
-			std::terminate( );//Logic bug!
+		UIETWASSERT(::GetLastError() == NO_ERROR);
 	}
 }
 
-_Success_(return)
-bool OpenRegKey( _Out_ HKEY* const key, _In_ const HKEY root, PCWSTR const subkey )
+HKEY OpenRegKey( _In_ const HKEY root, PCWSTR const subkey )
 {
-	const LONG openResult = ::RegOpenKeyExW(root, subkey, 0, KEY_ALL_ACCESS, key);
-	if (openResult == ERROR_SUCCESS)
-		return true;
-	debugPrintf(L"Failed to open registry key `%s`.\n", subkey);
-	debugLastError();
-	return false;
+	HKEY key;
+	ATLVERIFY(::RegOpenKeyExW(root, subkey, 0, KEY_ALL_ACCESS, &key) == ERROR_SUCCESS);
+	return key;
 }
 
 void CloseRegKey(_In_ _Pre_valid_ _Post_ptr_invalid_ const HKEY key)
 {
-	const LONG closeKey = ::RegCloseKey(key);
-	if (closeKey == ERROR_SUCCESS)
-		return;
-	debugPrintf(L"Failed to close a registry key.\n");
-	debugLastError();
+	ATLVERIFY(::RegCloseKey(key) == ERROR_SUCCESS);
 }
 
 void CloseFindHandle(_In_ _Pre_valid_ _Post_ptr_invalid_ const HANDLE handle)
 {
-	const BOOL findClose = ::FindClose(handle);
-	if (findClose)
-		return;
-	debugPrintf(L"FindClose failed.\n");
-	debugLastError();
-	std::terminate();
+	ATLVERIFY(::FindClose(handle));
 }
 
 std::wstring GetDocumentsFolderPath()
@@ -100,9 +85,7 @@ void copyWPAProfileToDocuments(const bool force)
 	const BOOL destinationExists = ::PathFileExistsW(dest.c_str());
 	if (force || !destinationExists)
 	{
-		const BOOL makeDirResult = ::CreateDirectoryW(destDir.c_str(), NULL);
-		if (makeDirResult == 0)
-			debugLastError();
+		ATLVERIFY(::CreateDirectoryW(destDir.c_str(), NULL));
 
 		const BOOL copyResult = ::CopyFileW(source.c_str(), dest.c_str(), FALSE);
 		if (copyResult)
@@ -136,7 +119,8 @@ void copyWPAProfileToLocalAppData(const std::wstring& exeDir, const bool force)
 	if (force || !::PathFileExistsW(dest.c_str()))
 	{
 
-		const BOOL makeDirResult = ::CreateDirectoryW(destDir.c_str(), NULL);
+		ATLVERIFY(::CreateDirectoryW(destDir.c_str(), NULL));
+
 		if (::CopyFileW(source.c_str(), dest.c_str(), FALSE))
 		{
 			if (force)
@@ -220,12 +204,7 @@ std::vector<std::wstring> GetFileList(const std::wstring& pattern, const bool fu
 	{
 		//If there are NO matching files, then FindFirstFileExW returns
 		//INVALID_HANDLE_VALUE and the last error is ERROR_FILE_NOT_FOUND.
-		const DWORD lastErr = ::GetLastError();
-		if (lastErr != ERROR_FILE_NOT_FOUND)
-		{
-			debugPrintf(L"failed to get file list for directory: `%s`\n", pattern.c_str());
-			debugLastError(lastErr);
-		}
+		UIETWASSERT(::GetLastError() != ERROR_FILE_NOT_FOUND);
 		return result;
 	}
 	do
@@ -321,35 +300,22 @@ std::wstring ConvertToCRLF(const std::wstring& input)
 
 void SetRegistryDWORD(const HKEY root, const std::wstring& subkey, const std::wstring& valueName, const DWORD value)
 {
-	HKEY key;
-	if (!OpenRegKey(&key, root, subkey.c_str()))
-		return;
-
-	const LONG setResult = ::RegSetValueExW(key, valueName.c_str(), 0, REG_DWORD, reinterpret_cast<const BYTE*>(&value), sizeof(value));
-	if (setResult != ERROR_SUCCESS)
-	{
-		debugPrintf(L"Failed to set registry key `%s`.\n", subkey.c_str());
-		debugLastError();
-	}
+	HKEY key = OpenRegKey(root, subkey.c_str());
+	ATLVERIFY(ERROR_SUCCESS == ::RegSetValueExW(key, valueName.c_str(), 0, REG_DWORD, reinterpret_cast<const BYTE*>(&value), sizeof(value)));
 	CloseRegKey(key);
 }
 
 void CreateRegistryKey(const HKEY root, const std::wstring& subkey, const std::wstring& newKey)
 {
-	HKEY key;
-	if (!OpenRegKey(&key, root, subkey.c_str()))
-		return;
+	HKEY key = OpenRegKey(root, subkey.c_str());
 
 	HKEY resultKey;
 	//TODO: RegCreateKey is depreciated.
 	const LONG createResult = ::RegCreateKeyW(key, newKey.c_str(), &resultKey);
-	if (createResult != ERROR_SUCCESS)
-	{
-		debugPrintf(L"Failed to create registry key `%s`.\n", newKey.c_str());
-		debugLastError();
-	}
-	else
+	UIETWASSERT(createResult == ERROR_SUCCESS);
+	if (createResult == ERROR_SUCCESS)
 		CloseRegKey(resultKey);
+
 	CloseRegKey(key);
 }
 
@@ -421,7 +387,10 @@ std::wstring AnsiToUnicode(const std::string& text)
 	std::vector<wchar_t> buffer(multiCharCount);
 
 	// Convert to Unicode.
-	const int multiToWideResult = ::MultiByteToWideChar(CP_ACP, 0, text.c_str(), static_cast<int>(text.size() + 1), &buffer[0], multiCharCount);
+	const int multiToWideResult = ::MultiByteToWideChar(
+		CP_ACP, 0, text.c_str(), static_cast<int>(text.size() + 1),
+		&buffer[0], multiCharCount);
+
 	if (multiToWideResult == 0)
 	{
 		//No reasonable way for MultiByteToWideChar to fail.
@@ -512,6 +481,7 @@ void SmartEnableWindow(const HWND Win, const BOOL Enable)
 		for (HWND focuscopy = ::GetFocus(); focuscopy; focuscopy = ::GetParent(focuscopy))
 			if (focuscopy == Win)
 				FocusProblem = true;
+
 		if (FocusProblem)
 		{
 			HWND nextctrl = ::GetNextDlgItem(Win, true);
@@ -600,7 +570,7 @@ int DeleteFiles(const HWND hwnd, const std::vector<std::wstring>& paths)
 		FO_DELETE,
 		&fileNames[0],
 		NULL,
-		FOF_ALLOWUNDO | FOF_FILESONLY | FOF_NOCONFIRMATION,
+		(FOF_ALLOWUNDO | FOF_FILESONLY | FOF_NOCONFIRMATION),
 	};
 	// Delete using the recycle bin.
 	//TODO: IFileOperation?
@@ -867,14 +837,18 @@ void SetCurrentThreadName(PCSTR const threadName)
 	THREADNAME_INFO info = { 0x1000, threadName, dwThreadID, 0 };
 	__try
 	{
-		::RaiseException(MS_VC_EXCEPTION, 0, sizeof(info) / sizeof(ULONG_PTR), reinterpret_cast<ULONG_PTR*>(&info));
+		const DWORD numArguments = sizeof(info) / sizeof(ULONG_PTR);
+		static_assert(
+			numArguments <= EXCEPTION_MAXIMUM_PARAMETERS,
+			"This value must not exceed EXCEPTION_MAXIMUM_PARAMETERS.");
+
+		::RaiseException(MS_VC_EXCEPTION, 0, numArguments, reinterpret_cast<ULONG_PTR*>(&info));
 	}
 	__except (EXCEPTION_EXECUTE_HANDLER)
 	{
 	}
 }
 #pragma warning(pop)
-
 
 void CopyStartupProfiles(const std::wstring& exeDir, const bool force)
 {
@@ -885,13 +859,7 @@ void CopyStartupProfiles(const std::wstring& exeDir, const bool force)
 	copyWPAProfileToLocalAppData(exeDir, force);
 }
 
-
-
 void CloseValidHandle(_In_ _Pre_valid_ _Post_ptr_invalid_ const HANDLE handle)
 {
-	const BOOL handleClosed = ::CloseHandle(handle);
-	if (handleClosed == 0)
-		std::terminate();//Logic bug!
+	ATLVERIFY(::CloseHandle(handle) != 0);
 }
-
-
