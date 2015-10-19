@@ -22,7 +22,7 @@ limitations under the License.
 
 
 namespace {
-PCWSTR const WPAStartupFileName = L"\\Startup.wpaProfile";
+PCWSTR const kWPAStartupFileName = L"\\Startup.wpaProfile";
 
 void UnlockGlobalMemory(_In_ const HGLOBAL hmem)
 {
@@ -33,36 +33,18 @@ void UnlockGlobalMemory(_In_ const HGLOBAL hmem)
 	}
 }
 
-HKEY OpenRegKey( _In_ const HKEY root, PCWSTR const subkey )
-{
-	HKEY key;
-	ATLVERIFY(::RegOpenKeyExW(root, subkey, 0, KEY_ALL_ACCESS, &key) == ERROR_SUCCESS);
-	return key;
-}
-
-void CloseRegKey(_In_ _Pre_valid_ _Post_ptr_invalid_ const HKEY key)
-{
-	ATLVERIFY(::RegCloseKey(key) == ERROR_SUCCESS);
-}
-
-void CloseFindHandle(_In_ _Pre_valid_ _Post_ptr_invalid_ const HANDLE handle)
-{
-	ATLVERIFY(::FindClose(handle));
-}
-
 std::wstring GetDocumentsFolderPath()
 {
-	//must CoTaskMemFree when done!
-	PWSTR docsPathTemp = NULL;
-	const HRESULT docsPathResult = ::SHGetKnownFolderPath(FOLDERID_Documents, KF_FLAG_NO_ALIAS, NULL, &docsPathTemp);
+	ATL::CComHeapPtr<_Null_terminated_ wchar_t> docsPathTemp;
+	const HRESULT docsPathResult =
+		::SHGetKnownFolderPath(
+		FOLDERID_Documents, KF_FLAG_NO_ALIAS, NULL, &docsPathTemp.m_pData);
 	if (FAILED(docsPathResult))
 	{
 		debugPrintf(L"SHGetKnownFolderPath (for Documents) failed to retrieve the path.\n");
 		std::terminate();
 	}
-	std::wstring docsPath(docsPathTemp);
-	CoTaskMemFree(docsPathTemp);
-	return docsPath;
+	return docsPathTemp.m_pData;
 }
 
 void copyWPAProfileToDocuments(const bool force)
@@ -79,14 +61,13 @@ void copyWPAProfileToDocuments(const bool force)
 		return;
 	}
 
-	const std::wstring source = docsPath + WPAStartupFileName;
+	const std::wstring source = docsPath + kWPAStartupFileName;
 	const std::wstring destDir = docsPath + std::wstring(L"\\WPA Files");
-	const std::wstring dest = destDir + WPAStartupFileName;
+	const std::wstring dest = destDir + kWPAStartupFileName;
 	const BOOL destinationExists = ::PathFileExistsW(dest.c_str());
 	if (force || !destinationExists)
 	{
 		ATLVERIFY(::CreateDirectoryW(destDir.c_str(), NULL));
-
 		const BOOL copyResult = ::CopyFileW(source.c_str(), dest.c_str(), FALSE);
 		if (copyResult)
 		{
@@ -115,7 +96,7 @@ void copyWPAProfileToLocalAppData(const std::wstring& exeDir, const bool force)
 	}
 	std::wstring source = exeDir + L"\\startup10.wpaProfile";
 	std::wstring destDir = std::wstring(localAppData) + L"\\Windows Performance Analyzer";
-	std::wstring dest = destDir + WPAStartupFileName;
+	std::wstring dest = destDir + kWPAStartupFileName;
 	if (force || !::PathFileExistsW(dest.c_str()))
 	{
 
@@ -213,7 +194,7 @@ std::vector<std::wstring> GetFileList(const std::wstring& pattern, const bool fu
 	} while (::FindNextFileW(hFindFile, &findData));
 
 	UIETWASSERT(::GetLastError() == ERROR_NO_MORE_FILES);
-	CloseFindHandle(hFindFile);
+	ATLVERIFY(::FindClose(hFindFile));
 	return result;
 }
 
@@ -300,23 +281,27 @@ std::wstring ConvertToCRLF(const std::wstring& input)
 
 void SetRegistryDWORD(const HKEY root, const std::wstring& subkey, const std::wstring& valueName, const DWORD value)
 {
-	HKEY key = OpenRegKey(root, subkey.c_str());
+	HKEY key;
+	ATLVERIFY(::RegOpenKeyExW(root, subkey.c_str(), 0, KEY_ALL_ACCESS, &key) == ERROR_SUCCESS);
 	ATLVERIFY(ERROR_SUCCESS == ::RegSetValueExW(key, valueName.c_str(), 0, REG_DWORD, reinterpret_cast<const BYTE*>(&value), sizeof(value)));
-	CloseRegKey(key);
+	ATLVERIFY(::RegCloseKey(key) == ERROR_SUCCESS);
 }
 
 void CreateRegistryKey(const HKEY root, const std::wstring& subkey, const std::wstring& newKey)
 {
-	HKEY key = OpenRegKey(root, subkey.c_str());
+	HKEY key;
+	ATLVERIFY(::RegOpenKeyExW(root, subkey.c_str(), 0, KEY_ALL_ACCESS, &key) == ERROR_SUCCESS);
 
 	HKEY resultKey;
 	//TODO: RegCreateKey is depreciated.
 	const LONG createResult = ::RegCreateKeyW(key, newKey.c_str(), &resultKey);
 	UIETWASSERT(createResult == ERROR_SUCCESS);
 	if (createResult == ERROR_SUCCESS)
-		CloseRegKey(resultKey);
+	{
+		ATLVERIFY(::RegCloseKey(resultKey) == ERROR_SUCCESS);
+	}
 
-	CloseRegKey(key);
+	ATLVERIFY(::RegCloseKey(key) == ERROR_SUCCESS);
 }
 
 std::wstring GetEditControlText(const HWND hEdit)
@@ -370,6 +355,7 @@ int RequiredNumberOfWideChars(const std::string& text)
 		debugLastError( );
 		std::terminate( );
 	}
+	UIETWASSERT(multiCharCount > 0);
 	return multiCharCount;
 }
 
@@ -402,7 +388,7 @@ std::wstring AnsiToUnicode(const std::string& text)
 	UIETWASSERT(buffer[multiToWideResult - 1] == 0);
 
 	// Double-verify that the buffer is null-terminated.
-	buffer[buffer.size() - 1] = 0;
+	buffer.at(buffer.size() - 1) = 0;
 	std::wstring result = &buffer[0];
 	return result;
 }
@@ -445,7 +431,7 @@ static bool ControlOK(const HWND win)
 	// You have to check for visibility of the parent window because during dialog
 	// creation the parent window is invisible, which renders the child windows
 	// all invisible - not good.
-	HWND parent = ::GetParent(win);
+	const HWND parent = ::GetParent(win);
 	UIETWASSERT(parent);
 	if (!::IsWindowVisible(win) && ::IsWindowVisible(parent))
 		return false;
@@ -455,7 +441,7 @@ static bool ControlOK(const HWND win)
 static HWND GetNextDlgItem(const HWND win, const bool Wrap)
 {
 	HWND next = ::GetWindow(win, GW_HWNDNEXT);
-	while (next != win && !::ControlOK(next))
+	while ((next != win) && (!::ControlOK(next)))
 	{
 		if (next)
 			next = ::GetWindow(next, GW_HWNDNEXT);
@@ -479,8 +465,10 @@ void SmartEnableWindow(const HWND Win, const BOOL Enable)
 	{
 		bool FocusProblem = false;
 		for (HWND focuscopy = ::GetFocus(); focuscopy; focuscopy = ::GetParent(focuscopy))
+		{
 			if (focuscopy == Win)
 				FocusProblem = true;
+		}
 
 		if (FocusProblem)
 		{
@@ -574,9 +562,7 @@ int DeleteFiles(const HWND hwnd, const std::vector<std::wstring>& paths)
 	};
 	// Delete using the recycle bin.
 	//TODO: IFileOperation?
-	const int result = ::SHFileOperationW(&fileOp);
-
-	return result;
+	return ::SHFileOperationW(&fileOp);
 }
 
 void SetClipboardText(const std::wstring& text)
@@ -584,7 +570,6 @@ void SetClipboardText(const std::wstring& text)
 	ATLVERIFY(::OpenClipboard(::GetDesktopWindow()));
 	ATLVERIFY(::EmptyClipboard());
 
-	
 	const size_t length = (text.size() + 1) * sizeof(text[0]);
 	HANDLE hmem = ::GlobalAlloc(GMEM_MOVEABLE, length);
 	if (!hmem)
@@ -594,17 +579,11 @@ void SetClipboardText(const std::wstring& text)
 	}
 
 	void* const ptr = ::GlobalLock(hmem);
-	if (ptr == NULL)
-	{
-		ATLVERIFY(!::GlobalFree(hmem));
-		ATLVERIFY(::CloseClipboard());
-		return;
-	}
+	UIETWASSERT(ptr != NULL);
 
 	wcscpy_s(static_cast<wchar_t*>(ptr), (text.size() + 1), text.c_str());
 
 	UnlockGlobalMemory(hmem);
-
 	if (::SetClipboardData(CF_UNICODETEXT, hmem) == NULL)
 	{
 		ATLVERIFY(!::GlobalFree(hmem));
@@ -617,19 +596,13 @@ void SetClipboardText(const std::wstring& text)
 std::wstring GetClipboardText()
 {
 	ATLVERIFY(::OpenClipboard(::GetDesktopWindow()));
-
 	std::wstring result;
 
 	HANDLE hClip = ::GetClipboardData(CF_UNICODETEXT);
 	UIETWASSERT(hClip);
 
 	void* const ptr = ::GlobalLock(hClip);
-	if (ptr == NULL)
-	{
-		ATLVERIFY(::CloseClipboard());
-		return result;
-	}
-
+	UIETWASSERT(ptr != NULL);
 	const size_t bytes = ::GlobalSize(hClip);
 	if (bytes == 0)
 	{
@@ -637,10 +610,8 @@ std::wstring GetClipboardText()
 		ATLVERIFY(::CloseClipboard());
 		return result;
 	}
-
 	PCWSTR const text = static_cast<PCWSTR>(ptr);
-	result.insert(result.begin(), text, text + bytes / sizeof(wchar_t));
-
+	result.insert(result.begin(), text, text + (bytes / sizeof(text[0])));
 	UnlockGlobalMemory(hClip);
 	ATLVERIFY(::CloseClipboard());
 	return result;
@@ -652,6 +623,7 @@ int64_t GetFileSize(const std::wstring& path)
 	HANDLE hFile = ::CreateFileW(path.c_str(), GENERIC_READ,
 		(FILE_SHARE_READ | FILE_SHARE_WRITE), NULL, OPEN_EXISTING,
 		FILE_ATTRIBUTE_NORMAL, NULL);
+
 	if (hFile == INVALID_HANDLE_VALUE)
 	{
 		debugPrintf(L"Failed to get file size!\n");
@@ -735,7 +707,6 @@ std::wstring FindPython()
 	//See the issue: https://github.com/google/UIforETW/issues/13
 	if ( !pytwoseven.empty() )
 		return pytwoseven;
-
 	const std::wstring path = GetEnvironmentVariableString(L"path");
 	if (path.empty())
 	{
@@ -764,6 +735,9 @@ std::wstring GetBuildTimeFromAddress(_In_ const void* const codeAddress)
 	// Get the base of the address reservation. This lets this
 	// function be passed any function or global variable address
 	// in a DLL or EXE.
+
+	//https://msdn.microsoft.com/en-us/library/windows/desktop/aa366902.aspx
+	//If the function fails, the return value is zero.
 	MEMORY_BASIC_INFORMATION memoryInfo = {0};
 	if (::VirtualQuery(codeAddress, &memoryInfo, sizeof(memoryInfo)) != sizeof(memoryInfo))
 	{
@@ -834,7 +808,7 @@ typedef struct tagTHREADNAME_INFO
 void SetCurrentThreadName(PCSTR const threadName)
 {
 	const DWORD dwThreadID = ::GetCurrentThreadId();
-	THREADNAME_INFO info = { 0x1000, threadName, dwThreadID, 0 };
+	const THREADNAME_INFO info = { 0x1000, threadName, dwThreadID, 0 };
 	__try
 	{
 		const DWORD numArguments = sizeof(info) / sizeof(ULONG_PTR);
@@ -842,7 +816,7 @@ void SetCurrentThreadName(PCSTR const threadName)
 			numArguments <= EXCEPTION_MAXIMUM_PARAMETERS,
 			"This value must not exceed EXCEPTION_MAXIMUM_PARAMETERS.");
 
-		::RaiseException(MS_VC_EXCEPTION, 0, numArguments, reinterpret_cast<ULONG_PTR*>(&info));
+		::RaiseException(MS_VC_EXCEPTION, 0, numArguments, reinterpret_cast<const ULONG_PTR*>(&info));
 	}
 	__except (EXCEPTION_EXECUTE_HANDLER)
 	{

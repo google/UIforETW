@@ -39,7 +39,6 @@ void CreateRegistryKey(HKEY root, const std::wstring& subkey, const std::wstring
 std::wstring GetEditControlText(HWND hwnd);
 std::wstring AnsiToUnicode(const std::string& text);
 
-
 int RequiredNumberOfWideChars(const std::string& text);
 
 // Return a string from a format string and some printf-style arguments.
