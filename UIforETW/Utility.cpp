@@ -185,7 +185,7 @@ std::vector<std::wstring> GetFileList(const std::wstring& pattern, const bool fu
 	{
 		//If there are NO matching files, then FindFirstFileExW returns
 		//INVALID_HANDLE_VALUE and the last error is ERROR_FILE_NOT_FOUND.
-		UIETWASSERT(::GetLastError() != ERROR_FILE_NOT_FOUND);
+		UIETWASSERT(::GetLastError() == ERROR_FILE_NOT_FOUND);
 		return result;
 	}
 	do
