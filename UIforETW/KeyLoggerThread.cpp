@@ -78,6 +78,18 @@ LRESULT CALLBACK LowLevelKeyboardHook(int nCode, WPARAM wParam, LPARAM lParam)
 			case VK_RETURN:
 				pLabel = "enter";
 				break;
+			case VK_PRIOR:
+				pLabel = "page up";
+				break;
+			case VK_NEXT:
+				pLabel = "page down";
+				break;
+			case VK_END:
+				pLabel = "end";
+				break;
+			case VK_HOME:
+				pLabel = "home";
+				break;
 			case VK_LEFT:
 				pLabel = "left";
 				break;
@@ -89,6 +101,12 @@ LRESULT CALLBACK LowLevelKeyboardHook(int nCode, WPARAM wParam, LPARAM lParam)
 				break;
 			case VK_DOWN:
 				pLabel = "down";
+				break;
+			case VK_DELETE:
+				pLabel = "delete";
+				break;
+			case VK_INSERT:
+				pLabel = "insert";
 				break;
 			case VK_SHIFT:
 			case VK_LSHIFT:
