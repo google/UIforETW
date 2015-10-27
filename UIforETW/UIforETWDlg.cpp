@@ -219,7 +219,7 @@ void CUIforETWDlg::SetSymbolPath()
 {
 	// Make sure that the symbol paths are set.
 
-	if (bManageSymbolPath_ || GetEnvironmentVariableString("_NT_SYMBOL_PATH").empty())
+	if (bManageSymbolPath_ || GetEnvironmentVariableString(L"_NT_SYMBOL_PATH").empty())
 	{
 		bManageSymbolPath_ = true;
 		std::string symbolPath = "SRV*" + systemDrive_ + "symbols*https://msdl.microsoft.com/download/symbols";
@@ -230,7 +230,7 @@ void CUIforETWDlg::SetSymbolPath()
 			L"Set _NT_SYMBOL_PATH yourself or toggle 'Chrome developer' if you want different defaults.\n",
 			AnsiToUnicode(symbolPath).c_str(), bChromeDeveloper_ ? L" plus Chrome" : L"");
 	}
-	const std::string symCachePath = GetEnvironmentVariableString("_NT_SYMCACHE_PATH");
+	const std::wstring symCachePath = GetEnvironmentVariableString(L"_NT_SYMCACHE_PATH");
 	if (symCachePath.empty())
 		(void)_putenv(("_NT_SYMCACHE_PATH=" + systemDrive_ + "symcache").c_str());
 }

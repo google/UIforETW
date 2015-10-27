@@ -39,13 +39,11 @@ void CreateRegistryKey(HKEY root, const std::wstring& subkey, const std::wstring
 std::wstring GetEditControlText(HWND hwnd);
 std::wstring AnsiToUnicode(const std::string& text);
 
-int RequiredNumberOfWideChars(const std::string& text);
-
 // Return a string from a format string and some printf-style arguments.
 // Maximum output size is 4 K - larger outputs will be truncated.
-std::wstring stringPrintf(_Printf_format_string_ PCWSTR const pFormat, ...);
+std::wstring stringPrintf(_Printf_format_string_ PCWSTR pFormat, ...);
 // Call OutputDebugString with a format string and some printf-style arguments.
-void debugPrintf(_Printf_format_string_ PCWSTR const pFormat, ...);
+void debugPrintf(_Printf_format_string_ PCWSTR pFormat, ...);
 void outputLastError(DWORD lastErr = ::GetLastError());
 void debugLastError(DWORD lastErr = ::GetLastError());
 

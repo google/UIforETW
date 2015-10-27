@@ -36,6 +36,9 @@ Pull requests are welcomed. For information on contributing see the
 CONTRIBUTING file. When writing commit messages try following the
 general guidelines from here:
 http://chris.beams.io/posts/git-commit/
+Small pull requests are preferred - it's better to do several small
+pull requests, each with a unifying theme - than to do one huge pull
+request.
 
 This is not an official Google project and is not supported by Google
 in any way.
