@@ -39,11 +39,15 @@ void CreateRegistryKey(HKEY root, const std::wstring& subkey, const std::wstring
 std::wstring GetEditControlText(HWND hwnd);
 std::wstring AnsiToUnicode(const std::string& text);
 
+int RequiredNumberOfWideChars(const std::string& text);
+
 // Return a string from a format string and some printf-style arguments.
 // Maximum output size is 4 K - larger outputs will be truncated.
-std::wstring stringPrintf(_Printf_format_string_ const wchar_t* pFormat, ...);
+std::wstring stringPrintf(_Printf_format_string_ PCWSTR const pFormat, ...);
 // Call OutputDebugString with a format string and some printf-style arguments.
-void debugPrintf(_Printf_format_string_ const wchar_t* pFormat, ...);
+void debugPrintf(_Printf_format_string_ PCWSTR const pFormat, ...);
+void outputLastError(DWORD lastErr = ::GetLastError());
+void debugLastError(DWORD lastErr = ::GetLastError());
 
 // This function checks to see whether a control has focus before
 // disabling it. If it does have focus then it moves the focus, to
@@ -76,30 +80,27 @@ int64_t GetFileSize(const std::wstring& path);
 void SetClipboardText(const std::wstring& text);
 std::wstring GetClipboardText();
 
-enum WindowsVersion
-{
-	kWindowsVersionXP,
-	kWindowsVersionVista,
-	kWindowsVersion7,
-	kWindowsVersion8,
-	kWindowsVersion8_1,
-	kWindowsVersion10,
-};
+std::wstring GetEnvironmentVariableString(_In_z_ PCWSTR variable);
+std::string GetEnvironmentVariableString(_In_z_ PCSTR variable);
 
 bool Is64BitWindows();
 bool Is64BitBuild();
-WindowsVersion GetWindowsVersion();
+bool IsWindowsTenOrGreater();
+bool IsWindowsXPOrLesser();
+bool IsWindowsSevenOrLesser();
+bool IsWindowsVistaOrLesser();
 
 std::wstring FindPython(); // Returns a full path to python.exe or nothing.
 
 // Helpful timer class using trendy C++ 11 features.
-class ElapsedTimer
+class ElapsedTimer final
 {
 public:
 	double ElapsedSeconds() const
 	{
-		auto duration = std::chrono::steady_clock::now() - start_;
-		auto microseconds = std::chrono::duration_cast<std::chrono::microseconds>(duration);
+		const auto duration = std::chrono::steady_clock::now() - start_;
+		const auto microseconds =
+			std::chrono::duration_cast<std::chrono::microseconds>(duration);
 		return microseconds.count() / 1e6;
 	}
 private:
@@ -108,7 +109,7 @@ private:
 
 // High-precision timer class using QueryPerformanceCounter.
 // This may make ElapsedTimer unnecessary.
-class QPCElapsedTimer
+class QPCElapsedTimer final
 {
 public:
 	QPCElapsedTimer()
@@ -121,7 +122,6 @@ public:
 		QueryPerformanceCounter(&stop);
 		LARGE_INTEGER frequency;
 		QueryPerformanceFrequency(&frequency);
-
 		return (stop.QuadPart - start_.QuadPart) / float(frequency.QuadPart);
 	}
 private:
@@ -134,4 +134,5 @@ void SetCurrentThreadName(PCSTR threadName);
 
 void CopyStartupProfiles(const std::wstring& exeDir, bool force);
 
-void CloseValidHandle( _Pre_valid_ _Post_ptr_invalid_ HANDLE handle );
+void CloseValidHandle(_In_ _Pre_valid_ _Post_ptr_invalid_ HANDLE handle);
+
