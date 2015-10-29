@@ -1,0 +1,41 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.31101.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "base", "base\base.vcxproj", "{637388CA-E6E9-4D38-8DC9-CC2FE937DE24}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "etw_reader", "etw_reader\etw_reader.vcxproj", "{E1FCFE0C-B8CB-4516-9F46-54C1F73A9601}"
+	ProjectSection(ProjectDependencies) = postProject
+		{637388CA-E6E9-4D38-8DC9-CC2FE937DE24} = {637388CA-E6E9-4D38-8DC9-CC2FE937DE24}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "flame_graph", "flame_graph\flame_graph.vcxproj", "{EE253535-588A-4ABC-A65E-8DE45E240D7F}"
+	ProjectSection(ProjectDependencies) = postProject
+		{E1FCFE0C-B8CB-4516-9F46-54C1F73A9601} = {E1FCFE0C-B8CB-4516-9F46-54C1F73A9601}
+		{637388CA-E6E9-4D38-8DC9-CC2FE937DE24} = {637388CA-E6E9-4D38-8DC9-CC2FE937DE24}
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{637388CA-E6E9-4D38-8DC9-CC2FE937DE24}.Debug|Win32.ActiveCfg = Debug|Win32
+		{637388CA-E6E9-4D38-8DC9-CC2FE937DE24}.Debug|Win32.Build.0 = Debug|Win32
+		{637388CA-E6E9-4D38-8DC9-CC2FE937DE24}.Release|Win32.ActiveCfg = Release|Win32
+		{637388CA-E6E9-4D38-8DC9-CC2FE937DE24}.Release|Win32.Build.0 = Release|Win32
+		{E1FCFE0C-B8CB-4516-9F46-54C1F73A9601}.Debug|Win32.ActiveCfg = Debug|Win32
+		{E1FCFE0C-B8CB-4516-9F46-54C1F73A9601}.Debug|Win32.Build.0 = Debug|Win32
+		{E1FCFE0C-B8CB-4516-9F46-54C1F73A9601}.Release|Win32.ActiveCfg = Release|Win32
+		{E1FCFE0C-B8CB-4516-9F46-54C1F73A9601}.Release|Win32.Build.0 = Release|Win32
+		{EE253535-588A-4ABC-A65E-8DE45E240D7F}.Debug|Win32.ActiveCfg = Debug|Win32
+		{EE253535-588A-4ABC-A65E-8DE45E240D7F}.Debug|Win32.Build.0 = Debug|Win32
+		{EE253535-588A-4ABC-A65E-8DE45E240D7F}.Release|Win32.ActiveCfg = Release|Win32
+		{EE253535-588A-4ABC-A65E-8DE45E240D7F}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
