@@ -39,6 +39,11 @@ class CommandLine {
   //    value was specified for the switch in the command line.
   std::wstring GetSwitchValue(const std::wstring& switch_name) const;
 
+  // @returns the number of command-line switches.
+  size_t GetNumSwitches() const {
+    return switches_.size();
+  }
+
  private:
   // Map Switch Name -> Switch Value.
   std::unordered_map<std::wstring, std::wstring> switches_;

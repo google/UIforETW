@@ -5,15 +5,15 @@
 flame_graph is a command-line tool to generate a
 [flame graph](http://www.brendangregg.com/flamegraphs.html) from an ETW trace.
 
-Usage: `flame_graph.exe --trace trace_file_path [options]`
+Usage: `flame_graph.exe --trace <trace_file_path> [options]`
 
 Options:
 
-- `--process_name`: Only show stacks from processes with the specified name.
-- `--tid`: Only show stacks from the specified thread.
-- `--start_ts`: Only show stacks that occurred after the specified timestamp.
-- `--end_ts`: Only show stacks that occurred before the specified timestamp.
-- `--out`: Output file path. Default: flamegraph.txt
+- `--process_name`: Only include stacks from processes with the specified name.
+- `--tid`: Only include stacks from the specified thread.
+- `--start_ts`: Only include stacks that occurred after the specified timestamp.
+- `--end_ts`: Only include stacks that occurred before the specified timestamp.
+- `--out`: Output file path. Default: <trace_file_path>.flamegraph.txt
 
 Timestamps are a number of microseconds elapsed since the beginning of the
 trace.
