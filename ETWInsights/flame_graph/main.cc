@@ -36,15 +36,42 @@ namespace {
 // Suffix for a flame graph file name.
 const wchar_t kFlameGraphFileNameSuffix[] = L".flamegraph.txt";
 
+void ShowUsage() {
+  std::cout
+      << "Usage: flame_graph.exe --trace <trace_file_path> [options]"
+      << std::endl
+      << std::endl
+      << "Options:" << std::endl
+      << "  --process_name: Only include stacks from processes with the "
+         "specified name."
+      << std::endl
+      << "  --tid: Only include stacks from the specified thread." << std::endl
+      << "  --start_ts: Only include stacks that occurred after the specified "
+         "timestamp."
+      << std::endl
+      << "  --end_ts: Only include stacks that occurred before the specified "
+         "timestamp."
+      << std::endl
+      << "  --out: Output file path. Default: <trace_file_path>.flamegraph.txt"
+      << std::endl;
+}
+
 }  // namespace
 
 int wmain(int argc, wchar_t* argv[], wchar_t* /*envp */ []) {
   // Read command line arguments.
   base::CommandLine command_line(argc, argv);
 
+  if (command_line.GetNumSwitches() == 0) {
+    ShowUsage();
+    return 1;
+  }
+
   std::wstring trace_path = command_line.GetSwitchValue(L"trace");
   if (trace_path.empty()) {
-    std::cout << "Please specify a trace path (--trace)." << std::endl;
+    std::cout << "Please specify a trace path (--trace)." << std::endl
+              << std::endl;
+    ShowUsage();
     return 1;
   }
 
@@ -52,7 +79,8 @@ int wmain(int argc, wchar_t* argv[], wchar_t* /*envp */ []) {
   uint64_t thread_id_filter = base::kInvalidTid;
   if (!thread_id_filter_str.empty() &&
       !base::StrToULong(thread_id_filter_str, &thread_id_filter)) {
-    std::cout << "Thread id must be numeric (--tid)." << std::endl;
+    std::cout << "Thread id must be numeric (--tid)." << std::endl << std::endl;
+    ShowUsage();
     return 1;
   }
 
@@ -115,7 +143,7 @@ int wmain(int argc, wchar_t* argv[], wchar_t* /*envp */ []) {
 
   // Tell the user that the flame graph was generated.
   LOG(INFO) << "Wrote flame graph data in file "
-      << base::WStringToString(output_path);
+            << base::WStringToString(output_path);
 
   return 0;
 }
