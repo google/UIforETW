@@ -825,3 +825,9 @@ void CloseValidHandle(_In_ _Pre_valid_ _Post_ptr_invalid_ const HANDLE handle)
 {
 	ATLVERIFY(::CloseHandle(handle) != 0);
 }
+
+// Test function to see if /analyze is working.
+void IntentionalError(int x, void* p)
+{
+	outputPrintf(L"%f %d\n", x, p);
+}

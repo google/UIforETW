@@ -328,7 +328,7 @@ BOOL CUIforETWDlg::OnInitDialog()
 					}
 					else
 					{
-						outputPrintf(L"Failure code %d while installing WPT 8.1.\n", reinterpret_cast<int>(installResult81));
+						outputPrintf(L"Failure code %zu while installing WPT 8.1.\n", reinterpret_cast<size_t>(installResult81));
 					}
 				}
 			}
@@ -346,7 +346,7 @@ BOOL CUIforETWDlg::OnInitDialog()
 				}
 				else
 				{
-					outputPrintf(L"Failure code %d while installing WPT 10.\n", reinterpret_cast<int>(installResult10));
+					outputPrintf(L"Failure code %zu while installing WPT 10.\n", reinterpret_cast<size_t>(installResult10));
 				}
 			}
 		}
