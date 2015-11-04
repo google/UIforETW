@@ -177,13 +177,16 @@ std::vector<std::wstring> GetFileList(const std::wstring& pattern, const bool fu
 	WIN32_FIND_DATA findData;
 	HANDLE hFindFile = ::FindFirstFileExW(pattern.c_str(), FindExInfoBasic,
 				&findData, FindExSearchNameMatch, NULL, 0);
+	// Call GetLastError() here because on VC++ 2015 debug builds the memory
+	// allocations in the result constructor zero the last error value.
+	DWORD lastError = ::GetLastError();
 
 	std::vector<std::wstring> result;
 	if (hFindFile == INVALID_HANDLE_VALUE)
 	{
 		// If there are NO matching files, then FindFirstFileExW returns
 		// INVALID_HANDLE_VALUE and the last error is ERROR_FILE_NOT_FOUND.
-		UIETWASSERT(::GetLastError() == ERROR_FILE_NOT_FOUND);
+		UIETWASSERT(lastError == ERROR_FILE_NOT_FOUND);
 		return result;
 	}
 	do
