@@ -22,7 +22,8 @@ limitations under the License.
 
 
 namespace {
-PCWSTR const kWPAStartupFileName = L"\\Startup.wpaProfile";
+PCWSTR const kWPAStartupFileName = L"Startup.wpaProfile";
+PCWSTR const kChromeRegionsFileName = L"chrome_regions_of_interest.xml";
 
 void UnlockGlobalMemory(_In_ const HGLOBAL hmem)
 {
@@ -47,37 +48,34 @@ std::wstring GetDocumentsFolderPath()
 	return docsPathTemp.m_pData;
 }
 
-void copyWPAProfileToDocuments(const bool force)
+void copyFileToDocumentsWPA(PCWSTR const fileName, const std::wstring& exeDir, const bool force)
 {
 	// First copy the WPA 8.1 startup.wpaProfile file
 	std::wstring docsPath(GetDocumentsFolderPath());
 
-	if (force)
-		outputPrintf(L"\n");
-
 	if (docsPath.empty())
 	{
-		outputPrintf(L"Failed to copy WPA profile to documents. See debugger output for details.\n");
+		outputPrintf(L"Failed to copy %s to documents. See debugger output for details.\n", fileName);
 		return;
 	}
 
-	const std::wstring source = docsPath + kWPAStartupFileName;
+	const std::wstring source = exeDir + L"\\" + fileName;
 	const std::wstring destDir = docsPath + std::wstring(L"\\WPA Files");
-	const std::wstring dest = destDir + kWPAStartupFileName;
+	const std::wstring dest = destDir + L"\\" + fileName;
 	const BOOL destinationExists = ::PathFileExistsW(dest.c_str());
 	if (force || !destinationExists)
 	{
-		ATLVERIFY(::CreateDirectoryW(destDir.c_str(), NULL));
+		ATLVERIFY(::CreateDirectoryW(destDir.c_str(), NULL) || ::GetLastError() == ERROR_ALREADY_EXISTS);
 		const BOOL copyResult = ::CopyFileW(source.c_str(), dest.c_str(), FALSE);
 		if (copyResult)
 		{
 			if (force)
-				outputPrintf(L"Copied Startup.wpaProfile to the WPA Files directory.\n");
+				outputPrintf(L"Copied %s to the WPA Files directory.\n", fileName);
 			return;
 		}
 		if (force)
 		{
-			outputPrintf(L"Failed to copy Startup.wpaProfile to the WPA Files directory.\n");
+			outputPrintf(L"Failed to copy %s to the WPA Files directory.\n", fileName);
 			outputLastError();
 			return;
 		}
@@ -100,7 +98,7 @@ void copyWPAProfileToLocalAppData(const std::wstring& exeDir, const bool force)
 	if (force || !::PathFileExistsW(dest.c_str()))
 	{
 
-		ATLVERIFY(::CreateDirectoryW(destDir.c_str(), NULL));
+		ATLVERIFY(::CreateDirectoryW(destDir.c_str(), NULL) || ::GetLastError() == ERROR_ALREADY_EXISTS);
 
 		if (::CopyFileW(source.c_str(), dest.c_str(), FALSE))
 		{
@@ -694,8 +692,8 @@ std::wstring GetEnvironmentVariableString(_In_z_ PCWSTR const variable)
 std::wstring FindPython()
 {
 	const std::wstring pytwoseven = GetEnvironmentVariableString(L"python27");
-	
-	// Some people, like me, (Alexander Riccio) have an environment variable 
+
+	// Some people, like me, (Alexander Riccio) have an environment variable
 	// that specifically points to Python 2.7.
 	// As a workaround for issue #13, we'll use that version of Python.
 	// See the issue: https://github.com/google/UIforETW/issues/13
@@ -744,7 +742,7 @@ std::wstring GetBuildTimeFromAddress(_In_ const void* const codeAddress)
 		UIETWASSERT(0);
 		return L"";
 	}
-	const IMAGE_NT_HEADERS* const NTHeader = 
+	const IMAGE_NT_HEADERS* const NTHeader =
 		reinterpret_cast<const IMAGE_NT_HEADERS*>(
 			reinterpret_cast<const char*>(DosHeader) + DosHeader->e_lfanew);
 	if (IMAGE_NT_SIGNATURE != NTHeader->Signature)
@@ -814,9 +812,13 @@ void SetCurrentThreadName(PCSTR const threadName)
 
 void CopyStartupProfiles(const std::wstring& exeDir, const bool force)
 {
+	if (force)
+		outputPrintf(L"\n");
 
 	// WPA 8.1 stores startup.wpaProfile file in Documents/WPA Files
-	copyWPAProfileToDocuments(force);
+	copyFileToDocumentsWPA(kWPAStartupFileName, exeDir, force);
+
+	copyFileToDocumentsWPA(kChromeRegionsFileName, exeDir, force);
 
 	copyWPAProfileToLocalAppData(exeDir, force);
 }
