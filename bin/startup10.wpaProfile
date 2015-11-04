@@ -3,7 +3,9 @@
   <Content xsi:type="WpaProfile2">
     <Sessions>
       <Session Index="0">
-        <FileReferences />
+         <FileReferences>
+           <FileReference FileName="chrome_regions_of_interest.xml" ServiceMoniker="Regions.{51EF6868-EFEC-42A3-B284-1838673CC095}" />
+         </FileReferences>
       </Session>
     </Sessions>
     <Views>
@@ -1755,6 +1757,34 @@
         </ModifiedPresets>
         <PersistedPresets />
       </GraphSchema>
+       <GraphSchema Guid="1CE7FD53-2344-4EA8-ACD6-1A0722A51427" HelpText="{}{\rtf1\ansi\ansicpg1252\uc1\htmautsp\deff2{\fonttbl{\f0\fcharset0 Times New Roman;}{\f2\fcharset0 Segoe UI;}}{\colortbl\red0\green0\blue0;\red255\green255\blue255;}\loch\hich\dbch\pard\plain\ltrpar\itap0{\lang1033\fs18\f2\cf0 \cf0\ql{\f2 {\ltrch Lets the application apply user-friendly labels to portions of the trace.}\li0\ri0\sa0\sb0\fi0\ql\par}&#xD;&#xA;}&#xD;&#xA;}">
+         <ModifiedPresets>
+           <Preset Name="Randomascii Chrome Regions of Interest" BarGraphIntervalCount="50" GraphColumnCount="14" KeyColumnCount="4" LeftFrozenColumnCount="5" RightFrozenColumnCount="13" InitialFilterQuery="[Region]:~=&quot;Chrome&quot;" InitialFilterShouldKeep="true" HelpText="{}{\rtf1\ansi\ansicpg1252\uc1\htmautsp\deff2{\fonttbl{\f0\fcharset0 Times New Roman;}{\f2\fcharset0 Segoe UI;}}{\colortbl\red0\green0\blue0;\red255\green255\blue255;}\loch\hich\dbch\pard\plain\ltrpar\itap0{\lang1033\fs18\f2\cf0 \cf0\ql{\f2 {\ltrch Uses a Regions of Interest file to apply additional markup to an open trace in WPA. These labels are applied by finding events that define the start and stop of a given region. The XML file contains these regions as well as their events.}\li0\ri0\sa0\sb0\fi0\ql\par}&#xD;&#xA;}&#xD;&#xA;}">
+             <MetadataEntries>
+               <MetadataEntry Guid="052aa8a8-ce86-486b-8cc9-158ac7d27113" Name="Stop Thread" ColumnMetadata="EndThreadId" />
+               <MetadataEntry Guid="93b276b8-d183-41b7-a16e-19eb9373dbf3" Name="Start Time" ColumnMetadata="StartTime" />
+               <MetadataEntry Guid="03facf2d-1d9f-43c7-b8e8-aed46477f348" Name="Stop Time" ColumnMetadata="EndTime" />
+             </MetadataEntries>
+             <HighlightEntries />
+             <Columns>
+               <Column Guid="d0b2a5cb-1966-4fe9-919f-1383932b2d84" Name="Start Process" SortPriority="8" Width="137" IsVisible="true" />
+               <Column Guid="c74dbb74-97bf-4c5a-9b21-d967ce08df00" Name="Start Thread" SortPriority="5" TextAlignment="Right" Width="80" IsVisible="true" />
+               <Column Guid="07ec3178-e4ce-4729-a918-f1cc44ee55b9" Name="Region Friendly Name" SortPriority="4" Width="200" IsVisible="true" />
+               <Column Guid="d96b19f7-d47a-40f3-ba80-fe0b9fae4616" Name="Region" SortPriority="9" Width="300" />
+               <Column Guid="cb796d44-2927-5ac1-d231-4b71904c18f5" Name="Thread Name" SortPriority="1" Width="80" />
+               <Column Guid="82ddfdff-ee93-5f35-08ac-4705069618dc" Name="Thread Activity Tag" SortPriority="2" Width="80" />
+               <Column Guid="2818954f-2d30-5569-4510-dade0a5a605c" Name="Annotation" SortPriority="3" Width="80" />
+               <Column Guid="abfa45ec-ef0f-4fdd-8a6d-1c93a140032b" Name="Duration" AggregationMode="Sum" SortPriority="11" TextAlignment="Right" Width="100" IsVisible="true" />
+               <Column Guid="b9e5e33d-d875-4fb2-b4f9-7e9d14d8d370" Name="Stop Process" SortPriority="6" Width="195" />
+               <Column Guid="052aa8a8-ce86-486b-8cc9-158ac7d27113" Name="Stop Thread" SortPriority="7" TextAlignment="Right" Width="80" />
+               <Column Guid="471b850d-c2bc-482d-871d-13fb7c13bd2a" Name="Region Guid" AggregationMode="Count" SortPriority="10" Width="223" />
+               <Column Guid="93b276b8-d183-41b7-a16e-19eb9373dbf3" Name="Start Time" AggregationMode="Min" SortOrder="Ascending" TextAlignment="Right" Width="100" IsVisible="true" />
+               <Column Guid="03facf2d-1d9f-43c7-b8e8-aed46477f348" Name="Stop Time" AggregationMode="Max" SortPriority="12" TextAlignment="Right" Width="100" IsVisible="true" />
+             </Columns>
+           </Preset>
+         </ModifiedPresets>
+         <PersistedPresets />
+       </GraphSchema>
       <GraphSchema Guid="5279a15b-e0ad-4ec4-8d80-a8bc6bb8b7c8">
         <ModifiedPresets>
           <Preset Name="Randomascii Files by Process Name" GraphChartType="StackedBars" BarGraphIntervalCount="50" GraphColumnCount="27" KeyColumnCount="9" LeftFrozenColumnCount="10" RightFrozenColumnCount="26" InitialFilterShouldKeep="true">

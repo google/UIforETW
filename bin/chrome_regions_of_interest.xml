@@ -1,0 +1,53 @@
+<?xml version='1.0' encoding='utf-8' standalone='yes'?>
+<InstrumentationManifest>
+   <Instrumentation>
+      <Regions>
+         <RegionRoot Guid="{345488cf-b92b-4e49-993b-7d4b8b62aaff}"
+                     Name="ChromeRegionRoot"
+                     FriendlyName="Chrome">
+            <Region Guid="{0b57fd8c-7a6b-488f-868e-54f80f2e5884}"
+                    Name="ChromeCompleteRegion"
+                    FriendlyName="Complete">
+               <Start>
+                  <Event Provider="{d2d578d9-2936-45b6-a09f-30e32715f42d}" Id="1" Version="0" />
+                  <PayloadIdentifier FieldName="Phase" FieldValue="Complete" />
+               </Start>
+               <Stop>
+                  <Event Provider="{d2d578d9-2936-45b6-a09f-30e32715f42d}" Id="1" Version="0" />
+                  <PayloadIdentifier FieldName="Phase" FieldValue="Complete End" />
+               </Stop>
+               <Match>
+                  <SelfNest TID="true" />
+                  <Event TID="true">
+                    <Payload FieldName="Name" />
+                  </Event>
+               </Match>
+               <Naming>
+                  <PayloadBased NameField="Name" />
+               </Naming>
+            </Region>
+            <Region Guid="{4ef2aaaa-537a-43d5-8222-197bfba63f13}"
+                    Name="ChromeBeginEndRegion"
+                    FriendlyName="BeginEnd">
+               <Start>
+                  <Event Provider="{d2d578d9-2936-45b6-a09f-30e32715f42d}" Id="1" Version="0" />
+                  <PayloadIdentifier FieldName="Phase" FieldValue="Begin" />
+               </Start>
+               <Stop>
+                  <Event Provider="{d2d578d9-2936-45b6-a09f-30e32715f42d}" Id="1" Version="0" />
+                  <PayloadIdentifier FieldName="Phase" FieldValue="End" />
+               </Stop>
+               <Match>
+                  <SelfNest TID="true" />
+                  <Event TID="true">
+                    <Payload FieldName="Name" />
+                  </Event>
+               </Match>
+               <Naming>
+                  <PayloadBased NameField="Name" />
+               </Naming>
+            </Region>
+         </RegionRoot>
+      </Regions>
+   </Instrumentation>
+</InstrumentationManifest>

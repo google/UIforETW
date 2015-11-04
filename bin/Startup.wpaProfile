@@ -1,6 +1,10 @@
 ﻿<WpaProfile xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" SavedWith="6.3.9600.16384 (winblue_rtm.130821-1623)" AppendNtSymbolPath="" AppendNtSymCachePath="" xmlns="clr-namespace:Microsoft.Performance.Shell;assembly=Microsoft.Performance.Shell">
   <WpaProfile.UISessions>
-    <UISessionProperties Index="0" />
+    <UISessionProperties Index="0">
+      <UISessionProperties.References>
+        <ExternalFileReference FileName="chrome_regions_of_interest.xml" ServiceMoniker="Regions.{51EF6868-EFEC-42A3-B284-1838673CC095}" />
+      </UISessionProperties.References>
+    </UISessionProperties>
   </WpaProfile.UISessions>
   <WpaProfile.Views>
     <AnalysisView Name="67b8486a-9cc3-4d36-978b-cfc07051f750" IsSelected="True" IsVisible="True" xmlns="clr-namespace:Microsoft.Performance.Shell.Graphing;assembly=Microsoft.Performance.Shell">
@@ -1163,6 +1167,33 @@
                 <HdvColumnViewModelPreset Guid="3e80b2ba-b36a-4ff1-9c2c-d2542002a6d6" Name="Count" AggregationMode="Sum" IsVisible="True" SortPriority="19" TextAlignment="Right" Width="60" />
                 <HdvColumnViewModelPreset Guid="191711d7-f84c-4936-93b7-e2793639cdd1" Name="Impacting Size" AggregationMode="Sum" IsVisible="True" SortOrder="Descending" TextAlignment="Right" Width="120" />
                 <HdvColumnViewModelPreset Guid="355d0688-9ebd-41af-b2c4-0dc0f4294eaa" Name="Size" AggregationMode="Sum" IsVisible="True" SortOrder="Descending" SortPriority="1" TextAlignment="Right" Width="120" />
+              </HdvViewModelPreset.ConfigurableColumns>
+            </HdvViewModelPreset>
+          </HdvViewModelPresetCollection.UserPresets>
+        </HdvViewModelPresetCollection>
+        <HdvViewModelPresetCollection Name="1CE7FD53-2344-4EA8-ACD6-1A0722A51427">
+          <HdvViewModelPresetCollection.UserPresets>
+            <HdvViewModelPreset Name="Randomascii Chrome Regions of Interest" GraphColumnCount="14" KeyColumnCount="4" LeftFrozenColumnCount="5" RightFrozenColumnCount="13" InitialFilterQuery="" InitialSelectionQuery="" InitialExpansionQuery="">
+              <HdvViewModelPreset.ColumnMetadataEntries>
+                <ColumnMetadataEntry Guid="052aa8a8-ce86-486b-8cc9-158ac7d27113" Name="Stop Thread" ColumnMetadata="EndThreadId" />
+                <ColumnMetadataEntry Guid="93b276b8-d183-41b7-a16e-19eb9373dbf3" Name="Start Time" ColumnMetadata="StartTime" />
+                <ColumnMetadataEntry Guid="03facf2d-1d9f-43c7-b8e8-aed46477f348" Name="Stop Time" ColumnMetadata="EndTime" />
+              </HdvViewModelPreset.ColumnMetadataEntries>
+              <HdvViewModelPreset.HighlightEntries />
+              <HdvViewModelPreset.ConfigurableColumns>
+                <HdvColumnViewModelPreset Guid="d0b2a5cb-1966-4fe9-919f-1383932b2d84" Name="Start Process" IsVisible="True" SortPriority="8" Width="195" />
+                <HdvColumnViewModelPreset Guid="c74dbb74-97bf-4c5a-9b21-d967ce08df00" Name="Start Thread" IsVisible="True" SortPriority="5" TextAlignment="Right" Width="80" />
+                <HdvColumnViewModelPreset Guid="07ec3178-e4ce-4729-a918-f1cc44ee55b9" Name="Region Friendly Name" SortPriority="4" Width="200" />
+                <HdvColumnViewModelPreset Guid="d96b19f7-d47a-40f3-ba80-fe0b9fae4616" Name="Region" IsVisible="True" SortPriority="9" Width="300" />
+                <HdvColumnViewModelPreset Guid="cb796d44-2927-5ac1-d231-4b71904c18f5" Name="Thread Name" SortPriority="1" Width="80" />
+                <HdvColumnViewModelPreset Guid="82ddfdff-ee93-5f35-08ac-4705069618dc" Name="Thread Activity Tag" SortPriority="2" Width="80" />
+                <HdvColumnViewModelPreset Guid="2818954f-2d30-5569-4510-dade0a5a605c" Name="Annotation" SortPriority="3" Width="80" />
+                <HdvColumnViewModelPreset Guid="abfa45ec-ef0f-4fdd-8a6d-1c93a140032b" Name="Duration" AggregationMode="Sum" IsVisible="True" SortPriority="11" TextAlignment="Right" Width="100" />
+                <HdvColumnViewModelPreset Guid="b9e5e33d-d875-4fb2-b4f9-7e9d14d8d370" Name="Stop Process" SortPriority="6" Width="195" />
+                <HdvColumnViewModelPreset Guid="052aa8a8-ce86-486b-8cc9-158ac7d27113" Name="Stop Thread" SortPriority="7" TextAlignment="Right" Width="80" />
+                <HdvColumnViewModelPreset Guid="471b850d-c2bc-482d-871d-13fb7c13bd2a" Name="Region Guid" AggregationMode="Count" SortPriority="10" Width="223" />
+                <HdvColumnViewModelPreset Guid="93b276b8-d183-41b7-a16e-19eb9373dbf3" Name="Start Time" AggregationMode="Min" IsVisible="True" SortOrder="Ascending" TextAlignment="Right" Width="100" />
+                <HdvColumnViewModelPreset Guid="03facf2d-1d9f-43c7-b8e8-aed46477f348" Name="Stop Time" AggregationMode="Max" IsVisible="True" SortPriority="12" TextAlignment="Right" Width="100" />
               </HdvViewModelPreset.ConfigurableColumns>
             </HdvViewModelPreset>
           </HdvViewModelPresetCollection.UserPresets>
