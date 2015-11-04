@@ -25,6 +25,12 @@ present.txt
 # wpaexporter drops these
 *.csv
 
+# VS 2015 drops these
+*.VC.opendb
+
+# Temporary flamegraph files
+flamegraph.txt
+
 #Created by package_etw.bat
 etwpackage/
 etwpackage.zip
