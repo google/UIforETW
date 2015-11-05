@@ -57,7 +57,7 @@ int main(int argc, _Pre_readable_size_(argc) char* argv[])
    // then _NT_SYMBOL_PATH will be used instead.
    // Force setting it here to make sure that the test succeeds.
    SymSetSearchPath(fakeProcess,
-              "SRV*c:\\symbolstest*http://msdl.microsoft.com/download/symbols");
+              "SRV*c:\\symbolstest*https://msdl.microsoft.com/download/symbols");
 
    // Valid PDB data to test the code.
    std::string gTextArg = "072FF0EB54D24DFAAE9D13885486EE09";
