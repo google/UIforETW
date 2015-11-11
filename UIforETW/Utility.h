@@ -68,6 +68,9 @@ std::wstring GetDirPart(const std::wstring& path);
 std::wstring CrackFilePart(const std::wstring& path);
 // Pass this a path and it returns everything except the extension.
 std::wstring StripExtensionFromPath(const std::wstring& path);
+// Remove extraneous ..\ entries, etc. This is needed for msiexec
+// which expects canonicalized paths.
+std::wstring CanonicalizePath(const std::wstring& path);
 
 // Delete one or more files using the shell so that errors will bring up
 // a dialog and deleted files will go to the recycle bin.

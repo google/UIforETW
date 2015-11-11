@@ -235,7 +235,6 @@ void CUIforETWDlg::SetSymbolPath()
 		(void)_putenv(("_NT_SYMCACHE_PATH=" + systemDrive_ + "symcache").c_str());
 }
 
-
 BOOL CUIforETWDlg::OnInitDialog()
 {
 	CDialog::OnInitDialog();
@@ -309,7 +308,11 @@ BOOL CUIforETWDlg::OnInitDialog()
 	wptDir_ = windowsKitsDir_ + L"8.1\\Windows Performance Toolkit\\";
 	wpt10Dir_ = windowsKitsDir_ + L"10\\Windows Performance Toolkit\\";
 
-	if (Is64BitWindows())
+	wchar_t systemDir[MAX_PATH];
+	systemDir[0] = 0;
+	GetSystemDirectory(systemDir, ARRAYSIZE(systemDir));
+	std::wstring msiExecPath = systemDir + std::wstring(L"\\msiexec.exe");
+	if (Is64BitWindows() && PathFileExists(msiExecPath.c_str()))
 	{
 		// Install 64-bit WPT 8.1 and WPT 10 if needed and if available.
 		// The installers are available as part of etwpackage.zip on https://github.com/google/UIforETW/releases
@@ -318,17 +321,20 @@ BOOL CUIforETWDlg::OnInitDialog()
 			// Windows 7 users need to have WPT 8.1 installed.
 			if (IsWindowsSevenOrLesser())
 			{
-				const std::wstring installPath81 = GetExeDir() + L"..\\third_party\\wpt81\\WPTx64-x86_en-us.msi";
+				const std::wstring installPath81 = CanonicalizePath(GetExeDir() + L"..\\third_party\\wpt81\\WPTx64-x86_en-us.msi");
 				if (PathFileExists(installPath81.c_str()))
 				{
-					HINSTANCE installResult81 = ShellExecute(m_hWnd, L"open", installPath81.c_str(), nullptr, nullptr, SW_SHOWDEFAULT);
-					if (installResult81 > reinterpret_cast<HINSTANCE>(32))
+					ChildProcess child(msiExecPath);
+					std::wstring args = L" /i \"" + installPath81 + L"\"";
+					child.Run(true, L"msiexec.exe" + args);
+					DWORD installResult81 = child.GetExitCode();
+					if (!installResult81)
 					{
 						outputPrintf(L"WPT version 8.1 was installed.\n");
 					}
 					else
 					{
-						outputPrintf(L"Failure code %zu while installing WPT 8.1.\n", reinterpret_cast<size_t>(installResult81));
+						outputPrintf(L"Failure code %u while installing WPT 8.1.\n", installResult81);
 					}
 				}
 			}
@@ -336,17 +342,20 @@ BOOL CUIforETWDlg::OnInitDialog()
 		// Everybody should have WPT 10 installed.
 		if (!PathFileExists((wpt10Dir_ + L"xperf.exe").c_str()))
 		{
-			const std::wstring installPath10 = GetExeDir() + L"..\\third_party\\wpt10\\WPTx64-x86_en-us.msi";
+			const std::wstring installPath10 = CanonicalizePath(GetExeDir() + L"..\\third_party\\wpt10\\WPTx64-x86_en-us.msi");
 			if (PathFileExists(installPath10.c_str()))
 			{
-				HINSTANCE installResult10 = ShellExecute(m_hWnd, L"open", installPath10.c_str(), nullptr, nullptr, SW_SHOWDEFAULT);
-				if (installResult10 > reinterpret_cast<HINSTANCE>(32))
+				ChildProcess child(msiExecPath);
+				std::wstring args = L" /i \"" + installPath10 + L"\"";
+				child.Run(true, L"msiexec.exe" + args);
+				DWORD installResult10 = child.GetExitCode();
+				if (!installResult10)
 				{
 					outputPrintf(L"WPT version 10 was installed.\n");
 				}
 				else
 				{
-					outputPrintf(L"Failure code %zu while installing WPT 10.\n", reinterpret_cast<size_t>(installResult10));
+					outputPrintf(L"Failure code %u while installing WPT 10.\n", installResult10);
 				}
 			}
 		}

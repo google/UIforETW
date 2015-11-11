@@ -532,6 +532,17 @@ std::wstring StripExtensionFromPath(const std::wstring& path)
 	return path.substr(0, path.size() - ext.size());
 }
 
+std::wstring CanonicalizePath(const std::wstring& path)
+{
+	// The PathCanonicalize function says that the maximum supported
+	// input length is MAX_PATH, so check for that.
+	if (path.size() >= MAX_PATH)
+		return L"";
+	WCHAR output[MAX_PATH];
+	PathCanonicalize(output, path.c_str());
+	return output;
+}
+
 int DeleteOneFile(const HWND hwnd, const std::wstring& path)
 {
 	// {path} uses std::vector list initialization
