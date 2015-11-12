@@ -47,10 +47,10 @@ void ShowUsage() {
       << std::endl
       << "  --tid: Only include stacks from the specified thread." << std::endl
       << "  --start_ts: Only include stacks that occurred after the specified "
-         "timestamp."
+         "timestamp (in microseconds)."
       << std::endl
       << "  --end_ts: Only include stacks that occurred before the specified "
-         "timestamp."
+         "timestamp (in microseconds)."
       << std::endl
       << "  --out: Output file path. Default: <trace_file_path>.flamegraph.txt"
       << std::endl;
