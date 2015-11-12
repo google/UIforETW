@@ -59,7 +59,7 @@ void copyFileToDocumentsWPA(PCWSTR const fileName, const std::wstring& exeDir, c
 		return;
 	}
 
-	const std::wstring source = exeDir + L"\\" + fileName;
+	const std::wstring source = exeDir + fileName;
 	const std::wstring destDir = docsPath + std::wstring(L"\\WPA Files");
 	const std::wstring dest = destDir + L"\\" + fileName;
 	const BOOL destinationExists = ::PathFileExistsW(dest.c_str());
@@ -92,8 +92,8 @@ void copyWPAProfileToLocalAppData(const std::wstring& exeDir, const bool force)
 		outputPrintf(L"the `%s` environment variable didn't contain a valid path. Failed to copy WPA 10 profile.\n", localAppDataEnvVar);
 		return;
 	}
-	std::wstring source = exeDir + L"\\startup10.wpaProfile";
-	std::wstring destDir = std::wstring(localAppData) + L"\\Windows Performance Analyzer";
+	std::wstring source = exeDir + L"startup10.wpaProfile";
+	std::wstring destDir = std::wstring(localAppData) + L"\\Windows Performance Analyzer\\";
 	std::wstring dest = destDir + kWPAStartupFileName;
 	if (force || !::PathFileExistsW(dest.c_str()))
 	{
