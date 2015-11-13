@@ -1,18 +1,15 @@
-*.user
-*.suo
-*.sdf
 *.aps
-*.opensdf
-*Generated*
-# Excluded most executables, but include a few specific ones.
+# wpaexporter drops these
+*.csv
 *.exe
 *.exp
 *.ilk
+*.opensdf
+*.sdf
+*.suo
+*.svg
 *.pdb
-Debug/
-Release/
-*DoNotShip/
-ipch/
+*.user
 symsrv.yes
 
 # GPUView likes to drop these files when run.
@@ -22,11 +19,11 @@ Log.txt
 present.txt
 *.lastcodeanalysissucceeded
 
-# wpaexporter drops these
-*.csv
+*Generated*
 
 # VS 2015 drops these
 *.VC.opendb
+/.vs/
 
 # Temporary flamegraph files
 flamegraph.txt
@@ -34,3 +31,8 @@ flamegraph.txt
 #Created by package_etw.bat
 etwpackage/
 etwpackage.zip
+
+Debug/
+Release/
+*DoNotShip/
+ipch/
