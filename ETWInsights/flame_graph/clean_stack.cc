@@ -51,7 +51,7 @@ Stack CleanStack(const Stack& stack) {
   for (auto it = stack.rbegin(); it != stack.rend(); ++it) {
     // Truncate tall stacks.
     if (cleaned_stack.size() > kMaxStackSize) {
-      cleaned_stack.push_back("[Tuncated]");
+      cleaned_stack.push_back("[Truncated]");
       break;
     }
 
