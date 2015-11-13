@@ -29,10 +29,14 @@ xcopy "%wpt10%Licenses\10.0.10240.0\sdk_license.rtf" %destdir%\third_party\wpt10
 ren %destdir%\third_party\wpt10\sdk_license.rtf LICENSE.rtf
 
 @rem Add VS tools to the path
-@call "%vs120comntools%vsvars32.bat"
+@call "%vs140comntools%vsvars32.bat"
 
-cd /d %UIforETW%
-cd UIforETW
+cd /d %UIforETW%\ETWInsights
+devenv /rebuild "release|Win32" ETWInsights.sln
+@if ERRORLEVEL 1 goto BuildFailure
+xcopy flame_graph.exe %destdir%\bin
+
+cd /d %UIforETW%\UIforETW
 @rem Modify the UIforETW project to be statically linked and build that version
 @rem so that it will run without any extra install requirements.
 sed "s/UIforETW.vcxproj/UIforETWStatic.vcxproj/" <UIforETW.sln >UIforETWStatic.sln
