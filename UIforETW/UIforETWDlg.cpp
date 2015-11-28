@@ -567,6 +567,7 @@ std::wstring CUIforETWDlg::GetDirectory(PCWSTR env, const std::wstring& default)
 
 void CUIforETWDlg::RegisterProviders()
 {
+	outputPrintf(L"\n");
 	// Assume failure. This assures that when we say
 	// "Chrome providers will not be recorded." it will actually be true.
 	useChromeProviders_ = false;
@@ -600,6 +601,10 @@ void CUIforETWDlg::RegisterProviders()
 		ChildProcess child(wevtPath);
 		std::wstring args = pass ? L" im" : L" um";
 		args += L" \"" + GetExeDir() + L"etwproviders.man\"";
+		if (pass)
+		{
+			args += L" /mf:\"" + dllDest + L"\" /rf:\"" + dllDest + L"\"";
+		}
 		child.Run(bShowCommands_, L"wevtutil.exe" + args);
 	}
 
