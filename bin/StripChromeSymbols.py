@@ -1,4 +1,4 @@
-# Copyright 2015 Google Inc. All Rights Reserved.
+﻿# Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -127,7 +127,7 @@ def main():
       if match:
         guid, age, path = match.groups()
         guid = guid.replace("-", "")
-        age = int(age) # Prefer for printing as hex
+        age = int(age) # Prepare for printing as hex
         filepart = os.path.split(path)[1]
         symcache_file = r"c:\symcache\%s-%s%xv2.symcache" % (dllMatch, guid, age)
         if os.path.exists(symcache_file):
