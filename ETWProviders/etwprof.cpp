@@ -58,6 +58,11 @@ limitations under the License.
 // Note that this includes evntprov.h which requires a Vista+ Windows SDK.
 #include "ETWProvidersGenerated.h"
 
+#ifndef _In_reads_opt_
+// Support building with the VS 2010 Windows SDK.
+#define _In_reads_opt_(x)
+#endif
+
 // Typedefs for use with GetProcAddress
 typedef ULONG (__stdcall *tEventRegister)( _In_ LPCGUID ProviderId, _In_opt_ PENABLECALLBACK EnableCallback, _In_opt_ PVOID CallbackContext, _Out_ PREGHANDLE RegHandle);
 typedef ULONG (__stdcall *tEventWrite)( _In_ REGHANDLE RegHandle, _In_ PCEVENT_DESCRIPTOR EventDescriptor, _In_ ULONG UserDataCount, _In_reads_opt_(UserDataCount) PEVENT_DATA_DESCRIPTOR UserData);

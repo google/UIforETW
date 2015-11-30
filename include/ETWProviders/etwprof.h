@@ -45,7 +45,13 @@ const int kFlagDoubleClick = 100;
 
 #ifdef	ETW_MARKS_ENABLED
 
-#ifdef ETWPROVIDERSDLL
+// Define this when compiling the ETW provider functions into your own
+// executable, not for export.
+//#define STATIC_LINKED_ETWPROVIDERS
+
+#if defined(STATIC_LINKED_ETWPROVIDERS)
+	#define PLATFORM_INTERFACE
+#elif defined(ETWPROVIDERSDLL)
 	#define PLATFORM_INTERFACE __declspec(dllexport)
 #else
 	#define PLATFORM_INTERFACE __declspec(dllimport)
