@@ -139,11 +139,12 @@ public:
 		ETWEnd(m_pMessage, m_nStartTime);
 	}
 private:
-	// disable copying.
-	CETWScope(const CETWScope& rhs) = delete;
-	CETWScope& operator=(const CETWScope& rhs) = delete;
+	// Disable copying. Don't use "= delete" because this header
+	// should work with older compilers like VC++ 2010.
+	CETWScope(const CETWScope& rhs);
+	CETWScope& operator=(const CETWScope& rhs);
 
-	_Field_z_ PCSTR m_pMessage;
+	PCSTR m_pMessage;
 	int64 m_nStartTime;
 };
 #endif // __cplusplus
