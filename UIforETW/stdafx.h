@@ -63,6 +63,12 @@ void outputPrintf(_Printf_format_string_ const wchar_t* pFormat, ...);
 // Send this when the list of traces needs to be updated.
 const int WM_UPDATETRACELIST = WM_USER + 10;
 
+// Disable "warning C6054: String 'buffer' might not be zero-terminated." because
+// these warnings are spurious. They are caused by incorrect annotations on
+// _vsnwprintf_s and swprintf_s. See this bug for details:
+// https://connect.microsoft.com/VisualStudio/feedback/details/1570481/vs-2015-analyze-warns-that-vsprintf-s-doesnt-null-terminate-buffers
+#pragma warning(disable : 6054)
+
 
 #define UIETWASSERT( x ) ATLASSERT( x )
 
