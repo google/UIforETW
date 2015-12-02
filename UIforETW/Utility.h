@@ -82,7 +82,6 @@ void SetClipboardText(const std::wstring& text);
 std::wstring GetClipboardText();
 
 std::wstring GetEnvironmentVariableString(_In_z_ PCWSTR variable);
-std::string GetEnvironmentVariableString(_In_z_ PCSTR variable);
 
 bool Is64BitWindows();
 bool Is64BitBuild();
