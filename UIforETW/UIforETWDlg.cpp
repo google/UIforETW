@@ -305,42 +305,23 @@ BOOL CUIforETWDlg::OnInitDialog()
 	progFilesx86Dir = nullptr;
 
 	windowsKitsDir_ += L"\\Windows Kits\\";
-	wptDir_ = windowsKitsDir_ + L"8.1\\Windows Performance Toolkit\\";
+	wpt81Dir_ = windowsKitsDir_ + L"8.1\\Windows Performance Toolkit\\";
 	wpt10Dir_ = windowsKitsDir_ + L"10\\Windows Performance Toolkit\\";
+
+	auto xperfVersion = GetFileVersion(GetXperfPath());
+	const int64_t requiredXperfVersion = (10llu << 48) + 0 + (10586llu << 16) + (15llu << 0);
 
 	wchar_t systemDir[MAX_PATH];
 	systemDir[0] = 0;
 	GetSystemDirectory(systemDir, ARRAYSIZE(systemDir));
 	std::wstring msiExecPath = systemDir + std::wstring(L"\\msiexec.exe");
+
 	if (Is64BitWindows() && PathFileExists(msiExecPath.c_str()))
 	{
-		// Install 64-bit WPT 8.1 and WPT 10 if needed and if available.
-		// The installers are available as part of etwpackage.zip on https://github.com/google/UIforETW/releases
-		if (!PathFileExists(GetXperfPath().c_str()))
-		{
-			// Windows 7 users need to have WPT 8.1 installed.
-			if (IsWindowsSevenOrLesser())
-			{
-				const std::wstring installPath81 = CanonicalizePath(GetExeDir() + L"..\\third_party\\wpt81\\WPTx64-x86_en-us.msi");
-				if (PathFileExists(installPath81.c_str()))
-				{
-					ChildProcess child(msiExecPath);
-					std::wstring args = L" /i \"" + installPath81 + L"\"";
-					child.Run(true, L"msiexec.exe" + args);
-					DWORD installResult81 = child.GetExitCode();
-					if (!installResult81)
-					{
-						outputPrintf(L"WPT version 8.1 was installed.\n");
-					}
-					else
-					{
-						outputPrintf(L"Failure code %u while installing WPT 8.1.\n", installResult81);
-					}
-				}
-			}
-		}
-		// Everybody should have WPT 10 installed.
-		if (!PathFileExists((wpt10Dir_ + L"xperf.exe").c_str()))
+		// Install 64-bit WPT 10 if needed and if available.
+		// The installers are available as part of etwpackage.zip on
+		// https://github.com/google/UIforETW/releases
+		if (xperfVersion < requiredXperfVersion)
 		{
 			const std::wstring installPath10 = CanonicalizePath(GetExeDir() + L"..\\third_party\\wpt10\\WPTx64-x86_en-us.msi");
 			if (PathFileExists(installPath10.c_str()))
@@ -358,50 +339,43 @@ BOOL CUIforETWDlg::OnInitDialog()
 					outputPrintf(L"Failure code %u while installing WPT 10.\n", installResult10);
 				}
 			}
+			xperfVersion = GetFileVersion(GetXperfPath());
 		}
 	}
-	if (!PathFileExists(GetXperfPath().c_str()))
+
+	// Because of bugs in the initial WPT 10 we require the TH2 version.
+	if (xperfVersion < requiredXperfVersion)
 	{
-		if (IsWindowsSevenOrLesser())
+		if (Is64BitWindows())
 		{
-			// WPT 10 (at least the 10240 version) doesn't record image ID information
-			// on Windows 7 and below, so the Windows 8.1 version of WPT is needed.
-			if (Is64BitWindows())
-			{
-				AfxMessageBox((GetXperfPath() + L" does not exist. Windows 7 and below require that "
-					L"WPT 8.1 be installed. If you run UIforETW from etwpackage.zip from\n"
-					L"https://github.com/google/UIforETW/releases\n"
+			if (xperfVersion)
+				AfxMessageBox((GetXperfPath() + L" must be version 10.0.10586.15 or higher. If you run UIforETW from etwpackage.zip\n"
+					L"from https://github.com/google/UIforETW/releases\n"
 					L"then WPT will be automatically installed. Exiting.").c_str());
-			}
 			else
-			{
-				AfxMessageBox((GetXperfPath() + L" does not exist. Windows 7 and below require that "
-					L"WPT 8.1 be installed. You'll need to find the installer in the Windows "
-					L"8.1 SDK. Exiting.").c_str());
-			}
-			exit(10);
+				AfxMessageBox((GetXperfPath() + L" does not exist. If you run UIforETW from etwpackage.zip\n"
+					L"from https://github.com/google/UIforETW/releases\n"
+					L"then WPT will be automatically installed. Exiting.").c_str());
 		}
-		std::wstring oldXperfPath = GetXperfPath();
-		wptDir_ = wpt10Dir_;
-		if (!PathFileExists(GetXperfPath().c_str()))
+		else
 		{
-			if (Is64BitWindows())
-			{
-				AfxMessageBox((oldXperfPath + L" and " + GetXperfPath() + L" do not exist. Please install WPT 8.1 or 10. "
-					L"If you run UIforETW from etwpackage.zip from\n"
-					L"https://github.com/google/UIforETW/releases\n"
+			if (xperfVersion)
+				AfxMessageBox((GetXperfPath() + L" must be version 10.0.10586.15 or higher. If you run UIforETW from etwpackage.zip\n"
+					L"from https://github.com/google/UIforETW/releases\n"
 					L"then WPT will be automatically installed. Exiting.").c_str());
-			}
 			else
-			{
-				AfxMessageBox((oldXperfPath + L" and " + GetXperfPath() + L" do not exist. Please install WPT 8.1 or 10. "
-					L"You'll need to find the installers in the Windows 8.1 or 10 SDKs. Exiting.").c_str());
-			}
-			exit(10);
+				AfxMessageBox((GetXperfPath() + L" does not exist. You'll need to find the installer in the Windows "
+				L"Windows 10, Version 1511 SDK. Exiting.").c_str());
 		}
+		exit(10);
 	}
-	wpaPath_ = wptDir_ + L"wpa.exe";
-	gpuViewPath_ = wptDir_ + L"gpuview\\gpuview.exe";
+
+	if (!PathFileExists((wpt81Dir_ + L"xperf.exe").c_str()))
+		wpt81Dir_ = L"";
+
+	if (!wpt81Dir_.empty())
+		wpa81Path_ = wpt81Dir_ + L"wpa.exe";
+	gpuViewPath_ = wpt10Dir_ + L"gpuview\\gpuview.exe";
 	wpa10Path_ = wpt10Dir_ + L"wpa.exe";
 
 	// The Media Experience Analyzer is a 64-bit installer, so we look for it in
@@ -538,7 +512,7 @@ std::wstring CUIforETWDlg::wpaDefaultPath() const
 {
 	if (PathFileExists(wpa10Path_.c_str()))
 		return wpa10Path_;
-	return wpaPath_;
+	return wpa81Path_;
 }
 
 std::wstring CUIforETWDlg::GetDirectory(PCWSTR env, const std::wstring& default)
@@ -1510,7 +1484,7 @@ void CUIforETWDlg::OnCbnSelchangeTracingmode()
 
 void CUIforETWDlg::OnBnClickedSettings()
 {
-	CSettings dlgSettings(nullptr, GetExeDir(), GetWPTDir(), wpt10Dir_);
+	CSettings dlgSettings(nullptr, GetExeDir(), wpt81Dir_, wpt10Dir_);
 	dlgSettings.heapTracingExes_ = heapTracingExes_;
 	dlgSettings.WSMonitoredProcesses_ = WSMonitoredProcesses_;
 	dlgSettings.bExpensiveWSMonitoring_ = bExpensiveWSMonitoring_;
@@ -1574,28 +1548,17 @@ void CUIforETWDlg::OnContextMenu(CWnd* pWnd, CPoint point)
 		std::wstring tracePath;
 		if (selIndex >= 0)
 		{
-			// Either 8.1, 10, or both must be installed or else UIforETW won't run.
-			if (wptDir_ == wpt10Dir_)
+			// WPT 10 must be installed and 8.1 may be.
+			if (wpt81Dir_.empty())
 			{
-				// If the two variables match then WPT 8.1 is not installed, so disable it.
+				// If WPT 8.1 is not installed then disable it.
 				pContextMenu->SetDefaultItem(ID_TRACES_OPENTRACEIN10WPA);
 				pContextMenu->EnableMenuItem(ID_TRACES_OPENTRACEINWPA, MF_BYCOMMAND | MF_GRAYED);
 			}
 			else
 			{
-				// 8.1 is definitely installed, but is 10 installed?
-				if (PathFileExists(wpa10Path_.c_str()))
-				{
-					// If WPT 10 is installed then make it the default.
-					pContextMenu->SetDefaultItem(ID_TRACES_OPENTRACEIN10WPA);
-				}
-				else
-				{
-					// If WPT 10 is not installed then disable it and make WPT 8.1
-					// the default.
-					pContextMenu->EnableMenuItem(ID_TRACES_OPENTRACEIN10WPA, MF_BYCOMMAND | MF_GRAYED);
-					pContextMenu->SetDefaultItem(ID_TRACES_OPENTRACEINWPA);
-				}
+				// Make WPT 10 the default.
+				pContextMenu->SetDefaultItem(ID_TRACES_OPENTRACEIN10WPA);
 			}
 			if (!PathFileExists(mxaPath_.c_str()))
 			{
@@ -1646,7 +1609,7 @@ void CUIforETWDlg::OnContextMenu(CWnd* pWnd, CPoint point)
 		switch (selection)
 		{
 			case ID_TRACES_OPENTRACEINWPA:
-				LaunchTraceViewer(tracePath, wpaPath_);
+				LaunchTraceViewer(tracePath, wpa81Path_);
 				break;
 			case ID_TRACES_OPENTRACEIN10WPA:
 				LaunchTraceViewer(tracePath, wpa10Path_);
@@ -1750,7 +1713,8 @@ void CUIforETWDlg::OnOpenTraceWPA()
 	if (selIndex >= 0)
 	{
 		std::wstring tracePath = GetTraceDir() + traces_[selIndex] + L".etl";
-		LaunchTraceViewer(tracePath, wpaPath_);
+		// The default viewer is WPA 10
+		LaunchTraceViewer(tracePath, wpa10Path_);
 	}
 }
 

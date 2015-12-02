@@ -644,6 +644,39 @@ int64_t GetFileSize(const std::wstring& path)
 	return 0;
 }
 
+#pragma comment(lib, "mincore.lib") // For VerQueryValue
+#pragma comment(lib, "version.lib") // For GetFileVersionInfoSize and GetFileVersionInfo
+
+uint64_t GetFileVersion(const std::wstring& path)
+{
+	DWORD  infoSize = GetFileVersionInfoSizeW(path.c_str(), nullptr);
+	uint64_t result = 0;
+
+	if (infoSize)
+	{
+		std::vector<uint8_t> buffer(infoSize);
+
+		if (GetFileVersionInfoW(path.c_str(), 0, infoSize, &buffer[0]))
+		{
+			LPVOID pData = 0;
+			UINT   size = 0;
+			if (VerQueryValueW(&buffer[0], L"\\", &pData, &size))
+			{
+				if (size)
+				{
+					auto* verInfo = static_cast<VS_FIXEDFILEINFO *>(pData);
+					if (verInfo->dwSignature == 0xFEEF04BD)
+					{
+						result = (static_cast<uint64_t>(verInfo->dwFileVersionMS) << 32) + verInfo->dwFileVersionLS;
+					}
+				}
+			}
+		}
+	}
+
+	return result;
+}
+
 bool Is64BitWindows()
 {
 #if defined(_WIN64)

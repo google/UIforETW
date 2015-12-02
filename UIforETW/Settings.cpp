@@ -65,10 +65,10 @@ uint64_t disabled_other_events_keyword_bit = 1ULL << 62;
 
 IMPLEMENT_DYNAMIC(CSettings, CDialog)
 
-CSettings::CSettings(CWnd* pParent /*=NULL*/, const std::wstring& exeDir, const std::wstring& wptDir, const std::wstring& wpt10Dir)
+CSettings::CSettings(CWnd* pParent /*=NULL*/, const std::wstring& exeDir, const std::wstring& wpt81Dir, const std::wstring& wpt10Dir)
 	: CDialog(CSettings::IDD, pParent)
 	, exeDir_(exeDir)
-	, wptDir_(wptDir)
+	, wpt81Dir_(wpt81Dir)
 	, wpt10Dir_(wpt10Dir)
 {
 
@@ -248,9 +248,9 @@ void CSettings::OnBnClickedCopysymboldlls()
 
 	const std::wstring third_party = exeDir_ + L"..\\third_party\\";
 	std::vector<std::wstring> wptDirs;
-	wptDirs.push_back(wptDir_);
-	if (wpt10Dir_ != wptDir_)
-		wptDirs.push_back(wpt10Dir_);
+	if (!wpt81Dir_.empty())
+		wptDirs.push_back(wpt81Dir_);
+	wptDirs.push_back(wpt10Dir_);
 	// Perform the operation twice, potentially, for WPT 8.1 and WPT 10
 	for (auto& wptDir : wptDirs)
 	{

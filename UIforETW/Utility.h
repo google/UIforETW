@@ -83,6 +83,11 @@ std::wstring GetClipboardText();
 
 std::wstring GetEnvironmentVariableString(_In_z_ PCWSTR variable);
 
+// Get version information out of a PE file. If it fails for any reason then the
+// result will be zero. The version number is the four 16-bit parts in the obvious
+// order. That is, it is dwFileVersionMS and dwFileVersionLS from VS_FIXEDFILEINFO.
+uint64_t GetFileVersion(const std::wstring& path);
+
 bool Is64BitWindows();
 bool Is64BitBuild();
 bool IsWindowsTenOrGreater();

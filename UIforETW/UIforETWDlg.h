@@ -139,11 +139,11 @@ private:
 	std::wstring traceDir_;
 	std::wstring tempTraceDir_;
 	std::wstring windowsKitsDir_; // C:\\Program Files (x86)\\Windows Kits
-	std::wstring wptDir_; // This points to the WPT 8.1 directory if it exists, else WPT 10
-	std::wstring wpt10Dir_;
-	std::wstring wpaPath_;
-	std::wstring gpuViewPath_;
+	std::wstring wpt81Dir_; // This points to the WPT 8.1 directory if it exists, else nothing.
+	std::wstring wpt10Dir_; // If WPT 10 isn't installed UIforETW will exit.
+	std::wstring wpa81Path_;
 	std::wstring wpa10Path_;
+	std::wstring gpuViewPath_;
 	std::wstring wpaDefaultPath() const; // Default viewer.
 	// MXA is available from http://www.microsoft.com/en-us/download/confirmation.aspx?id=43105
 	std::wstring mxaPath_; // Media Experience Analyzer path
@@ -173,8 +173,7 @@ private:
 	// false), saving the trace as well if bSaveTrace is true.
 	void StopTracingAndMaybeRecord(bool bSaveTrace);
 
-	std::wstring GetWPTDir() const { return wptDir_; }
-	std::wstring GetXperfPath() const { return GetWPTDir() + L"xperf.exe"; }
+	std::wstring GetXperfPath() const { return wpt10Dir_ + L"xperf.exe"; }
 	std::wstring GetTraceDir() const { return traceDir_; }
 	std::wstring GetExeDir() const;
 	// Note that GenerateResultFilename() gives a time-based name, so don't expect
