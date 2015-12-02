@@ -644,8 +644,10 @@ int64_t GetFileSize(const std::wstring& path)
 	return 0;
 }
 
-#pragma comment(lib, "mincore.lib") // For VerQueryValue
-#pragma comment(lib, "version.lib") // For GetFileVersionInfoSize and GetFileVersionInfo
+// Despite what the documentation says you should *not* link with mincore.lib.
+// This will pull in a half-dozen VS 2015 CRT DLLs (api-ms-win-core-*) and
+// it isn't needed. Plus, it only contains VerQueryValue so it's not much use.
+#pragma comment(lib, "version.lib")
 
 uint64_t GetFileVersion(const std::wstring& path)
 {
