@@ -14,14 +14,14 @@ mkdir %destdir%\lib
 mkdir %destdir%\third_party
 
 set wptredistmsi=Windows Performance Toolkit\Redistributables\WPTx64-x86_en-us.msi
-set wpt81=c:\Program Files (x86)\Windows Kits\8.1\
-set wpt10=c:\Program Files (x86)\Windows Kits\10\
-if not exist "%wpt81%%wptredistmsi%" goto nowpt81
-mkdir %destdir%\third_party\wpt81
-xcopy "%wpt81%%wptredistmsi%" %destdir%\third_party\wpt81
-xcopy "%wpt81%sdk_license.rtf" %destdir%\third_party\wpt81
-ren %destdir%\third_party\wpt81\sdk_license.rtf LICENSE.rtf
+@rem set wpt81=c:\Program Files (x86)\Windows Kits\8.1\
+@rem if not exist "%wpt81%%wptredistmsi%" goto nowpt81
+@rem mkdir %destdir%\third_party\wpt81
+@rem xcopy "%wpt81%%wptredistmsi%" %destdir%\third_party\wpt81
+@rem xcopy "%wpt81%sdk_license.rtf" %destdir%\third_party\wpt81
+@rem ren %destdir%\third_party\wpt81\sdk_license.rtf LICENSE.rtf
 
+set wpt10=c:\Program Files (x86)\Windows Kits\10\
 if not exist "%wpt10%%wptredistmsi%" goto nowpt10
 mkdir %destdir%\third_party\wpt10
 xcopy "%wpt10%%wptredistmsi%" %destdir%\third_party\wpt10
@@ -31,12 +31,12 @@ ren %destdir%\third_party\wpt10\sdk_license.rtf LICENSE.rtf
 @rem Add VS tools to the path
 @call "%vs140comntools%vsvars32.bat"
 
-cd /d %UIforETW%\ETWInsights
+cd /d %UIforETW%ETWInsights
 devenv /rebuild "release|Win32" ETWInsights.sln
 @if ERRORLEVEL 1 goto BuildFailure
-xcopy flame_graph.exe %destdir%\bin
+xcopy Release\flame_graph.exe %UIforETW%\bin /y
 
-cd /d %UIforETW%\UIforETW
+cd /d %UIforETW%UIforETW
 @rem Modify the UIforETW project to be statically linked and build that version
 @rem so that it will run without any extra install requirements.
 sed "s/UIforETW.vcxproj/UIforETWStatic.vcxproj/" <UIforETW.sln >UIforETWStatic.sln
@@ -92,9 +92,9 @@ python %UIforETW%make_zip_file.py %UIforETW%etwpackage.zip etwpackage
 @echo Something is running with ETWProviders.dll loaded. Please close it and try again.
 @exit /b
 
-:nowpt81
-@echo WPT 8.1 redistributables not found. Aborting.
-@exit /b
+@rem :nowpt81
+@rem @echo WPT 8.1 redistributables not found. Aborting.
+@rem @exit /b
 
 :nowpt10
 @echo WPT 10 redistributables not found. Aborting.
