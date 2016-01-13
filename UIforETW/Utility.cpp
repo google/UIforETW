@@ -487,7 +487,7 @@ std::wstring GetFilePart(const std::wstring& path)
 	UIETWASSERT(path.size() > 0);
 	const size_t lastSlash = path.find_last_of(L'\\');
 	if (lastSlash != std::wstring::npos)
-		return path.substr(lastSlash);
+		return path.substr(lastSlash + 1);
 	// If there's no slash then the file part is the entire string.
 	return path;
 }
