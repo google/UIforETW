@@ -27,8 +27,9 @@ def main():
   #        MIN,   24656403, Process, 0XA1141C60,       chrome.exe ( 748),      10760,          1, 0x11e8c260, "C:\...\chrome.exe" --type=renderer ...
   # Find the PID and ParentPID
   pidsRe = re.compile(r".*\(([\d ]*)\), *(\d*),.*")
-  # Find the space-terminated word after 'type='
-  processTypeRe = re.compile(r".*.exe\" --type=([^ ]*) .*")
+  # Find the space-terminated word after 'type='. This used to require that it
+  # be the first command-line option, but that is likely to not always be true.
+  processTypeRe = re.compile(r".* --type=([^ ]*) .*")
 
   tracename = sys.argv[1]
   #-tle = tolerate lost events
@@ -45,19 +46,22 @@ def main():
   pidsByParent = {}
   for line in os.popen(command).readlines():
     # Split the commandline from the .csv data and then extract the exePath.
-    # It may or may not be quoted.
+    # It may or may not be quoted, and may or not have the .exe suffix.
     parts = line.split(", ")
     if len(parts) > 8:
+      processName = parts[4]
       commandLine = parts[8]
       if commandLine[0] == '"':
         exePath = commandLine[1:commandLine.find('"', 1)]
       else:
         exePath = commandLine.split(" ")[0]
-      if exePath.count("chrome.exe") > 0:
+      # The exepath may omit the ".exe" suffix so we need to look at processName
+      # instead.
+      if processName.count("chrome.exe") > 0:
         pids = pidsRe.match(line)
         pid = int(pids.groups()[0])
         parentPid = int(pids.groups()[1])
-        match = processTypeRe.match(line)
+        match = processTypeRe.match(commandLine)
         if match:
           type = match.groups()[0]
           browserPid = parentPid
@@ -87,7 +91,7 @@ def main():
     # Note the importance of printing the '\r' so that the
     # output will be compatible with Windows edit controls.
     for type in keys:
-      print("%-11s : " % type, end="")
+      print("    %-11s : " % type, end="")
       for pid in pidsByType[type]:
         print("%d " % pid, end="")
       print("\r")
