@@ -18,31 +18,32 @@
 @set batchdir=%~dp0
 @set path=%path%;%batchdir%
 
-@rem Set the xperftracedir environment variable if it
+@rem Set the etwtracedir environment variable if it
 @rem isn't set already.
-@if not "%xperftracedir%" == "" goto TraceDirSet
-@set xperftracedir=%homedrive%%homepath%\documents\xperftraces
+@if not "%etwtracedir%" == "" goto TraceDirSet
+@set etwtracedir=%homedrive%%homepath%\documents\xperftraces
 :TraceDirSet
 
-@rem Make sure %xperftracedir% exists
-@if exist %xperftracedir% goto TraceDirExists
-@mkdir %xperftracedir%
+@rem Make sure %etwtracedir% exists
+@if exist %etwtracedir% goto TraceDirExists
+@mkdir %etwtracedir%
 :TraceDirExists
 
 @rem %temp% should be a good location for temporary traces.
+@rem Make sure this is a fast drive, preferably an SSD.
 @set xperftemptracedir=%temp%
 
 @call etwcommonsettings.bat
 @call etwregister.bat
 
 @rem Generate a file name based on the current date and time and put it in
-@rem the parent directory of the batch file.
+@rem etwtracedir. This is compatible with UIforETW which looks for traces there.
 @rem Note: this probably fails in some locales. Sorry.
 @for /F "tokens=2-4 delims=/- " %%A in ('date/T') do @set datevar=%%C-%%A-%%B
 @for /F "tokens=1-3 delims=:-. " %%A in ('echo %time%') do @set timevar=%%A-%%B-%%C&set hour=%%A
 @rem Make sure that morning hours such as 9:00 are handled as 09 rather than 9
 @if %hour% LSS 10 set timevar=0%timevar%
-@set FileName=%xperftracedir%\%datevar%_%timevar%_%username%
+@set FileName=%etwtracedir%\%datevar%_%timevar%_%username%
 
 @if "%1" == "" goto NoFileSpecified
 @set ext=%~x1
@@ -88,12 +89,7 @@
 @rem but be aware that the current setting locks up 300 MB of RAM.
 @set KBuffers=-buffersize 1024 -minbuffers 1200
 
-@rem Stop the circular tracing if it is enabled.
-@rem @call etwcirc stop
-
 @rem Select locations for the temporary kernel and user trace files.
-@rem These locations are chosen to be on the SSD and be in the directory
-@rem that is excluded from virus scanning and bit9 hashing.
 @set kernelfile=%xperftemptracedir%\kernel.etl
 @set userfile=%xperftemptracedir%\user.etl
 
@@ -142,8 +138,6 @@ xperf -merge %kernelfile% %userfile% %FileAndCompressFlags%
 python StripChromeSymbols.py %FileName%
 @popd
 start wpa %FileName%
-@rem Restart circular tracing.
-@rem @call etwcirc StartSilent
 @exit /b
 
 :FailureToRecord
@@ -151,8 +145,6 @@ start wpa %FileName%
 @del %kernelfile%
 @del %userfile%
 @echo Failed to record trace.
-@rem Restart circular tracing.
-@rem @call etwcirc StartSilent
 @exit /b
 
 :failure
