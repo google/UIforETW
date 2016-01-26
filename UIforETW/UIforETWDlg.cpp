@@ -1364,8 +1364,14 @@ void CUIforETWDlg::UpdateNotesState()
 		SmartEnableWindow(btTraceNotes_.m_hWnd, true);
 		std::wstring traceName = traces_[curSel];
 		traceNoteFilename_ = GetTraceDir() + traceName + L".txt";
-		traceNotes_ = LoadFileAsText(traceNoteFilename_);
-		SetDlgItemText(IDC_TRACENOTES, traceNotes_.c_str());
+		std::wstring newTraceNotes = LoadFileAsText(traceNoteFilename_);
+		if (newTraceNotes != traceNotes_)
+		{
+			// Only call SetDlgItemText if something has actually changed, to
+			// avoid resetting state such as the cursor position.
+			traceNotes_ = newTraceNotes;
+			SetDlgItemText(IDC_TRACENOTES, traceNotes_.c_str());
+		}
 	}
 	else
 	{
