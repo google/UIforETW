@@ -14,6 +14,10 @@
 
 @setlocal
 
+@set logger="Circular Kernel Context Logger"
+@rem Can also use "NT Kernel Logger", but that conflicts with UIforETW
+@rem Better to use a different kernel logger to let them run in parallel.
+
 @rem Set the etwtracedir environment variable if it
 @rem isn't set already.
 @if not "%etwtracedir%" == "" goto TraceDirSet
@@ -41,24 +45,27 @@
 
 @set kernelfile=%temp%\kernel_trace.etl
 
-@echo This repords context switches, DPCs, and interrupts and nothing else, to allow for very long running tracing.
-xperf.exe -start "NT Kernel Logger" -on PROC_THREAD+LOADER+DPC+INTERRUPT+CSWITCH -buffersize 1024 -minbuffers 60 -maxbuffers 60 -f "%kernelfile%"
+@xperf.exe -start %logger% -on PROC_THREAD+LOADER+DPC+INTERRUPT+CSWITCH -buffersize 1024 -minbuffers 60 -maxbuffers 60 -f "%kernelfile%"
 @set starttime=%time%
 @if not %errorlevel% equ 0 goto failure
-@echo Tracing started at %starttime%
+@echo Low data-rate tracing started at %starttime%
 
 @echo Run the test you want to profile here
+@rem Can replace "pause" with "timeout 3600" so that tracing automatically stops
+@rem after an hour. But this will require some process to wake up once a second
+@rem to update the timeout status.
 @pause
-xperf.exe -stop "NT Kernel Logger"
-xperf.exe -merge "%kernelfile%" "%tracefile%" -compress
+@xperf.exe -stop %logger%
+@xperf.exe -merge "%kernelfile%" "%tracefile%" -compress
 @del "%kernelfile%"
 @echo Tracing ran from %starttime% to %time%
 @echo Tracing ran from %starttime% to %time% > %textfile%
 
-@echo Trace data is in "%tracefile%"
-@dir "%tracefile%" | find /i ".etl"
+@echo Trace can be loaded using UIforETW or with:
+@echo wpa "%tracefile%" -profile CPUUsageByProcess.wpaProfile
 @exit /b
 
 :failure
-@echo Failure!
+@echo Failure! Stopping tracing to clear state.
+@xperf.exe -stop %logger%
 @exit /b
