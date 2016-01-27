@@ -17,7 +17,7 @@
 @rem Set the etwtracedir environment variable if it
 @rem isn't set already.
 @if not "%etwtracedir%" == "" goto TraceDirSet
-@set etwtracedir=%homedrive%%homepath%\documents\xperftraces
+@set etwtracedir=%homedrive%%homepath%\documents\etwtraces
 :TraceDirSet
 
 @rem Make sure %etwtracedir% exists
