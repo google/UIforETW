@@ -238,7 +238,7 @@ void ETWMarkPrintf( _Printf_format_string_ _In_z_ PCSTR pMessage, ... )
 	char buffer[1000];
 	va_list args;
 	va_start( args, pMessage );
-	vsprintf_s( buffer, pMessage, args );
+	vsnprintf_s( buffer, _TRUNCATE, pMessage, args );
 	va_end( args );
 
 	EventWriteMark( buffer );
@@ -260,7 +260,7 @@ void ETWMarkWPrintf(_Printf_format_string_ _In_z_ PCWSTR pMessage, ...)
 	wchar_t buffer[1000];
 	va_list args;
 	va_start(args, pMessage);
-	vswprintf_s(buffer, pMessage, args);
+	_vsnwprintf_s(buffer, _TRUNCATE, pMessage, args);
 	va_end(args);
 
 	EventWriteMarkW(buffer);
@@ -370,7 +370,7 @@ void ETWWorkerMarkPrintf( _Printf_format_string_ _In_z_ PCSTR pMessage, ... )
 	char buffer[1000];
 	va_list args;
 	va_start( args, pMessage );
-	vsprintf_s( buffer, pMessage, args );
+	vsnprintf_s( buffer, _TRUNCATE, pMessage, args );
 	va_end( args );
 
 	EventWriteMarkWorker( buffer );
