@@ -25,8 +25,8 @@
 :TraceDirSet
 
 @rem Make sure %etwtracedir% exists
-@if exist %etwtracedir% goto TraceDirExists
-@mkdir %etwtracedir%
+@if exist "%etwtracedir%" goto TraceDirExists
+@mkdir "%etwtracedir%"
 :TraceDirExists
 
 @rem %temp% should be a good location for temporary traces.
@@ -94,10 +94,10 @@
 @set userfile=%xperftemptracedir%\user.etl
 
 @rem Start the kernel provider and user-mode provider
-xperf -on %KernelProviders% %KernelStackWalk% %KBuffers% -f %kernelfile% -start %SessionName% -on %UserProviders%+%CustomProviders% -f %userfile%
+xperf -on %KernelProviders% %KernelStackWalk% %KBuffers% -f "%kernelfile%" -start %SessionName% -on %UserProviders%+%CustomProviders% -f "%userfile%"
 @if not %errorlevel% equ -2147023892 goto NotInvalidFlags
 @echo Trying again without the custom providers. Run ETWRegister.bat to register them.
-xperf -on %KernelProviders% %KernelStackWalk% %KBuffers% -f %kernelfile%  -start %SessionName% -on %UserProviders% -f %userfile%
+xperf -on %KernelProviders% %KernelStackWalk% %KBuffers% -f "%kernelfile%"  -start %SessionName% -on %UserProviders% -f "%userfile%"
 :NotInvalidFlags
 @if not %errorlevel% equ 0 goto failure
 
@@ -106,9 +106,9 @@ xperf -on %KernelProviders% %KernelStackWalk% %KBuffers% -f %kernelfile%  -start
 
 @rem Record the data and stop tracing
 xperf -stop %SessionName% -stop
-@set FileAndCompressFlags=%FileName% -compress
+@set FileAndCompressFlags="%FileName%" -compress
 @if "%NOETWCOMPRESS%" == "" goto compressTrace
-@set FileAndCompressFlags=%FileName%
+@set FileAndCompressFlags="%FileName%"
 :compressTrace
 
 @rem New method -- allows requesting trace compression. This is a NOP on
@@ -120,7 +120,7 @@ xperf -stop %SessionName% -stop
 @rename %HVEDir%\Amcache.hve Amcache_temp.hve 2>nul
 @set RenameErrorCode=%errorlevel%
 
-xperf -merge %kernelfile% %userfile% %FileAndCompressFlags%
+xperf -merge "%kernelfile%" "%userfile%" %FileAndCompressFlags%
 
 @rem Rename the file back
 @if not "%RenameErrorCode%" equ "0" goto SkipRename
@@ -129,21 +129,21 @@ xperf -merge %kernelfile% %userfile% %FileAndCompressFlags%
 
 @if not %errorlevel% equ 0 goto FailureToRecord
 @rem Delete the temporary ETL files
-@del %kernelfile%
-@del %userfile%
+@del "%kernelfile%""
+@del "%userfile%"
 @echo Trace data is in %FileName% -- load it with wpa or xperfview or gpuview.
-@dir %FileName% | find /i ".etl"
+@dir "%FileName%" | find /i ".etl"
 @rem Preprocessing symbols to avoid delays with Chrome's huge symbols
-@pushd %batchdir%
-python StripChromeSymbols.py %FileName%
+@pushd "%batchdir%"
+python StripChromeSymbols.py "%FileName%"
 @popd
-start wpa %FileName%
+start wpa "%FileName%"
 @exit /b
 
 :FailureToRecord
 @rem Delete the temporary ETL files
-@del %kernelfile%
-@del %userfile%
+@del "%kernelfile%"
+@del "%userfile%"
 @echo Failed to record trace.
 @exit /b
 

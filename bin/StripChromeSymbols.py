@@ -144,6 +144,9 @@ def main():
           cache_match = pdb_cached_re.match(subline.strip())
           if cache_match:
             pdb_cache_path = cache_match.groups()[0]
+            # RetrieveSymbols puts a period at the end of the output, so strip that.
+            if pdb_cache_path.endswith("."):
+              pdb_cache_path = pdb_cache_path[:-1]
         if not pdb_cache_path:
           # Look for locally built symbols
           if os.path.exists(path):
@@ -152,9 +155,12 @@ def main():
         if pdb_cache_path:
           tempdir = tempfile.mkdtemp()
           tempdirs.append(tempdir)
-          dest_path = os.path.join(tempdir, os.path.split(pdb_cache_path)[1])
+          dest_path = os.path.join(tempdir, os.path.basename(pdb_cache_path))
           print("  Copying PDB to %s" % dest_path)
-          for copyline in os.popen("%s %s %s -p" % (pdbcopy_path, pdb_cache_path, dest_path)):
+          # For some reason putting quotes around the command to be run causes
+          # it to fail. So don't do that.
+          copy_command = '%s "%s" "%s" -p' % (pdbcopy_path, pdb_cache_path, dest_path)
+          for copyline in os.popen(copy_command):
             print("  %s" % copyline.strip())
         else:
           print("  Failed to retrieve symbols.")

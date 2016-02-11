@@ -27,11 +27,11 @@
 @set ManifestFile=%ManifestFileMain%
 @if not exist %ManifestFile% goto NoManifest
 
-xcopy /y %DLLFile% %temp%
+xcopy /y %DLLFile% "%temp%"
 @set DLLFileTemp=%temp%\ETWProviders.dll
-wevtutil um %ManifestFile%
+wevtutil um "%ManifestFile%"
 @if %errorlevel% == 5 goto NotElevated
-wevtutil im %ManifestFile% /mf:%DLLFileTemp% /rf:%DLLFileTemp%
+wevtutil im "%ManifestFile%" /mf:"%DLLFileTemp%" /rf:"%DLLFileTemp%"
 @:Done
 @exit /b
 

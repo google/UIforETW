@@ -25,8 +25,8 @@
 :TraceDirSet
 
 @rem Make sure %etwtracedir% exists
-@if exist %etwtracedir% goto TraceDirExists
-@mkdir %etwtracedir%
+@if exist "%etwtracedir%" goto TraceDirExists
+@mkdir "%etwtracedir%"
 :TraceDirExists
 
 @rem %temp% should be a good location for temporary traces.
@@ -59,7 +59,7 @@
 @xperf.exe -merge "%kernelfile%" "%tracefile%" -compress
 @del "%kernelfile%"
 @echo Tracing ran from %starttime% to %time%
-@echo Tracing ran from %starttime% to %time% > %textfile%
+@echo Tracing ran from %starttime% to %time% > "%textfile%"
 
 @echo Trace can be loaded using UIforETW or with:
 @echo wpa "%tracefile%" -profile CPUUsageByProcess.wpaProfile
