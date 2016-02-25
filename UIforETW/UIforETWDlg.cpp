@@ -505,6 +505,8 @@ BOOL CUIforETWDlg::OnInitDialog()
 
 	SetTimer(0, 1000, nullptr);
 
+	CheckProcesses();
+
 	return TRUE; // return TRUE unless you set the focus to a control
 }
 

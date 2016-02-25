@@ -55,6 +55,8 @@ void outputPrintf(_Printf_format_string_ const wchar_t* pFormat, ...);
 // Needed for int64_t and friends
 #include <inttypes.h>
 
+void CheckProcesses();
+
 // Using #define NOMINMAX would be nice but gdiplustypes.h *depends*
 // on min/max macros, so the best I can do is to undefine them here.
 #undef min
