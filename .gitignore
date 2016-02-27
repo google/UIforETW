@@ -10,6 +10,9 @@
 *.svg
 *.pdb
 *.user
+# New Visual Studio 2015 intellisense DB files
+# http://blogs.msdn.com/b/vcblog/archive/2015/11/11/new-improved-and-faster-database-engine.aspx
+*.VC.db
 symsrv.yes
 
 # GPUView likes to drop these files when run.
