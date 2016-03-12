@@ -63,6 +63,12 @@ def main():
   script_dir = os.path.split(sys.argv[0])[0]
   retrieve_path = os.path.join(script_dir, "RetrieveSymbols.exe")
   pdbcopy_path = os.path.join(script_dir, "pdbcopy.exe")
+  if os.environ.has_key("programfiles(x86)"):
+    # The UIforETW copy of pdbcopy.exe fails to copy some Chrome PDBs that the
+    # Windows 10 SDK version can copy - use it if present.
+    pdbcopy_install = os.path.join(os.environ["programfiles(x86)"], r"Windows kits\10\debuggers\x86\pdbcopy.exe")
+    if os.path.exists(pdbcopy_install):
+      pdbcopy_path = pdbcopy_install
 
   # RetrieveSymbols.exe requires some support files. dbghelp.dll and symsrv.dll
   # have to be in the same directory as RetrieveSymbols.exe and pdbcopy.exe must
@@ -160,8 +166,13 @@ def main():
           # For some reason putting quotes around the command to be run causes
           # it to fail. So don't do that.
           copy_command = '%s "%s" "%s" -p' % (pdbcopy_path, pdb_cache_path, dest_path)
-          for copyline in os.popen(copy_command):
-            print("  %s" % copyline.strip())
+          print("  > %s" % copy_command)
+          output = str(subprocess.check_output(copy_command, stderr=subprocess.STDOUT))
+          if output:
+            print("  %s" % output, end="")
+          if not os.path.exists(dest_path):
+            print("Aborting symbol generation because stripped PDB '%s' does not exist. WPA symbol loading may be slow." % dest_path)
+            sys.exit(0)
         else:
           print("  Failed to retrieve symbols.")
 
@@ -173,23 +184,32 @@ def main():
     renames = []
     error = False
     try:
+      rename_errors = False
       for local_pdb in local_symbol_files:
         temp_name = local_pdb + "x"
         print("Renaming %s to %s to stop unstripped PDBs from being used." % (local_pdb, temp_name))
         try:
+          # If the destination file exists we have to rename it or else the
+          # rename will fail.
+          if os.path.exists(temp_name):
+            os.remove(temp_name)
           os.rename(local_pdb, temp_name)
         except:
           # Rename can and does throw exceptions. We must catch and continue.
           e = sys.exc_info()[0]
           print("Hit exception while renaming %s to %s. Continuing.\n%s" % (local_pdb, temp_name, e))
+          rename_errors = True
         else:
           renames.append((local_pdb, temp_name))
 
       #-build = build the symcache store for this trace (see xperf -help symcache)
-      gen_command = 'xperf -i "%s" -symbols -tle -tti -a symcache -build' % tracename
-      print("> %s" % gen_command)
-      for line in os.popen(gen_command).readlines():
-        pass # Don't print line
+      if rename_errors:
+        print("Skipping symbol generation due to PDB rename errors. WPA symbol loading may be slow.")
+      else:
+        gen_command = 'xperf -i "%s" -symbols -tle -tti -a symcache -build' % tracename
+        print("> %s" % gen_command)
+        for line in os.popen(gen_command).readlines():
+          pass # Don't print line
     except KeyboardInterrupt:
       # Catch Ctrl+C exception so that PDBs will get renamed back.
       if renames:
