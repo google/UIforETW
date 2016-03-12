@@ -1311,7 +1311,6 @@ void CUIforETWDlg::OnGetMinMaxInfo(MINMAXINFO* lpMMI)
 	lpMMI->ptMinTrackSize.y = initialHeight_;
 }
 
-
 void CUIforETWDlg::OnSize(UINT nType, int /*cx*/, int /*cy*/)
 {
 	if (nType == SIZE_RESTORED && initialWidth_)
@@ -1325,9 +1324,16 @@ void CUIforETWDlg::OnSize(UINT nType, int /*cx*/, int /*cy*/)
 		int yDelta = windowRect.Height() - lastHeight_;
 		lastHeight_ += yDelta;
 
-		UINT flags = SWP_NOMOVE | SWP_NOOWNERZORDER | SWP_NOZORDER | SWP_NOACTIVATE;
+		const UINT flags = SWP_NOMOVE | SWP_NOOWNERZORDER | SWP_NOZORDER | SWP_NOACTIVATE;
 
-		// Resize the trace list and notes control.
+		// Resize the output window, trace list, and notes control.
+
+		// Output window sizes horizontally only.
+		CRect outputRect;
+		btOutput_.GetWindowRect(&outputRect);
+		btOutput_.SetWindowPos(nullptr, 0, 0, outputRect.Width() + xDelta, outputRect.Height(), flags);
+
+		// Trace list sizes vertically only.
 		CRect listRect;
 		btTraces_.GetWindowRect(&listRect);
 		btTraces_.SetWindowPos(nullptr, 0, 0, listRect.Width(), listRect.Height() + yDelta, flags);
@@ -1338,9 +1344,24 @@ void CUIforETWDlg::OnSize(UINT nType, int /*cx*/, int /*cy*/)
 			btTraces_.SetTopIndex(curSel);
 		}
 
+		// Notes control sizes horizontally and vertically.
 		CRect editRect;
 		btTraceNotes_.GetWindowRect(&editRect);
 		btTraceNotes_.SetWindowPos(nullptr, 0, 0, editRect.Width() + xDelta, editRect.Height() + yDelta, flags);
+
+		// Option buttons move horizontally.
+		if (xDelta)
+		{
+			MoveControl(this, btCompress_, xDelta, 0);
+			MoveControl(this, btCswitchStacks_, xDelta, 0);
+			MoveControl(this, btSampledStacks_, xDelta, 0);
+			MoveControl(this, btFastSampling_, xDelta, 0);
+			MoveControl(this, btGPUTracing_, xDelta, 0);
+			MoveControl(this, btInputTracingLabel_, xDelta, 0);
+			MoveControl(this, btInputTracing_, xDelta, 0);
+			MoveControl(this, btTracingMode_, xDelta, 0);
+			MoveControl(this, btShowCommands_, xDelta, 0);
+		}
 	}
 }
 

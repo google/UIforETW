@@ -876,3 +876,13 @@ void CloseValidHandle(_In_ _Pre_valid_ _Post_ptr_invalid_ const HANDLE handle)
 {
 	ATLVERIFY(::CloseHandle(handle) != 0);
 }
+
+void MoveControl(CWnd* pParent, CWnd& control, int xDelta, int yDelta)
+{
+	const UINT flags = SWP_NOSIZE | SWP_NOOWNERZORDER | SWP_NOZORDER | SWP_NOACTIVATE;
+	CRect controlRect;
+	control.GetWindowRect(&controlRect);
+	POINT p = { controlRect.left, controlRect.top };
+	pParent->ScreenToClient(&p);
+	control.SetWindowPos(nullptr, p.x + xDelta, p.y + yDelta, 0, 0, flags);
+}
