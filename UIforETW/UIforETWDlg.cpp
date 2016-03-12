@@ -1038,8 +1038,10 @@ void CUIforETWDlg::StopTracingAndMaybeRecord(bool bSaveTrace)
 		{
 			// Some machines (one so far?) can take 5-10 minutes to do the trace
 			// saving stage.
-			outputPrintf(L"Saving the trace took %1.1f s, which is unusually long. Please "
-				L"try metatrace.bat, and share your results on "
+			outputPrintf(L"Saving the trace took %1.1f s, which is unusually long. Consider "
+				L"changing the trace mode to \"Tracing to file\" to see if this works better. "
+				L"Alternately, try using metatrace.bat to record a trace of UIforETW saving "
+				L"the trace, and share your results on "
 				L"https://groups.google.com/forum/#!forum/uiforetw.\n", saveTime);
 		}
 		if (mergeTime > 100.0)
