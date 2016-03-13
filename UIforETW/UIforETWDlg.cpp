@@ -452,7 +452,15 @@ BOOL CUIforETWDlg::OnInitDialog()
 
 	DisablePagingExecutive();
 
+	// Fill in the traces list.
 	UpdateTraceList();
+	const int numTraces = btTraces_.GetCount();
+	if (numTraces > 0)
+	{
+		// Select the most recent trace.
+		btTraces_.SetCurSel(numTraces - 1);
+		UpdateNotesState();
+	}
 
 	if (toolTip_.Create(this))
 	{
