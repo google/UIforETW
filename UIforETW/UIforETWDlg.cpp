@@ -185,14 +185,14 @@ BEGIN_MESSAGE_MAP(CUIforETWDlg, CDialog)
 	ON_BN_CLICKED(IDC_SHOWCOMMANDS, &CUIforETWDlg::OnBnClickedShowcommands)
 	ON_BN_CLICKED(IDC_FASTSAMPLING, &CUIforETWDlg::OnBnClickedFastsampling)
 	ON_CBN_SELCHANGE(IDC_INPUTTRACING, &CUIforETWDlg::OnCbnSelchangeInputtracing)
-	ON_MESSAGE(WM_UPDATETRACELIST, UpdateTraceListHandler)
+	ON_MESSAGE(WM_UPDATETRACELIST, &CUIforETWDlg::UpdateTraceListHandler)
 	ON_LBN_DBLCLK(IDC_TRACELIST, &CUIforETWDlg::OnLbnDblclkTracelist)
 	ON_WM_GETMINMAXINFO()
 	ON_WM_SIZE()
 	ON_LBN_SELCHANGE(IDC_TRACELIST, &CUIforETWDlg::OnLbnSelchangeTracelist)
 	ON_BN_CLICKED(IDC_ABOUT, &CUIforETWDlg::OnBnClickedAbout)
 	ON_BN_CLICKED(IDC_SAVETRACEBUFFERS, &CUIforETWDlg::OnBnClickedSavetracebuffers)
-	ON_MESSAGE(WM_HOTKEY, OnHotKey)
+	ON_MESSAGE(WM_HOTKEY, &CUIforETWDlg::OnHotKey)
 	ON_WM_CLOSE()
 	ON_CBN_SELCHANGE(IDC_TRACINGMODE, &CUIforETWDlg::OnCbnSelchangeTracingmode)
 	ON_BN_CLICKED(IDC_SETTINGS, &CUIforETWDlg::OnBnClickedSettings)
@@ -525,10 +525,10 @@ std::wstring CUIforETWDlg::wpaDefaultPath() const
 	return wpa81Path_;
 }
 
-std::wstring CUIforETWDlg::GetDirectory(PCWSTR env, const std::wstring& default)
+std::wstring CUIforETWDlg::GetDirectory(PCWSTR env, const std::wstring& defaultDir)
 {
 	// Get a directory (from an environment variable, if set) and make sure it exists.
-	std::wstring result = default;
+	std::wstring result = defaultDir;
 	const std::wstring traceDir = GetEnvironmentVariableString(env);
 	if (!traceDir.empty())
 	{

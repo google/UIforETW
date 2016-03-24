@@ -53,7 +53,7 @@ struct HMODULEhelper
 
 };
 
-typedef WINBASEAPI BOOL(WINAPI* SetProcessMitigationPolicy_t)(\
+typedef BOOL(WINAPI* SetProcessMitigationPolicy_t)(\
 	_In_ _Const_ PROCESS_MITIGATION_POLICY MitigationPolicy,
 	_In_reads_bytes_( dwLength ) _Const_ PVOID lpBuffer,
 	_In_ _Const_ SIZE_T dwLength);

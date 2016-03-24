@@ -23,7 +23,7 @@ limitations under the License.
 namespace
 {
 
-std::atomic<bool> g_LogKeyboardDetails = false;
+std::atomic<bool> g_LogKeyboardDetails(false);
 
 _Pre_satisfies_(nCode == HC_ACTION)
 LRESULT CALLBACK LowLevelKeyboardHook(int nCode, WPARAM wParam, LPARAM lParam)

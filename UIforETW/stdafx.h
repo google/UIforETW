@@ -24,6 +24,10 @@ limitations under the License.
 // documented as available on the Server Core SKUs.
 #define _AFX_NO_MFC_CONTROLS_IN_DIALOGS
 
+// disable turning old-style unqualified names to pointers to members
+// when used in BEGIN_MESSAGE_MAP
+#define _ATL_ENABLE_PTM_WARNING
+
 #ifndef VC_EXTRALEAN
 #define VC_EXTRALEAN            // Exclude rarely-used stuff from Windows headers
 #endif
