@@ -37,6 +37,7 @@
 #define IDC_TRACEDIR                    1019
 #define IDC_EXTRAPROVIDERS              1019
 #define IDC_EXTRAKERNELFLAGS            1019
+#define IDC_CLRTRACING                  1019
 #define IDC_BUTTON1                     1020
 #define IDC_EXTRASTACKWALKS             1020
 #define IDC_TEMPTRACEDIR                1021
@@ -94,7 +95,7 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        136
+#define _APS_NEXT_RESOURCE_VALUE        137
 #define _APS_NEXT_COMMAND_VALUE         32812
 #define _APS_NEXT_CONTROL_VALUE         1034
 #define _APS_NEXT_SYMED_VALUE           101
