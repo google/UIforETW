@@ -66,12 +66,14 @@ private:
 	bool bSampledStacks_ = true;
 	bool bFastSampling_ = false;
 	bool bGPUTracing_ = false;
+	bool bCLRTracing_ = false;
 	bool bShowCommands_ = false;
 	CButton btCompress_;
 	CButton btCswitchStacks_;
 	CButton btSampledStacks_;
 	CButton btFastSampling_;
 	CButton btGPUTracing_;
+	CButton btCLRTracing_;
 	CButton btShowCommands_;
 
 	bool bHeapStacks_ = true;
@@ -268,4 +270,5 @@ private:
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 public:
 	afx_msg void OnBnClickedGPUtracing();
+	afx_msg void OnBnClickedClrtracing();
 };

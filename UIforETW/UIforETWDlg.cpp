@@ -159,6 +159,7 @@ void CUIforETWDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_CONTEXTSWITCHCALLSTACKS, btCswitchStacks_);
 	DDX_Control(pDX, IDC_FASTSAMPLING, btFastSampling_);
 	DDX_Control(pDX, IDC_GPUTRACING, btGPUTracing_);
+	DDX_Control(pDX, IDC_CLRTRACING, btCLRTracing_ );
 	DDX_Control(pDX, IDC_SHOWCOMMANDS, btShowCommands_);
 
 	DDX_Control(pDX, IDC_INPUTTRACING, btInputTracing_);
@@ -212,6 +213,7 @@ BEGIN_MESSAGE_MAP(CUIforETWDlg, CDialog)
 	ON_BN_CLICKED(ID_PASTEOVERRIDE, &CUIforETWDlg::NotesPaste)
 	ON_WM_ACTIVATE()
 	ON_WM_TIMER()
+	ON_BN_CLICKED( IDC_CLRTRACING, &CUIforETWDlg::OnBnClickedClrtracing )
 END_MESSAGE_MAP()
 
 
@@ -424,6 +426,7 @@ BOOL CUIforETWDlg::OnInitDialog()
 	CheckDlgButton(IDC_CPUSAMPLINGCALLSTACKS, bSampledStacks_);
 	CheckDlgButton(IDC_FASTSAMPLING, bFastSampling_);
 	CheckDlgButton(IDC_GPUTRACING, bGPUTracing_);
+	CheckDlgButton(IDC_CLRTRACING, bCLRTracing_);
 	CheckDlgButton(IDC_SHOWCOMMANDS, bShowCommands_);
 
 	// If a fast sampling speed is requested then set it now. Note that
@@ -486,6 +489,7 @@ BOOL CUIforETWDlg::OnInitDialog()
 					L"more practical.");
 		toolTip_.AddTool(&btGPUTracing_, L"Check this to allow seeing GPU usage "
 					L"in WPA, and more data in GPUView.");
+		toolTip_.AddTool(&btCLRTracing_, L"Check this to record CLR call stacks" );
 		toolTip_.AddTool(&btShowCommands_, L"This tells UIforETW to display the commands being "
 					L"executed. This can be helpful for diagnostic purposes but is not normally needed.");
 
@@ -651,6 +655,7 @@ void CUIforETWDlg::UpdateEnabling()
 	SmartEnableWindow(btSampledStacks_.m_hWnd, !bIsTracing_);
 	SmartEnableWindow(btCswitchStacks_.m_hWnd, !bIsTracing_);
 	SmartEnableWindow(btGPUTracing_.m_hWnd, !bIsTracing_);
+	SmartEnableWindow(btCLRTracing_.m_hWnd, !bIsTracing_ );
 }
 
 void CUIforETWDlg::OnSysCommand(UINT nID, LPARAM lParam)
@@ -850,6 +855,18 @@ void CUIforETWDlg::OnBnClickedStarttracing()
 			// DirectX logger:
 			userProviders += L"+DX:0x2F";
 		}
+	}
+
+	if (bCLRTracing_)
+	{
+		// CLR runtime provider
+		// https://msdn.microsoft.com/en-us/library/ff357718(v=vs.100).aspx
+		userProviders += L"+e13c0d23-ccbc-4e12-931b-d9cc2eee27e4:0x1CCBD:0x5";
+        
+		// note: this seems to be an updated version of
+		// userProviders += L"+ClrAll:0x98:5";
+		// which results in Invalid flags. (0x3ec) when I run it
+		// https://msdn.microsoft.com/en-us/library/windows/hardware/hh448186.aspx
 	}
 
 	// Increase the user buffer sizes when doing graphics tracing or Chrome tracing.
@@ -1204,6 +1221,10 @@ void CUIforETWDlg::OnBnClickedGPUtracing()
 	bGPUTracing_ = !bGPUTracing_;
 }
 
+void CUIforETWDlg::OnBnClickedClrtracing()
+{
+	bCLRTracing_ = !bCLRTracing_;
+}
 
 void CUIforETWDlg::OnCbnSelchangeInputtracing()
 {
@@ -1365,6 +1386,7 @@ void CUIforETWDlg::OnSize(UINT nType, int /*cx*/, int /*cy*/)
 			MoveControl(this, btSampledStacks_, xDelta, 0);
 			MoveControl(this, btFastSampling_, xDelta, 0);
 			MoveControl(this, btGPUTracing_, xDelta, 0);
+			MoveControl(this, btCLRTracing_, xDelta, 0 );
 			MoveControl(this, btInputTracingLabel_, xDelta, 0);
 			MoveControl(this, btInputTracing_, xDelta, 0);
 			MoveControl(this, btTracingMode_, xDelta, 0);

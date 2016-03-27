@@ -74,6 +74,7 @@ END
 // remains consistent on all systems.
 IDR_MAINFRAME           ICON                    "res\\UIforETW.ico"
 
+
 /////////////////////////////////////////////////////////////////////////////
 //
 // Dialog
@@ -106,13 +107,13 @@ BEGIN
     PUSHBUTTON      "About",IDC_ABOUT,455,7,50,14
     EDITTEXT        IDC_OUTPUT,7,24,453,110,ES_MULTILINE | ES_READONLY | WS_VSCROLL
     PUSHBUTTON      "Close",IDOK,512,7,50,14
-    CONTROL         "&Compress Trace",IDC_COMPRESSTRACE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,464,28,67,10
+    CONTROL         "&Compress Trace",IDC_COMPRESSTRACE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,464,24,67,10
     CONTROL         "Context s&witch call stacks",IDC_CONTEXTSWITCHCALLSTACKS,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,464,42,98,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,464,36,98,10
     CONTROL         "CP&U sampling call stacks",IDC_CPUSAMPLINGCALLSTACKS,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,464,56,93,10
-    CONTROL         "&Fast sampling",IDC_FASTSAMPLING,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,464,70,59,10
-    CONTROL         "&GPU tracing",IDC_GPUTRACING,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,464,84,53,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,464,48,93,10
+    CONTROL         "&Fast sampling",IDC_FASTSAMPLING,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,464,60,59,10
+    CONTROL         "&GPU tracing",IDC_GPUTRACING,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,464,72,53,10
     LTEXT           "&Input tracing:",IDC_INPUTTRACING_LABEL,464,99,45,8
     COMBOBOX        IDC_INPUTTRACING,511,97,51,127,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     COMBOBOX        IDC_TRACINGMODE,464,116,98,133,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
@@ -122,6 +123,7 @@ BEGIN
     LTEXT           "Trace inform&ation:",IDC_STATIC,239,135,60,8
     EDITTEXT        IDC_TRACENOTES,239,145,323,68,ES_MULTILINE | ES_WANTRETURN | WS_VSCROLL
     EDITTEXT        IDC_TRACENAMEEDIT,75,144,160,14,ES_AUTOHSCROLL | ES_WANTRETURN | NOT WS_VISIBLE | NOT WS_TABSTOP
+    CONTROL         "&CLR tracing",IDC_CLRTRACING,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,464,84,53,10
 END
 
 IDD_SETTINGS DIALOGEX 0, 0, 401, 178
@@ -293,6 +295,17 @@ IDR_TRACESACCELERATORS ACCELERATORS
 BEGIN
     "^C",           ID_COPYTRACENAME,       ASCII,  NOINVERT
     VK_DELETE,      ID_DELETETRACE,         VIRTKEY, NOINVERT
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// AFX_DIALOG_LAYOUT
+//
+
+IDD_UIFORETW_DIALOG AFX_DIALOG_LAYOUT
+BEGIN
+    0
 END
 
 
