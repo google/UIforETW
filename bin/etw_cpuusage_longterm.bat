@@ -29,10 +29,6 @@
 @mkdir "%etwtracedir%"
 :TraceDirExists
 
-@rem %temp% should be a good location for temporary traces.
-@rem Make sure this is a fast drive, preferably an SSD.
-@set xperftemptracedir=%temp%
-
 @rem Generate a file name based on the current date and time and put it in
 @rem etwtracedir. This is compatible with UIforETW which looks for traces there.
 @rem Note: this probably fails in some locales. Sorry.
