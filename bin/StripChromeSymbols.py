@@ -70,6 +70,13 @@ def main():
     if os.path.exists(pdbcopy_install):
       pdbcopy_path = pdbcopy_install
 
+  # This tool converts PDBs created with /debug:fastlink (VC++ 2015 feature) to
+  # regular PDBs that contain all of the symbol information directly. This is
+  # required so that pdbcopy can copy the symbols.
+  un_fastlink_tool = r"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\amd64\mspdbcmf.exe"
+  if not os.path.exists(un_fastlink_tool):
+    un_fastlink_tool = None
+
   # RetrieveSymbols.exe requires some support files. dbghelp.dll and symsrv.dll
   # have to be in the same directory as RetrieveSymbols.exe and pdbcopy.exe must
   # be in the path, so copy them all to the script directory.
@@ -167,9 +174,25 @@ def main():
           # it to fail. So don't do that.
           copy_command = '%s "%s" "%s" -p' % (pdbcopy_path, pdb_cache_path, dest_path)
           print("  > %s" % copy_command)
-          output = str(subprocess.check_output(copy_command, stderr=subprocess.STDOUT))
-          if output:
-            print("  %s" % output, end="")
+          if un_fastlink_tool:
+            # If the un_fastlink_tool is available then run the pdbcopy command in a
+            # try block. If pdbcopy fails then run the un_fastlink_tool and try again.
+            try:
+              output = str(subprocess.check_output(copy_command, stderr=subprocess.STDOUT))
+              if output:
+                print("  %s" % output, end="")
+            except:
+              convert_command = '%s "%s"' % (un_fastlink_tool, pdb_cache_path)
+              print("Attempting to un-fastlink PDB so that pdbcopy can strip it. This may be slow.")
+              print("  > %s" % convert_command)
+              subprocess.check_output(convert_command)
+              output = str(subprocess.check_output(copy_command, stderr=subprocess.STDOUT))
+              if output:
+                print("  %s" % output, end="")
+          else:
+            output = str(subprocess.check_output(copy_command, stderr=subprocess.STDOUT))
+            if output:
+              print("  %s" % output, end="")
           if not os.path.exists(dest_path):
             print("Aborting symbol generation because stripped PDB '%s' does not exist. WPA symbol loading may be slow." % dest_path)
             sys.exit(0)
