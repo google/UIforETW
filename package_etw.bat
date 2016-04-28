@@ -14,18 +14,14 @@ mkdir %destdir%\lib
 mkdir %destdir%\third_party
 
 set wptredistmsi=Windows Performance Toolkit\Redistributables\WPTx64-x86_en-us.msi
-@rem set wpt81=c:\Program Files (x86)\Windows Kits\8.1\
-@rem if not exist "%wpt81%%wptredistmsi%" goto nowpt81
-@rem mkdir %destdir%\third_party\wpt81
-@rem xcopy "%wpt81%%wptredistmsi%" %destdir%\third_party\wpt81
-@rem xcopy "%wpt81%sdk_license.rtf" %destdir%\third_party\wpt81
-@rem ren %destdir%\third_party\wpt81\sdk_license.rtf LICENSE.rtf
 
 set wpt10=c:\Program Files (x86)\Windows Kits\10\
 if not exist "%wpt10%%wptredistmsi%" goto nowpt10
 mkdir %destdir%\third_party\wpt10
 xcopy "%wpt10%%wptredistmsi%" %destdir%\third_party\wpt10
+@if errorlevel 1 goto copyfailure
 xcopy "%wpt10%Licenses\10.0.10240.0\sdk_license.rtf" %destdir%\third_party\wpt10
+@if errorlevel 1 goto copyfailure
 ren %destdir%\third_party\wpt10\sdk_license.rtf LICENSE.rtf
 
 @rem Add VS tools to the path
@@ -92,14 +88,14 @@ python %UIforETW%make_zip_file.py %UIforETW%etwpackage.zip etwpackage
 @echo Something is running with ETWProviders.dll loaded. Please close it and try again.
 @exit /b
 
-@rem :nowpt81
-@rem @echo WPT 8.1 redistributables not found. Aborting.
-@rem @exit /b
-
 :nowpt10
 @echo WPT 10 redistributables not found. Aborting.
 @exit /b
 
 :BuildFailure
 @echo Build failure of some sort. Aborting.
+@exit /b
+
+:copyfailure
+@echo Failed to copy file. Aborting.
 @exit /b
