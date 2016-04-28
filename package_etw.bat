@@ -20,7 +20,7 @@ if not exist "%wpt10%%wptredistmsi%" goto nowpt10
 mkdir %destdir%\third_party\wpt10
 xcopy "%wpt10%%wptredistmsi%" %destdir%\third_party\wpt10
 @if errorlevel 1 goto copyfailure
-xcopy "%wpt10%Licenses\10.0.10240.0\sdk_license.rtf" %destdir%\third_party\wpt10
+xcopy "%wpt10%Licenses\10.0.10586.0\sdk_license.rtf" %destdir%\third_party\wpt10
 @if errorlevel 1 goto copyfailure
 ren %destdir%\third_party\wpt10\sdk_license.rtf LICENSE.rtf
 
