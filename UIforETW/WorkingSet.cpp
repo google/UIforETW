@@ -182,17 +182,25 @@ void CWorkingSetMonitor::WSMonitorThread()
 
 CWorkingSetMonitor::CWorkingSetMonitor()
 {
-	hExitEvent_ = CreateEvent(nullptr, FALSE, FALSE, nullptr);
-	hThread_ = CreateThread(NULL, 0, StaticWSMonitorThread, this, 0, NULL);
+	// The working set monitoring is not needed on Windows 8.1 and above because
+	// of the Microsoft-Windows-Kernel-Memory provider.
+	if (!IsWindows8Point1OrGreater())
+	{
+		hExitEvent_ = CreateEvent(nullptr, FALSE, FALSE, nullptr);
+		hThread_ = CreateThread(NULL, 0, StaticWSMonitorThread, this, 0, NULL);
+	}
 }
 
 CWorkingSetMonitor::~CWorkingSetMonitor()
 {
-	// Shut down the child thread.
-	SetEvent(hExitEvent_);
-	WaitForSingleObject(hThread_, INFINITE);
-	CloseHandle(hThread_);
-	CloseHandle(hExitEvent_);
+	if (hExitEvent_)
+	{
+		// Shut down the child thread.
+		SetEvent(hExitEvent_);
+		WaitForSingleObject(hThread_, INFINITE);
+		CloseHandle(hThread_);
+		CloseHandle(hExitEvent_);
+	}
 }
 
 void CWorkingSetMonitor::SetProcessFilter(const std::wstring& processes, bool bExpensiveWSMonitoring)

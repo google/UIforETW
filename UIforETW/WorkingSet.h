@@ -36,8 +36,8 @@ private:
 
 	void SampleWorkingSets();
 
-	HANDLE hThread_;
-	HANDLE hExitEvent_;
+	HANDLE hThread_ = nullptr;
+	HANDLE hExitEvent_ = nullptr;
 
 	CCriticalSection processesLock_;
 	// This is a list of process names to monitor. If the list is

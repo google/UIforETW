@@ -119,13 +119,24 @@ BOOL CSettings::OnInitDialog()
 	CheckDlgButton(IDC_VIRTUALALLOCSTACKS, bVirtualAllocStacks_);
 
 	btBufferSizes_.EnableWindow(FALSE);
-	// A 32-bit process on 64-bit Windows will not be able to read the
-	// full working set of 64-bit processes, so don't even try.
-	if (Is64BitWindows() && !Is64BitBuild())
+	if (IsWindows8Point1OrGreater())
+	{
+		// The working set monitoring is not needed on Windows 8.1 and above because
+		// of the Microsoft-Windows-Kernel-Memory provider.
 		btWSMonitoredProcesses_.EnableWindow(FALSE);
+		btExpensiveWSMonitoring_.EnableWindow(FALSE);
+		GetDlgItem(IDC_WS_MONITOR_STATIC)->EnableWindow(FALSE);
+	}
 	else
-		SetDlgItemText(IDC_WSMONITOREDPROCESSES, WSMonitoredProcesses_.c_str());
-	CheckDlgButton(IDC_EXPENSIVEWS, bExpensiveWSMonitoring_);
+	{
+		// A 32-bit process on 64-bit Windows will not be able to read the
+		// full working set of 64-bit processes, so don't even try.
+		if (Is64BitWindows() && !Is64BitBuild())
+			btWSMonitoredProcesses_.EnableWindow(FALSE);
+		else
+			SetDlgItemText(IDC_WSMONITOREDPROCESSES, WSMonitoredProcesses_.c_str());
+		CheckDlgButton(IDC_EXPENSIVEWS, bExpensiveWSMonitoring_);
+	}
 	btExtraKernelFlags_.SetWindowTextW(extraKernelFlags_.c_str());
 	btExtraStackwalks_.SetWindowTextW(extraKernelStacks_.c_str());
 

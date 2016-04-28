@@ -822,6 +822,10 @@ void CUIforETWDlg::OnBnClickedStarttracing()
 	if (IsWindowsVistaOrLesser())
 		userProviders = L"Microsoft-Windows-LUA"; // Because Microsoft-Windows-Win32k doesn't work on Vista.
 	userProviders += L"+Multi-MAIN+Multi-FrameRate+Multi-Input+Multi-Worker";
+	// Suggested in https://github.com/google/UIforETW/issues/80. The data shows up in WPA in
+	// Memory-> Virtual Memory Snapshots. On windows 8.1 and above this makes the working set
+	// scanning in UIforETW unnecessary.
+	userProviders += L"+Microsoft-Windows-Kernel-Memory:0xE0";
 
 	// DWM providers can be helpful also. Uncomment to enable.
 	//userProviders += L"+Microsoft-Windows-Dwm-Dwm";

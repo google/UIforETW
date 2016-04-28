@@ -133,7 +133,7 @@ FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     LTEXT           "&Heap-profiled processes:",IDC_STATIC,7,9,81,8
     EDITTEXT        IDC_HEAPEXE,89,7,133,14,ES_AUTOHSCROLL
-    LTEXT           "&WS monitored processes:",IDC_STATIC,7,25,82,8
+    LTEXT           "&WS monitored processes:",IDC_WS_MONITOR_STATIC,7,25,82,8
     EDITTEXT        IDC_WSMONITOREDPROCESSES,89,22,133,14,ES_AUTOHSCROLL
     CONTROL         "E&xpensive working set monitoring",IDC_EXPENSIVEWS,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,39,123,10
@@ -304,6 +304,11 @@ END
 //
 
 IDD_UIFORETW_DIALOG AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+IDD_SETTINGS AFX_DIALOG_LAYOUT
 BEGIN
     0
 END
