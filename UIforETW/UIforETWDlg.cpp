@@ -958,7 +958,7 @@ void CUIforETWDlg::StopTracingAndMaybeRecord(bool bSaveTrace)
 		outputPrintf(L"\nStopping tracing...\n");
 
 	// Rename Amcache.hve to work around a merge hang that can last up to six
-	// minutes.
+	// minutes. This was seen on two Windows 7 machines.
 	// https://randomascii.wordpress.com/2015/03/02/profiling-the-profiler-working-around-a-six-minute-xperf-hang/
 	const std::wstring compatFile = windowsDir_ + L"AppCompat\\Programs\\Amcache.hve";
 	const std::wstring compatFileTemp = windowsDir_ + L"AppCompat\\Programs\\Amcache_temp.hve";
@@ -968,8 +968,10 @@ void CUIforETWDlg::StopTracingAndMaybeRecord(bool bSaveTrace)
 	// and the -merge step painfully slow.
 	DeleteFile(compatFileTemp.c_str());
 	BOOL moveSuccess = MoveFile(compatFile.c_str(), compatFileTemp.c_str());
-	if (bShowCommands_ && !moveSuccess)
-		outputPrintf(L"Failed to rename %s to %s\n", compatFile.c_str(), compatFileTemp.c_str());
+	// Don't print this message - it just cause confusion, especially since the renaming fails
+	// on most machines without it mattering.
+	//if (bShowCommands_ && !moveSuccess)
+	//	outputPrintf(L"Failed to rename %s to %s\n", compatFile.c_str(), compatFileTemp.c_str());
 
 	ElapsedTimer saveTimer;
 	{
@@ -1075,15 +1077,15 @@ void CUIforETWDlg::StopTracingAndMaybeRecord(bool bSaveTrace)
 			if (moveSuccess)
 			{
 				outputPrintf(L"Merging the trace took %1.1fs, which is unusually long. This is surprising "
-					L"because renaming of amcache.hve to avoid this worked. Please try metatrace.bat "
-					L"and share this on "
+					L"because renaming of amcache.hve to avoid this worked. Please try using metatrace.bat "
+					L"to record a trace of UIforETW saving the trace, and share this on "
 					L"https://groups.google.com/forum/#!forum/uiforetw\n", mergeTime);
 			}
 			else
 			{
-				outputPrintf(L"Merging the trace took %1.1fs, which is unusually long. This is probably "
-					L"because renaming of amcache.hve failed. Please try metatrace.bat "
-					L"and share this on "
+				outputPrintf(L"Merging the trace took %1.1fs, which is unusually long. This might be "
+					L"because renaming of amcache.hve failed. Please try using metatrace.bat "
+					L"to record a trace of UIforETW saving the trace, and share this on "
 					L"https://groups.google.com/forum/#!forum/uiforetw\n", mergeTime);
 			}
 		}
