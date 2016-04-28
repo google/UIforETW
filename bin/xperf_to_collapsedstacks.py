@@ -34,9 +34,28 @@ import sys
 import os
 import time
 import subprocess
+import argparse
+
+parser = argparse.ArgumentParser(description='Process xperf ETL file and generate flamegraph(s).')
+parser.add_argument('etlFilename', metavar='FILE', type=str,
+                    help='Path to ETL file')
+parser.add_argument('-p', '--processlist', help='List of process names to generate flamegraph for. Comma separated.', type=str)
+parser.add_argument('-b', '--begin', help='Time range. Begin from the specified value. In seconds.', type=float)
+parser.add_argument('-e', '--end', help='Time range. End at the specified value. In seconds.', type=float)
+parser.add_argument('-o', '--output', help='Path to directory where output will written into. Default is system TEMP directory', type=str)
+parser.set_defaults(output=os.environ["temp"])
+parser.add_argument('-n', '--numshow', help='Number of top processes to generate flame graph for. Default is 1', type=int)
+parser.set_defaults(numshow=1)
+parser.add_argument('-d', '--dontopen', help='Do not open the generated SVG file automatically. Default is open', action='store_true')
+parser.set_defaults(dontopen=False)
+args = parser.parse_args()
+
+processList = []
+if args.processlist:
+	processList = [item.lower() for item in args.processlist.split(',')]
 
 # How many threads to create collapsed stacks for.
-numToShow = 1
+numToShow = args.numshow
 
 scriptPath = os.path.abspath(sys.argv[0])
 scriptDir = os.path.split(scriptPath)[0]
@@ -63,18 +82,10 @@ if not os.path.exists(wpaExporterPath):
 	print "Couldn't find \"%s\". Make sure WPT 10 is installed." % wpaExporterPath
 	sys.exit(0)
 
-if len(sys.argv) < 2:
-	print "Usage: %s trace.etl begin end" % sys.argv[0]
-	print "Begin and end specify the time range to be processed, in seconds."
-	sys.exit(0)
-
-etlFilename = sys.argv[1]
-if len(sys.argv) >= 4:
-	begin = float(sys.argv[2])
-	end = float(sys.argv[3])
-	wpaCommand = r'"%s" "%s" -range %ss %ss -profile "%s" -symbols' % (wpaExporterPath, etlFilename, begin, end, profilePath)
+if args.begin and args.end:
+	wpaCommand = r'"%s" "%s" -range %ss %ss -profile "%s" -symbols' % (wpaExporterPath, args.etlFilename, args.begin, args.end, profilePath)
 else:
-	wpaCommand = r'"%s" "%s" -profile "%s" -symbols' % (wpaExporterPath, etlFilename, profilePath)
+	wpaCommand = r'"%s" "%s" -profile "%s" -symbols' % (wpaExporterPath, args.etlFilename, profilePath)
 
 print "> %s" % wpaCommand
 start = time.clock()
@@ -97,6 +108,8 @@ for line in open(csvName).readlines()[1:]:
 	line = line.strip()
 	firstCommaPos = line.find(",")
 	process = line[:firstCommaPos]
+	if processList and process.split(' ')[0].lower() not in processList:
+		continue
 	secondCommaPos = line.find(",", firstCommaPos + 1)
 	threadID = line[firstCommaPos + 1 : secondCommaPos]
 	stackSummary = line[secondCommaPos + 1:]
@@ -145,11 +158,13 @@ sortedThreads.reverse() # Put the thread with the most samples first
 
 print "Found %d samples from %d threads." % (totalSamples, len(samples))
 
-tempDir = os.environ["temp"]
+if len(processList)>0:
+	numToShow = len(sortedThreads)
+
 count = 0
 for numSamples, processAndThread in sortedThreads[:numToShow]:
 	threadSamples = samples[processAndThread]
-	outputName = os.path.join(tempDir, "collapsed_stacks_%d.txt" % count)
+	outputName = os.path.join(args.output, "collapsed_stacks_%d.txt" % count)
 	count += 1
 	print "Writing %d samples to temporary file %s" % (numSamples, outputName)
 	sortedStacks = []
@@ -166,14 +181,15 @@ for numSamples, processAndThread in sortedThreads[:numToShow]:
 	# perl script is run.
 	out.close()
 
-	destPath = os.path.join(tempDir, "%s.svg" % processAndThread)
+	destPath = os.path.join(args.output, "%s.svg" % processAndThread)
 	title = "CPU Usage flame graph of %s" % processAndThread
 	perlCommand = 'perl "%s" --title="%s" "%s"' % (flameGraphPath, title, outputName)
 	print "> %s" % perlCommand
 	svgOutput = subprocess.check_output(perlCommand)
 	if len(svgOutput) > 100:
 		open(destPath, "wt").write(svgOutput)
-		os.popen(destPath)
+		if not args.dontopen:
+			os.popen(destPath)
 		print 'Results are in "%s" - they should be auto-opened in the default SVG viewer.' % destPath
 	else:
 		print "Result size is %d bytes - is perl in your path?" % len(svgOutput)
