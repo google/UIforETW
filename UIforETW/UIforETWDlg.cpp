@@ -23,6 +23,7 @@ limitations under the License.
 #include "Settings.h"
 #include "Utility.h"
 #include "WorkingSet.h"
+#include "Version.h"
 
 #include <algorithm>
 #include <direct.h>
@@ -187,6 +188,7 @@ BEGIN_MESSAGE_MAP(CUIforETWDlg, CDialog)
 	ON_BN_CLICKED(IDC_FASTSAMPLING, &CUIforETWDlg::OnBnClickedFastsampling)
 	ON_CBN_SELCHANGE(IDC_INPUTTRACING, &CUIforETWDlg::OnCbnSelchangeInputtracing)
 	ON_MESSAGE(WM_UPDATETRACELIST, &CUIforETWDlg::UpdateTraceListHandler)
+	ON_MESSAGE(WM_NEWVERSIONAVAILABLE, &CUIforETWDlg::NewVersionAvailable)
 	ON_LBN_DBLCLK(IDC_TRACELIST, &CUIforETWDlg::OnLbnDblclkTracelist)
 	ON_WM_GETMINMAXINFO()
 	ON_WM_SIZE()
@@ -518,6 +520,9 @@ BOOL CUIforETWDlg::OnInitDialog()
 	SetTimer(0, 1000, nullptr);
 
 	CheckProcesses();
+
+	if (bVersionChecks_)
+		versionCheckerThread_.StartVersionCheckerThread(this);
 
 	return TRUE; // return TRUE unless you set the focus to a control
 }
@@ -1325,6 +1330,23 @@ LRESULT CUIforETWDlg::UpdateTraceListHandler(WPARAM /*wParam*/, LPARAM /*lParam*
 	return 0;
 }
 
+LRESULT CUIforETWDlg::NewVersionAvailable(WPARAM wParam, LPARAM /*lParam*/)
+{
+	PackagedFloatVersion newVersion;
+	newVersion.u = static_cast<unsigned>(wParam);
+	std::wstring message = stringPrintf(L"A newer version of UIforETW is available from https://github.com/google/UIforETW/releases/\n"
+		"The version you have installed is %1.2f and the new version is %1.2f.\n"
+		"Would you like to download the new version?", kCurrentVersion, newVersion.f);
+
+	int result = AfxMessageBox(message.c_str(), MB_YESNO);
+	if (result == IDYES)
+		ShellExecute(*this, L"open", L"https://github.com/google/UIforETW/releases/", 0, L".", SW_SHOWNORMAL);
+	if (result == IDNO)
+		AfxMessageBox(L"Version checking can be turned off in the settings dialog.");
+
+	return 0;
+}
+
 
 void CUIforETWDlg::OnLbnDblclkTracelist()
 {
@@ -1561,6 +1583,7 @@ void CUIforETWDlg::OnBnClickedSettings()
 	dlgSettings.bAutoViewTraces_ = bAutoViewTraces_;
 	dlgSettings.bHeapStacks_ = bHeapStacks_;
 	dlgSettings.bVirtualAllocStacks_ = bVirtualAllocStacks_;
+	dlgSettings.bVersionChecks_ = bVersionChecks_;
 	dlgSettings.chromeKeywords_ = chromeKeywords_;
 	if (dlgSettings.DoModal() == IDOK)
 	{
@@ -1595,6 +1618,7 @@ void CUIforETWDlg::OnBnClickedSettings()
 		bAutoViewTraces_ = dlgSettings.bAutoViewTraces_;
 		bHeapStacks_ = dlgSettings.bHeapStacks_;
 		bVirtualAllocStacks_ = dlgSettings.bVirtualAllocStacks_;
+		bVersionChecks_ = dlgSettings.bVersionChecks_;
 		chromeKeywords_ = dlgSettings.chromeKeywords_;
 	}
 }

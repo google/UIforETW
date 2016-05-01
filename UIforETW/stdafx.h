@@ -68,6 +68,8 @@ void CheckProcesses();
 
 // Send this when the list of traces needs to be updated.
 const int WM_UPDATETRACELIST = WM_USER + 10;
+// Send this when a new version is detected.
+const int WM_NEWVERSIONAVAILABLE = WM_USER + 11;
 
 // Disable "warning C6054: String 'buffer' might not be zero-terminated." because
 // these warnings are spurious. They are caused by incorrect annotations on

@@ -92,6 +92,7 @@ void CSettings::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_AUTOVIEWTRACES, btAutoViewTraces_);
 	DDX_Control(pDX, IDC_HEAPSTACKS, btHeapStacks_);
 	DDX_Control(pDX, IDC_VIRTUALALLOCSTACKS, btVirtualAllocStacks_);
+	DDX_Control(pDX, IDC_CHECKFORNEWVERSIONS, btVersionChecks_);
 	DDX_Control(pDX, IDC_CHROME_CATEGORIES, btChromeCategories_);
 
 	CDialog::DoDataExchange(pDX);
@@ -106,6 +107,7 @@ BEGIN_MESSAGE_MAP(CSettings, CDialog)
 	ON_BN_CLICKED(IDC_HEAPSTACKS, &CSettings::OnBnClickedHeapstacks)
 	ON_BN_CLICKED(IDC_VIRTUALALLOCSTACKS, &CSettings::OnBnClickedVirtualallocstacks)
 	ON_BN_CLICKED(IDC_EXPENSIVEWS, &CSettings::OnBnClickedExpensivews)
+	ON_BN_CLICKED(IDC_CHECKFORNEWVERSIONS, &CSettings::OnBnClickedCheckfornewversions)
 END_MESSAGE_MAP()
 
 BOOL CSettings::OnInitDialog()
@@ -117,6 +119,7 @@ BOOL CSettings::OnInitDialog()
 	CheckDlgButton(IDC_AUTOVIEWTRACES, bAutoViewTraces_);
 	CheckDlgButton(IDC_HEAPSTACKS, bHeapStacks_);
 	CheckDlgButton(IDC_VIRTUALALLOCSTACKS, bVirtualAllocStacks_);
+	CheckDlgButton(IDC_CHECKFORNEWVERSIONS, bVersionChecks_);
 
 	btBufferSizes_.EnableWindow(FALSE);
 	if (IsWindows8Point1OrGreater())
@@ -180,6 +183,7 @@ BOOL CSettings::OnInitDialog()
 					L"and similar calls, when doing heap traces.");
 		toolTip_.AddTool(&btVirtualAllocStacks_, L"Check this to record call stacks on VirtualAlloc on all "
 					L"traces instead of just heap traces.");
+		toolTip_.AddTool(&btVersionChecks_, L"Check this to have UIforETW check for new versions at startup.");
 		toolTip_.AddTool(&btChromeCategories_, L"Check the chrome tracing categories that you want Chrome "
 					L"to emit ETW events for. This requires running Chrome version 46 or later, and "
 					L"using chrome://flags/ to \"Enable exporting of tracing events to ETW\" - search for "
@@ -314,4 +318,10 @@ void CSettings::OnBnClickedVirtualallocstacks()
 void CSettings::OnBnClickedExpensivews()
 {
 	bExpensiveWSMonitoring_ = !bExpensiveWSMonitoring_;
+}
+
+
+void CSettings::OnBnClickedCheckfornewversions()
+{
+	bVersionChecks_ = !bVersionChecks_;
 }

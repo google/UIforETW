@@ -42,6 +42,7 @@ public:
 	bool bAutoViewTraces_ = false;
 	bool bHeapStacks_ = false;
 	bool bVirtualAllocStacks_ = false;
+	bool bVersionChecks_ = false;
 	uint64_t chromeKeywords_ = 0;
 
 protected:
@@ -59,6 +60,7 @@ protected:
 	CButton btAutoViewTraces_;
 	CButton btHeapStacks_;
 	CButton btVirtualAllocStacks_;
+	CButton btVersionChecks_;
 	CCheckListBox btChromeCategories_;
 
 	CToolTipCtrl toolTip_;
@@ -82,4 +84,5 @@ public:
 	afx_msg void OnBnClickedHeapstacks();
 	afx_msg void OnBnClickedVirtualallocstacks();
 	afx_msg void OnBnClickedExpensivews();
+	afx_msg void OnBnClickedCheckfornewversions();
 };

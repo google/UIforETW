@@ -68,6 +68,7 @@ void CUIforETWDlg::TransferSettings(bool saving)
 		{ L"AutoViewTraces", &bAutoViewTraces_ },
 		{ L"HeapStacks", &bHeapStacks_ },
 		{ L"VirtualAllocStacks", &bVirtualAllocStacks_ },
+		{ L"VersionChecks", &bVersionChecks_ },
 	};
 
 	for (auto& m : bools)

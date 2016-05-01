@@ -24,6 +24,7 @@ limitations under the License.
 #include "WorkingSet.h"
 #include "PowerStatus.h"
 #include "CPUFrequency.h"
+#include "VersionChecker.h"
 
 enum TracingMode
 {
@@ -120,6 +121,10 @@ private:
 	CWorkingSetMonitor workingSetThread_;
 	std::wstring WSMonitoredProcesses_;
 	bool bExpensiveWSMonitoring_ = false;
+
+	// This starts and stops a thread that checks for new versions of UIforETW
+	CVersionChecker versionCheckerThread_;
+	bool bVersionChecks_ = true;
 
 	// This starts and stops a thread that monitors battery status.
 	CPowerStatusMonitor PowerMonitor_;
@@ -241,6 +246,7 @@ private:
 	afx_msg void OnBnClickedFastsampling();
 	afx_msg void OnCbnSelchangeInputtracing();
 	afx_msg LRESULT UpdateTraceListHandler(WPARAM wParam, LPARAM lParam);
+	afx_msg LRESULT NewVersionAvailable(WPARAM wParam, LPARAM lParam);
 	afx_msg void OnLbnDblclkTracelist();
 	afx_msg void OnGetMinMaxInfo(MINMAXINFO* lpMMI);
 	afx_msg void OnSize(UINT, int, int);
