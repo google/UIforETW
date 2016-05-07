@@ -37,6 +37,7 @@ limitations under the License.
 #endif
 
 const int kRecordTraceHotKey = 1234;
+const int kTimerID = 5678;
 
 // This static pointer to the main window is used by the global
 // outputPrintf function.
@@ -94,7 +95,8 @@ CUIforETWDlg::CUIforETWDlg(CWnd* pParent /*=NULL*/)
 
 CUIforETWDlg::~CUIforETWDlg()
 {
-	// Shut down key logging.
+	// Shut down key logging. Ideally this would be managed by an object so
+	// that CUIforETWDlg didn't have to do this, as the other threads are.
 	SetKeyloggingState(kKeyLoggerOff);
 
 	// Save settings.
@@ -514,10 +516,6 @@ BOOL CUIforETWDlg::OnInitDialog()
 	}
 
 	SetHeapTracing(false);
-	// Start the input logging thread with the current settings.
-	SetKeyloggingState(InputTracing_);
-
-	SetTimer(0, 1000, nullptr);
 
 	CheckProcesses();
 
@@ -767,9 +765,36 @@ std::wstring CUIforETWDlg::GenerateResultFilename() const
 	return GetTraceDir() + filePart + L".etl";
 }
 
+void CUIforETWDlg::StartEventThreads()
+{
+	// Start the input logging thread with the current settings.
+	SetKeyloggingState(InputTracing_);
+
+	// Send occasional timer messages so that we can check for tracing to file
+	// that has run "too long". Checking every thirty seconds should be fine.
+	SetTimer(kTimerID, 30000, nullptr);
+
+	CPUFrequencyMonitor_.StartThreads();
+	PowerMonitor_.StartThreads();
+	workingSetThread_.StartThreads();
+}
+
+void CUIforETWDlg::StopEventThreads()
+{
+	// Stop the input logging thread.
+	SetKeyloggingState(kKeyLoggerOff);
+
+	KillTimer(kTimerID);
+
+	CPUFrequencyMonitor_.StopThreads();
+	PowerMonitor_.StopThreads();
+	workingSetThread_.StopThreads();
+}
+
 void CUIforETWDlg::OnBnClickedStarttracing()
 {
 	RegisterProviders();
+	StartEventThreads();
 	if (tracingMode_ == kTracingToMemory)
 		outputPrintf(L"\nStarting tracing to in-memory circular buffers...\n");
 	else if (tracingMode_ == kTracingToFile)
@@ -950,6 +975,11 @@ void CUIforETWDlg::OnBnClickedStarttracing()
 		std::wstring captureArgs = L" -capturestate UIforETWSession " + userProviders;
 		child.Run(bShowCommands_, L"xperf.exe" + captureArgs);
 	}
+	else
+	{
+		// No sense leaving these running if tracing failed to start.
+		StopEventThreads();
+	}
 
 	// Set this whether starting succeeds or not, to allow forced-stopping.
 	bIsTracing_ = true;
@@ -958,6 +988,9 @@ void CUIforETWDlg::OnBnClickedStarttracing()
 	traceStartTime_ = GetTickCount64();
 }
 
+// This should probably be named MaybeStopTracingAndMaybeRecord because it
+// doesn't always do either. The behavior depends on the type of tracing and
+// on the bSaveTrace flag. Circular buffer tracing continues after this call.
 void CUIforETWDlg::StopTracingAndMaybeRecord(bool bSaveTrace)
 {
 	std::wstring traceFilename = GenerateResultFilename();
@@ -1016,6 +1049,8 @@ void CUIforETWDlg::StopTracingAndMaybeRecord(bool bSaveTrace)
 				ETWMark("Tracing type was tracing to file.");
 				child.Run(bShowCommands_, L"xperf.exe -stop UIforETWSession -stop " + GetKernelLogger());
 			}
+			// Stop the event monitoring threads now that tracing is stopped.
+			StopEventThreads();
 		}
 	}
 	double saveTime = saveTimer.ElapsedSeconds();
@@ -1256,7 +1291,8 @@ void CUIforETWDlg::OnCbnSelchangeInputtracing()
 		InputTracing_ = kKeyLoggerOff;
 		break;
 	}
-	SetKeyloggingState(InputTracing_);
+	if (bIsTracing_)
+		SetKeyloggingState(InputTracing_);
 }
 
 void CUIforETWDlg::UpdateTraceList()

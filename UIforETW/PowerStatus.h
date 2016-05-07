@@ -31,6 +31,11 @@ public:
 	CPowerStatusMonitor();
 	~CPowerStatusMonitor();
 
+	// Start and stop the sampling threads so that they aren't running
+	// when tracing is not running.
+	void StartThreads();
+	void StopThreads();
+
 private:
 	static DWORD __stdcall StaticPowerMonitorThread(LPVOID);
 	void PowerMonitorThread();
@@ -40,8 +45,8 @@ private:
 	void SampleTimerState();
 	void ClearEnergyLibFunctionPointers();
 
-	HANDLE hThread_;
-	HANDLE hExitEvent_;
+	HANDLE hThread_ = nullptr;
+	HANDLE hExitEvent_ = nullptr;
 
 	HMODULE energyLib_ = nullptr;
 	IntelEnergyLibInitialize_t IntelEnergyLibInitialize = nullptr;

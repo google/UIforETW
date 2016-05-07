@@ -25,6 +25,11 @@ public:
 	CCPUFrequencyMonitor();
 	~CCPUFrequencyMonitor();
 
+	// Start and stop the sampling threads so that they aren't running
+	// when tracing is not running.
+	void StartThreads();
+	void StopThreads();
+
 private:
 	// Call this function with the 'this' pointer.
 	static DWORD __stdcall StaticMonitorThread(LPVOID);
@@ -56,14 +61,14 @@ private:
 	std::atomic_bool quit_;
 
 	// Semaphores to start measurement and wait for results.
-	HANDLE workStartSemaphore_;
-	HANDLE resultsDoneSemaphore_;
+	HANDLE workStartSemaphore_ = nullptr;
+	HANDLE resultsDoneSemaphore_ = nullptr;
 
 	float startFrequency_ = 0.0f;
 
 	// Handle to monitor thread and event to tell it to halt.
-	HANDLE hThread_;
-	HANDLE hExitEvent_;
+	HANDLE hThread_ = nullptr;
+	HANDLE hExitEvent_ = nullptr;
 
 	CCPUFrequencyMonitor(const CCPUFrequencyMonitor&) = delete;
 	CCPUFrequencyMonitor& operator=(const CCPUFrequencyMonitor&) = delete;

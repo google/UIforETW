@@ -25,6 +25,11 @@ public:
 	CWorkingSetMonitor();
 	~CWorkingSetMonitor();
 
+	// Start and stop the sampling threads so that they aren't running
+	// when tracing is not running.
+	void StartThreads();
+	void StopThreads();
+
 	// Pass in a semi-colon separated list of process names that
 	// the working set display should monitor. If this is the
 	// empty string then no processes will be monitored.

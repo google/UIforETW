@@ -207,6 +207,10 @@ private:
 	std::wstring GetDirectory(PCWSTR env, const std::wstring& defaultDir);
 	void UpdateTraceList();
 	void RegisterProviders();
+	// Start the event monitoring/emitting threads in preparation for tracing.
+	void StartEventThreads();
+	// Stop the event monitoring/emitting threads after tracing stops.
+	void StopEventThreads();
 	void DisablePagingExecutive();
 
 	CToolTipCtrl toolTip_;

@@ -31,6 +31,8 @@ limitations under the License.
 
 #pragma comment(lib, "setupapi.lib")
 
+// This sampling frequency leads to roughly 20 context switches per second, which is
+// perhaps okay when tracing but must be avoided when tracing is not running.
 const int kSamplingInterval = 200;
 
 // These correspond to the funcID values returned by GetMsrFunc
@@ -348,7 +350,6 @@ DWORD __stdcall CPowerStatusMonitor::StaticPowerMonitorThread(LPVOID param)
 
 void CPowerStatusMonitor::PowerMonitorThread()
 {
-
 	for (;;)
 	{
 		DWORD result = WaitForSingleObject(hExitEvent_, kSamplingInterval);
@@ -397,9 +398,6 @@ CPowerStatusMonitor::CPowerStatusMonitor()
 			}
 		}
 	}
-
-	hExitEvent_ = CreateEvent(nullptr, FALSE, FALSE, nullptr);
-	hThread_ = CreateThread(NULL, 0, StaticPowerMonitorThread, this, 0, nullptr);
 }
 
 void CPowerStatusMonitor::ClearEnergyLibFunctionPointers()
@@ -412,13 +410,34 @@ void CPowerStatusMonitor::ClearEnergyLibFunctionPointers()
 	ReadSample = nullptr;
 }
 
+void CPowerStatusMonitor::StartThreads()
+{
+	UIETWASSERT(!hExitEvent_);
+
+	if (!hExitEvent_)
+	{
+		hExitEvent_ = CreateEvent(nullptr, FALSE, FALSE, nullptr);
+		hThread_ = CreateThread(NULL, 0, StaticPowerMonitorThread, this, 0, nullptr);
+	}
+}
+
+void CPowerStatusMonitor::StopThreads()
+{
+	if (hExitEvent_)
+	{
+		// Shut down the child thread.
+		SetEvent(hExitEvent_);
+		WaitForSingleObject(hThread_, INFINITE);
+		CloseHandle(hThread_);
+		hThread_ = nullptr;
+		CloseHandle(hExitEvent_);
+		hExitEvent_ = nullptr;
+	}
+}
+
 CPowerStatusMonitor::~CPowerStatusMonitor()
 {
-	// Shut down the child thread.
-	SetEvent(hExitEvent_);
-	WaitForSingleObject(hThread_, INFINITE);
-	CloseHandle(hThread_);
-	CloseHandle(hExitEvent_);
+	StopThreads();
 
 	if (energyLib_ != nullptr)
 	{

@@ -201,75 +201,96 @@ DWORD __stdcall CCPUFrequencyMonitor::StaticMonitorThread(LPVOID param)
 
 CCPUFrequencyMonitor::CCPUFrequencyMonitor()
 {
-	// Must do all this before creating the child threads.
+}
 
-	SYSTEM_INFO systemInfo;
-	GetSystemInfo(&systemInfo);
-	numCPUs_ = systemInfo.dwNumberOfProcessors;
-	// Clamp to the number of processors that can be identified by
-	// SetThreadAffinityMask - 32 or 64.
-	if (numCPUs_ > sizeof(DWORD_PTR) * 8)
-		numCPUs_ = sizeof(DWORD_PTR) * 8;
-	threads_.resize(numCPUs_);
-
-	workStartSemaphore_ = CreateSemaphore(nullptr, 0, numCPUs_, nullptr);
-	resultsDoneSemaphore_ = CreateSemaphore(nullptr, 0, numCPUs_, nullptr);
-	if (!workStartSemaphore_ || !resultsDoneSemaphore_)
-		return;
-
-	// Create numCPUs_ threads, set their affinity to individual CPU
-	// cores, and raise their priority. This will mostly ensure that they
-	// run promptly and on the desired CPU core.
-	for (unsigned i = 0; i < numCPUs_; ++i)
+void CCPUFrequencyMonitor::StartThreads()
+{
+	UIETWASSERT(!hExitEvent_);
+	if (!hExitEvent_)
 	{
-		threads_[i].pOwner = this;
-		threads_[i].cpuNumber = i;
-		HANDLE hThread = CreateThread(nullptr, 0x10000, StaticPerCPUSamplingThread, &threads_[i], 0, nullptr);
-		if (hThread)
+		// Must do all this before creating the child threads.
+		SYSTEM_INFO systemInfo;
+		GetSystemInfo(&systemInfo);
+		numCPUs_ = systemInfo.dwNumberOfProcessors;
+		// Clamp to the number of processors that can be identified by
+		// SetThreadAffinityMask - 32 or 64.
+		if (numCPUs_ > sizeof(DWORD_PTR) * 8)
+			numCPUs_ = sizeof(DWORD_PTR) * 8;
+		threads_.resize(numCPUs_);
+		quit_ = false;
+
+		workStartSemaphore_ = CreateSemaphore(nullptr, 0, numCPUs_, nullptr);
+		resultsDoneSemaphore_ = CreateSemaphore(nullptr, 0, numCPUs_, nullptr);
+		if (!workStartSemaphore_ || !resultsDoneSemaphore_)
+			return;
+
+		// Create numCPUs_ threads, set their affinity to individual CPU
+		// cores, and raise their priority. This will mostly ensure that they
+		// run promptly and on the desired CPU core.
+		for (unsigned i = 0; i < numCPUs_; ++i)
 		{
-			SetThreadAffinityMask(hThread, DWORD_PTR(1) << i);
-			SetThreadPriority(hThread, THREAD_PRIORITY_HIGHEST);
+			threads_[i].pOwner = this;
+			threads_[i].cpuNumber = i;
+			HANDLE hThread = CreateThread(nullptr, 0x10000, StaticPerCPUSamplingThread, &threads_[i], 0, nullptr);
+			if (hThread)
+			{
+				SetThreadAffinityMask(hThread, DWORD_PTR(1) << i);
+				SetThreadPriority(hThread, THREAD_PRIORITY_HIGHEST);
+			}
+			threads_[i].hThread = hThread;
 		}
-		threads_[i].hThread = hThread;
+
+		// Get the initial frequency
+		QPCElapsedTimer timer;
+		// Run the test long enough so that the OS will ramp up the CPU to
+		// full speed.
+		startFrequency_ = MeasureFrequency(600);
+		float testElapsed = static_cast<float>(timer.ElapsedSeconds());
+
+		ETWMark2F("Startup CPU frequency (MHz) and measurement time (s)", startFrequency_, testElapsed);
+
+		// Once the monitor thread is created the other threads will start
+		// being told to do measurements occasionally.
+		hExitEvent_ = CreateEvent(nullptr, FALSE, FALSE, nullptr);
+		hThread_ = CreateThread(NULL, 0, StaticMonitorThread, this, 0, NULL);
 	}
+}
 
-	// Get the initial frequency
-	QPCElapsedTimer timer;
-	// Run the test long enough so that the OS will ramp up the CPU to
-	// full speed.
-	startFrequency_ = MeasureFrequency(600);
-	float testElapsed = static_cast<float>(timer.ElapsedSeconds());
+void CCPUFrequencyMonitor::StopThreads()
+{
+	if (hExitEvent_)
+	{
+		// Shut down the child thread.
+		SetEvent(hExitEvent_);
+		WaitForSingleObject(hThread_, INFINITE);
+		CloseHandle(hThread_);
+		hThread_ = nullptr;
+		CloseHandle(hExitEvent_);
+		hExitEvent_ = nullptr;
 
-	ETWMark2F("Startup CPU frequency (MHz) and measurement time (s)", startFrequency_, testElapsed);
+		// Shut down the measurement threads.
+		quit_ = true;
+		ReleaseSemaphore(workStartSemaphore_, numCPUs_, nullptr);
+		for (auto& thread : threads_)
+		{
+			// Wait for the measurement threads to exit and then close
+			// the thread handles.
+			if (thread.hThread)
+			{
+				WaitForSingleObject(thread.hThread, INFINITE);
+				CloseHandle(thread.hThread);
+			}
+		}
+		threads_.resize(0);
 
-	// Once the monitor thread is created the other threads will start
-	// being told to do measurements occasionally.
-	hExitEvent_ = CreateEvent(nullptr, FALSE, FALSE, nullptr);
-	hThread_ = CreateThread(NULL, 0, StaticMonitorThread, this, 0, NULL);
+		CloseHandle(workStartSemaphore_);
+		workStartSemaphore_ = nullptr;
+		CloseHandle(resultsDoneSemaphore_);
+		resultsDoneSemaphore_ = nullptr;
+	}
 }
 
 CCPUFrequencyMonitor::~CCPUFrequencyMonitor()
 {
-	// Shut down the child thread.
-	SetEvent(hExitEvent_);
-	WaitForSingleObject(hThread_, INFINITE);
-	CloseHandle(hThread_);
-	CloseHandle(hExitEvent_);
-
-	// Shut down the measurement threads.
-	quit_ = true;
-	ReleaseSemaphore(workStartSemaphore_, numCPUs_, nullptr);
-	for (auto& thread : threads_)
-	{
-		// Wait for the measurement threads to exit and then close
-		// the thread handles.
-		if (thread.hThread)
-		{
-			WaitForSingleObject(thread.hThread, INFINITE);
-			CloseHandle(thread.hThread);
-		}
-	}
-
-	CloseHandle(workStartSemaphore_);
-	CloseHandle(resultsDoneSemaphore_);
+	StopThreads();
 }
