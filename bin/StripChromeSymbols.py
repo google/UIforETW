@@ -55,6 +55,11 @@ def main():
     print("Usage: %s trace.etl" % sys.argv[0])
     sys.exit(0)
 
+  if sys.version_info.major == 2 and sys.version_info.minor < 7:
+    print("Your python version is too old - 2.7 or higher required.")
+    print("Python version is %s" % sys.version)
+    sys.exit(0)
+
   symbol_path = os.environ.get("_NT_SYMBOL_PATH", "")
   if symbol_path.count("chromium-browser-symsrv") == 0:
     print("Chromium symbol server is not in _NT_SYMBOL_PATH. No symbol stripping needed.")
