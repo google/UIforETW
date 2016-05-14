@@ -17,6 +17,7 @@ limitations under the License.
 #pragma once
 
 #include "Utility.h"
+#include "Version.h"
 
 class CATLAboutDlg final : public ATL::CDialogImpl< CATLAboutDlg >
 {
@@ -29,7 +30,7 @@ public:
 	LRESULT OnInitDialog(UINT, WPARAM, LPARAM, BOOL&)
 	{
 		wchar_t buffer[200];
-		swprintf_s(buffer, L"Build date: %s", GetEXEBuildTime().c_str());
+		swprintf_s(buffer, L"Version %1.2f, build date: %s", kCurrentVersion, GetEXEBuildTime().c_str());
 		SetDlgItemText(IDC_BUILDDATE, buffer);
 		return 0;
 	}
