@@ -44,6 +44,8 @@ def main():
   # a dictionary that is indexed by process type with each entry's payload
   # being a list of Pids (for example, a list of renderer processes).
   pidsByParent = {}
+  # Dictionary of Pids and their lines of data
+  lineByPid = {}
   for line in os.popen(command).readlines():
     # Split the commandline from the .csv data and then extract the exePath.
     # It may or may not be quoted, and may or not have the .exe suffix.
@@ -61,6 +63,7 @@ def main():
         pids = pidsRe.match(line)
         pid = int(pids.groups()[0])
         parentPid = int(pids.groups()[1])
+        lineByPid[pid] = line
         match = processTypeRe.match(commandLine)
         if match:
           type = match.groups()[0]
@@ -76,6 +79,35 @@ def main():
         pidList.append(pid)
         pidsByType[type] = pidList
         pidsByParent[browserPid] = pidsByType
+  # Scan a copy of the list of browser Pids looking for those with parents
+  # in the list and no children. These represent child processes whose --type=
+  # option was too far along in the command line for ETW's 512-character capture
+  # to get. See crbug.com/614502 for how this happened.
+  # This should probably be deleted at some point, along with the declaration and
+  # initialization of lineByPid.
+  for pid in pathByBrowserPid.keys()[:]:
+    # Checking that there is only one entry (itself) in the list is important
+    # to avoid problems caused by Pid reuse that could cause one browser process
+    # to appear to be another browser process' parent.
+    if len(pidsByParent[pid]) == 1: # The 'browser' appears in its own list
+      line = lineByPid[pid]
+      pids = pidsRe.match(line)
+      pid = int(pids.groups()[0])
+      parentPid = int(pids.groups()[1])
+      if pathByBrowserPid.has_key(parentPid):
+        browserPid = parentPid
+        # Retrieve the list of processes associated with this
+        # browser (parent) pid.
+        pidsByType = pidsByParent[browserPid]
+        type = "gpu???"
+        pidList = list(pidsByType.get(type, []))
+        pidList.append(pid)
+        pidsByType[type] = pidList
+        pidsByParent[browserPid] = pidsByType
+        # Delete the references to the process that we now know isn't a browser
+        # process.
+        del pathByBrowserPid[pid]
+        del pidsByParent[pid]
 
   print("Chrome PIDs by process type:\r")
   for browserPid in pidsByParent.keys():
