@@ -220,6 +220,7 @@ private:
 	bool bAutoViewTraces_ = false;
 	std::wstring extraKernelFlags_;
 	std::wstring extraKernelStacks_;
+	std::wstring extraUserProviders_;
 
 	std::pair<uint64_t, uint64_t> CompressTrace(const std::wstring& tracePath) const;
 	void CompressAllTraces() const;

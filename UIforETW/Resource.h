@@ -51,6 +51,8 @@
 #define IDC_COPYSTARTUPPROFILE2         1024
 #define IDC_COPYSYMBOLDLLS              1024
 #define IDC_UNUSEDDEFAULTBUTTON         1025
+#define IDC_EXTRASTACKWALKS2            1025
+#define IDC_EXTRAUSERMODEPROVIDERS      1025
 #define IDC_CHROMEDEVELOPER             1026
 #define IDC_CHECK2                      1027
 #define IDC_AUTOVIEWTRACES              1027

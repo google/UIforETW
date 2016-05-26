@@ -85,6 +85,7 @@ void CSettings::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_EXPENSIVEWS, btExpensiveWSMonitoring_);
 	DDX_Control(pDX, IDC_EXTRAKERNELFLAGS, btExtraKernelFlags_);
 	DDX_Control(pDX, IDC_EXTRASTACKWALKS, btExtraStackwalks_);
+	DDX_Control(pDX, IDC_EXTRAUSERMODEPROVIDERS, btExtraUserProviders_);
 	DDX_Control(pDX, IDC_BUFFERSIZES, btBufferSizes_);
 	DDX_Control(pDX, IDC_COPYSTARTUPPROFILE, btCopyStartupProfile_);
 	DDX_Control(pDX, IDC_COPYSYMBOLDLLS, btCopySymbolDLLs_);
@@ -142,6 +143,7 @@ BOOL CSettings::OnInitDialog()
 	}
 	btExtraKernelFlags_.SetWindowTextW(extraKernelFlags_.c_str());
 	btExtraStackwalks_.SetWindowTextW(extraKernelStacks_.c_str());
+	btExtraUserProviders_.SetWindowTextW(extraUserProviders_.c_str());
 
 	if (toolTip_.Create(this))
 	{
@@ -156,10 +158,14 @@ BOOL CSettings::OnInitDialog()
 					L"\"REGISTRY+PERF_COUNTER\". See \"xperf -providers k\" for the full list. "
 					L"Note that incorrect kernel flags will cause tracing to fail to start.");
 		toolTip_.AddTool(&btExtraStackwalks_, L"List of extra stacks to collect from the kernel "
-					L"kernel provider. For example, \"DiskReadInit+DiskWriteInit+DiskFlushInit\". "
+					L"kernel provider. For example, \n\"DiskReadInit+DiskWriteInit+DiskFlushInit\". "
 					L"Run \"xperf -help stackwalk\" to see the full list. Note that incorrect stack "
 					L"walk flags will cause tracing to fail to start. Note also that stack walk flags "
 					L"are ignored if the corresponding kernel flag is not enabled.");
+		toolTip_.AddTool(&btExtraUserProviders_, L"Extra user providers, separated by '+', such as "
+					L"\n\"Microsoft-Windows-Audio+Microsoft-Windows-HttpLog\". See \"xperf -providers\" "
+					L"for the full list. "
+					L"Note that incorrect user providers will cause tracing to fail to start.");
 		toolTip_.AddTool(&btWSMonitoredProcesses_, L"Names of processes whose working sets will be "
 					L"monitored, separated by semi-colons. An empty string means no monitoring. A '*' means "
 					L"that all processes will be monitored. For instance 'chrome.exe;notepad.exe'");
@@ -216,6 +222,7 @@ void CSettings::OnOK()
 	WSMonitoredProcesses_ = GetEditControlText(btWSMonitoredProcesses_);
 	extraKernelStacks_ = GetEditControlText(btExtraStackwalks_);
 	extraKernelFlags_ = GetEditControlText(btExtraKernelFlags_);
+	extraUserProviders_ = GetEditControlText(btExtraUserProviders_);
 
 	// Extract the Chrome categories settings and put the result in chromeKeywords_.
 	chromeKeywords_ = 0;

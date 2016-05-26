@@ -857,6 +857,9 @@ void CUIforETWDlg::OnBnClickedStarttracing()
 	// scanning in UIforETW unnecessary.
 	userProviders += L"+Microsoft-Windows-Kernel-Memory:0xE0";
 
+	if (!extraUserProviders_.empty())
+		userProviders += L"+" + extraUserProviders_;
+
 	// DWM providers can be helpful also. Uncomment to enable.
 	//userProviders += L"+Microsoft-Windows-Dwm-Dwm";
 	// Theoretically better power monitoring data, Windows 7+, but it doesn't
@@ -947,6 +950,10 @@ void CUIforETWDlg::OnBnClickedStarttracing()
 				if (!extraKernelFlags_.empty())
 				{
 					outputPrintf(L"Check your extra kernel flags in the settings dialog for typos.\n");
+				}
+				if (!extraUserProviders_.empty())
+				{
+					outputPrintf(L"Check your extra user providers in the settings dialog for typos.\n");
 				}
 			}
 			if (exitCode == 0x8000ffff)
@@ -1615,6 +1622,7 @@ void CUIforETWDlg::OnBnClickedSettings()
 	dlgSettings.bExpensiveWSMonitoring_ = bExpensiveWSMonitoring_;
 	dlgSettings.extraKernelFlags_ = extraKernelFlags_;
 	dlgSettings.extraKernelStacks_ = extraKernelStacks_;
+	dlgSettings.extraUserProviders_ = extraUserProviders_;
 	dlgSettings.bChromeDeveloper_ = bChromeDeveloper_;
 	dlgSettings.bAutoViewTraces_ = bAutoViewTraces_;
 	dlgSettings.bHeapStacks_ = bHeapStacks_;
@@ -1649,6 +1657,7 @@ void CUIforETWDlg::OnBnClickedSettings()
 		bExpensiveWSMonitoring_ = dlgSettings.bExpensiveWSMonitoring_;
 		extraKernelFlags_ = dlgSettings.extraKernelFlags_;
 		extraKernelStacks_ = dlgSettings.extraKernelStacks_;
+		extraUserProviders_ = dlgSettings.extraUserProviders_;
 		workingSetThread_.SetProcessFilter(WSMonitoredProcesses_, bExpensiveWSMonitoring_);
 
 		bAutoViewTraces_ = dlgSettings.bAutoViewTraces_;

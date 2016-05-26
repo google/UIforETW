@@ -36,8 +36,9 @@ public:
 	std::wstring heapTracingExes_;
 	std::wstring WSMonitoredProcesses_;
 	bool bExpensiveWSMonitoring_ = false;
-	std::wstring extraKernelStacks_;
 	std::wstring extraKernelFlags_;
+	std::wstring extraKernelStacks_;
+	std::wstring extraUserProviders_;
 	bool bChromeDeveloper_ = false;
 	bool bAutoViewTraces_ = false;
 	bool bHeapStacks_ = false;
@@ -51,6 +52,7 @@ protected:
 	CButton btExpensiveWSMonitoring_;
 	CEdit btExtraKernelFlags_;
 	CEdit btExtraStackwalks_;
+	CEdit btExtraUserProviders_;
 	CComboBox btBufferSizes_;
 
 	CButton btCopyStartupProfile_;
