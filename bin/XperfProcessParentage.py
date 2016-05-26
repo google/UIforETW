@@ -108,9 +108,8 @@ def main():
   profilePath = os.path.join(scriptdir, "XperfProcessParentage.wpaProfile")
 
   # Run wpaexporter
-  lines = subprocess.check_output("wpaexporter \"%s\" -profile \"%s\"" % (sys.argv[1], profilePath))
-  for line in lines:
-    print(line, file=sys.stderr)
+  output = subprocess.check_output("wpaexporter \"%s\" -profile \"%s\"" % (sys.argv[1], profilePath))
+  print(output, file=sys.stderr)
 
   # Read the raw data.
   with open(csvFilename) as csvFile:
