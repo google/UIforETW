@@ -36,6 +36,12 @@ import time
 import subprocess
 import argparse
 
+# Our usage of subprocess seems to require Python 2.7+
+if sys.version_info.major == 2 and sys.version_info.minor < 7:
+  print("Your python version is too old - 2.7 or higher required.")
+  print("Python version is %s" % sys.version)
+  sys.exit(0)
+
 parser = argparse.ArgumentParser(description='Process xperf ETL file and generate flamegraph(s).')
 parser.add_argument('etlFilename', metavar='FILE', type=str,
                     help='Path to ETL file')

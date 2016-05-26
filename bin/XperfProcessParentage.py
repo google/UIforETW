@@ -91,6 +91,12 @@ def main():
     print("http://randomascii.wordpress.com/2013/11/04/exporting-arbitrary-data-from-xperf-etl-files/")
     sys.exit(0)
 
+  # Our usage of subprocess seems to require Python 2.7+
+  if sys.version_info.major == 2 and sys.version_info.minor < 7:
+    print("Your python version is too old - 2.7 or higher required.")
+    print("Python version is %s" % sys.version)
+    sys.exit(0)
+
   if not os.path.exists(sys.argv[1]):
     print("ETL file '%s' does not exist." % sys.argv[1])
     sys.exit(0)

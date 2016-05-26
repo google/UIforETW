@@ -62,6 +62,12 @@ def main():
     print("other machines for analysis and sharing.")
     sys.exit(0)
 
+  # Our usage of subprocess seems to require Python 2.7+
+  if sys.version_info.major == 2 and sys.version_info.minor < 7:
+    print("Your python version is too old - 2.7 or higher required.")
+    print("Python version is %s" % sys.version)
+    sys.exit(0)
+
   ETLName = sys.argv[1]
   DestDirName = sys.argv[2]
   if not os.path.exists(DestDirName):

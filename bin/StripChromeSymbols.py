@@ -55,6 +55,7 @@ def main():
     print("Usage: %s trace.etl" % sys.argv[0])
     sys.exit(0)
 
+  # Our usage of subprocess seems to require Python 2.7+
   if sys.version_info.major == 2 and sys.version_info.minor < 7:
     print("Your python version is too old - 2.7 or higher required.")
     print("Python version is %s" % sys.version)
