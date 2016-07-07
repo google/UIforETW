@@ -38,7 +38,9 @@ void CVersionChecker::VersionCheckerThread()
 		version_string += strlen(marker);
 		if (strlen(version_string) > 4)
 		{
-			version_string[4] = 0;
+			// String is something like: "v1.32\?..." and we want to cut off after
+			// v1.32
+			version_string[5] = 0;
 			PackagedFloatVersion newVersion;
 			newVersion.u = 0;
 			if (sscanf_s(version_string, "v%f", &newVersion.f) == 1)
