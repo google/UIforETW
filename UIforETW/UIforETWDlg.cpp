@@ -1498,11 +1498,21 @@ void CUIforETWDlg::UpdateNotesState()
 			traceNotes_ = newTraceNotes;
 			SetDlgItemText(IDC_TRACENOTES, traceNotes_.c_str());
 		}
+		auto trace_size = GetFileSize(GetTraceDir() + traceName + L".etl");
+		wchar_t buffer[500];
+		// Yep, base-10 MB. The numbers will not match what Windows File Explorer
+		// shows, but that's because it is wrong. Using base-10 means you can
+		// trivially change to bytes, or kB, or estimate how many traces will fit
+		// in a (base-10) 640 GB drive.
+		// https://randomascii.wordpress.com/2016/02/13/base-ten-for-almost-everything/
+		swprintf_s(buffer, L"Trace size: %.1f MB", trace_size / 1e6);
+		SetDlgItemText(IDC_TRACESIZE, buffer);
 	}
 	else
 	{
 		SmartEnableWindow(btTraceNotes_.m_hWnd, false);
 		SetDlgItemText(IDC_TRACENOTES, L"");
+		SetDlgItemText(IDC_TRACESIZE, L"Trace size:");
 	}
 }
 
