@@ -241,6 +241,34 @@ void CUIforETWDlg::SetSymbolPath()
 		(void)_putenv(("_NT_SYMCACHE_PATH=" + systemDrive_ + "symcache").c_str());
 }
 
+void CUIforETWDlg::CheckSymbolDLLs()
+{
+	// Starting with the 10.0.14393.33 (Windows 10 Anniversary) edition of
+	// WPT the latest version of symsrv.dll *must* be used. So, old copies
+	// in the WPT directory have to be deleted. Failing to do this will cause
+	// heap corruption and other crashes because WPT expects a thread-safe
+	// symsrv.dll, and the old versions aren't. Also, dbghelp.dll is rarely
+	// needed so it is deleted at the same time.
+	// Previously the old copies were used to handle these issues:
+	// https://randomascii.wordpress.com/2012/10/04/xperf-symbol-loading-pitfalls/
+	const wchar_t* fileNames[] =
+	{
+		L"dbghelp.dll",
+		L"symsrv.dll",
+	};
+
+	std::vector<std::wstring> filePaths;
+	for (size_t i = 0; i < ARRAYSIZE(fileNames); ++i)
+	{
+		std::wstring filepath = wpt10Dir_ + fileNames[i];
+		if (PathFileExists(filepath.c_str()))
+			filePaths.push_back(std::move(filepath));
+	}
+
+	if (!filePaths.empty())
+		DeleteFiles(*this, filePaths);
+}
+
 BOOL CUIforETWDlg::OnInitDialog()
 {
 	CDialog::OnInitDialog();
@@ -316,6 +344,8 @@ BOOL CUIforETWDlg::OnInitDialog()
 
 	auto xperfVersion = GetFileVersion(GetXperfPath());
 	const int64_t requiredXperfVersion = (10llu << 48) + 0 + (10586llu << 16) + (15llu << 0);
+	// Windows 10 Anniversary Edition version (August 2016)
+	const int64_t preferredXperfVersion = (10llu << 48) + 0 + (14393llu << 16) + (33llu << 0);
 
 	wchar_t systemDir[MAX_PATH];
 	systemDir[0] = 0;
@@ -327,7 +357,7 @@ BOOL CUIforETWDlg::OnInitDialog()
 		// Install 64-bit WPT 10 if needed and if available.
 		// The installers are available as part of etwpackage.zip on
 		// https://github.com/google/UIforETW/releases
-		if (xperfVersion < requiredXperfVersion)
+		if (xperfVersion < preferredXperfVersion)
 		{
 			const std::wstring installPath10 = CanonicalizePath(GetExeDir() + L"..\\third_party\\wpt10\\WPTx64-x86_en-us.msi");
 			if (PathFileExists(installPath10.c_str()))
@@ -366,14 +396,18 @@ BOOL CUIforETWDlg::OnInitDialog()
 		else
 		{
 			if (xperfVersion)
-				AfxMessageBox((GetXperfPath() + L" must be version 10.0.10586.15 or higher. If you run UIforETW from etwpackage.zip\n"
-					L"from https://github.com/google/UIforETW/releases\n"
-					L"then WPT will be automatically installed. Exiting.").c_str());
+				AfxMessageBox((GetXperfPath() + L" must be version 10.0.10586.15 or higher. You'll need to find the installer in the Windows "
+					L"Windows 10, Version 1511 SDK. Exiting.").c_str());
 			else
 				AfxMessageBox((GetXperfPath() + L" does not exist. You'll need to find the installer in the Windows "
 				L"Windows 10, Version 1511 SDK. Exiting.").c_str());
 		}
 		exit(10);
+	}
+
+	if (xperfVersion >= preferredXperfVersion)
+	{
+		CheckSymbolDLLs();
 	}
 
 	if (!PathFileExists((wpt81Dir_ + L"xperf.exe").c_str()))

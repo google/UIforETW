@@ -56,7 +56,6 @@ protected:
 	CComboBox btBufferSizes_;
 
 	CButton btCopyStartupProfile_;
-	CButton btCopySymbolDLLs_;
 
 	CButton btChromeDeveloper_;
 	CButton btAutoViewTraces_;
@@ -79,7 +78,6 @@ protected:
 	afx_msg void OnOK();
 public:
 	afx_msg void OnBnClickedCopystartupprofile();
-	afx_msg void OnBnClickedCopysymboldlls();
 	afx_msg BOOL PreTranslateMessage(MSG* pMsg);
 	afx_msg void OnBnClickedChromedeveloper();
 	afx_msg void OnBnClickedAutoviewtraces();

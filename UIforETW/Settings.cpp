@@ -88,7 +88,6 @@ void CSettings::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_EXTRAUSERMODEPROVIDERS, btExtraUserProviders_);
 	DDX_Control(pDX, IDC_BUFFERSIZES, btBufferSizes_);
 	DDX_Control(pDX, IDC_COPYSTARTUPPROFILE, btCopyStartupProfile_);
-	DDX_Control(pDX, IDC_COPYSYMBOLDLLS, btCopySymbolDLLs_);
 	DDX_Control(pDX, IDC_CHROMEDEVELOPER, btChromeDeveloper_);
 	DDX_Control(pDX, IDC_AUTOVIEWTRACES, btAutoViewTraces_);
 	DDX_Control(pDX, IDC_HEAPSTACKS, btHeapStacks_);
@@ -102,7 +101,6 @@ void CSettings::DoDataExchange(CDataExchange* pDX)
 
 BEGIN_MESSAGE_MAP(CSettings, CDialog)
 	ON_BN_CLICKED(IDC_COPYSTARTUPPROFILE, &CSettings::OnBnClickedCopystartupprofile)
-	ON_BN_CLICKED(IDC_COPYSYMBOLDLLS, &CSettings::OnBnClickedCopysymboldlls)
 	ON_BN_CLICKED(IDC_CHROMEDEVELOPER, &CSettings::OnBnClickedChromedeveloper)
 	ON_BN_CLICKED(IDC_AUTOVIEWTRACES, &CSettings::OnBnClickedAutoviewtraces)
 	ON_BN_CLICKED(IDC_HEAPSTACKS, &CSettings::OnBnClickedHeapstacks)
@@ -176,10 +174,6 @@ BOOL CSettings::OnInitDialog()
 		toolTip_.AddTool(&btCopyStartupProfile_, L"Copies startup.wpaProfile files for WPA 8.1 and "
 					L"10 to the appropriate destinations so that the next time WPA starts up it will have "
 					L"reasonable analysis defaults.");
-		toolTip_.AddTool(&btCopySymbolDLLs_, L"Copy dbghelp.dll and symsrv.dll to the xperf directory to "
-					L"try to resolve slow or failed symbol loading in WPA. See "
-					L"https://randomascii.wordpress.com/2012/10/04/xperf-symbol-loading-pitfalls/ "
-					L"for details.");
 		toolTip_.AddTool(&btChromeDeveloper_, L"Check this to enable Chrome specific behavior such as "
 					L"setting the Chrome symbol server path, and preprocessing of Chrome symbols and "
 					L"traces.");
@@ -253,48 +247,6 @@ BOOL CSettings::PreTranslateMessage(MSG* pMsg)
 void CSettings::OnBnClickedCopystartupprofile()
 {
 	CopyStartupProfiles(exeDir_, true);
-}
-
-
-void CSettings::OnBnClickedCopysymboldlls()
-{
-	// Attempt to deal with these problems:
-	// https://randomascii.wordpress.com/2012/10/04/xperf-symbol-loading-pitfalls/
-	const wchar_t* fileNames[] =
-	{
-		L"dbghelp.dll",
-		L"symsrv.dll",
-	};
-
-	bool bIsWin64 = Is64BitWindows();
-
-	const std::wstring third_party = exeDir_ + L"..\\third_party\\";
-	std::vector<std::wstring> wptDirs;
-	if (!wpt81Dir_.empty())
-		wptDirs.push_back(wpt81Dir_);
-	wptDirs.push_back(wpt10Dir_);
-	// Perform the operation twice, potentially, for WPT 8.1 and WPT 10
-	for (auto& wptDir : wptDirs)
-	{
-		bool failed = false;
-		for (size_t i = 0; i < ARRAYSIZE(fileNames); ++i)
-		{
-			std::wstring source = third_party + fileNames[i];
-			if (bIsWin64)
-				source = third_party + L"x64\\" + fileNames[i];
-
-			std::wstring dest = wptDir + fileNames[i];
-			if (!CopyFile(source.c_str(), dest.c_str(), FALSE))
-				failed = true;
-		}
-		std::wstring message;
-		if (failed)
-			message = stringPrintf(L"Failed to copy dbghelp.dll and symsrv.dll to %s. Is WPA running?", wptDir.c_str());
-		else
-			message = stringPrintf(L"Copied dbghelp.dll and symsrv.dll to %s. If this doesn't help "
-				L"with symbol loading then consider deleting them to restore the previous state.", wptDir.c_str());
-		AfxMessageBox(message.c_str());
-	}
 }
 
 

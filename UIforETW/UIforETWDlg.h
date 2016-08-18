@@ -175,6 +175,7 @@ private:
 	HACCEL hTracesAccelTable_ = NULL;
 
 	void SetSamplingSpeed();
+	void CheckSymbolDLLs();
 
 	// Stop tracing (if tracing to a file or if bSaveTrace is
 	// false), saving the trace as well if bSaveTrace is true.
