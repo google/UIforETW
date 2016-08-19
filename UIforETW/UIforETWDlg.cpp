@@ -267,6 +267,30 @@ void CUIforETWDlg::CheckSymbolDLLs()
 
 	if (!filePaths.empty())
 		DeleteFiles(*this, filePaths);
+
+#if defined(_WIN64)
+	const std::wstring symsrv_path = CanonicalizePath(wpt10Dir_ + L"..\\Debuggers\\x64\\symsrv.dll");
+#else
+	const std::wstring symsrv_path = CanonicalizePath(wpt10Dir_ + L"..\\Debuggers\\x86\\symsrv.dll");
+#endif
+	if (!PathFileExists(symsrv_path.c_str()))
+	{
+		AfxMessageBox((L"symsrv.dll (" + symsrv_path +
+			L") not found. Be sure to install the Windows 10 Anniversary Edition Debuggers "
+			L"or else symbol servers will not work.").c_str());
+	}
+
+	// Previous versions of symsrv.dll may not be multithreading safe and therefore can't
+	// be used with the latest WPA.
+	const int64_t requiredSymsrvVersion = (10llu << 48) + 0 + (14321llu << 16) + (1024llu << 0);
+	auto symsrvVersion = GetFileVersion(symsrv_path);
+	if (symsrvVersion < requiredSymsrvVersion)
+	{
+		AfxMessageBox((L"symsrv.dll (" + symsrv_path +
+			L") is not the required version (10.0.14321.1024 or higher). "
+			L"Be sure to install the Windows 10 Anniversary Edition Debuggers "
+			L"or else symbol servers will not work.").c_str());
+	}
 }
 
 BOOL CUIforETWDlg::OnInitDialog()
