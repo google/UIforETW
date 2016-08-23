@@ -368,7 +368,7 @@ BOOL CUIforETWDlg::OnInitDialog()
 
 	auto xperfVersion = GetFileVersion(GetXperfPath());
 	const int64_t requiredXperfVersion = (10llu << 48) + 0 + (10586llu << 16) + (15llu << 0);
-	// Windows 10 Anniversary Edition version (August 2016)
+	// Windows 10 Anniversary Edition version (August 2016) - requires Windows 8 or higher.
 	const int64_t preferredXperfVersion = (10llu << 48) + 0 + (14393llu << 16) + (33llu << 0);
 
 	wchar_t systemDir[MAX_PATH];
@@ -378,25 +378,52 @@ BOOL CUIforETWDlg::OnInitDialog()
 
 	if (Is64BitWindows() && PathFileExists(msiExecPath.c_str()))
 	{
-		// Install 64-bit WPT 10 if needed and if available.
 		// The installers are available as part of etwpackage.zip on
 		// https://github.com/google/UIforETW/releases
-		if (xperfVersion < preferredXperfVersion)
+		if (IsWindowsSevenOrLesser())
 		{
-			const std::wstring installPath10 = CanonicalizePath(GetExeDir() + L"..\\third_party\\wpt10\\WPTx64-x86_en-us.msi");
-			if (PathFileExists(installPath10.c_str()))
+			// The newest (Anniversary Edition or beyond) WPT doesn't work on Windows 7.
+			// Install the older 64-bit WPT 10 if needed and if available.
+			if (xperfVersion < requiredXperfVersion)
 			{
-				ChildProcess child(msiExecPath);
-				std::wstring args = L" /i \"" + installPath10 + L"\"";
-				child.Run(true, L"msiexec.exe" + args);
-				DWORD installResult10 = child.GetExitCode();
-				if (!installResult10)
+				const std::wstring installPathOld10 = CanonicalizePath(GetExeDir() + L"..\\third_party\\oldwpt10\\WPTx64-x86_en-us.msi");
+				if (PathFileExists(installPathOld10.c_str()))
 				{
-					outputPrintf(L"WPT version 10 was installed.\n");
+					ChildProcess child(msiExecPath);
+					std::wstring args = L" /i \"" + installPathOld10 + L"\"";
+					child.Run(true, L"msiexec.exe" + args);
+					DWORD installResult10 = child.GetExitCode();
+					if (!installResult10)
+					{
+						outputPrintf(L"WPT version 10.0.10586 was installed.\n");
+					}
+					else
+					{
+						outputPrintf(L"Failure code %u while installing WPT 10.\n", installResult10);
+					}
 				}
-				else
+			}
+		}
+		else
+		{
+			// Install 64-bit WPT 10 if needed and if available.
+			if (xperfVersion < preferredXperfVersion)
+			{
+				const std::wstring installPath10 = CanonicalizePath(GetExeDir() + L"..\\third_party\\wpt10\\WPTx64-x86_en-us.msi");
+				if (PathFileExists(installPath10.c_str()))
 				{
-					outputPrintf(L"Failure code %u while installing WPT 10.\n", installResult10);
+					ChildProcess child(msiExecPath);
+					std::wstring args = L" /i \"" + installPath10 + L"\"";
+					child.Run(true, L"msiexec.exe" + args);
+					DWORD installResult10 = child.GetExitCode();
+					if (!installResult10)
+					{
+						outputPrintf(L"WPT version 10.0.14393 was installed.\n");
+					}
+					else
+					{
+						outputPrintf(L"Failure code %u while installing WPT 10.\n", installResult10);
+					}
 				}
 			}
 			xperfVersion = GetFileVersion(GetXperfPath());
@@ -421,17 +448,25 @@ BOOL CUIforETWDlg::OnInitDialog()
 		{
 			if (xperfVersion)
 				AfxMessageBox((GetXperfPath() + L" must be version 10.0.10586.15 or higher. You'll need to find the installer in the Windows "
-					L"Windows 10, Version 1511 SDK. Exiting.").c_str());
+					L"Windows 10 SDK or you can xcopy install it. Exiting.").c_str());
 			else
 				AfxMessageBox((GetXperfPath() + L" does not exist. You'll need to find the installer in the Windows "
-				L"Windows 10, Version 1511 SDK. Exiting.").c_str());
+				L"Windows 10 SDK or you can xcopy install it. Exiting.").c_str());
 		}
 		exit(10);
 	}
 
 	if (xperfVersion >= preferredXperfVersion)
 	{
-		CheckSymbolDLLs();
+		if (IsWindowsSevenOrLesser())
+		{
+			AfxMessageBox(L"The installed version of Windows Performance Toolkit is not compatible with Windows 7. "
+										L"Please uninstall it and run UIforETW again.");
+		}
+		else
+		{
+			CheckSymbolDLLs();
+		}
 	}
 
 	if (!PathFileExists((wpt81Dir_ + L"xperf.exe").c_str()))
@@ -984,6 +1019,7 @@ void CUIforETWDlg::OnBnClickedStarttracing()
 	std::wstring heapArgs = L" -start xperfHeapSession -heap -Pids 0" + heapStackWalk + heapBuffers + heapFile;
 
 	DWORD exitCode = 0;
+	bool started = true;
 	{
 		ChildProcess child(GetXperfPath());
 
@@ -991,11 +1027,12 @@ void CUIforETWDlg::OnBnClickedStarttracing()
 			startupCommand_ = L"xperf.exe" + kernelArgs + userArgs + heapArgs;
 		else
 			startupCommand_ = L"xperf.exe" + kernelArgs + userArgs;
-		child.Run(bShowCommands_, startupCommand_);
+		started = child.Run(bShowCommands_, startupCommand_);
 
 		exitCode = child.GetExitCode();
-		if (exitCode)
+		if (exitCode || !started)
 		{
+			started = false;
 			outputPrintf(L"Error starting tracing. Try stopping tracing and then starting it again?\n");
 			//  NT Kernel Logger: Cannot create a file when that file already exists. (0xb7).
 			if (exitCode == 0x800700b7)
@@ -1030,7 +1067,7 @@ void CUIforETWDlg::OnBnClickedStarttracing()
 
 	// Don't run the -capturestate step unless the previous step succeeded.
 	// Otherwise the error messages build up and get ever more confusing.
-	if (exitCode == 0)
+	if (started)
 	{
 		// Run -capturestate on the user-mode loggers, for reliable captures.
 		// If this step is skipped then GPU usage data will not be recorded on

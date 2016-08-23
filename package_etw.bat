@@ -14,11 +14,16 @@ mkdir %destdir%\lib
 mkdir %destdir%\third_party
 
 set wptredistmsi=Windows Performance Toolkit\Redistributables\WPTx64-x86_en-us.msi
+set oldwptredistmsi=Windows Performance Toolkit\OldRedistributables\WPTx64-x86_en-us.msi
 
 set wpt10=c:\Program Files (x86)\Windows Kits\10\
 if not exist "%wpt10%%wptredistmsi%" goto nowpt10
+if not exist "%wpt10%%oldwptredistmsi%" goto nooldwpt10
 mkdir %destdir%\third_party\wpt10
+mkdir %destdir%\third_party\oldwpt10
 xcopy "%wpt10%%wptredistmsi%" %destdir%\third_party\wpt10
+@if errorlevel 1 goto copyfailure
+xcopy "%wpt10%%oldwptredistmsi%" %destdir%\third_party\oldwpt10
 @if errorlevel 1 goto copyfailure
 xcopy "%wpt10%Licenses\10.0.10586.0\sdk_license.rtf" %destdir%\third_party\wpt10
 @if errorlevel 1 goto copyfailure
@@ -90,6 +95,10 @@ python %UIforETW%make_zip_file.py %UIforETW%etwpackage.zip etwpackage
 
 :nowpt10
 @echo WPT 10 redistributables not found. Aborting.
+@exit /b
+
+:nooldwpt10
+@echo Old WPT 10 redistributables not found. Aborting.
 @exit /b
 
 :BuildFailure
