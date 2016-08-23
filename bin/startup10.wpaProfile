@@ -3,9 +3,7 @@
   <Content xsi:type="WpaProfile2">
     <Sessions>
       <Session Index="0">
-        <FileReferences>
-          <FileReference FileName="C:\Users\Bruced\Documents\WPA Files\chrome_regions_of_interest.xml" ServiceMoniker="Regions.{51EF6868-EFEC-42A3-B284-1838673CC095}" />
-        </FileReferences>
+        <FileReferences />
       </Session>
     </Sessions>
     <Views>
