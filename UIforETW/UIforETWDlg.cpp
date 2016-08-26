@@ -1508,7 +1508,7 @@ void CUIforETWDlg::OnGetMinMaxInfo(MINMAXINFO* lpMMI)
 
 void CUIforETWDlg::OnSize(UINT nType, int /*cx*/, int /*cy*/)
 {
-	if (nType == SIZE_RESTORED && initialWidth_)
+	if ((nType == SIZE_RESTORED || nType == SIZE_MAXIMIZED) && initialWidth_)
 	{
 		FinishTraceRename();
 		// Calculate xDelta and yDelta -- the change in the window's size.
