@@ -34,6 +34,8 @@ flamegraph.txt
 #Created by package_etw.bat
 etwpackage/
 etwpackage.zip
+etwsymbols.zip
+sourceindex.txt
 
 Debug/
 Release/
