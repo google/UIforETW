@@ -108,8 +108,24 @@ cd /d %UIforETW%
 if not exist ..\GitHub-Source-Indexer\github-sourceindexer.ps1 goto NoSourceIndexing
 mkdir %temp%\srcsrv
 xcopy /s /y "c:\Program Files (x86)\Windows Kits\10\Debuggers\x64\srcsrv" %temp%\srcsrv
-powershell ..\GitHub-Source-Indexer\github-sourceindexer.ps1 -symbolsFolder etwsymbols -userID "google" -repository UIforETW -branch "master" -sourcesRoot %UIforETW% -dbgToolsPath %temp%\srcsrv -verifyLocalRepo
-@echo Run these commands to verify what has been indexed:
+
+@rem Crazy gymnastics to get the current git hash into an environment variable:
+echo|set /p="set hash=">sethash.bat
+call git log -1 --pretty=%%%%H >>sethash.bat
+call sethash.bat
+del sethash.bat
+
+@rem We need to create this sort of URL:
+@rem https://raw.githubusercontent.com/google/UIforETW/ea1129d25ba58efd03ef649829348ca553f82383/.gitignore
+@rem From this template:
+@rem HTTP_EXTRACT_TARGET=%HTTP_ALIAS%/%var2%/%var3%/raw/%var4%/%var5%
+@rem With these sort of arguments:
+@rem c:\github\uiforetw\uiforetw\utility.h*google*UIforETW*master*UIforETW/utility.h
+
+powershell ..\GitHub-Source-Indexer\github-sourceindexer.ps1 -symbolsFolder etwsymbols -userID "google" ^
+    -repository UIforETW -branch %hash% -sourcesRoot %UIforETW% -dbgToolsPath %temp%\srcsrv ^
+    -verifyLocalRepo -gitHubUrl https://raw.githubusercontent.com -serverIsRaw
+@echo Run these commands if you want to verify what has been indexed:
 @echo %temp%\srcsrv\pdbstr -r -p:etwsymbols\UIforETWStatic_devrel.pdb -s:srcsrv
 @echo %temp%\srcsrv\pdbstr -r -p:etwsymbols\UIforETWStatic_devrel32.pdb -s:srcsrv
 :NoSourceIndexing
