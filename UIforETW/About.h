@@ -30,7 +30,11 @@ public:
 	LRESULT OnInitDialog(UINT, WPARAM, LPARAM, BOOL&)
 	{
 		wchar_t buffer[200];
+#ifdef VERSION_SUFFIX
+		swprintf_s(buffer, L"Version %1.2f%c, build date: %s", kCurrentVersion, VERSION_SUFFIX, GetEXEBuildTime().c_str());
+#else
 		swprintf_s(buffer, L"Version %1.2f, build date: %s", kCurrentVersion, GetEXEBuildTime().c_str());
+#endif
 		SetDlgItemText(IDC_BUILDDATE, buffer);
 		return 0;
 	}
