@@ -100,19 +100,34 @@ void copyWPAProfileToLocalAppData(const std::wstring& exeDir, const bool force)
 
 		ATLVERIFY(::CreateDirectoryW(destDir.c_str(), NULL) || ::GetLastError() == ERROR_ALREADY_EXISTS);
 
-		if (::CopyFileW(source.c_str(), dest.c_str(), FALSE))
+		BOOL copyResult = ::CopyFileW(source.c_str(), dest.c_str(), FALSE);
+		if (force) // Print status of copy
 		{
-			if (force)
+			if (copyResult)
 				outputPrintf(L"%s", L"Copied Startup.10wpaProfile to %localappdata%\\Windows Performance Analyzer\n");
-			return;
+			else
+			{
+				outputPrintf(L"%s", L"Failed to copy Startup.10wpaProfile to %localappdata%\\Windows Performance Analyzer\n");
+				outputLastError();
+			}
 		}
-		if (force)
+
+		// This file holds modifications to presets that supersede the startup
+		// profile and therefore should be deleted when copying over a new
+		// startup profile.
+		const std::wstring presets = destDir + L"MyPresets.wpaPresets";
+		if (PathFileExistsW(presets.c_str()))
 		{
-			outputPrintf(L"%s", L"Failed to copy Startup.10wpaProfile to %localappdata%\\Windows Performance Analyzer\n");
-			outputLastError();
+			int deleteResult = DeleteOneFile(NULL, presets);
+			if (force) // Print status of delete
+			{
+				if (deleteResult)
+					outputPrintf(L"%s", L"Failed to delete MyPresets.wpaPresets from %localappdata%\\Windows Performance Analyzer\n");
+				else
+					outputPrintf(L"%s", L"Deleted MyPresets.wpaPresets from %localappdata%\\Windows Performance Analyzer\n");
+			}
 		}
 	}
-
 }
 } // namespace {
 
@@ -546,6 +561,7 @@ std::wstring CanonicalizePath(const std::wstring& path)
 int DeleteOneFile(const HWND hwnd, const std::wstring& path)
 {
 	// {path} uses std::vector list initialization
+	// Returns zero for success
 	return DeleteFiles(hwnd, {path});
 }
 
@@ -574,6 +590,7 @@ int DeleteFiles(const HWND hwnd, const std::vector<std::wstring>& paths)
 	};
 	// Delete using the recycle bin.
 	// TODO: IFileOperation?
+	// Returns zero for success
 	return ::SHFileOperationW(&fileOp);
 }
 
