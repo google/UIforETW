@@ -136,6 +136,8 @@ call python make_zip_file.py etwsymbols.zip etwsymbols
 @echo on
 
 @echo Now upload the new etwpackage.zip and etwsymbols.zip
+@echo But make sure that the PersistedPresets section from startup10.wpaProfile
+@echo been deleted to avoid shipping modified presets and bloating the file.
 @exit /b
 
 :pleasecloseUIforETW
