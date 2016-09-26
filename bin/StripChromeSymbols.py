@@ -35,11 +35,19 @@ More details on the discovery of this slowness and the evolution of the fix
 can be found here:
 https://randomascii.wordpress.com/2014/11/04/slow-symbol-loading-in-microsofts-profiler-take-two/
 
-Discussion and source code for RetrieveSymbols.exe can be found here:
+Discussion can be found here:
 https://randomascii.wordpress.com/2013/03/09/symbols-the-microsoft-way/
+
+Source code for RetrieveSymbols.exe can be found here:
+https://github.com/google/UIforETW/tree/master/RetrieveSymbols
 
 If "chromium-browser-symsrv" is not found in _NT_SYMBOL_PATH or RetrieveSymbols.exe
 and pdbcopy.exe are not found then this script will exit early.
+
+With the 10.0.14393 version of WPA the symbol translation problems have largely
+been eliminated, which seems like it would make this script unnecessary, but the
+symbol translation slowdowns have been replaced by a bug in downloading symbols from
+Chrome's symbol server.
 """
 from __future__ import print_function
 
@@ -49,6 +57,10 @@ import re
 import tempfile
 import shutil
 import subprocess
+
+# Set to true to do symbol translation as well as downloading. Set to
+# false to just download symbols and let WPA translate them.
+strip_and_translate = True
 
 def main():
   if len(sys.argv) < 2:
@@ -116,7 +128,8 @@ def main():
   pdb_re = re.compile(r'"\[RSDS\] PdbSig: {(.*-.*-.*-.*-.*)}; Age: (.*); Pdb: (.*)"')
   pdb_cached_re = re.compile(r"Found .*file - placed it in (.*)")
 
-  print("Pre-translating chrome symbols from stripped PDBs to avoid 10-15 minute translation times.")
+  print("Pre-translating chrome symbols from stripped PDBs to avoid 10-15 minute translation times "
+        "and to work around WPA symbol download bugs.")
 
   symcache_files = []
   # Keep track of the local symbol files so that we can temporarily rename them
@@ -134,13 +147,15 @@ def main():
   command_output = str(raw_command_output).splitlines()
 
   for line in command_output:
-    dllMatch = None
-    if line.count("chrome.dll") > 0 or line.count("chrome_child.dll") > 0:
+    dllMatch = None # This is the name to use when generating the .symcache files
+    if line.count("chrome_child.dll") > 0:
+      # The symcache files for chrome_child.dll use the name chrome.dll for some reason
       dllMatch = "chrome.dll"
-    if line.count("blink_web.dll") > 0:
-      dllMatch = "blink_web.dll"
-    if line.count("\\content.dll") > 0:
-      dllMatch = "content.dll"
+    # Complete list of Chrome executables and binaries. Some are only used in internal builds.
+    # Note that case matters for downloading PDBs.
+    for dllName in ["chrome.exe", "chrome.dll", "blink_web.dll", "content.dll", "chrome_elf.dll", "chrome_watcher.dll", "libEGL.dll", "libGLESv2.dll"]:
+      if line.count("\\" + dllName) > 0:
+        dllMatch = dllName
     if dllMatch:
       match = pdb_re.match(line)
       if match:
@@ -166,42 +181,45 @@ def main():
             # RetrieveSymbols puts a period at the end of the output, so strip that.
             if pdb_cache_path.endswith("."):
               pdb_cache_path = pdb_cache_path[:-1]
-        if not pdb_cache_path:
+        if strip_and_translate and not pdb_cache_path:
           # Look for locally built symbols
           if os.path.exists(path):
             pdb_cache_path = path
             local_symbol_files.append(path)
         if pdb_cache_path:
-          tempdir = tempfile.mkdtemp()
-          tempdirs.append(tempdir)
-          dest_path = os.path.join(tempdir, os.path.basename(pdb_cache_path))
-          print("  Copying PDB to %s" % dest_path)
-          # For some reason putting quotes around the command to be run causes
-          # it to fail. So don't do that.
-          copy_command = '%s "%s" "%s" -p' % (pdbcopy_path, pdb_cache_path, dest_path)
-          print("  > %s" % copy_command)
-          if un_fastlink_tool:
-            # If the un_fastlink_tool is available then run the pdbcopy command in a
-            # try block. If pdbcopy fails then run the un_fastlink_tool and try again.
-            try:
+          if strip_and_translate:
+            tempdir = tempfile.mkdtemp()
+            tempdirs.append(tempdir)
+            dest_path = os.path.join(tempdir, os.path.basename(pdb_cache_path))
+            print("  Copying PDB to %s" % dest_path)
+            # For some reason putting quotes around the command to be run causes
+            # it to fail. So don't do that.
+            copy_command = '%s "%s" "%s" -p' % (pdbcopy_path, pdb_cache_path, dest_path)
+            print("  > %s" % copy_command)
+            if un_fastlink_tool:
+              # If the un_fastlink_tool is available then run the pdbcopy command in a
+              # try block. If pdbcopy fails then run the un_fastlink_tool and try again.
+              try:
+                output = str(subprocess.check_output(copy_command, stderr=subprocess.STDOUT))
+                if output:
+                  print("  %s" % output, end="")
+              except:
+                convert_command = '%s "%s"' % (un_fastlink_tool, pdb_cache_path)
+                print("Attempting to un-fastlink PDB so that pdbcopy can strip it. This may be slow.")
+                print("  > %s" % convert_command)
+                subprocess.check_output(convert_command)
+                output = str(subprocess.check_output(copy_command, stderr=subprocess.STDOUT))
+                if output:
+                  print("  %s" % output, end="")
+            else:
               output = str(subprocess.check_output(copy_command, stderr=subprocess.STDOUT))
               if output:
                 print("  %s" % output, end="")
-            except:
-              convert_command = '%s "%s"' % (un_fastlink_tool, pdb_cache_path)
-              print("Attempting to un-fastlink PDB so that pdbcopy can strip it. This may be slow.")
-              print("  > %s" % convert_command)
-              subprocess.check_output(convert_command)
-              output = str(subprocess.check_output(copy_command, stderr=subprocess.STDOUT))
-              if output:
-                print("  %s" % output, end="")
+            if not os.path.exists(dest_path):
+              print("Aborting symbol generation because stripped PDB '%s' does not exist. WPA symbol loading may be slow." % dest_path)
+              sys.exit(0)
           else:
-            output = str(subprocess.check_output(copy_command, stderr=subprocess.STDOUT))
-            if output:
-              print("  %s" % output, end="")
-          if not os.path.exists(dest_path):
-            print("Aborting symbol generation because stripped PDB '%s' does not exist. WPA symbol loading may be slow." % dest_path)
-            sys.exit(0)
+            print("   Symbols retrieved.")
         else:
           print("  Failed to retrieve symbols.")
 
@@ -265,7 +283,7 @@ def main():
     else:
       for directory in tempdirs:
         shutil.rmtree(directory, ignore_errors=True)
-  else:
+  elif strip_and_translate:
     if found_uncached:
       print("No PDBs copied, nothing to do.")
     else:
