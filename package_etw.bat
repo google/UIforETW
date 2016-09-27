@@ -81,6 +81,7 @@ xcopy %UIforETW%bin\UIforETWStatic_devrel32.exe %destdir%\bin\UIforETW32.exe /y
 xcopy %UIforETW%bin\UIforETWStatic_devrel.exe %destdir%\bin\UIforETW.exe /y
 @rem Copy the official binaries back to the local copy, for development purposes.
 xcopy /exclude:%UIforETW%excludecopy.txt %destdir%\bin\UIforETW*.exe %UIforETW%bin /y
+@if ERRORLEVEL 1 goto BuildFailure
 
 xcopy %UIforETW%\bin\UIforETWStatic_devrel*.pdb %symboldir%
 
