@@ -127,6 +127,11 @@ PLATFORM_INTERFACE void __cdecl ETWMouseMove(unsigned flags, int nX, int nY);
 PLATFORM_INTERFACE void __cdecl ETWMouseWheel(unsigned flags, int zDelta, int nX, int nY);
 PLATFORM_INTERFACE void __cdecl ETWKeyDown(unsigned nChar, _In_opt_z_ PCSTR keyName, unsigned nRepCnt, unsigned flags);
 
+// Mark window 
+PLATFORM_INTERFACE bool __cdecl ETWUserMarkBegin(int nWhich, int nOccurance);
+PLATFORM_INTERFACE bool __cdecl ETWUserMarkEnd(int nWhich, int nOccurance);
+
+
 #ifdef __cplusplus
 } // end of extern "C"
 
@@ -192,6 +197,8 @@ inline void ETWMouseUp(int, unsigned int, int, int) {}
 inline void ETWMouseMove(unsigned int, int, int) {}
 inline void ETWMouseWheel(unsigned int, int, int, int) {}
 inline void ETWKeyDown(unsigned, PCSTR, unsigned, unsigned) {}
+inline bool ETWUserMarkBegin(int nWhich, int nOccurance) {}
+inline bool ETWUserMarkEnd(int nWhich, int nOccurance) {}
 
 #ifdef __cplusplus
 // This class calls the ETW Begin and End functions in order to insert a

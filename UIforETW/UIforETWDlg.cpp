@@ -37,6 +37,7 @@ limitations under the License.
 #endif
 
 const int kRecordTraceHotKey = 1234;
+const int kMarkHotKeyStart = 1230;
 const int kTimerID = 5678;
 
 // This static pointer to the main window is used by the global
@@ -128,6 +129,42 @@ void CUIforETWDlg::ShutdownTasks()
 		bFastSampling_ = false;
 		SetSamplingSpeed();
 		bFastSampling_ = true;
+	}
+}
+
+void CUIforETWDlg::RegisterHotkeys()
+{
+	// Win+Ctrl+C is used to trigger recording of traces. This is compatible with
+	// wprui. If this is changed then be sure to change the button text.
+	if (!RegisterHotKey(*this, kRecordTraceHotKey, MOD_WIN + MOD_CONTROL, 'C'))
+	{
+		AfxMessageBox(L"Couldn't register hot key.");
+		btSaveTraceBuffers_.SetWindowTextW(L"Sa&ve Trace Buffers");
+	}
+
+	// Win+Ctrl+Alt+[0-9] can be used mark regions in a trace
+	for (int i = 0; i < 10; ++i)
+	{
+		RegisterHotKey(*this, kMarkHotKeyStart + i, MOD_WIN + MOD_CONTROL + MOD_ALT, '0' + i);
+	}
+}
+
+void CUIforETWDlg::ToggleMark(int index)
+{
+	if (markActive_[index])
+	{
+		ETWUserMarkEnd(index, markOccurance_[index]);
+		markActive_[index] = false;
+		outputPrintf(L"Stopping user mark %i\n", index);
+		++markOccurance_[index];
+	}
+	else
+	{
+		if (ETWUserMarkBegin(index, markOccurance_[index]))
+		{
+			outputPrintf(L"Starting user mark %i\n", index);
+			markActive_[index] = true;
+		}
 	}
 }
 
@@ -311,13 +348,7 @@ BOOL CUIforETWDlg::OnInitDialog()
 	initialWidth_ = lastWidth_ = windowRect.Width();
 	initialHeight_ = lastHeight_ = windowRect.Height();
 
-	// Win+Ctrl+C is used to trigger recording of traces. This is compatible with
-	// wprui. If this is changed then be sure to change the button text.
-	if (!RegisterHotKey(*this, kRecordTraceHotKey, MOD_WIN + MOD_CONTROL, 'C'))
-	{
-		AfxMessageBox(L"Couldn't register hot key.");
-		btSaveTraceBuffers_.SetWindowTextW(L"Sa&ve Trace Buffers");
-	}
+	RegisterHotkeys();
 
 	// Add "About..." menu item to system menu.
 
@@ -1645,6 +1676,11 @@ LRESULT CUIforETWDlg::OnHotKey(WPARAM wParam, LPARAM /*lParam*/)
 		if (bIsTracing_)
 			StopTracingAndMaybeRecord(true);
 		break;
+	}
+
+	if (wParam >= kMarkHotKeyStart && wParam < kMarkHotKeyStart + 10)
+	{
+		ToggleMark((int)(wParam - kMarkHotKeyStart));
 	}
 
 	return 0;

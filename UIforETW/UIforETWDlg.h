@@ -237,6 +237,11 @@ private:
 	void ShutdownTasks();
 	bool bShutdownCompleted_ = false;
 
+	void RegisterHotkeys();
+	void ToggleMark(int index);
+	bool markActive_[10] = {};
+	int markOccurance_[10] = {};
+
 	// Generated message map functions
 	virtual BOOL OnInitDialog() override;
 	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
