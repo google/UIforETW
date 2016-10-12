@@ -475,4 +475,26 @@ void ETWKeyDown( unsigned nChar, _In_opt_z_ const char* keyName, unsigned nRepCn
 	EventWriteKey_down( nChar, keyName, nRepCnt, flags );
 }
 
+bool ETWUserMarkBegin(int nWhich, int nOccurance)
+{
+	if (!MULTI_MAIN_Context.IsEnabled)
+	{
+		return false;
+	}
+
+	EventWriteUserMarkBegin(nWhich, nOccurance);
+	return true;
+}
+
+bool ETWUserMarkEnd(int nWhich, int nOccurance)
+{
+	if (!MULTI_MAIN_Context.IsEnabled)
+	{
+		return false;
+	}
+
+	EventWriteUserMarkEnd(nWhich, nOccurance);
+	return true;
+}
+
 #endif // ETW_MARKS_ENABLED
