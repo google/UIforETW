@@ -1,0 +1,1087 @@
+<?xml version="1.0" encoding="utf-8"?>
+<WpaProfileContainer xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Version="2" xmlns="http://tempuri.org/SerializableElement.xsd">
+  <Content xsi:type="WpaProfile2">
+    <Sessions>
+      <Session Index="0">
+        <FileReferences />
+      </Session>
+    </Sessions>
+    <Views>
+      <View Guid="67b8486a-9cc3-4d36-978b-cfc07051f750" Title="Analysis" IsVisible="true">
+        <Graphs>
+          <Graph Guid="04f69f98-176e-4d1c-b44e-97f734996ab8" LayoutStyle="GraphAndLegend" Color="#FF005DE0" GraphHeight="54" IsShown="true" HelpText="{}{\rtf1\ansi\ansicpg1252\uc1\htmautsp\deff2{\fonttbl{\f0\fcharset0 Times New Roman;}{\f2\fcharset0 Segoe UI;}}{\colortbl\red0\green0\blue0;\red255\green255\blue255;}\loch\hich\dbch\pard\plain\ltrpar\itap0{\lang1033\fs18\f2\cf0 \cf0\ql{\f2 {\ltrch Shows every event in the trace, including the associated payload fields.}\li0\ri0\sa0\sb0\fi0\ql\par}&#xD;&#xA;{\f2 \li0\ri0\sa0\sb0\fi0\ql\par}&#xD;&#xA;{\f2 {\ltrch New capability - graph payload fields!}\li0\ri0\sa0\sb0\fi0\ql\par}&#xD;&#xA;{\f2 \li0\ri0\sa0\sb0\fi0\ql\par}&#xD;&#xA;{\f2 {\ltrch 1. Filter down to the event with the payload field you want to graph.}\li0\ri0\sa0\sb0\fi0\ql\par}&#xD;&#xA;{\f2 {\ltrch 2. Drag the column corresponding to the payload field you want to graph to the right of the blue bar.}\li0\ri0\sa0\sb0\fi0\ql\par}&#xD;&#xA;{\f2 {\ltrch 3. If the automatic graphing isn't representing your data correctly, go to View Editor and:}\li0\ri0\sa0\sb0\fi0\ql\par}&#xD;&#xA;{\f2 {\ltrch a. Adjust the aggregation mode for your column, or}\li0\ri0\sa0\sb0\fi0\ql\par}&#xD;&#xA;{\f2 {\ltrch b. Go to Advanced &gt; Graph Configuration and change your graphing aggregation mode.}\li0\ri0\sa0\sb0\fi0\ql\par}&#xD;&#xA;}&#xD;&#xA;}">
+            <Preset Name="User Marks" BarGraphIntervalCount="50" GraphColumnCount="26" KeyColumnCount="9" LeftFrozenColumnCount="8" RightFrozenColumnCount="25" InitialFilterQuery="[Provider Name]:=&quot;Multi-Input&quot; [Task Name]:=&quot;Keyboard&quot; [Field 2]:~=&quot;Ctrl+Alt+Win+F&quot;" InitialFilterShouldKeep="true">
+              <MetadataEntries>
+                <MetadataEntry Guid="edf01e5d-3644-4dbc-ab9d-f8954e6db6ea" Name="ThreadId" ColumnMetadata="EndThreadId" />
+                <MetadataEntry Guid="bbfc990a-b6c9-4dcd-858b-f040ab4a1efe" Name="Time" ColumnMetadata="StartTime" />
+                <MetadataEntry Guid="bbfc990a-b6c9-4dcd-858b-f040ab4a1efe" Name="Time" ColumnMetadata="EndTime" />
+              </MetadataEntries>
+              <HighlightEntries />
+              <Columns>
+                <Column Guid="71badd11-26e5-56bc-44ec-12f4cc6a8f3e" Name="Field 2" AggregationMode="Average" SortPriority="6" Width="80" IsVisible="true" />
+                <Column Guid="7ee6a5ff-1faf-428a-a7c2-7d2cb2b5cf26" Name="Process" SortPriority="28" Width="186" />
+                <Column Guid="8b4c40f8-0d99-437d-86ab-56ec200137dc" Name="Provider Name" SortPriority="18" Width="135" />
+                <Column Guid="2a23f9b1-65d6-46d2-87b2-72f3606b7f75" Name="Provider Id" SortPriority="23" Width="100" />
+                <Column Guid="511777f7-30ef-4e86-bd0b-0facaf23a0d3" Name="Task Name" SortPriority="19" Width="80" />
+                <Column Guid="5b51716b-b88f-443a-a396-c6316296d5f8" Name="Opcode Name" SortPriority="20" Width="100" />
+                <Column Guid="c72e1c5a-f6db-4c84-8c0b-85989e514075" Name="Id" SortPriority="21" Width="80" />
+                <Column Guid="d446a182-5203-4a29-aca1-4ab9bea0d1b5" Name="Version" SortPriority="1" Width="80" />
+                <Column Guid="cb796d44-2927-5ac1-d231-4b71904c18f5" Name="Thread Name" SortPriority="2" Width="80" />
+                <Column Guid="82ddfdff-ee93-5f35-08ac-4705069618dc" Name="Thread Activity Tag" SortPriority="3" Width="80" />
+                <Column Guid="2818954f-2d30-5569-4510-dade0a5a605c" Name="Annotation" SortPriority="4" Width="80" />
+                <Column Guid="90fe0b49-e3bb-440f-b829-5813c42108a1" Name="Event Name" SortPriority="22" Width="239" />
+                <Column Guid="72892fbe-0f55-426a-9aa1-26b6baf09ffb" Name="Event Type" SortPriority="24" Width="100" />
+                <Column Guid="0734f1a4-fbd9-4ff6-aec0-cf43875c8253" Name="Message" SortPriority="25" Width="100" />
+                <Column Guid="3be8610c-babb-4154-9970-1b2210928024" Name="Cpu" SortPriority="26" Width="45" />
+                <Column Guid="342f7677-17b2-4c7e-b9ec-e89612c49792" Name="Count" AggregationMode="Sum" SortOrder="Descending" Width="80" />
+                <Column Guid="edf01e5d-3644-4dbc-ab9d-f8954e6db6ea" Name="ThreadId" SortPriority="27" Width="63" />
+                <Column Guid="0c5cf8cd-9b9e-5798-1a5d-09d429f7fa3c" Name="Field 1" AggregationMode="Average" SortPriority="5" Width="111" />
+                <Column Guid="411dba2d-5d6e-5272-8287-636d0841768c" Name="Field 3" AggregationMode="Average" SortPriority="7" Width="80" />
+                <Column Guid="048f5050-1f17-59b3-fa22-4b0781ee630b" Name="Field 4" AggregationMode="Average" SortPriority="8" Width="80" />
+                <Column Guid="94e48f22-d499-5227-bb04-be011b4159b0" Name="Field 5" AggregationMode="Average" SortPriority="9" Width="80" />
+                <Column Guid="c1054028-424a-59ba-e760-6d30abbd69c5" Name="Field 6" AggregationMode="Average" SortPriority="10" Width="80" />
+                <Column Guid="5cbc4b58-2de1-5449-55b2-4651d4edf90a" Name="Field 7" AggregationMode="Average" SortPriority="11" Width="80" />
+                <Column Guid="bbfc990a-b6c9-4dcd-858b-f040ab4a1efe" Name="Time" SortPriority="29" Width="80" IsVisible="true" />
+              </Columns>
+            </Preset>
+          </Graph>
+          <Graph Guid="c58f5fea-0319-4046-932d-e695ebe20b47" LayoutStyle="GraphAndLegend" Color="#FFFF0000" GraphHeight="264" IsShown="true" HelpText="{}{\rtf1\ansi\ansicpg1252\uc1\htmautsp\deff2{\fonttbl{\f0\fcharset0 Times New Roman;}{\f2\fcharset0 Segoe UI;}}{\colortbl\red0\green0\blue0;\red255\green255\blue255;}\loch\hich\dbch\pard\plain\ltrpar\itap0{\lang1033\fs18\f2\cf0 \cf0\ql{\f2 {\ltrch Uses context switch events to provide a precise view of CPU usage in the trace. You can view a timeline of when threads are switched in and out, a graph of usage, and many other visualizations.}\li0\ri0\sa0\sb0\fi0\ql\par}&#xD;&#xA;{\f2 \li0\ri0\sa0\sb0\fi0\ql\par}&#xD;&#xA;{\f2 {\ltrch More on context switching }\li0\ri0\sa0\sb0\fi0\ql\par}&#xD;&#xA;{\f2 {\ltrch Because the number of processors in a system is limited, all threads cannot run at the same time. Windows uses processor time-sharing, which allows a thread to run for a period of time before the processor switches to another thread. Switching between threads is called a context-switch and it is performed by a Windows component called the dispatcher. The dispatcher makes thread scheduling decisions based on priority, ideal processor and affinity, quantum, and state. This graph captures the data by the dispatcher.}\li0\ri0\sa0\sb0\fi0\ql\par}&#xD;&#xA;}&#xD;&#xA;}">
+            <Preset Name="Randomascii Wait Analysis" BarGraphIntervalCount="50" GraphColumnCount="61" KeyColumnCount="13" RightFrozenColumnCount="59" InitialFilterShouldKeep="true" InitialSelectionQuery="([Series Name]:=&quot;New Process&quot; AND NOT ([New Process]:=&quot;Idle (0)&quot;))" GraphFilterColumnGuid="17a03387-5d14-405a-a5b2-0201c934f917">
+              <MetadataEntries>
+                <MetadataEntry Guid="944ed37a-5774-421e-b2d5-84f17a4b3a05" Name="New Thread Id" ColumnMetadata="EndThreadId" />
+                <MetadataEntry Guid="5417f63c-9b79-45aa-beb9-73e3c1959221" Name="Switch-In Time" ColumnMetadata="StartTime" />
+                <MetadataEntry Guid="03a1d898-7231-4cc5-9712-4bfbf53908c7" Name="New Switch-In Time" ColumnMetadata="Duration" />
+                <MetadataEntry Guid="2575f38e-f991-4ce5-bafb-793e2ba1936a" Name="Cpu" ColumnMetadata="ResourceId" />
+                <MetadataEntry Guid="17a03387-5d14-405a-a5b2-0201c934f917" Name="Time Since Last" ColumnMetadata="WaitDuration" />
+                <MetadataEntry Guid="5417f63c-9b79-45aa-beb9-73e3c1959221" Name="Switch-In Time" ColumnMetadata="WaitEndTime" />
+              </MetadataEntries>
+              <HighlightEntries />
+              <Columns>
+                <Column Guid="f64abe19-837a-4e53-8087-4547026b82b2" Name="New Process Name" SortPriority="1" Width="180" />
+                <Column Guid="b065487c-5e32-4f1f-a2cd-581e086ce29e" Name="New Process" SortPriority="2" Width="124" IsVisible="true" />
+                <Column Guid="944ed37a-5774-421e-b2d5-84f17a4b3a05" Name="New Thread Id" SortPriority="3" TextAlignment="Right" Width="87" IsVisible="true" />
+                <Column Guid="68482a06-b6a3-4eb9-922f-9fa43537148b" Name="New Thread Stack" SortPriority="4" Width="200">
+                  <StackOptionsParameter Mode="StackTag" FrameTagFold="True" />
+                </Column>
+                <Column Guid="68482a06-b6a3-4eb9-922f-9fa43537148b" Name="New Thread Stack" SortPriority="5" Width="200">
+                  <StackOptionsParameter Mode="FrameTags" FrameTagFold="True" />
+                </Column>
+                <Column Guid="68482a06-b6a3-4eb9-922f-9fa43537148b" Name="New Thread Stack" SortPriority="6" Width="340" IsVisible="true">
+                  <StackOptionsParameter FrameTagFold="True" />
+                </Column>
+                <Column Guid="74714606-d216-4cfa-a7d8-7ccb9c67de76" Name="Ready Thread Stack" SortPriority="7" Width="200">
+                  <StackOptionsParameter Mode="StackTag" FrameTagFold="True" />
+                </Column>
+                <Column Guid="74714606-d216-4cfa-a7d8-7ccb9c67de76" Name="Ready Thread Stack" SortPriority="8" Width="200">
+                  <StackOptionsParameter Mode="FrameTags" FrameTagFold="True" />
+                </Column>
+                <Column Guid="a91e1d66-1316-4baa-b95d-e69aeeef891e" Name="Readying Process" SortPriority="11" Width="98" IsVisible="true" />
+                <Column Guid="4ce38ba6-1665-4d3a-91cb-35b64f8c4280" Name="Readying Thread Id" SortPriority="12" TextAlignment="Right" Width="92" IsVisible="true" />
+                <Column Guid="74714606-d216-4cfa-a7d8-7ccb9c67de76" Name="Ready Thread Stack" SortPriority="9" Width="280" IsVisible="true">
+                  <StackOptionsParameter FrameTagFold="True" />
+                </Column>
+                <Column Guid="5b7c10a2-868c-415c-826e-0b8065de3872" Name="Readying Process Name" SortPriority="10" Width="180" />
+                <Column Guid="cb796d44-2927-5ac1-d231-4b71904c18f5" Name="Thread Name" SortPriority="13" Width="80" />
+                <Column Guid="82ddfdff-ee93-5f35-08ac-4705069618dc" Name="Thread Activity Tag" SortPriority="14" Width="80" />
+                <Column Guid="2818954f-2d30-5569-4510-dade0a5a605c" Name="Annotation" SortPriority="15" Width="80" />
+                <Column Guid="7bb1053b-8f03-4c72-89f1-a5f8b9c45a9e" Name="Ready Time" SortPriority="16" TextAlignment="Right" Width="120" />
+                <Column Guid="d227f58f-ec9b-4a52-8fe5-e082771c55c6" Name="Count" AggregationMode="Count" SortPriority="17" TextAlignment="Right" Width="50" IsVisible="true" />
+                <Column Guid="17a03387-5d14-405a-a5b2-0201c934f917" Name="Time Since Last" AggregationMode="Sum" SortPriority="18" TextAlignment="Right" Width="120" CellFormat="uN" IsVisible="true" />
+                <Column Guid="17a03387-5d14-405a-a5b2-0201c934f917" Name="Time Since Last" AggregationMode="Max" SortPriority="19" TextAlignment="Right" Width="120" CellFormat="uN" IsVisible="true" />
+                <Column Guid="906ea81e-ab68-4dfd-9b9f-3adafab60f83" Name="Ready" AggregationMode="Sum" SortPriority="20" TextAlignment="Right" Width="100" CellFormat="uN" />
+                <Column Guid="906ea81e-ab68-4dfd-9b9f-3adafab60f83" Name="Ready" AggregationMode="Max" SortPriority="21" TextAlignment="Right" Width="100" CellFormat="uN" />
+                <Column Guid="6d598aa8-2ec4-46cd-b71a-88a239dfacf7" Name="Waits" AggregationMode="Sum" SortPriority="22" TextAlignment="Right" Width="100" CellFormat="uN" />
+                <Column Guid="6d598aa8-2ec4-46cd-b71a-88a239dfacf7" Name="Waits" AggregationMode="Max" SortPriority="23" TextAlignment="Right" Width="100" CellFormat="uN" />
+                <Column Guid="1db45bc8-4cd5-49f3-a0ec-7f861d33c7a2" Name="Count:Waits" AggregationMode="Sum" SortPriority="24" TextAlignment="Right" Width="70" IsVisible="true" />
+                <Column Guid="5417f63c-9b79-45aa-beb9-73e3c1959221" Name="Switch-In Time" SortPriority="25" TextAlignment="Right" Width="99" IsVisible="true" />
+                <Column Guid="71d9a1a9-f32c-4b0b-8f09-09b56cbbb843" Name="Last Switch-Out Time" SortPriority="26" TextAlignment="Right" Width="120" />
+                <Column Guid="b0394c3a-60ba-4305-84d6-82384bd863cb" Name="Next Switch-Out Time" SortPriority="27" TextAlignment="Right" Width="120" />
+                <Column Guid="f611f788-c420-49a0-84b2-21ad7cfea811" Name="New Prev Out Pri" SortPriority="28" TextAlignment="Right" Width="70" />
+                <Column Guid="5664dbf4-e565-4b15-add0-3e826ee25c10" Name="New In Pri" SortPriority="29" TextAlignment="Right" Width="70" />
+                <Column Guid="f88c657f-5f13-4477-a713-eaf1abf81ece" Name="New Out Pri" SortPriority="30" TextAlignment="Right" Width="70" />
+                <Column Guid="32a7f4fc-f7ad-47a3-b5a8-ad740991c9c1" Name="New Qnt" SortPriority="31" TextAlignment="Right" Width="60" />
+                <Column Guid="11628f2a-3000-43af-9924-d99198ae9be2" Name="New Prev State" SortPriority="32" Width="100" />
+                <Column Guid="fe7ccd45-6275-413e-a538-3587f0eb452b" Name="New Prev Wait Reason" SortPriority="33" Width="100" />
+                <Column Guid="f9284962-f8ee-4344-817a-ca44acd3a75d" Name="New Prev Wait Mode" SortPriority="34" Width="80" />
+                <Column Guid="ef1e0e6d-e243-48e8-b40a-71c408eeae9f" Name="New State" SortPriority="35" Width="100" />
+                <Column Guid="d8d5d554-5877-4b5a-8df5-7cfa1935430a" Name="New Wait Reason" SortPriority="36" Width="100" />
+                <Column Guid="3fd1ebd9-3538-443f-b50b-d08de1352271" Name="New Wait Mode" SortPriority="37" Width="80" />
+                <Column Guid="7d7dabe0-0896-4fd1-9617-1c6758d80da5" Name="New Pri Decr" SortPriority="38" TextAlignment="Right" Width="60" />
+                <Column Guid="c10c7661-6e59-4743-894d-9fbc770a41f3" Name="Old Process Name" SortPriority="39" Width="180" />
+                <Column Guid="e93e468d-86a2-4f3a-a750-bb3b07c14a0b" Name="Old Process" SortPriority="40" Width="200" />
+                <Column Guid="7e24b8da-fe12-4e69-b8cc-9ab0c22c9734" Name="Old Thread Id" SortPriority="41" TextAlignment="Right" Width="80" />
+                <Column Guid="3aa1863c-4219-4667-9aa8-aedc0da92bbe" Name="Old Out Pri" SortPriority="42" TextAlignment="Right" Width="70" />
+                <Column Guid="2d8aa42b-6fde-45bb-8b4e-230c6adcc656" Name="Old Qnt" SortPriority="43" TextAlignment="Right" Width="60" />
+                <Column Guid="ad3b2db0-2dbb-449b-88f5-cf83b8db33ec" Name="Old Switch-In Time" AggregationMode="Sum" SortPriority="44" TextAlignment="Right" Width="100" CellFormat="uN" />
+                <Column Guid="6d59239b-c825-4f19-bc0f-039d59568408" Name="Old State" SortPriority="45" Width="80" />
+                <Column Guid="89a7715b-5b16-48ec-b6db-f6a28ac4ca63" Name="Old Wait Reason" SortPriority="46" Width="100" />
+                <Column Guid="0a1c969d-e94a-4ca8-83f1-086f55c46dd1" Name="Old Wait Mode" SortPriority="47" Width="80" />
+                <Column Guid="2575f38e-f991-4ce5-bafb-793e2ba1936a" Name="Cpu" SortPriority="48" TextAlignment="Right" Width="50" />
+                <Column Guid="e93dcc3d-9960-446a-aa1d-fa05d47d5aa4" Name="Ideal Cpu" SortPriority="49" TextAlignment="Right" Width="60" />
+                <Column Guid="6143445c-c984-49f5-994b-9351a7520f3c" Name="Prev CState" SortPriority="50" TextAlignment="Right" Width="60" />
+                <Column Guid="59117e0d-0465-42c7-a758-52728c5b0099" Name="New Thread Start Module" SortPriority="51" Width="200" />
+                <Column Guid="b09b3bba-08ea-4e1b-9c16-4d0bb97926fb" Name="New Thread Start Function" SortPriority="52" Width="200" />
+                <Column Guid="de478623-0270-43d8-b2b4-c7df7b93ec7a" Name="Readying Thread Start Module" SortPriority="53" Width="200" />
+                <Column Guid="3a13296d-8e2d-40d7-8ab6-46ebb2646caa" Name="Readying Thread Start Function" SortPriority="54" Width="200" />
+                <Column Guid="96d10b76-4157-42d0-8163-91dc0b8b12b5" Name="Old Thread Start Module" SortPriority="55" Width="200" />
+                <Column Guid="e99e2971-b205-41e9-894d-ba0c19e2af83" Name="Old Thread Start Function" SortPriority="56" Width="200" />
+                <Column Guid="03a1d898-7231-4cc5-9712-4bfbf53908c7" Name="New Switch-In Time" AggregationMode="Sum" SortPriority="57" TextAlignment="Right" Width="100" CellFormat="uN" />
+                <Column Guid="e008ed7a-15b0-40ab-854b-b5f6392f298b" Name="CPU Usage (in view)" AggregationMode="Sum" SortPriority="58" TextAlignment="Right" Width="100" CellFormat="mN" IsVisible="true" />
+                <Column Guid="fc672588-da05-4f43-991f-6b644a3f5b3d" Name="% CPU Usage" AggregationMode="Sum" SortOrder="Descending" TextAlignment="Right" Width="100" CellFormat="N2" IsVisible="true" />
+              </Columns>
+            </Preset>
+          </Graph>
+          <Graph Guid="b855361e-7be0-4bc8-a754-3e8507715ca5" LayoutStyle="DataTable" Color="#FFFF0000" GraphHeight="169" IsShown="true" HelpText="{}{\rtf1\ansi\ansicpg1252\uc1\htmautsp\deff2{\fonttbl{\f0\fcharset0 Times New Roman;}{\f2\fcharset0 Segoe UI;}}{\colortbl\red0\green0\blue0;\red255\green255\blue255;}\loch\hich\dbch\pard\plain\ltrpar\itap0{\lang1033\fs18\f2\cf0 \cf0\ql{\f2 {\ltrch This graph shows CPU usage events logged at a regular sampling interval, usually about 1ms.  Each event logs the CPU, thread, address and optionally the call stack.}\li0\ri0\sa0\sb0\fi0\ql\par}&#xD;&#xA;}&#xD;&#xA;}">
+            <Preset Name="Randomascii Inclusive (stack)" BarGraphIntervalCount="50" GraphColumnCount="23" KeyColumnCount="12" RightFrozenColumnCount="22" InitialFilterQuery="[DPC/ISR]:=&quot;DPC&quot; OR [DPC/ISR]:=&quot;ISR&quot;" InitialSelectionQuery="([Series Name]:=&quot;Process&quot; AND NOT ([Process]:=&quot;Idle (0)&quot;))">
+              <MetadataEntries>
+                <MetadataEntry Guid="05100ece-df05-40c7-aad6-ffff99b60491" Name="Thread ID" ColumnMetadata="EndThreadId" />
+                <MetadataEntry Guid="0bbf4299-0176-445e-b1d9-991df475d631" Name="TimeStamp" ColumnMetadata="EndTime" />
+                <MetadataEntry Guid="e0c6cb9e-04c2-4bb5-ba5f-4ed765f4ecaa" Name="Weight" ColumnMetadata="Duration" />
+                <MetadataEntry Guid="55d56ebb-77af-4af5-a056-6122751ea093" Name="CPU" ColumnMetadata="ResourceId" />
+              </MetadataEntries>
+              <HighlightEntries />
+              <Columns>
+                <Column Guid="9c1ceec3-ef4a-4865-b678-d774881187b9" Name="Process Name" SortPriority="1" Width="180" />
+                <Column Guid="00875e0c-482f-418d-ab40-decf05030541" Name="Display Name" SortPriority="2" Width="200" />
+                <Column Guid="5b77e48f-6d24-4f29-8972-69c30e32f87d" Name="Process" SortPriority="3" Width="200" IsVisible="true" />
+                <Column Guid="842af11e-661d-477e-b7b6-556ed8181177" Name="Stack" SortPriority="4" Width="200">
+                  <StackOptionsParameter Mode="StackTag" FrameTagFold="True" />
+                </Column>
+                <Column Guid="842af11e-661d-477e-b7b6-556ed8181177" Name="Stack" SortPriority="5" Width="200">
+                  <StackOptionsParameter Mode="FrameTags" FrameTagFold="True" />
+                </Column>
+                <Column Guid="05100ece-df05-40c7-aad6-ffff99b60491" Name="Thread ID" SortPriority="11" TextAlignment="Right" Width="80" IsVisible="true" />
+                <Column Guid="842af11e-661d-477e-b7b6-556ed8181177" Name="Stack" SortPriority="6" Width="535" IsVisible="true">
+                  <StackOptionsParameter FrameTagFold="True" />
+                </Column>
+                <Column Guid="ccdb05c1-04a9-4289-aaa6-a376d1d66012" Name="Module" SortPriority="7" Width="124" />
+                <Column Guid="7ad93780-708c-471c-9e3f-5a497cbefdd7" Name="Function" SortPriority="8" Width="184" />
+                <Column Guid="d0028ea0-aa66-452a-882a-616fd8b9fdce" Name="DPC/ISR" SortPriority="9" Width="184" />
+                <Column Guid="9aa2e00d-db0a-4207-a0bd-964aa492356e" Name="Address" SortPriority="10" TextAlignment="Right" Width="140" />
+                <Column Guid="cb796d44-2927-5ac1-d231-4b71904c18f5" Name="Thread Name" SortPriority="12" Width="80" />
+                <Column Guid="82ddfdff-ee93-5f35-08ac-4705069618dc" Name="Thread Activity Tag" SortPriority="13" Width="80" />
+                <Column Guid="2818954f-2d30-5569-4510-dade0a5a605c" Name="Annotation" SortPriority="14" Width="80" />
+                <Column Guid="55d56ebb-77af-4af5-a056-6122751ea093" Name="CPU" SortPriority="15" TextAlignment="Right" Width="40" />
+                <Column Guid="01a82c2c-5048-4c9d-ac37-eaf6556f6af5" Name="Count" AggregationMode="Sum" SortOrder="Descending" TextAlignment="Right" Width="60" IsVisible="true" />
+                <Column Guid="63cfb4e2-a24c-4e9d-80f2-393f03794d60" Name="Weight (in view)" AggregationMode="Sum" SortPriority="16" TextAlignment="Right" Width="100" IsVisible="true" />
+                <Column Guid="0bbf4299-0176-445e-b1d9-991df475d631" Name="TimeStamp" SortPriority="17" TextAlignment="Right" Width="100" />
+                <Column Guid="ab54241e-ce5d-4ef7-a28c-bbcb5b8d39d4" Name="Rank" SortPriority="18" TextAlignment="Right" Width="80" />
+                <Column Guid="5a1e1ba4-6a14-43e5-96eb-3b462be470fe" Name="Priority" SortPriority="19" TextAlignment="Right" Width="80" />
+                <Column Guid="f5ebf01b-f7cb-4afb-877d-c36edb2a62b6" Name="% Weight" AggregationMode="Sum" SortOrder="Descending" SortPriority="20" TextAlignment="Right" Width="80" />
+              </Columns>
+            </Preset>
+          </Graph>
+        </Graphs>
+        <SessionIndices>
+          <SessionIndex>0</SessionIndex>
+        </SessionIndices>
+      </View>
+    </Views>
+    <ModifiedGraphs>
+      <GraphSchema Guid="c58f5fea-0319-4046-932d-e695ebe20b47" HelpText="{}{\rtf1\ansi\ansicpg1252\uc1\htmautsp\deff2{\fonttbl{\f0\fcharset0 Times New Roman;}{\f2\fcharset0 Segoe UI;}}{\colortbl\red0\green0\blue0;\red255\green255\blue255;}\loch\hich\dbch\pard\plain\ltrpar\itap0{\lang1033\fs18\f2\cf0 \cf0\ql{\f2 {\ltrch Uses context switch events to provide a precise view of CPU usage in the trace. You can view a timeline of when threads are switched in and out, a graph of usage, and many other visualizations.}\li0\ri0\sa0\sb0\fi0\ql\par}&#xD;&#xA;{\f2 \li0\ri0\sa0\sb0\fi0\ql\par}&#xD;&#xA;{\f2 {\ltrch More on context switching }\li0\ri0\sa0\sb0\fi0\ql\par}&#xD;&#xA;{\f2 {\ltrch Because the number of processors in a system is limited, all threads cannot run at the same time. Windows uses processor time-sharing, which allows a thread to run for a period of time before the processor switches to another thread. Switching between threads is called a context-switch and it is performed by a Windows component called the dispatcher. The dispatcher makes thread scheduling decisions based on priority, ideal processor and affinity, quantum, and state. This graph captures the data by the dispatcher.}\li0\ri0\sa0\sb0\fi0\ql\par}&#xD;&#xA;}&#xD;&#xA;}">
+        <ModifiedPresets>
+          <Preset Name="Randomascii Wait Analysis" BarGraphIntervalCount="50" GraphColumnCount="61" KeyColumnCount="13" RightFrozenColumnCount="59" InitialFilterShouldKeep="true" InitialSelectionQuery="([Series Name]:=&quot;New Process&quot; AND NOT ([New Process]:=&quot;Idle (0)&quot;))" GraphFilterColumnGuid="17a03387-5d14-405a-a5b2-0201c934f917">
+            <MetadataEntries>
+              <MetadataEntry Guid="944ed37a-5774-421e-b2d5-84f17a4b3a05" Name="New Thread Id" ColumnMetadata="EndThreadId" />
+              <MetadataEntry Guid="5417f63c-9b79-45aa-beb9-73e3c1959221" Name="Switch-In Time" ColumnMetadata="StartTime" />
+              <MetadataEntry Guid="03a1d898-7231-4cc5-9712-4bfbf53908c7" Name="New Switch-In Time" ColumnMetadata="Duration" />
+              <MetadataEntry Guid="2575f38e-f991-4ce5-bafb-793e2ba1936a" Name="Cpu" ColumnMetadata="ResourceId" />
+              <MetadataEntry Guid="17a03387-5d14-405a-a5b2-0201c934f917" Name="Time Since Last" ColumnMetadata="WaitDuration" />
+              <MetadataEntry Guid="5417f63c-9b79-45aa-beb9-73e3c1959221" Name="Switch-In Time" ColumnMetadata="WaitEndTime" />
+            </MetadataEntries>
+            <HighlightEntries />
+            <Columns>
+              <Column Guid="f64abe19-837a-4e53-8087-4547026b82b2" Name="New Process Name" SortPriority="1" Width="180" />
+              <Column Guid="b065487c-5e32-4f1f-a2cd-581e086ce29e" Name="New Process" SortPriority="2" Width="124" IsVisible="true" />
+              <Column Guid="944ed37a-5774-421e-b2d5-84f17a4b3a05" Name="New Thread Id" SortPriority="3" TextAlignment="Right" Width="87" IsVisible="true" />
+              <Column Guid="68482a06-b6a3-4eb9-922f-9fa43537148b" Name="New Thread Stack" SortPriority="4" Width="200">
+                <StackOptionsParameter Mode="StackTag" FrameTagFold="True" />
+              </Column>
+              <Column Guid="68482a06-b6a3-4eb9-922f-9fa43537148b" Name="New Thread Stack" SortPriority="5" Width="200">
+                <StackOptionsParameter Mode="FrameTags" FrameTagFold="True" />
+              </Column>
+              <Column Guid="68482a06-b6a3-4eb9-922f-9fa43537148b" Name="New Thread Stack" SortPriority="6" Width="340" IsVisible="true">
+                <StackOptionsParameter FrameTagFold="True" />
+              </Column>
+              <Column Guid="74714606-d216-4cfa-a7d8-7ccb9c67de76" Name="Ready Thread Stack" SortPriority="7" Width="200">
+                <StackOptionsParameter Mode="StackTag" FrameTagFold="True" />
+              </Column>
+              <Column Guid="74714606-d216-4cfa-a7d8-7ccb9c67de76" Name="Ready Thread Stack" SortPriority="8" Width="200">
+                <StackOptionsParameter Mode="FrameTags" FrameTagFold="True" />
+              </Column>
+              <Column Guid="a91e1d66-1316-4baa-b95d-e69aeeef891e" Name="Readying Process" SortPriority="11" Width="98" IsVisible="true" />
+              <Column Guid="4ce38ba6-1665-4d3a-91cb-35b64f8c4280" Name="Readying Thread Id" SortPriority="12" TextAlignment="Right" Width="92" IsVisible="true" />
+              <Column Guid="74714606-d216-4cfa-a7d8-7ccb9c67de76" Name="Ready Thread Stack" SortPriority="9" Width="280" IsVisible="true">
+                <StackOptionsParameter FrameTagFold="True" />
+              </Column>
+              <Column Guid="5b7c10a2-868c-415c-826e-0b8065de3872" Name="Readying Process Name" SortPriority="10" Width="180" />
+              <Column Guid="cb796d44-2927-5ac1-d231-4b71904c18f5" Name="Thread Name" SortPriority="13" Width="80" />
+              <Column Guid="82ddfdff-ee93-5f35-08ac-4705069618dc" Name="Thread Activity Tag" SortPriority="14" Width="80" />
+              <Column Guid="2818954f-2d30-5569-4510-dade0a5a605c" Name="Annotation" SortPriority="15" Width="80" />
+              <Column Guid="7bb1053b-8f03-4c72-89f1-a5f8b9c45a9e" Name="Ready Time" SortPriority="16" TextAlignment="Right" Width="120" />
+              <Column Guid="d227f58f-ec9b-4a52-8fe5-e082771c55c6" Name="Count" AggregationMode="Count" SortPriority="17" TextAlignment="Right" Width="50" IsVisible="true" />
+              <Column Guid="17a03387-5d14-405a-a5b2-0201c934f917" Name="Time Since Last" AggregationMode="Sum" SortPriority="18" TextAlignment="Right" Width="120" CellFormat="uN" IsVisible="true" />
+              <Column Guid="17a03387-5d14-405a-a5b2-0201c934f917" Name="Time Since Last" AggregationMode="Max" SortPriority="19" TextAlignment="Right" Width="120" CellFormat="uN" IsVisible="true" />
+              <Column Guid="906ea81e-ab68-4dfd-9b9f-3adafab60f83" Name="Ready" AggregationMode="Sum" SortPriority="20" TextAlignment="Right" Width="100" CellFormat="uN" />
+              <Column Guid="906ea81e-ab68-4dfd-9b9f-3adafab60f83" Name="Ready" AggregationMode="Max" SortPriority="21" TextAlignment="Right" Width="100" CellFormat="uN" />
+              <Column Guid="6d598aa8-2ec4-46cd-b71a-88a239dfacf7" Name="Waits" AggregationMode="Sum" SortPriority="22" TextAlignment="Right" Width="100" CellFormat="uN" />
+              <Column Guid="6d598aa8-2ec4-46cd-b71a-88a239dfacf7" Name="Waits" AggregationMode="Max" SortPriority="23" TextAlignment="Right" Width="100" CellFormat="uN" />
+              <Column Guid="1db45bc8-4cd5-49f3-a0ec-7f861d33c7a2" Name="Count:Waits" AggregationMode="Sum" SortPriority="24" TextAlignment="Right" Width="70" IsVisible="true" />
+              <Column Guid="5417f63c-9b79-45aa-beb9-73e3c1959221" Name="Switch-In Time" SortPriority="25" TextAlignment="Right" Width="99" IsVisible="true" />
+              <Column Guid="71d9a1a9-f32c-4b0b-8f09-09b56cbbb843" Name="Last Switch-Out Time" SortPriority="26" TextAlignment="Right" Width="120" />
+              <Column Guid="b0394c3a-60ba-4305-84d6-82384bd863cb" Name="Next Switch-Out Time" SortPriority="27" TextAlignment="Right" Width="120" />
+              <Column Guid="f611f788-c420-49a0-84b2-21ad7cfea811" Name="New Prev Out Pri" SortPriority="28" TextAlignment="Right" Width="70" />
+              <Column Guid="5664dbf4-e565-4b15-add0-3e826ee25c10" Name="New In Pri" SortPriority="29" TextAlignment="Right" Width="70" />
+              <Column Guid="f88c657f-5f13-4477-a713-eaf1abf81ece" Name="New Out Pri" SortPriority="30" TextAlignment="Right" Width="70" />
+              <Column Guid="32a7f4fc-f7ad-47a3-b5a8-ad740991c9c1" Name="New Qnt" SortPriority="31" TextAlignment="Right" Width="60" />
+              <Column Guid="11628f2a-3000-43af-9924-d99198ae9be2" Name="New Prev State" SortPriority="32" Width="100" />
+              <Column Guid="fe7ccd45-6275-413e-a538-3587f0eb452b" Name="New Prev Wait Reason" SortPriority="33" Width="100" />
+              <Column Guid="f9284962-f8ee-4344-817a-ca44acd3a75d" Name="New Prev Wait Mode" SortPriority="34" Width="80" />
+              <Column Guid="ef1e0e6d-e243-48e8-b40a-71c408eeae9f" Name="New State" SortPriority="35" Width="100" />
+              <Column Guid="d8d5d554-5877-4b5a-8df5-7cfa1935430a" Name="New Wait Reason" SortPriority="36" Width="100" />
+              <Column Guid="3fd1ebd9-3538-443f-b50b-d08de1352271" Name="New Wait Mode" SortPriority="37" Width="80" />
+              <Column Guid="7d7dabe0-0896-4fd1-9617-1c6758d80da5" Name="New Pri Decr" SortPriority="38" TextAlignment="Right" Width="60" />
+              <Column Guid="c10c7661-6e59-4743-894d-9fbc770a41f3" Name="Old Process Name" SortPriority="39" Width="180" />
+              <Column Guid="e93e468d-86a2-4f3a-a750-bb3b07c14a0b" Name="Old Process" SortPriority="40" Width="200" />
+              <Column Guid="7e24b8da-fe12-4e69-b8cc-9ab0c22c9734" Name="Old Thread Id" SortPriority="41" TextAlignment="Right" Width="80" />
+              <Column Guid="3aa1863c-4219-4667-9aa8-aedc0da92bbe" Name="Old Out Pri" SortPriority="42" TextAlignment="Right" Width="70" />
+              <Column Guid="2d8aa42b-6fde-45bb-8b4e-230c6adcc656" Name="Old Qnt" SortPriority="43" TextAlignment="Right" Width="60" />
+              <Column Guid="ad3b2db0-2dbb-449b-88f5-cf83b8db33ec" Name="Old Switch-In Time" AggregationMode="Sum" SortPriority="44" TextAlignment="Right" Width="100" CellFormat="uN" />
+              <Column Guid="6d59239b-c825-4f19-bc0f-039d59568408" Name="Old State" SortPriority="45" Width="80" />
+              <Column Guid="89a7715b-5b16-48ec-b6db-f6a28ac4ca63" Name="Old Wait Reason" SortPriority="46" Width="100" />
+              <Column Guid="0a1c969d-e94a-4ca8-83f1-086f55c46dd1" Name="Old Wait Mode" SortPriority="47" Width="80" />
+              <Column Guid="2575f38e-f991-4ce5-bafb-793e2ba1936a" Name="Cpu" SortPriority="48" TextAlignment="Right" Width="50" />
+              <Column Guid="e93dcc3d-9960-446a-aa1d-fa05d47d5aa4" Name="Ideal Cpu" SortPriority="49" TextAlignment="Right" Width="60" />
+              <Column Guid="6143445c-c984-49f5-994b-9351a7520f3c" Name="Prev CState" SortPriority="50" TextAlignment="Right" Width="60" />
+              <Column Guid="59117e0d-0465-42c7-a758-52728c5b0099" Name="New Thread Start Module" SortPriority="51" Width="200" />
+              <Column Guid="b09b3bba-08ea-4e1b-9c16-4d0bb97926fb" Name="New Thread Start Function" SortPriority="52" Width="200" />
+              <Column Guid="de478623-0270-43d8-b2b4-c7df7b93ec7a" Name="Readying Thread Start Module" SortPriority="53" Width="200" />
+              <Column Guid="3a13296d-8e2d-40d7-8ab6-46ebb2646caa" Name="Readying Thread Start Function" SortPriority="54" Width="200" />
+              <Column Guid="96d10b76-4157-42d0-8163-91dc0b8b12b5" Name="Old Thread Start Module" SortPriority="55" Width="200" />
+              <Column Guid="e99e2971-b205-41e9-894d-ba0c19e2af83" Name="Old Thread Start Function" SortPriority="56" Width="200" />
+              <Column Guid="03a1d898-7231-4cc5-9712-4bfbf53908c7" Name="New Switch-In Time" AggregationMode="Sum" SortPriority="57" TextAlignment="Right" Width="100" CellFormat="uN" />
+              <Column Guid="e008ed7a-15b0-40ab-854b-b5f6392f298b" Name="CPU Usage (in view)" AggregationMode="Sum" SortPriority="58" TextAlignment="Right" Width="100" CellFormat="mN" IsVisible="true" />
+              <Column Guid="fc672588-da05-4f43-991f-6b644a3f5b3d" Name="% CPU Usage" AggregationMode="Sum" SortOrder="Descending" TextAlignment="Right" Width="100" CellFormat="N2" IsVisible="true" />
+            </Columns>
+          </Preset>
+        </ModifiedPresets>
+        <PersistedPresets />
+      </GraphSchema>
+      <GraphSchema Guid="04f69f98-176e-4d1c-b44e-97f734996ab8" HelpText="{}{\rtf1\ansi\ansicpg1252\uc1\htmautsp\deff2{\fonttbl{\f0\fcharset0 Times New Roman;}{\f2\fcharset0 Segoe UI;}}{\colortbl\red0\green0\blue0;\red255\green255\blue255;}\loch\hich\dbch\pard\plain\ltrpar\itap0{\lang1033\fs18\f2\cf0 \cf0\ql{\f2 {\ltrch Shows every event in the trace, including the associated payload fields.}\li0\ri0\sa0\sb0\fi0\ql\par}&#xD;&#xA;{\f2 \li0\ri0\sa0\sb0\fi0\ql\par}&#xD;&#xA;{\f2 {\ltrch New capability - graph payload fields!}\li0\ri0\sa0\sb0\fi0\ql\par}&#xD;&#xA;{\f2 \li0\ri0\sa0\sb0\fi0\ql\par}&#xD;&#xA;{\f2 {\ltrch 1. Filter down to the event with the payload field you want to graph.}\li0\ri0\sa0\sb0\fi0\ql\par}&#xD;&#xA;{\f2 {\ltrch 2. Drag the column corresponding to the payload field you want to graph to the right of the blue bar.}\li0\ri0\sa0\sb0\fi0\ql\par}&#xD;&#xA;{\f2 {\ltrch 3. If the automatic graphing isn't representing your data correctly, go to View Editor and:}\li0\ri0\sa0\sb0\fi0\ql\par}&#xD;&#xA;{\f2 {\ltrch a. Adjust the aggregation mode for your column, or}\li0\ri0\sa0\sb0\fi0\ql\par}&#xD;&#xA;{\f2 {\ltrch b. Go to Advanced &gt; Graph Configuration and change your graphing aggregation mode.}\li0\ri0\sa0\sb0\fi0\ql\par}&#xD;&#xA;}&#xD;&#xA;}">
+        <ModifiedPresets>
+          <Preset Name="Randomascii Chrome Events" BarGraphIntervalCount="50" GraphColumnCount="26" KeyColumnCount="8" LeftFrozenColumnCount="7" RightFrozenColumnCount="25" InitialFilterQuery="[Provider Name]:~&lt;&quot;Chrome&quot;" InitialFilterShouldKeep="true">
+            <MetadataEntries>
+              <MetadataEntry Guid="edf01e5d-3644-4dbc-ab9d-f8954e6db6ea" Name="ThreadId" ColumnMetadata="EndThreadId" />
+              <MetadataEntry Guid="bbfc990a-b6c9-4dcd-858b-f040ab4a1efe" Name="Time" ColumnMetadata="StartTime" />
+              <MetadataEntry Guid="bbfc990a-b6c9-4dcd-858b-f040ab4a1efe" Name="Time" ColumnMetadata="EndTime" />
+            </MetadataEntries>
+            <HighlightEntries />
+            <Columns>
+              <Column Guid="7ee6a5ff-1faf-428a-a7c2-7d2cb2b5cf26" Name="Process" SortPriority="28" Width="186" IsVisible="true" />
+              <Column Guid="8b4c40f8-0d99-437d-86ab-56ec200137dc" Name="Provider Name" SortPriority="18" Width="135" IsVisible="true" />
+              <Column Guid="2a23f9b1-65d6-46d2-87b2-72f3606b7f75" Name="Provider Id" SortPriority="23" Width="100" />
+              <Column Guid="511777f7-30ef-4e86-bd0b-0facaf23a0d3" Name="Task Name" SortPriority="19" Width="80" IsVisible="true" />
+              <Column Guid="5b51716b-b88f-443a-a396-c6316296d5f8" Name="Opcode Name" SortPriority="20" Width="100" IsVisible="true" />
+              <Column Guid="c72e1c5a-f6db-4c84-8c0b-85989e514075" Name="Id" SortPriority="21" Width="80" />
+              <Column Guid="d446a182-5203-4a29-aca1-4ab9bea0d1b5" Name="Version" SortPriority="1" Width="80" />
+              <Column Guid="cb796d44-2927-5ac1-d231-4b71904c18f5" Name="Thread Name" SortPriority="2" Width="80" />
+              <Column Guid="82ddfdff-ee93-5f35-08ac-4705069618dc" Name="Thread Activity Tag" SortPriority="3" Width="80" />
+              <Column Guid="2818954f-2d30-5569-4510-dade0a5a605c" Name="Annotation" SortPriority="4" Width="80" />
+              <Column Guid="90fe0b49-e3bb-440f-b829-5813c42108a1" Name="Event Name" SortPriority="22" Width="239" />
+              <Column Guid="72892fbe-0f55-426a-9aa1-26b6baf09ffb" Name="Event Type" SortPriority="24" Width="100" />
+              <Column Guid="0734f1a4-fbd9-4ff6-aec0-cf43875c8253" Name="Message" SortPriority="25" Width="100" />
+              <Column Guid="3be8610c-babb-4154-9970-1b2210928024" Name="Cpu" SortPriority="26" Width="45" />
+              <Column Guid="342f7677-17b2-4c7e-b9ec-e89612c49792" Name="Count" AggregationMode="Sum" SortOrder="Descending" Width="80" IsVisible="true" />
+              <Column Guid="edf01e5d-3644-4dbc-ab9d-f8954e6db6ea" Name="ThreadId" AggregationMode="Average" SortPriority="27" Width="63" IsVisible="true" />
+              <Column Guid="0c5cf8cd-9b9e-5798-1a5d-09d429f7fa3c" Name="Field 1" AggregationMode="Average" SortPriority="5" Width="111" IsVisible="true" />
+              <Column Guid="71badd11-26e5-56bc-44ec-12f4cc6a8f3e" Name="Field 2" AggregationMode="Average" SortPriority="6" Width="80" IsVisible="true" />
+              <Column Guid="411dba2d-5d6e-5272-8287-636d0841768c" Name="Field 3" AggregationMode="Average" SortPriority="7" Width="80" IsVisible="true" />
+              <Column Guid="048f5050-1f17-59b3-fa22-4b0781ee630b" Name="Field 4" AggregationMode="Average" SortPriority="8" Width="80" IsVisible="true" />
+              <Column Guid="94e48f22-d499-5227-bb04-be011b4159b0" Name="Field 5" AggregationMode="Average" SortPriority="9" Width="80" IsVisible="true" />
+              <Column Guid="c1054028-424a-59ba-e760-6d30abbd69c5" Name="Field 6" AggregationMode="Average" SortPriority="10" Width="80" IsVisible="true" />
+              <Column Guid="5cbc4b58-2de1-5449-55b2-4651d4edf90a" Name="Field 7" AggregationMode="Average" SortPriority="11" Width="80" IsVisible="true" />
+              <Column Guid="bbfc990a-b6c9-4dcd-858b-f040ab4a1efe" Name="Time" SortPriority="29" Width="80" IsVisible="true" />
+            </Columns>
+          </Preset>
+          <Preset Name="Randomascii Multi Events" BarGraphIntervalCount="50" GraphColumnCount="26" KeyColumnCount="8" LeftFrozenColumnCount="7" RightFrozenColumnCount="25" InitialFilterQuery="[Provider Name]:~&lt;&quot;Multi-&quot;" InitialFilterShouldKeep="true">
+            <MetadataEntries>
+              <MetadataEntry Guid="edf01e5d-3644-4dbc-ab9d-f8954e6db6ea" Name="ThreadId" ColumnMetadata="EndThreadId" />
+              <MetadataEntry Guid="bbfc990a-b6c9-4dcd-858b-f040ab4a1efe" Name="Time" ColumnMetadata="StartTime" />
+              <MetadataEntry Guid="bbfc990a-b6c9-4dcd-858b-f040ab4a1efe" Name="Time" ColumnMetadata="EndTime" />
+            </MetadataEntries>
+            <HighlightEntries />
+            <Columns>
+              <Column Guid="7ee6a5ff-1faf-428a-a7c2-7d2cb2b5cf26" Name="Process" SortPriority="28" Width="186" IsVisible="true" />
+              <Column Guid="8b4c40f8-0d99-437d-86ab-56ec200137dc" Name="Provider Name" SortPriority="18" Width="135" IsVisible="true" />
+              <Column Guid="2a23f9b1-65d6-46d2-87b2-72f3606b7f75" Name="Provider Id" SortPriority="23" Width="100" />
+              <Column Guid="511777f7-30ef-4e86-bd0b-0facaf23a0d3" Name="Task Name" SortPriority="19" Width="80" IsVisible="true" />
+              <Column Guid="5b51716b-b88f-443a-a396-c6316296d5f8" Name="Opcode Name" SortPriority="20" Width="100" IsVisible="true" />
+              <Column Guid="c72e1c5a-f6db-4c84-8c0b-85989e514075" Name="Id" SortPriority="21" Width="80" />
+              <Column Guid="d446a182-5203-4a29-aca1-4ab9bea0d1b5" Name="Version" SortPriority="1" Width="80" />
+              <Column Guid="cb796d44-2927-5ac1-d231-4b71904c18f5" Name="Thread Name" SortPriority="2" Width="80" />
+              <Column Guid="82ddfdff-ee93-5f35-08ac-4705069618dc" Name="Thread Activity Tag" SortPriority="3" Width="80" />
+              <Column Guid="2818954f-2d30-5569-4510-dade0a5a605c" Name="Annotation" SortPriority="4" Width="80" />
+              <Column Guid="90fe0b49-e3bb-440f-b829-5813c42108a1" Name="Event Name" SortPriority="22" Width="239" />
+              <Column Guid="72892fbe-0f55-426a-9aa1-26b6baf09ffb" Name="Event Type" SortPriority="24" Width="100" />
+              <Column Guid="0734f1a4-fbd9-4ff6-aec0-cf43875c8253" Name="Message" SortPriority="25" Width="100" />
+              <Column Guid="3be8610c-babb-4154-9970-1b2210928024" Name="Cpu" SortPriority="26" Width="45" />
+              <Column Guid="342f7677-17b2-4c7e-b9ec-e89612c49792" Name="Count" AggregationMode="Sum" SortOrder="Descending" Width="80" IsVisible="true" />
+              <Column Guid="edf01e5d-3644-4dbc-ab9d-f8954e6db6ea" Name="ThreadId" SortPriority="27" Width="63" IsVisible="true" />
+              <Column Guid="0c5cf8cd-9b9e-5798-1a5d-09d429f7fa3c" Name="Field 1" AggregationMode="Average" SortPriority="5" Width="111" IsVisible="true" />
+              <Column Guid="71badd11-26e5-56bc-44ec-12f4cc6a8f3e" Name="Field 2" AggregationMode="Average" SortPriority="6" Width="80" IsVisible="true" />
+              <Column Guid="411dba2d-5d6e-5272-8287-636d0841768c" Name="Field 3" AggregationMode="Average" SortPriority="7" Width="80" IsVisible="true" />
+              <Column Guid="048f5050-1f17-59b3-fa22-4b0781ee630b" Name="Field 4" AggregationMode="Average" SortPriority="8" Width="80" IsVisible="true" />
+              <Column Guid="94e48f22-d499-5227-bb04-be011b4159b0" Name="Field 5" AggregationMode="Average" SortPriority="9" Width="80" IsVisible="true" />
+              <Column Guid="c1054028-424a-59ba-e760-6d30abbd69c5" Name="Field 6" AggregationMode="Average" SortPriority="10" Width="80" IsVisible="true" />
+              <Column Guid="5cbc4b58-2de1-5449-55b2-4651d4edf90a" Name="Field 7" AggregationMode="Average" SortPriority="11" Width="80" IsVisible="true" />
+              <Column Guid="bbfc990a-b6c9-4dcd-858b-f040ab4a1efe" Name="Time" SortPriority="29" Width="80" IsVisible="true" />
+            </Columns>
+          </Preset>
+          <Preset Name="Randomascii Graph Field 1" GraphChartType="StackedBars" BarGraphIntervalCount="50" GraphColumnCount="26" KeyColumnCount="8" LeftFrozenColumnCount="7" RightFrozenColumnCount="25" InitialFilterQuery="[Provider Name]:*&quot;Multi-.*|Chrome.*&quot;" InitialFilterShouldKeep="true">
+            <MetadataEntries>
+              <MetadataEntry Guid="edf01e5d-3644-4dbc-ab9d-f8954e6db6ea" Name="ThreadId" ColumnMetadata="EndThreadId" />
+              <MetadataEntry Guid="bbfc990a-b6c9-4dcd-858b-f040ab4a1efe" Name="Time" ColumnMetadata="StartTime" />
+              <MetadataEntry Guid="bbfc990a-b6c9-4dcd-858b-f040ab4a1efe" Name="Time" ColumnMetadata="EndTime" />
+            </MetadataEntries>
+            <HighlightEntries />
+            <Columns>
+              <Column Guid="7ee6a5ff-1faf-428a-a7c2-7d2cb2b5cf26" Name="Process" SortPriority="17" Width="186" IsVisible="true" />
+              <Column Guid="8b4c40f8-0d99-437d-86ab-56ec200137dc" Name="Provider Name" SortPriority="12" Width="135" IsVisible="true" />
+              <Column Guid="2a23f9b1-65d6-46d2-87b2-72f3606b7f75" Name="Provider Id" SortPriority="18" Width="100" />
+              <Column Guid="511777f7-30ef-4e86-bd0b-0facaf23a0d3" Name="Task Name" SortPriority="13" Width="80" IsVisible="true" />
+              <Column Guid="5b51716b-b88f-443a-a396-c6316296d5f8" Name="Opcode Name" SortPriority="14" Width="100" IsVisible="true" />
+              <Column Guid="c72e1c5a-f6db-4c84-8c0b-85989e514075" Name="Id" SortPriority="15" Width="80" />
+              <Column Guid="d446a182-5203-4a29-aca1-4ab9bea0d1b5" Name="Version" SortPriority="1" Width="80" />
+              <Column Guid="cb796d44-2927-5ac1-d231-4b71904c18f5" Name="Thread Name" SortPriority="2" Width="80" />
+              <Column Guid="82ddfdff-ee93-5f35-08ac-4705069618dc" Name="Thread Activity Tag" SortPriority="3" Width="80" />
+              <Column Guid="2818954f-2d30-5569-4510-dade0a5a605c" Name="Annotation" SortPriority="4" Width="80" />
+              <Column Guid="90fe0b49-e3bb-440f-b829-5813c42108a1" Name="Event Name" SortPriority="16" Width="239" />
+              <Column Guid="72892fbe-0f55-426a-9aa1-26b6baf09ffb" Name="Event Type" SortPriority="19" Width="100" />
+              <Column Guid="0734f1a4-fbd9-4ff6-aec0-cf43875c8253" Name="Message" SortPriority="20" Width="100" />
+              <Column Guid="3be8610c-babb-4154-9970-1b2210928024" Name="Cpu" SortPriority="21" Width="45" />
+              <Column Guid="342f7677-17b2-4c7e-b9ec-e89612c49792" Name="Count" AggregationMode="Sum" SortOrder="Descending" Width="80" IsVisible="true" />
+              <Column Guid="edf01e5d-3644-4dbc-ab9d-f8954e6db6ea" Name="ThreadId" SortPriority="22" Width="63" IsVisible="true" />
+              <Column Guid="71badd11-26e5-56bc-44ec-12f4cc6a8f3e" Name="Field 2" AggregationMode="Average" SortPriority="6" Width="80" IsVisible="true" />
+              <Column Guid="411dba2d-5d6e-5272-8287-636d0841768c" Name="Field 3" AggregationMode="Average" SortPriority="7" Width="80" IsVisible="true" />
+              <Column Guid="048f5050-1f17-59b3-fa22-4b0781ee630b" Name="Field 4" AggregationMode="Average" SortPriority="8" Width="80" IsVisible="true" />
+              <Column Guid="94e48f22-d499-5227-bb04-be011b4159b0" Name="Field 5" AggregationMode="Average" SortPriority="9" Width="80" IsVisible="true" />
+              <Column Guid="c1054028-424a-59ba-e760-6d30abbd69c5" Name="Field 6" AggregationMode="Average" SortPriority="10" Width="80" IsVisible="true" />
+              <Column Guid="5cbc4b58-2de1-5449-55b2-4651d4edf90a" Name="Field 7" AggregationMode="Average" SortPriority="11" Width="80" IsVisible="true" />
+              <Column Guid="bbfc990a-b6c9-4dcd-858b-f040ab4a1efe" Name="Time" SortPriority="23" Width="80" IsVisible="true" />
+              <Column Guid="0c5cf8cd-9b9e-5798-1a5d-09d429f7fa3c" Name="Field 1" AggregationMode="Average" SortPriority="5" Width="111" IsVisible="true" />
+            </Columns>
+          </Preset>
+          <Preset Name="Randomascii Graph Field 2" GraphChartType="StackedBars" BarGraphIntervalCount="50" GraphColumnCount="26" KeyColumnCount="8" LeftFrozenColumnCount="7" RightFrozenColumnCount="25" InitialFilterQuery="[Provider Name]:*&quot;Multi-.*|Chrome.*&quot;" InitialFilterShouldKeep="true" GraphFilterColumnGuid="342f7677-17b2-4c7e-b9ec-e89612c49792">
+            <MetadataEntries>
+              <MetadataEntry Guid="edf01e5d-3644-4dbc-ab9d-f8954e6db6ea" Name="ThreadId" ColumnMetadata="EndThreadId" />
+              <MetadataEntry Guid="bbfc990a-b6c9-4dcd-858b-f040ab4a1efe" Name="Time" ColumnMetadata="StartTime" />
+              <MetadataEntry Guid="bbfc990a-b6c9-4dcd-858b-f040ab4a1efe" Name="Time" ColumnMetadata="EndTime" />
+            </MetadataEntries>
+            <HighlightEntries />
+            <Columns>
+              <Column Guid="7ee6a5ff-1faf-428a-a7c2-7d2cb2b5cf26" Name="Process" SortPriority="17" Width="186" IsVisible="true" />
+              <Column Guid="8b4c40f8-0d99-437d-86ab-56ec200137dc" Name="Provider Name" SortPriority="12" Width="135" IsVisible="true" />
+              <Column Guid="2a23f9b1-65d6-46d2-87b2-72f3606b7f75" Name="Provider Id" SortPriority="18" Width="100" />
+              <Column Guid="511777f7-30ef-4e86-bd0b-0facaf23a0d3" Name="Task Name" SortPriority="13" Width="80" IsVisible="true" />
+              <Column Guid="5b51716b-b88f-443a-a396-c6316296d5f8" Name="Opcode Name" SortPriority="14" Width="100" IsVisible="true" />
+              <Column Guid="c72e1c5a-f6db-4c84-8c0b-85989e514075" Name="Id" SortPriority="15" Width="80" />
+              <Column Guid="d446a182-5203-4a29-aca1-4ab9bea0d1b5" Name="Version" SortPriority="1" Width="80" />
+              <Column Guid="cb796d44-2927-5ac1-d231-4b71904c18f5" Name="Thread Name" SortPriority="2" Width="80" />
+              <Column Guid="82ddfdff-ee93-5f35-08ac-4705069618dc" Name="Thread Activity Tag" SortPriority="3" Width="80" />
+              <Column Guid="2818954f-2d30-5569-4510-dade0a5a605c" Name="Annotation" SortPriority="4" Width="80" />
+              <Column Guid="90fe0b49-e3bb-440f-b829-5813c42108a1" Name="Event Name" SortPriority="16" Width="239" />
+              <Column Guid="72892fbe-0f55-426a-9aa1-26b6baf09ffb" Name="Event Type" SortPriority="19" Width="100" />
+              <Column Guid="0734f1a4-fbd9-4ff6-aec0-cf43875c8253" Name="Message" SortPriority="20" Width="100" />
+              <Column Guid="3be8610c-babb-4154-9970-1b2210928024" Name="Cpu" SortPriority="21" Width="45" />
+              <Column Guid="342f7677-17b2-4c7e-b9ec-e89612c49792" Name="Count" AggregationMode="Sum" SortOrder="Descending" Width="80" IsVisible="true" />
+              <Column Guid="edf01e5d-3644-4dbc-ab9d-f8954e6db6ea" Name="ThreadId" SortPriority="22" Width="63" IsVisible="true" />
+              <Column Guid="0c5cf8cd-9b9e-5798-1a5d-09d429f7fa3c" Name="Field 1" AggregationMode="Average" SortPriority="5" Width="111" IsVisible="true" />
+              <Column Guid="411dba2d-5d6e-5272-8287-636d0841768c" Name="Field 3" AggregationMode="Average" SortPriority="7" Width="80" IsVisible="true" />
+              <Column Guid="048f5050-1f17-59b3-fa22-4b0781ee630b" Name="Field 4" AggregationMode="Average" SortPriority="8" Width="80" IsVisible="true" />
+              <Column Guid="94e48f22-d499-5227-bb04-be011b4159b0" Name="Field 5" AggregationMode="Average" SortPriority="9" Width="80" IsVisible="true" />
+              <Column Guid="c1054028-424a-59ba-e760-6d30abbd69c5" Name="Field 6" AggregationMode="Average" SortPriority="10" Width="80" IsVisible="true" />
+              <Column Guid="5cbc4b58-2de1-5449-55b2-4651d4edf90a" Name="Field 7" AggregationMode="Average" SortPriority="11" Width="80" IsVisible="true" />
+              <Column Guid="bbfc990a-b6c9-4dcd-858b-f040ab4a1efe" Name="Time" SortPriority="23" Width="80" IsVisible="true" />
+              <Column Guid="71badd11-26e5-56bc-44ec-12f4cc6a8f3e" Name="Field 2" AggregationMode="Average" SortPriority="6" Width="80" IsVisible="true" />
+            </Columns>
+          </Preset>
+          <Preset Name="Randomascii Graph Field 3" GraphChartType="StackedBars" BarGraphIntervalCount="50" GraphColumnCount="26" KeyColumnCount="8" LeftFrozenColumnCount="7" RightFrozenColumnCount="25" InitialFilterQuery="[Provider Name]:*&quot;Multi-.*|Chrome.*&quot;" InitialFilterShouldKeep="true" GraphFilterColumnGuid="342f7677-17b2-4c7e-b9ec-e89612c49792">
+            <MetadataEntries>
+              <MetadataEntry Guid="edf01e5d-3644-4dbc-ab9d-f8954e6db6ea" Name="ThreadId" ColumnMetadata="EndThreadId" />
+              <MetadataEntry Guid="bbfc990a-b6c9-4dcd-858b-f040ab4a1efe" Name="Time" ColumnMetadata="StartTime" />
+              <MetadataEntry Guid="bbfc990a-b6c9-4dcd-858b-f040ab4a1efe" Name="Time" ColumnMetadata="EndTime" />
+            </MetadataEntries>
+            <HighlightEntries />
+            <Columns>
+              <Column Guid="7ee6a5ff-1faf-428a-a7c2-7d2cb2b5cf26" Name="Process" SortPriority="17" Width="186" IsVisible="true" />
+              <Column Guid="8b4c40f8-0d99-437d-86ab-56ec200137dc" Name="Provider Name" SortPriority="12" Width="135" IsVisible="true" />
+              <Column Guid="2a23f9b1-65d6-46d2-87b2-72f3606b7f75" Name="Provider Id" SortPriority="18" Width="100" />
+              <Column Guid="511777f7-30ef-4e86-bd0b-0facaf23a0d3" Name="Task Name" SortPriority="13" Width="80" IsVisible="true" />
+              <Column Guid="5b51716b-b88f-443a-a396-c6316296d5f8" Name="Opcode Name" SortPriority="14" Width="100" IsVisible="true" />
+              <Column Guid="c72e1c5a-f6db-4c84-8c0b-85989e514075" Name="Id" SortPriority="15" Width="80" />
+              <Column Guid="d446a182-5203-4a29-aca1-4ab9bea0d1b5" Name="Version" SortPriority="1" Width="80" />
+              <Column Guid="cb796d44-2927-5ac1-d231-4b71904c18f5" Name="Thread Name" SortPriority="2" Width="80" />
+              <Column Guid="82ddfdff-ee93-5f35-08ac-4705069618dc" Name="Thread Activity Tag" SortPriority="3" Width="80" />
+              <Column Guid="2818954f-2d30-5569-4510-dade0a5a605c" Name="Annotation" SortPriority="4" Width="80" />
+              <Column Guid="90fe0b49-e3bb-440f-b829-5813c42108a1" Name="Event Name" SortPriority="16" Width="239" />
+              <Column Guid="72892fbe-0f55-426a-9aa1-26b6baf09ffb" Name="Event Type" SortPriority="19" Width="100" />
+              <Column Guid="0734f1a4-fbd9-4ff6-aec0-cf43875c8253" Name="Message" SortPriority="20" Width="100" />
+              <Column Guid="3be8610c-babb-4154-9970-1b2210928024" Name="Cpu" SortPriority="21" Width="45" />
+              <Column Guid="342f7677-17b2-4c7e-b9ec-e89612c49792" Name="Count" AggregationMode="Sum" SortOrder="Descending" Width="80" IsVisible="true" />
+              <Column Guid="edf01e5d-3644-4dbc-ab9d-f8954e6db6ea" Name="ThreadId" SortPriority="22" Width="63" IsVisible="true" />
+              <Column Guid="0c5cf8cd-9b9e-5798-1a5d-09d429f7fa3c" Name="Field 1" AggregationMode="Average" SortPriority="5" Width="111" IsVisible="true" />
+              <Column Guid="71badd11-26e5-56bc-44ec-12f4cc6a8f3e" Name="Field 2" AggregationMode="Average" SortPriority="6" Width="80" IsVisible="true" />
+              <Column Guid="048f5050-1f17-59b3-fa22-4b0781ee630b" Name="Field 4" AggregationMode="Average" SortPriority="8" Width="80" IsVisible="true" />
+              <Column Guid="94e48f22-d499-5227-bb04-be011b4159b0" Name="Field 5" AggregationMode="Average" SortPriority="9" Width="80" IsVisible="true" />
+              <Column Guid="c1054028-424a-59ba-e760-6d30abbd69c5" Name="Field 6" AggregationMode="Average" SortPriority="10" Width="80" IsVisible="true" />
+              <Column Guid="5cbc4b58-2de1-5449-55b2-4651d4edf90a" Name="Field 7" AggregationMode="Average" SortPriority="11" Width="80" IsVisible="true" />
+              <Column Guid="bbfc990a-b6c9-4dcd-858b-f040ab4a1efe" Name="Time" SortPriority="23" Width="80" IsVisible="true" />
+              <Column Guid="411dba2d-5d6e-5272-8287-636d0841768c" Name="Field 3" AggregationMode="Average" SortPriority="7" Width="80" IsVisible="true" />
+            </Columns>
+          </Preset>
+          <Preset Name="Randomascii Graph Field 4" GraphChartType="StackedBars" BarGraphIntervalCount="50" GraphColumnCount="26" KeyColumnCount="8" LeftFrozenColumnCount="7" RightFrozenColumnCount="25" InitialFilterQuery="[Provider Name]:*&quot;Multi-.*|Chrome.*&quot;" InitialFilterShouldKeep="true" GraphFilterColumnGuid="342f7677-17b2-4c7e-b9ec-e89612c49792">
+            <MetadataEntries>
+              <MetadataEntry Guid="edf01e5d-3644-4dbc-ab9d-f8954e6db6ea" Name="ThreadId" ColumnMetadata="EndThreadId" />
+              <MetadataEntry Guid="bbfc990a-b6c9-4dcd-858b-f040ab4a1efe" Name="Time" ColumnMetadata="StartTime" />
+              <MetadataEntry Guid="bbfc990a-b6c9-4dcd-858b-f040ab4a1efe" Name="Time" ColumnMetadata="EndTime" />
+            </MetadataEntries>
+            <HighlightEntries />
+            <Columns>
+              <Column Guid="7ee6a5ff-1faf-428a-a7c2-7d2cb2b5cf26" Name="Process" SortPriority="17" Width="186" IsVisible="true" />
+              <Column Guid="8b4c40f8-0d99-437d-86ab-56ec200137dc" Name="Provider Name" SortPriority="12" Width="135" IsVisible="true" />
+              <Column Guid="2a23f9b1-65d6-46d2-87b2-72f3606b7f75" Name="Provider Id" SortPriority="18" Width="100" />
+              <Column Guid="511777f7-30ef-4e86-bd0b-0facaf23a0d3" Name="Task Name" SortPriority="13" Width="80" IsVisible="true" />
+              <Column Guid="5b51716b-b88f-443a-a396-c6316296d5f8" Name="Opcode Name" SortPriority="14" Width="100" IsVisible="true" />
+              <Column Guid="c72e1c5a-f6db-4c84-8c0b-85989e514075" Name="Id" SortPriority="15" Width="80" />
+              <Column Guid="d446a182-5203-4a29-aca1-4ab9bea0d1b5" Name="Version" SortPriority="1" Width="80" />
+              <Column Guid="cb796d44-2927-5ac1-d231-4b71904c18f5" Name="Thread Name" SortPriority="2" Width="80" />
+              <Column Guid="82ddfdff-ee93-5f35-08ac-4705069618dc" Name="Thread Activity Tag" SortPriority="3" Width="80" />
+              <Column Guid="2818954f-2d30-5569-4510-dade0a5a605c" Name="Annotation" SortPriority="4" Width="80" />
+              <Column Guid="90fe0b49-e3bb-440f-b829-5813c42108a1" Name="Event Name" SortPriority="16" Width="239" />
+              <Column Guid="72892fbe-0f55-426a-9aa1-26b6baf09ffb" Name="Event Type" SortPriority="19" Width="100" />
+              <Column Guid="0734f1a4-fbd9-4ff6-aec0-cf43875c8253" Name="Message" SortPriority="20" Width="100" />
+              <Column Guid="3be8610c-babb-4154-9970-1b2210928024" Name="Cpu" SortPriority="21" Width="45" />
+              <Column Guid="342f7677-17b2-4c7e-b9ec-e89612c49792" Name="Count" AggregationMode="Sum" SortOrder="Descending" Width="80" IsVisible="true" />
+              <Column Guid="edf01e5d-3644-4dbc-ab9d-f8954e6db6ea" Name="ThreadId" SortPriority="22" Width="63" IsVisible="true" />
+              <Column Guid="0c5cf8cd-9b9e-5798-1a5d-09d429f7fa3c" Name="Field 1" AggregationMode="Average" SortPriority="5" Width="111" IsVisible="true" />
+              <Column Guid="71badd11-26e5-56bc-44ec-12f4cc6a8f3e" Name="Field 2" AggregationMode="Average" SortPriority="6" Width="80" IsVisible="true" />
+              <Column Guid="411dba2d-5d6e-5272-8287-636d0841768c" Name="Field 3" AggregationMode="Average" SortPriority="7" Width="80" IsVisible="true" />
+              <Column Guid="94e48f22-d499-5227-bb04-be011b4159b0" Name="Field 5" AggregationMode="Average" SortPriority="9" Width="80" IsVisible="true" />
+              <Column Guid="c1054028-424a-59ba-e760-6d30abbd69c5" Name="Field 6" AggregationMode="Average" SortPriority="10" Width="80" IsVisible="true" />
+              <Column Guid="5cbc4b58-2de1-5449-55b2-4651d4edf90a" Name="Field 7" AggregationMode="Average" SortPriority="11" Width="80" IsVisible="true" />
+              <Column Guid="bbfc990a-b6c9-4dcd-858b-f040ab4a1efe" Name="Time" SortPriority="23" Width="80" IsVisible="true" />
+              <Column Guid="048f5050-1f17-59b3-fa22-4b0781ee630b" Name="Field 4" AggregationMode="Average" SortPriority="8" Width="80" IsVisible="true" />
+            </Columns>
+          </Preset>
+          <Preset Name="Randomascii Graph Field 5" GraphChartType="StackedBars" BarGraphIntervalCount="50" GraphColumnCount="26" KeyColumnCount="8" LeftFrozenColumnCount="7" RightFrozenColumnCount="25" InitialFilterQuery="[Provider Name]:*&quot;Multi-.*|Chrome.*&quot;" InitialFilterShouldKeep="true" GraphFilterColumnGuid="342f7677-17b2-4c7e-b9ec-e89612c49792">
+            <MetadataEntries>
+              <MetadataEntry Guid="edf01e5d-3644-4dbc-ab9d-f8954e6db6ea" Name="ThreadId" ColumnMetadata="EndThreadId" />
+              <MetadataEntry Guid="bbfc990a-b6c9-4dcd-858b-f040ab4a1efe" Name="Time" ColumnMetadata="StartTime" />
+              <MetadataEntry Guid="bbfc990a-b6c9-4dcd-858b-f040ab4a1efe" Name="Time" ColumnMetadata="EndTime" />
+            </MetadataEntries>
+            <HighlightEntries />
+            <Columns>
+              <Column Guid="7ee6a5ff-1faf-428a-a7c2-7d2cb2b5cf26" Name="Process" SortPriority="17" Width="186" IsVisible="true" />
+              <Column Guid="8b4c40f8-0d99-437d-86ab-56ec200137dc" Name="Provider Name" SortPriority="12" Width="135" IsVisible="true" />
+              <Column Guid="2a23f9b1-65d6-46d2-87b2-72f3606b7f75" Name="Provider Id" SortPriority="18" Width="100" />
+              <Column Guid="511777f7-30ef-4e86-bd0b-0facaf23a0d3" Name="Task Name" SortPriority="13" Width="80" IsVisible="true" />
+              <Column Guid="5b51716b-b88f-443a-a396-c6316296d5f8" Name="Opcode Name" SortPriority="14" Width="100" IsVisible="true" />
+              <Column Guid="c72e1c5a-f6db-4c84-8c0b-85989e514075" Name="Id" SortPriority="15" Width="80" />
+              <Column Guid="d446a182-5203-4a29-aca1-4ab9bea0d1b5" Name="Version" SortPriority="1" Width="80" />
+              <Column Guid="cb796d44-2927-5ac1-d231-4b71904c18f5" Name="Thread Name" SortPriority="2" Width="80" />
+              <Column Guid="82ddfdff-ee93-5f35-08ac-4705069618dc" Name="Thread Activity Tag" SortPriority="3" Width="80" />
+              <Column Guid="2818954f-2d30-5569-4510-dade0a5a605c" Name="Annotation" SortPriority="4" Width="80" />
+              <Column Guid="90fe0b49-e3bb-440f-b829-5813c42108a1" Name="Event Name" SortPriority="16" Width="239" />
+              <Column Guid="72892fbe-0f55-426a-9aa1-26b6baf09ffb" Name="Event Type" SortPriority="19" Width="100" />
+              <Column Guid="0734f1a4-fbd9-4ff6-aec0-cf43875c8253" Name="Message" SortPriority="20" Width="100" />
+              <Column Guid="3be8610c-babb-4154-9970-1b2210928024" Name="Cpu" SortPriority="21" Width="45" />
+              <Column Guid="342f7677-17b2-4c7e-b9ec-e89612c49792" Name="Count" AggregationMode="Sum" SortOrder="Descending" Width="80" IsVisible="true" />
+              <Column Guid="edf01e5d-3644-4dbc-ab9d-f8954e6db6ea" Name="ThreadId" SortPriority="22" Width="63" IsVisible="true" />
+              <Column Guid="0c5cf8cd-9b9e-5798-1a5d-09d429f7fa3c" Name="Field 1" AggregationMode="Average" SortPriority="5" Width="111" IsVisible="true" />
+              <Column Guid="71badd11-26e5-56bc-44ec-12f4cc6a8f3e" Name="Field 2" AggregationMode="Average" SortPriority="6" Width="80" IsVisible="true" />
+              <Column Guid="411dba2d-5d6e-5272-8287-636d0841768c" Name="Field 3" AggregationMode="Average" SortPriority="7" Width="80" IsVisible="true" />
+              <Column Guid="048f5050-1f17-59b3-fa22-4b0781ee630b" Name="Field 4" AggregationMode="Average" SortPriority="8" Width="80" IsVisible="true" />
+              <Column Guid="c1054028-424a-59ba-e760-6d30abbd69c5" Name="Field 6" AggregationMode="Average" SortPriority="10" Width="80" IsVisible="true" />
+              <Column Guid="5cbc4b58-2de1-5449-55b2-4651d4edf90a" Name="Field 7" AggregationMode="Average" SortPriority="11" Width="80" IsVisible="true" />
+              <Column Guid="bbfc990a-b6c9-4dcd-858b-f040ab4a1efe" Name="Time" SortPriority="23" Width="80" IsVisible="true" />
+              <Column Guid="94e48f22-d499-5227-bb04-be011b4159b0" Name="Field 5" AggregationMode="Average" SortPriority="9" Width="80" IsVisible="true" />
+            </Columns>
+          </Preset>
+          <Preset Name="Randomascii Graph Field 6" GraphChartType="StackedBars" BarGraphIntervalCount="50" GraphColumnCount="26" KeyColumnCount="8" LeftFrozenColumnCount="7" RightFrozenColumnCount="25" InitialFilterQuery="[Provider Name]:*&quot;Multi-.*|Chrome.*&quot;" InitialFilterShouldKeep="true" GraphFilterColumnGuid="342f7677-17b2-4c7e-b9ec-e89612c49792">
+            <MetadataEntries>
+              <MetadataEntry Guid="edf01e5d-3644-4dbc-ab9d-f8954e6db6ea" Name="ThreadId" ColumnMetadata="EndThreadId" />
+              <MetadataEntry Guid="bbfc990a-b6c9-4dcd-858b-f040ab4a1efe" Name="Time" ColumnMetadata="StartTime" />
+              <MetadataEntry Guid="bbfc990a-b6c9-4dcd-858b-f040ab4a1efe" Name="Time" ColumnMetadata="EndTime" />
+            </MetadataEntries>
+            <HighlightEntries />
+            <Columns>
+              <Column Guid="7ee6a5ff-1faf-428a-a7c2-7d2cb2b5cf26" Name="Process" SortPriority="17" Width="186" IsVisible="true" />
+              <Column Guid="8b4c40f8-0d99-437d-86ab-56ec200137dc" Name="Provider Name" SortPriority="12" Width="135" IsVisible="true" />
+              <Column Guid="2a23f9b1-65d6-46d2-87b2-72f3606b7f75" Name="Provider Id" SortPriority="18" Width="100" />
+              <Column Guid="511777f7-30ef-4e86-bd0b-0facaf23a0d3" Name="Task Name" SortPriority="13" Width="80" IsVisible="true" />
+              <Column Guid="5b51716b-b88f-443a-a396-c6316296d5f8" Name="Opcode Name" SortPriority="14" Width="100" IsVisible="true" />
+              <Column Guid="c72e1c5a-f6db-4c84-8c0b-85989e514075" Name="Id" SortPriority="15" Width="80" />
+              <Column Guid="d446a182-5203-4a29-aca1-4ab9bea0d1b5" Name="Version" SortPriority="1" Width="80" />
+              <Column Guid="cb796d44-2927-5ac1-d231-4b71904c18f5" Name="Thread Name" SortPriority="2" Width="80" />
+              <Column Guid="82ddfdff-ee93-5f35-08ac-4705069618dc" Name="Thread Activity Tag" SortPriority="3" Width="80" />
+              <Column Guid="2818954f-2d30-5569-4510-dade0a5a605c" Name="Annotation" SortPriority="4" Width="80" />
+              <Column Guid="90fe0b49-e3bb-440f-b829-5813c42108a1" Name="Event Name" SortPriority="16" Width="239" />
+              <Column Guid="72892fbe-0f55-426a-9aa1-26b6baf09ffb" Name="Event Type" SortPriority="19" Width="100" />
+              <Column Guid="0734f1a4-fbd9-4ff6-aec0-cf43875c8253" Name="Message" SortPriority="20" Width="100" />
+              <Column Guid="3be8610c-babb-4154-9970-1b2210928024" Name="Cpu" SortPriority="21" Width="45" />
+              <Column Guid="342f7677-17b2-4c7e-b9ec-e89612c49792" Name="Count" AggregationMode="Sum" SortOrder="Descending" Width="80" IsVisible="true" />
+              <Column Guid="edf01e5d-3644-4dbc-ab9d-f8954e6db6ea" Name="ThreadId" SortPriority="22" Width="63" IsVisible="true" />
+              <Column Guid="0c5cf8cd-9b9e-5798-1a5d-09d429f7fa3c" Name="Field 1" AggregationMode="Average" SortPriority="5" Width="111" IsVisible="true" />
+              <Column Guid="71badd11-26e5-56bc-44ec-12f4cc6a8f3e" Name="Field 2" AggregationMode="Average" SortPriority="6" Width="80" IsVisible="true" />
+              <Column Guid="411dba2d-5d6e-5272-8287-636d0841768c" Name="Field 3" AggregationMode="Average" SortPriority="7" Width="80" IsVisible="true" />
+              <Column Guid="048f5050-1f17-59b3-fa22-4b0781ee630b" Name="Field 4" AggregationMode="Average" SortPriority="8" Width="80" IsVisible="true" />
+              <Column Guid="94e48f22-d499-5227-bb04-be011b4159b0" Name="Field 5" AggregationMode="Average" SortPriority="9" Width="80" IsVisible="true" />
+              <Column Guid="5cbc4b58-2de1-5449-55b2-4651d4edf90a" Name="Field 7" AggregationMode="Average" SortPriority="11" Width="80" IsVisible="true" />
+              <Column Guid="bbfc990a-b6c9-4dcd-858b-f040ab4a1efe" Name="Time" SortPriority="23" Width="80" IsVisible="true" />
+              <Column Guid="c1054028-424a-59ba-e760-6d30abbd69c5" Name="Field 6" AggregationMode="Average" SortPriority="10" Width="80" IsVisible="true" />
+            </Columns>
+          </Preset>
+          <Preset Name="Randomascii Chrome and Multi Events" BarGraphIntervalCount="50" GraphColumnCount="26" KeyColumnCount="8" LeftFrozenColumnCount="7" RightFrozenColumnCount="25" InitialFilterQuery="[Provider Name]:*&quot;Multi-.*|Chrome.*&quot;" InitialFilterShouldKeep="true">
+            <MetadataEntries>
+              <MetadataEntry Guid="edf01e5d-3644-4dbc-ab9d-f8954e6db6ea" Name="ThreadId" ColumnMetadata="EndThreadId" />
+              <MetadataEntry Guid="bbfc990a-b6c9-4dcd-858b-f040ab4a1efe" Name="Time" ColumnMetadata="StartTime" />
+              <MetadataEntry Guid="bbfc990a-b6c9-4dcd-858b-f040ab4a1efe" Name="Time" ColumnMetadata="EndTime" />
+            </MetadataEntries>
+            <HighlightEntries />
+            <Columns>
+              <Column Guid="7ee6a5ff-1faf-428a-a7c2-7d2cb2b5cf26" Name="Process" SortPriority="28" Width="186" IsVisible="true" />
+              <Column Guid="8b4c40f8-0d99-437d-86ab-56ec200137dc" Name="Provider Name" SortPriority="18" Width="135" IsVisible="true" />
+              <Column Guid="2a23f9b1-65d6-46d2-87b2-72f3606b7f75" Name="Provider Id" SortPriority="23" Width="100" />
+              <Column Guid="511777f7-30ef-4e86-bd0b-0facaf23a0d3" Name="Task Name" SortPriority="19" Width="80" IsVisible="true" />
+              <Column Guid="5b51716b-b88f-443a-a396-c6316296d5f8" Name="Opcode Name" SortPriority="20" Width="100" IsVisible="true" />
+              <Column Guid="c72e1c5a-f6db-4c84-8c0b-85989e514075" Name="Id" SortPriority="21" Width="80" />
+              <Column Guid="d446a182-5203-4a29-aca1-4ab9bea0d1b5" Name="Version" SortPriority="1" Width="80" />
+              <Column Guid="cb796d44-2927-5ac1-d231-4b71904c18f5" Name="Thread Name" SortPriority="2" Width="80" />
+              <Column Guid="82ddfdff-ee93-5f35-08ac-4705069618dc" Name="Thread Activity Tag" SortPriority="3" Width="80" />
+              <Column Guid="2818954f-2d30-5569-4510-dade0a5a605c" Name="Annotation" SortPriority="4" Width="80" />
+              <Column Guid="90fe0b49-e3bb-440f-b829-5813c42108a1" Name="Event Name" SortPriority="22" Width="239" />
+              <Column Guid="72892fbe-0f55-426a-9aa1-26b6baf09ffb" Name="Event Type" SortPriority="24" Width="100" />
+              <Column Guid="0734f1a4-fbd9-4ff6-aec0-cf43875c8253" Name="Message" SortPriority="25" Width="100" />
+              <Column Guid="3be8610c-babb-4154-9970-1b2210928024" Name="Cpu" SortPriority="26" Width="45" />
+              <Column Guid="342f7677-17b2-4c7e-b9ec-e89612c49792" Name="Count" AggregationMode="Sum" SortOrder="Descending" Width="80" IsVisible="true" />
+              <Column Guid="edf01e5d-3644-4dbc-ab9d-f8954e6db6ea" Name="ThreadId" SortPriority="27" Width="63" IsVisible="true" />
+              <Column Guid="0c5cf8cd-9b9e-5798-1a5d-09d429f7fa3c" Name="Field 1" AggregationMode="Average" SortPriority="5" Width="111" IsVisible="true" />
+              <Column Guid="71badd11-26e5-56bc-44ec-12f4cc6a8f3e" Name="Field 2" AggregationMode="Average" SortPriority="6" Width="80" IsVisible="true" />
+              <Column Guid="411dba2d-5d6e-5272-8287-636d0841768c" Name="Field 3" AggregationMode="Average" SortPriority="7" Width="80" IsVisible="true" />
+              <Column Guid="048f5050-1f17-59b3-fa22-4b0781ee630b" Name="Field 4" AggregationMode="Average" SortPriority="8" Width="80" IsVisible="true" />
+              <Column Guid="94e48f22-d499-5227-bb04-be011b4159b0" Name="Field 5" AggregationMode="Average" SortPriority="9" Width="80" IsVisible="true" />
+              <Column Guid="c1054028-424a-59ba-e760-6d30abbd69c5" Name="Field 6" AggregationMode="Average" SortPriority="10" Width="80" IsVisible="true" />
+              <Column Guid="5cbc4b58-2de1-5449-55b2-4651d4edf90a" Name="Field 7" AggregationMode="Average" SortPriority="11" Width="80" IsVisible="true" />
+              <Column Guid="bbfc990a-b6c9-4dcd-858b-f040ab4a1efe" Name="Time" SortPriority="29" Width="80" IsVisible="true" />
+            </Columns>
+          </Preset>
+          <Preset Name="Randomascii Window Focus Events" BarGraphIntervalCount="50" GraphColumnCount="33" KeyColumnCount="6" LeftFrozenColumnCount="7" RightFrozenColumnCount="31" InitialFilterQuery="[Task Name]:=&quot;FocusChange&quot; OR [Task Name]:=&quot;FocusedProcessChange&quot;" InitialFilterShouldKeep="true" HelpText="{}{\rtf1\ansi\ansicpg1252\uc1\htmautsp\deff2{\fonttbl{\f0\fcharset0 Times New Roman;}{\f2\fcharset0 Segoe UI;}}{\colortbl\red0\green0\blue0;\red255\green255\blue255;}\loch\hich\dbch\pard\plain\ltrpar\itap0{\lang1033\fs18\f2\cf0 \cf0\ql{\f2 {\ltrch Groups all the events by provider, task, and opcode.}\li0\ri0\sa0\sb0\fi0\ql\par}&#xD;&#xA;}&#xD;&#xA;}">
+            <MetadataEntries>
+              <MetadataEntry Guid="edf01e5d-3644-4dbc-ab9d-f8954e6db6ea" Name="ThreadId" ColumnMetadata="EndThreadId" />
+              <MetadataEntry Guid="bbfc990a-b6c9-4dcd-858b-f040ab4a1efe" Name="Time" ColumnMetadata="StartTime" />
+              <MetadataEntry Guid="bbfc990a-b6c9-4dcd-858b-f040ab4a1efe" Name="Time" ColumnMetadata="EndTime" />
+            </MetadataEntries>
+            <HighlightEntries />
+            <Columns>
+              <Column Guid="8b4c40f8-0d99-437d-86ab-56ec200137dc" Name="Provider Name" SortPriority="19" Width="200" IsVisible="true" />
+              <Column Guid="2a23f9b1-65d6-46d2-87b2-72f3606b7f75" Name="Provider Id" SortPriority="24" Width="100" />
+              <Column Guid="5b51716b-b88f-443a-a396-c6316296d5f8" Name="Opcode Name" SortPriority="21" Width="80" />
+              <Column Guid="c72e1c5a-f6db-4c84-8c0b-85989e514075" Name="Id" SortPriority="22" Width="80" />
+              <Column Guid="d446a182-5203-4a29-aca1-4ab9bea0d1b5" Name="Version" SortPriority="1" Width="80" />
+              <Column Guid="7ee6a5ff-1faf-428a-a7c2-7d2cb2b5cf26" Name="Process" SortPriority="29" Width="150" />
+              <Column Guid="cb796d44-2927-5ac1-d231-4b71904c18f5" Name="Thread Name" SortPriority="2" Width="80" />
+              <Column Guid="82ddfdff-ee93-5f35-08ac-4705069618dc" Name="Thread Activity Tag" SortPriority="3" Width="80" />
+              <Column Guid="2818954f-2d30-5569-4510-dade0a5a605c" Name="Annotation" SortPriority="4" Width="80" />
+              <Column Guid="90fe0b49-e3bb-440f-b829-5813c42108a1" Name="Event Name" SortPriority="23" Width="100" />
+              <Column Guid="72892fbe-0f55-426a-9aa1-26b6baf09ffb" Name="Event Type" SortPriority="25" Width="100" />
+              <Column Guid="0734f1a4-fbd9-4ff6-aec0-cf43875c8253" Name="Message" SortPriority="26" Width="100" />
+              <Column Guid="3be8610c-babb-4154-9970-1b2210928024" Name="Cpu" SortPriority="27" Width="30" />
+              <Column Guid="edf01e5d-3644-4dbc-ab9d-f8954e6db6ea" Name="ThreadId" SortPriority="28" Width="50" />
+              <Column Guid="511777f7-30ef-4e86-bd0b-0facaf23a0d3" Name="Task Name" SortPriority="20" Width="143" IsVisible="true" />
+              <Column Guid="0c5cf8cd-9b9e-5798-1a5d-09d429f7fa3c" Name="Field 1" SortPriority="5" Width="127" IsVisible="true" />
+              <Column Guid="71badd11-26e5-56bc-44ec-12f4cc6a8f3e" Name="Field 2" SortPriority="6" Width="134" IsVisible="true" />
+              <Column Guid="411dba2d-5d6e-5272-8287-636d0841768c" Name="Field 3" SortPriority="7" Width="141" IsVisible="true" />
+              <Column Guid="048f5050-1f17-59b3-fa22-4b0781ee630b" Name="Field 4" SortPriority="8" Width="80" IsVisible="true" />
+              <Column Guid="94e48f22-d499-5227-bb04-be011b4159b0" Name="Field 5" SortPriority="9" Width="80" IsVisible="true" />
+              <Column Guid="c1054028-424a-59ba-e760-6d30abbd69c5" Name="Field 6" SortPriority="10" Width="80" IsVisible="true" />
+              <Column Guid="5cbc4b58-2de1-5449-55b2-4651d4edf90a" Name="Field 7" SortPriority="11" Width="80" />
+              <Column Guid="fc01e6c9-a43b-51a1-fd2e-112ba48aff65" Name="Field 8" SortPriority="12" Width="80" />
+              <Column Guid="e3dcf300-46e2-5c43-ef4b-2c3db489ec25" Name="Field 9" SortPriority="13" Width="80" />
+              <Column Guid="87c21ddb-4b29-58e3-5ddc-f114c5ca209a" Name="Field 10" SortPriority="14" Width="80" />
+              <Column Guid="65f8fe42-ad02-5016-3521-f93329c76227" Name="Field 11" SortPriority="15" Width="80" />
+              <Column Guid="03d48fd3-0fe4-57f5-a477-49beb0d70a1f" Name="Field 12" SortPriority="16" Width="80" />
+              <Column Guid="998f8e2d-0f5a-5a54-0133-226e2de62c0b" Name="Field 13" SortPriority="17" Width="80" />
+              <Column Guid="bb772c34-9600-5bf7-3f54-e6080f8a0611" Name="Field 14" SortPriority="18" Width="80" />
+              <Column Guid="342f7677-17b2-4c7e-b9ec-e89612c49792" Name="Count" AggregationMode="Sum" SortOrder="Descending" Width="80" IsVisible="true" />
+              <Column Guid="bbfc990a-b6c9-4dcd-858b-f040ab4a1efe" Name="Time" SortPriority="30" Width="80" IsVisible="true" />
+            </Columns>
+          </Preset>
+          <Preset Name="User Marks" BarGraphIntervalCount="50" GraphColumnCount="26" KeyColumnCount="9" LeftFrozenColumnCount="8" RightFrozenColumnCount="25" InitialFilterQuery="[Provider Name]:=&quot;Multi-Input&quot; [Task Name]:=&quot;Keyboard&quot; [Field 2]:~=&quot;Ctrl+Win+F&quot;" InitialFilterShouldKeep="true">
+            <MetadataEntries>
+              <MetadataEntry Guid="edf01e5d-3644-4dbc-ab9d-f8954e6db6ea" Name="ThreadId" ColumnMetadata="EndThreadId" />
+              <MetadataEntry Guid="bbfc990a-b6c9-4dcd-858b-f040ab4a1efe" Name="Time" ColumnMetadata="StartTime" />
+              <MetadataEntry Guid="bbfc990a-b6c9-4dcd-858b-f040ab4a1efe" Name="Time" ColumnMetadata="EndTime" />
+            </MetadataEntries>
+            <HighlightEntries />
+            <Columns>
+              <Column Guid="71badd11-26e5-56bc-44ec-12f4cc6a8f3e" Name="Field 2" AggregationMode="Average" SortPriority="6" Width="80" IsVisible="true" />
+              <Column Guid="7ee6a5ff-1faf-428a-a7c2-7d2cb2b5cf26" Name="Process" SortPriority="28" Width="186" />
+              <Column Guid="8b4c40f8-0d99-437d-86ab-56ec200137dc" Name="Provider Name" SortPriority="18" Width="135" />
+              <Column Guid="2a23f9b1-65d6-46d2-87b2-72f3606b7f75" Name="Provider Id" SortPriority="23" Width="100" />
+              <Column Guid="511777f7-30ef-4e86-bd0b-0facaf23a0d3" Name="Task Name" SortPriority="19" Width="80" />
+              <Column Guid="5b51716b-b88f-443a-a396-c6316296d5f8" Name="Opcode Name" SortPriority="20" Width="100" />
+              <Column Guid="c72e1c5a-f6db-4c84-8c0b-85989e514075" Name="Id" SortPriority="21" Width="80" />
+              <Column Guid="d446a182-5203-4a29-aca1-4ab9bea0d1b5" Name="Version" SortPriority="1" Width="80" />
+              <Column Guid="cb796d44-2927-5ac1-d231-4b71904c18f5" Name="Thread Name" SortPriority="2" Width="80" />
+              <Column Guid="82ddfdff-ee93-5f35-08ac-4705069618dc" Name="Thread Activity Tag" SortPriority="3" Width="80" />
+              <Column Guid="2818954f-2d30-5569-4510-dade0a5a605c" Name="Annotation" SortPriority="4" Width="80" />
+              <Column Guid="90fe0b49-e3bb-440f-b829-5813c42108a1" Name="Event Name" SortPriority="22" Width="239" />
+              <Column Guid="72892fbe-0f55-426a-9aa1-26b6baf09ffb" Name="Event Type" SortPriority="24" Width="100" />
+              <Column Guid="0734f1a4-fbd9-4ff6-aec0-cf43875c8253" Name="Message" SortPriority="25" Width="100" />
+              <Column Guid="3be8610c-babb-4154-9970-1b2210928024" Name="Cpu" SortPriority="26" Width="45" />
+              <Column Guid="342f7677-17b2-4c7e-b9ec-e89612c49792" Name="Count" AggregationMode="Sum" SortOrder="Descending" Width="80" IsVisible="true" />
+              <Column Guid="edf01e5d-3644-4dbc-ab9d-f8954e6db6ea" Name="ThreadId" SortPriority="27" Width="63" IsVisible="true" />
+              <Column Guid="0c5cf8cd-9b9e-5798-1a5d-09d429f7fa3c" Name="Field 1" AggregationMode="Average" SortPriority="5" Width="111" IsVisible="true" />
+              <Column Guid="411dba2d-5d6e-5272-8287-636d0841768c" Name="Field 3" AggregationMode="Average" SortPriority="7" Width="80" IsVisible="true" />
+              <Column Guid="048f5050-1f17-59b3-fa22-4b0781ee630b" Name="Field 4" AggregationMode="Average" SortPriority="8" Width="80" IsVisible="true" />
+              <Column Guid="94e48f22-d499-5227-bb04-be011b4159b0" Name="Field 5" AggregationMode="Average" SortPriority="9" Width="80" IsVisible="true" />
+              <Column Guid="c1054028-424a-59ba-e760-6d30abbd69c5" Name="Field 6" AggregationMode="Average" SortPriority="10" Width="80" IsVisible="true" />
+              <Column Guid="5cbc4b58-2de1-5449-55b2-4651d4edf90a" Name="Field 7" AggregationMode="Average" SortPriority="11" Width="80" IsVisible="true" />
+              <Column Guid="bbfc990a-b6c9-4dcd-858b-f040ab4a1efe" Name="Time" SortPriority="29" Width="80" IsVisible="true" />
+            </Columns>
+          </Preset>
+        </ModifiedPresets>
+        <PersistedPresets>
+          <Preset Name="Randomascii Chrome Events" BarGraphIntervalCount="50" GraphColumnCount="26" KeyColumnCount="8" LeftFrozenColumnCount="7" RightFrozenColumnCount="25" InitialFilterQuery="[Provider Name]:~&lt;&quot;Chrome&quot;" InitialFilterShouldKeep="true">
+            <MetadataEntries>
+              <MetadataEntry Guid="edf01e5d-3644-4dbc-ab9d-f8954e6db6ea" Name="ThreadId" ColumnMetadata="EndThreadId" />
+              <MetadataEntry Guid="bbfc990a-b6c9-4dcd-858b-f040ab4a1efe" Name="Time" ColumnMetadata="StartTime" />
+              <MetadataEntry Guid="bbfc990a-b6c9-4dcd-858b-f040ab4a1efe" Name="Time" ColumnMetadata="EndTime" />
+            </MetadataEntries>
+            <HighlightEntries />
+            <Columns>
+              <Column Guid="7ee6a5ff-1faf-428a-a7c2-7d2cb2b5cf26" Name="Process" SortPriority="28" Width="186" IsVisible="true" />
+              <Column Guid="8b4c40f8-0d99-437d-86ab-56ec200137dc" Name="Provider Name" SortPriority="18" Width="135" IsVisible="true" />
+              <Column Guid="2a23f9b1-65d6-46d2-87b2-72f3606b7f75" Name="Provider Id" SortPriority="23" Width="100" />
+              <Column Guid="511777f7-30ef-4e86-bd0b-0facaf23a0d3" Name="Task Name" SortPriority="19" Width="80" IsVisible="true" />
+              <Column Guid="5b51716b-b88f-443a-a396-c6316296d5f8" Name="Opcode Name" SortPriority="20" Width="100" IsVisible="true" />
+              <Column Guid="c72e1c5a-f6db-4c84-8c0b-85989e514075" Name="Id" SortPriority="21" Width="80" />
+              <Column Guid="d446a182-5203-4a29-aca1-4ab9bea0d1b5" Name="Version" SortPriority="1" Width="80" />
+              <Column Guid="cb796d44-2927-5ac1-d231-4b71904c18f5" Name="Thread Name" SortPriority="2" Width="80" />
+              <Column Guid="82ddfdff-ee93-5f35-08ac-4705069618dc" Name="Thread Activity Tag" SortPriority="3" Width="80" />
+              <Column Guid="2818954f-2d30-5569-4510-dade0a5a605c" Name="Annotation" SortPriority="4" Width="80" />
+              <Column Guid="90fe0b49-e3bb-440f-b829-5813c42108a1" Name="Event Name" SortPriority="22" Width="239" />
+              <Column Guid="72892fbe-0f55-426a-9aa1-26b6baf09ffb" Name="Event Type" SortPriority="24" Width="100" />
+              <Column Guid="0734f1a4-fbd9-4ff6-aec0-cf43875c8253" Name="Message" SortPriority="25" Width="100" />
+              <Column Guid="3be8610c-babb-4154-9970-1b2210928024" Name="Cpu" SortPriority="26" Width="45" />
+              <Column Guid="342f7677-17b2-4c7e-b9ec-e89612c49792" Name="Count" AggregationMode="Sum" SortOrder="Descending" Width="80" IsVisible="true" />
+              <Column Guid="edf01e5d-3644-4dbc-ab9d-f8954e6db6ea" Name="ThreadId" AggregationMode="Average" SortPriority="27" Width="63" IsVisible="true" />
+              <Column Guid="0c5cf8cd-9b9e-5798-1a5d-09d429f7fa3c" Name="Field 1" AggregationMode="Average" SortPriority="5" Width="111" IsVisible="true" />
+              <Column Guid="71badd11-26e5-56bc-44ec-12f4cc6a8f3e" Name="Field 2" AggregationMode="Average" SortPriority="6" Width="80" IsVisible="true" />
+              <Column Guid="411dba2d-5d6e-5272-8287-636d0841768c" Name="Field 3" AggregationMode="Average" SortPriority="7" Width="80" IsVisible="true" />
+              <Column Guid="048f5050-1f17-59b3-fa22-4b0781ee630b" Name="Field 4" AggregationMode="Average" SortPriority="8" Width="80" IsVisible="true" />
+              <Column Guid="94e48f22-d499-5227-bb04-be011b4159b0" Name="Field 5" AggregationMode="Average" SortPriority="9" Width="80" IsVisible="true" />
+              <Column Guid="c1054028-424a-59ba-e760-6d30abbd69c5" Name="Field 6" AggregationMode="Average" SortPriority="10" Width="80" IsVisible="true" />
+              <Column Guid="5cbc4b58-2de1-5449-55b2-4651d4edf90a" Name="Field 7" AggregationMode="Average" SortPriority="11" Width="80" IsVisible="true" />
+              <Column Guid="bbfc990a-b6c9-4dcd-858b-f040ab4a1efe" Name="Time" SortPriority="29" Width="80" IsVisible="true" />
+            </Columns>
+          </Preset>
+          <Preset Name="Randomascii Multi Events" BarGraphIntervalCount="50" GraphColumnCount="26" KeyColumnCount="8" LeftFrozenColumnCount="7" RightFrozenColumnCount="25" InitialFilterQuery="[Provider Name]:~&lt;&quot;Multi-&quot;" InitialFilterShouldKeep="true">
+            <MetadataEntries>
+              <MetadataEntry Guid="edf01e5d-3644-4dbc-ab9d-f8954e6db6ea" Name="ThreadId" ColumnMetadata="EndThreadId" />
+              <MetadataEntry Guid="bbfc990a-b6c9-4dcd-858b-f040ab4a1efe" Name="Time" ColumnMetadata="StartTime" />
+              <MetadataEntry Guid="bbfc990a-b6c9-4dcd-858b-f040ab4a1efe" Name="Time" ColumnMetadata="EndTime" />
+            </MetadataEntries>
+            <HighlightEntries />
+            <Columns>
+              <Column Guid="7ee6a5ff-1faf-428a-a7c2-7d2cb2b5cf26" Name="Process" SortPriority="28" Width="186" IsVisible="true" />
+              <Column Guid="8b4c40f8-0d99-437d-86ab-56ec200137dc" Name="Provider Name" SortPriority="18" Width="135" IsVisible="true" />
+              <Column Guid="2a23f9b1-65d6-46d2-87b2-72f3606b7f75" Name="Provider Id" SortPriority="23" Width="100" />
+              <Column Guid="511777f7-30ef-4e86-bd0b-0facaf23a0d3" Name="Task Name" SortPriority="19" Width="80" IsVisible="true" />
+              <Column Guid="5b51716b-b88f-443a-a396-c6316296d5f8" Name="Opcode Name" SortPriority="20" Width="100" IsVisible="true" />
+              <Column Guid="c72e1c5a-f6db-4c84-8c0b-85989e514075" Name="Id" SortPriority="21" Width="80" />
+              <Column Guid="d446a182-5203-4a29-aca1-4ab9bea0d1b5" Name="Version" SortPriority="1" Width="80" />
+              <Column Guid="cb796d44-2927-5ac1-d231-4b71904c18f5" Name="Thread Name" SortPriority="2" Width="80" />
+              <Column Guid="82ddfdff-ee93-5f35-08ac-4705069618dc" Name="Thread Activity Tag" SortPriority="3" Width="80" />
+              <Column Guid="2818954f-2d30-5569-4510-dade0a5a605c" Name="Annotation" SortPriority="4" Width="80" />
+              <Column Guid="90fe0b49-e3bb-440f-b829-5813c42108a1" Name="Event Name" SortPriority="22" Width="239" />
+              <Column Guid="72892fbe-0f55-426a-9aa1-26b6baf09ffb" Name="Event Type" SortPriority="24" Width="100" />
+              <Column Guid="0734f1a4-fbd9-4ff6-aec0-cf43875c8253" Name="Message" SortPriority="25" Width="100" />
+              <Column Guid="3be8610c-babb-4154-9970-1b2210928024" Name="Cpu" SortPriority="26" Width="45" />
+              <Column Guid="342f7677-17b2-4c7e-b9ec-e89612c49792" Name="Count" AggregationMode="Sum" SortOrder="Descending" Width="80" IsVisible="true" />
+              <Column Guid="edf01e5d-3644-4dbc-ab9d-f8954e6db6ea" Name="ThreadId" SortPriority="27" Width="63" IsVisible="true" />
+              <Column Guid="0c5cf8cd-9b9e-5798-1a5d-09d429f7fa3c" Name="Field 1" AggregationMode="Average" SortPriority="5" Width="111" IsVisible="true" />
+              <Column Guid="71badd11-26e5-56bc-44ec-12f4cc6a8f3e" Name="Field 2" AggregationMode="Average" SortPriority="6" Width="80" IsVisible="true" />
+              <Column Guid="411dba2d-5d6e-5272-8287-636d0841768c" Name="Field 3" AggregationMode="Average" SortPriority="7" Width="80" IsVisible="true" />
+              <Column Guid="048f5050-1f17-59b3-fa22-4b0781ee630b" Name="Field 4" AggregationMode="Average" SortPriority="8" Width="80" IsVisible="true" />
+              <Column Guid="94e48f22-d499-5227-bb04-be011b4159b0" Name="Field 5" AggregationMode="Average" SortPriority="9" Width="80" IsVisible="true" />
+              <Column Guid="c1054028-424a-59ba-e760-6d30abbd69c5" Name="Field 6" AggregationMode="Average" SortPriority="10" Width="80" IsVisible="true" />
+              <Column Guid="5cbc4b58-2de1-5449-55b2-4651d4edf90a" Name="Field 7" AggregationMode="Average" SortPriority="11" Width="80" IsVisible="true" />
+              <Column Guid="bbfc990a-b6c9-4dcd-858b-f040ab4a1efe" Name="Time" SortPriority="29" Width="80" IsVisible="true" />
+            </Columns>
+          </Preset>
+          <Preset Name="Randomascii Graph Field 1" GraphChartType="StackedBars" BarGraphIntervalCount="50" GraphColumnCount="26" KeyColumnCount="8" LeftFrozenColumnCount="7" RightFrozenColumnCount="25" InitialFilterQuery="[Provider Name]:*&quot;Multi-.*|Chrome.*&quot;" InitialFilterShouldKeep="true">
+            <MetadataEntries>
+              <MetadataEntry Guid="edf01e5d-3644-4dbc-ab9d-f8954e6db6ea" Name="ThreadId" ColumnMetadata="EndThreadId" />
+              <MetadataEntry Guid="bbfc990a-b6c9-4dcd-858b-f040ab4a1efe" Name="Time" ColumnMetadata="StartTime" />
+              <MetadataEntry Guid="bbfc990a-b6c9-4dcd-858b-f040ab4a1efe" Name="Time" ColumnMetadata="EndTime" />
+            </MetadataEntries>
+            <HighlightEntries />
+            <Columns>
+              <Column Guid="7ee6a5ff-1faf-428a-a7c2-7d2cb2b5cf26" Name="Process" SortPriority="17" Width="186" IsVisible="true" />
+              <Column Guid="8b4c40f8-0d99-437d-86ab-56ec200137dc" Name="Provider Name" SortPriority="12" Width="135" IsVisible="true" />
+              <Column Guid="2a23f9b1-65d6-46d2-87b2-72f3606b7f75" Name="Provider Id" SortPriority="18" Width="100" />
+              <Column Guid="511777f7-30ef-4e86-bd0b-0facaf23a0d3" Name="Task Name" SortPriority="13" Width="80" IsVisible="true" />
+              <Column Guid="5b51716b-b88f-443a-a396-c6316296d5f8" Name="Opcode Name" SortPriority="14" Width="100" IsVisible="true" />
+              <Column Guid="c72e1c5a-f6db-4c84-8c0b-85989e514075" Name="Id" SortPriority="15" Width="80" />
+              <Column Guid="d446a182-5203-4a29-aca1-4ab9bea0d1b5" Name="Version" SortPriority="1" Width="80" />
+              <Column Guid="cb796d44-2927-5ac1-d231-4b71904c18f5" Name="Thread Name" SortPriority="2" Width="80" />
+              <Column Guid="82ddfdff-ee93-5f35-08ac-4705069618dc" Name="Thread Activity Tag" SortPriority="3" Width="80" />
+              <Column Guid="2818954f-2d30-5569-4510-dade0a5a605c" Name="Annotation" SortPriority="4" Width="80" />
+              <Column Guid="90fe0b49-e3bb-440f-b829-5813c42108a1" Name="Event Name" SortPriority="16" Width="239" />
+              <Column Guid="72892fbe-0f55-426a-9aa1-26b6baf09ffb" Name="Event Type" SortPriority="19" Width="100" />
+              <Column Guid="0734f1a4-fbd9-4ff6-aec0-cf43875c8253" Name="Message" SortPriority="20" Width="100" />
+              <Column Guid="3be8610c-babb-4154-9970-1b2210928024" Name="Cpu" SortPriority="21" Width="45" />
+              <Column Guid="342f7677-17b2-4c7e-b9ec-e89612c49792" Name="Count" AggregationMode="Sum" SortOrder="Descending" Width="80" IsVisible="true" />
+              <Column Guid="edf01e5d-3644-4dbc-ab9d-f8954e6db6ea" Name="ThreadId" SortPriority="22" Width="63" IsVisible="true" />
+              <Column Guid="71badd11-26e5-56bc-44ec-12f4cc6a8f3e" Name="Field 2" AggregationMode="Average" SortPriority="6" Width="80" IsVisible="true" />
+              <Column Guid="411dba2d-5d6e-5272-8287-636d0841768c" Name="Field 3" AggregationMode="Average" SortPriority="7" Width="80" IsVisible="true" />
+              <Column Guid="048f5050-1f17-59b3-fa22-4b0781ee630b" Name="Field 4" AggregationMode="Average" SortPriority="8" Width="80" IsVisible="true" />
+              <Column Guid="94e48f22-d499-5227-bb04-be011b4159b0" Name="Field 5" AggregationMode="Average" SortPriority="9" Width="80" IsVisible="true" />
+              <Column Guid="c1054028-424a-59ba-e760-6d30abbd69c5" Name="Field 6" AggregationMode="Average" SortPriority="10" Width="80" IsVisible="true" />
+              <Column Guid="5cbc4b58-2de1-5449-55b2-4651d4edf90a" Name="Field 7" AggregationMode="Average" SortPriority="11" Width="80" IsVisible="true" />
+              <Column Guid="bbfc990a-b6c9-4dcd-858b-f040ab4a1efe" Name="Time" SortPriority="23" Width="80" IsVisible="true" />
+              <Column Guid="0c5cf8cd-9b9e-5798-1a5d-09d429f7fa3c" Name="Field 1" AggregationMode="Average" SortPriority="5" Width="111" IsVisible="true" />
+            </Columns>
+          </Preset>
+          <Preset Name="Randomascii Graph Field 2" GraphChartType="StackedBars" BarGraphIntervalCount="50" GraphColumnCount="26" KeyColumnCount="8" LeftFrozenColumnCount="7" RightFrozenColumnCount="25" InitialFilterQuery="[Provider Name]:*&quot;Multi-.*|Chrome.*&quot;" InitialFilterShouldKeep="true" GraphFilterColumnGuid="342f7677-17b2-4c7e-b9ec-e89612c49792">
+            <MetadataEntries>
+              <MetadataEntry Guid="edf01e5d-3644-4dbc-ab9d-f8954e6db6ea" Name="ThreadId" ColumnMetadata="EndThreadId" />
+              <MetadataEntry Guid="bbfc990a-b6c9-4dcd-858b-f040ab4a1efe" Name="Time" ColumnMetadata="StartTime" />
+              <MetadataEntry Guid="bbfc990a-b6c9-4dcd-858b-f040ab4a1efe" Name="Time" ColumnMetadata="EndTime" />
+            </MetadataEntries>
+            <HighlightEntries />
+            <Columns>
+              <Column Guid="7ee6a5ff-1faf-428a-a7c2-7d2cb2b5cf26" Name="Process" SortPriority="17" Width="186" IsVisible="true" />
+              <Column Guid="8b4c40f8-0d99-437d-86ab-56ec200137dc" Name="Provider Name" SortPriority="12" Width="135" IsVisible="true" />
+              <Column Guid="2a23f9b1-65d6-46d2-87b2-72f3606b7f75" Name="Provider Id" SortPriority="18" Width="100" />
+              <Column Guid="511777f7-30ef-4e86-bd0b-0facaf23a0d3" Name="Task Name" SortPriority="13" Width="80" IsVisible="true" />
+              <Column Guid="5b51716b-b88f-443a-a396-c6316296d5f8" Name="Opcode Name" SortPriority="14" Width="100" IsVisible="true" />
+              <Column Guid="c72e1c5a-f6db-4c84-8c0b-85989e514075" Name="Id" SortPriority="15" Width="80" />
+              <Column Guid="d446a182-5203-4a29-aca1-4ab9bea0d1b5" Name="Version" SortPriority="1" Width="80" />
+              <Column Guid="cb796d44-2927-5ac1-d231-4b71904c18f5" Name="Thread Name" SortPriority="2" Width="80" />
+              <Column Guid="82ddfdff-ee93-5f35-08ac-4705069618dc" Name="Thread Activity Tag" SortPriority="3" Width="80" />
+              <Column Guid="2818954f-2d30-5569-4510-dade0a5a605c" Name="Annotation" SortPriority="4" Width="80" />
+              <Column Guid="90fe0b49-e3bb-440f-b829-5813c42108a1" Name="Event Name" SortPriority="16" Width="239" />
+              <Column Guid="72892fbe-0f55-426a-9aa1-26b6baf09ffb" Name="Event Type" SortPriority="19" Width="100" />
+              <Column Guid="0734f1a4-fbd9-4ff6-aec0-cf43875c8253" Name="Message" SortPriority="20" Width="100" />
+              <Column Guid="3be8610c-babb-4154-9970-1b2210928024" Name="Cpu" SortPriority="21" Width="45" />
+              <Column Guid="342f7677-17b2-4c7e-b9ec-e89612c49792" Name="Count" AggregationMode="Sum" SortOrder="Descending" Width="80" IsVisible="true" />
+              <Column Guid="edf01e5d-3644-4dbc-ab9d-f8954e6db6ea" Name="ThreadId" SortPriority="22" Width="63" IsVisible="true" />
+              <Column Guid="0c5cf8cd-9b9e-5798-1a5d-09d429f7fa3c" Name="Field 1" AggregationMode="Average" SortPriority="5" Width="111" IsVisible="true" />
+              <Column Guid="411dba2d-5d6e-5272-8287-636d0841768c" Name="Field 3" AggregationMode="Average" SortPriority="7" Width="80" IsVisible="true" />
+              <Column Guid="048f5050-1f17-59b3-fa22-4b0781ee630b" Name="Field 4" AggregationMode="Average" SortPriority="8" Width="80" IsVisible="true" />
+              <Column Guid="94e48f22-d499-5227-bb04-be011b4159b0" Name="Field 5" AggregationMode="Average" SortPriority="9" Width="80" IsVisible="true" />
+              <Column Guid="c1054028-424a-59ba-e760-6d30abbd69c5" Name="Field 6" AggregationMode="Average" SortPriority="10" Width="80" IsVisible="true" />
+              <Column Guid="5cbc4b58-2de1-5449-55b2-4651d4edf90a" Name="Field 7" AggregationMode="Average" SortPriority="11" Width="80" IsVisible="true" />
+              <Column Guid="bbfc990a-b6c9-4dcd-858b-f040ab4a1efe" Name="Time" SortPriority="23" Width="80" IsVisible="true" />
+              <Column Guid="71badd11-26e5-56bc-44ec-12f4cc6a8f3e" Name="Field 2" AggregationMode="Average" SortPriority="6" Width="80" IsVisible="true" />
+            </Columns>
+          </Preset>
+          <Preset Name="Randomascii Graph Field 3" GraphChartType="StackedBars" BarGraphIntervalCount="50" GraphColumnCount="26" KeyColumnCount="8" LeftFrozenColumnCount="7" RightFrozenColumnCount="25" InitialFilterQuery="[Provider Name]:*&quot;Multi-.*|Chrome.*&quot;" InitialFilterShouldKeep="true" GraphFilterColumnGuid="342f7677-17b2-4c7e-b9ec-e89612c49792">
+            <MetadataEntries>
+              <MetadataEntry Guid="edf01e5d-3644-4dbc-ab9d-f8954e6db6ea" Name="ThreadId" ColumnMetadata="EndThreadId" />
+              <MetadataEntry Guid="bbfc990a-b6c9-4dcd-858b-f040ab4a1efe" Name="Time" ColumnMetadata="StartTime" />
+              <MetadataEntry Guid="bbfc990a-b6c9-4dcd-858b-f040ab4a1efe" Name="Time" ColumnMetadata="EndTime" />
+            </MetadataEntries>
+            <HighlightEntries />
+            <Columns>
+              <Column Guid="7ee6a5ff-1faf-428a-a7c2-7d2cb2b5cf26" Name="Process" SortPriority="17" Width="186" IsVisible="true" />
+              <Column Guid="8b4c40f8-0d99-437d-86ab-56ec200137dc" Name="Provider Name" SortPriority="12" Width="135" IsVisible="true" />
+              <Column Guid="2a23f9b1-65d6-46d2-87b2-72f3606b7f75" Name="Provider Id" SortPriority="18" Width="100" />
+              <Column Guid="511777f7-30ef-4e86-bd0b-0facaf23a0d3" Name="Task Name" SortPriority="13" Width="80" IsVisible="true" />
+              <Column Guid="5b51716b-b88f-443a-a396-c6316296d5f8" Name="Opcode Name" SortPriority="14" Width="100" IsVisible="true" />
+              <Column Guid="c72e1c5a-f6db-4c84-8c0b-85989e514075" Name="Id" SortPriority="15" Width="80" />
+              <Column Guid="d446a182-5203-4a29-aca1-4ab9bea0d1b5" Name="Version" SortPriority="1" Width="80" />
+              <Column Guid="cb796d44-2927-5ac1-d231-4b71904c18f5" Name="Thread Name" SortPriority="2" Width="80" />
+              <Column Guid="82ddfdff-ee93-5f35-08ac-4705069618dc" Name="Thread Activity Tag" SortPriority="3" Width="80" />
+              <Column Guid="2818954f-2d30-5569-4510-dade0a5a605c" Name="Annotation" SortPriority="4" Width="80" />
+              <Column Guid="90fe0b49-e3bb-440f-b829-5813c42108a1" Name="Event Name" SortPriority="16" Width="239" />
+              <Column Guid="72892fbe-0f55-426a-9aa1-26b6baf09ffb" Name="Event Type" SortPriority="19" Width="100" />
+              <Column Guid="0734f1a4-fbd9-4ff6-aec0-cf43875c8253" Name="Message" SortPriority="20" Width="100" />
+              <Column Guid="3be8610c-babb-4154-9970-1b2210928024" Name="Cpu" SortPriority="21" Width="45" />
+              <Column Guid="342f7677-17b2-4c7e-b9ec-e89612c49792" Name="Count" AggregationMode="Sum" SortOrder="Descending" Width="80" IsVisible="true" />
+              <Column Guid="edf01e5d-3644-4dbc-ab9d-f8954e6db6ea" Name="ThreadId" SortPriority="22" Width="63" IsVisible="true" />
+              <Column Guid="0c5cf8cd-9b9e-5798-1a5d-09d429f7fa3c" Name="Field 1" AggregationMode="Average" SortPriority="5" Width="111" IsVisible="true" />
+              <Column Guid="71badd11-26e5-56bc-44ec-12f4cc6a8f3e" Name="Field 2" AggregationMode="Average" SortPriority="6" Width="80" IsVisible="true" />
+              <Column Guid="048f5050-1f17-59b3-fa22-4b0781ee630b" Name="Field 4" AggregationMode="Average" SortPriority="8" Width="80" IsVisible="true" />
+              <Column Guid="94e48f22-d499-5227-bb04-be011b4159b0" Name="Field 5" AggregationMode="Average" SortPriority="9" Width="80" IsVisible="true" />
+              <Column Guid="c1054028-424a-59ba-e760-6d30abbd69c5" Name="Field 6" AggregationMode="Average" SortPriority="10" Width="80" IsVisible="true" />
+              <Column Guid="5cbc4b58-2de1-5449-55b2-4651d4edf90a" Name="Field 7" AggregationMode="Average" SortPriority="11" Width="80" IsVisible="true" />
+              <Column Guid="bbfc990a-b6c9-4dcd-858b-f040ab4a1efe" Name="Time" SortPriority="23" Width="80" IsVisible="true" />
+              <Column Guid="411dba2d-5d6e-5272-8287-636d0841768c" Name="Field 3" AggregationMode="Average" SortPriority="7" Width="80" IsVisible="true" />
+            </Columns>
+          </Preset>
+          <Preset Name="Randomascii Graph Field 4" GraphChartType="StackedBars" BarGraphIntervalCount="50" GraphColumnCount="26" KeyColumnCount="8" LeftFrozenColumnCount="7" RightFrozenColumnCount="25" InitialFilterQuery="[Provider Name]:*&quot;Multi-.*|Chrome.*&quot;" InitialFilterShouldKeep="true" GraphFilterColumnGuid="342f7677-17b2-4c7e-b9ec-e89612c49792">
+            <MetadataEntries>
+              <MetadataEntry Guid="edf01e5d-3644-4dbc-ab9d-f8954e6db6ea" Name="ThreadId" ColumnMetadata="EndThreadId" />
+              <MetadataEntry Guid="bbfc990a-b6c9-4dcd-858b-f040ab4a1efe" Name="Time" ColumnMetadata="StartTime" />
+              <MetadataEntry Guid="bbfc990a-b6c9-4dcd-858b-f040ab4a1efe" Name="Time" ColumnMetadata="EndTime" />
+            </MetadataEntries>
+            <HighlightEntries />
+            <Columns>
+              <Column Guid="7ee6a5ff-1faf-428a-a7c2-7d2cb2b5cf26" Name="Process" SortPriority="17" Width="186" IsVisible="true" />
+              <Column Guid="8b4c40f8-0d99-437d-86ab-56ec200137dc" Name="Provider Name" SortPriority="12" Width="135" IsVisible="true" />
+              <Column Guid="2a23f9b1-65d6-46d2-87b2-72f3606b7f75" Name="Provider Id" SortPriority="18" Width="100" />
+              <Column Guid="511777f7-30ef-4e86-bd0b-0facaf23a0d3" Name="Task Name" SortPriority="13" Width="80" IsVisible="true" />
+              <Column Guid="5b51716b-b88f-443a-a396-c6316296d5f8" Name="Opcode Name" SortPriority="14" Width="100" IsVisible="true" />
+              <Column Guid="c72e1c5a-f6db-4c84-8c0b-85989e514075" Name="Id" SortPriority="15" Width="80" />
+              <Column Guid="d446a182-5203-4a29-aca1-4ab9bea0d1b5" Name="Version" SortPriority="1" Width="80" />
+              <Column Guid="cb796d44-2927-5ac1-d231-4b71904c18f5" Name="Thread Name" SortPriority="2" Width="80" />
+              <Column Guid="82ddfdff-ee93-5f35-08ac-4705069618dc" Name="Thread Activity Tag" SortPriority="3" Width="80" />
+              <Column Guid="2818954f-2d30-5569-4510-dade0a5a605c" Name="Annotation" SortPriority="4" Width="80" />
+              <Column Guid="90fe0b49-e3bb-440f-b829-5813c42108a1" Name="Event Name" SortPriority="16" Width="239" />
+              <Column Guid="72892fbe-0f55-426a-9aa1-26b6baf09ffb" Name="Event Type" SortPriority="19" Width="100" />
+              <Column Guid="0734f1a4-fbd9-4ff6-aec0-cf43875c8253" Name="Message" SortPriority="20" Width="100" />
+              <Column Guid="3be8610c-babb-4154-9970-1b2210928024" Name="Cpu" SortPriority="21" Width="45" />
+              <Column Guid="342f7677-17b2-4c7e-b9ec-e89612c49792" Name="Count" AggregationMode="Sum" SortOrder="Descending" Width="80" IsVisible="true" />
+              <Column Guid="edf01e5d-3644-4dbc-ab9d-f8954e6db6ea" Name="ThreadId" SortPriority="22" Width="63" IsVisible="true" />
+              <Column Guid="0c5cf8cd-9b9e-5798-1a5d-09d429f7fa3c" Name="Field 1" AggregationMode="Average" SortPriority="5" Width="111" IsVisible="true" />
+              <Column Guid="71badd11-26e5-56bc-44ec-12f4cc6a8f3e" Name="Field 2" AggregationMode="Average" SortPriority="6" Width="80" IsVisible="true" />
+              <Column Guid="411dba2d-5d6e-5272-8287-636d0841768c" Name="Field 3" AggregationMode="Average" SortPriority="7" Width="80" IsVisible="true" />
+              <Column Guid="94e48f22-d499-5227-bb04-be011b4159b0" Name="Field 5" AggregationMode="Average" SortPriority="9" Width="80" IsVisible="true" />
+              <Column Guid="c1054028-424a-59ba-e760-6d30abbd69c5" Name="Field 6" AggregationMode="Average" SortPriority="10" Width="80" IsVisible="true" />
+              <Column Guid="5cbc4b58-2de1-5449-55b2-4651d4edf90a" Name="Field 7" AggregationMode="Average" SortPriority="11" Width="80" IsVisible="true" />
+              <Column Guid="bbfc990a-b6c9-4dcd-858b-f040ab4a1efe" Name="Time" SortPriority="23" Width="80" IsVisible="true" />
+              <Column Guid="048f5050-1f17-59b3-fa22-4b0781ee630b" Name="Field 4" AggregationMode="Average" SortPriority="8" Width="80" IsVisible="true" />
+            </Columns>
+          </Preset>
+          <Preset Name="Randomascii Graph Field 5" GraphChartType="StackedBars" BarGraphIntervalCount="50" GraphColumnCount="26" KeyColumnCount="8" LeftFrozenColumnCount="7" RightFrozenColumnCount="25" InitialFilterQuery="[Provider Name]:*&quot;Multi-.*|Chrome.*&quot;" InitialFilterShouldKeep="true" GraphFilterColumnGuid="342f7677-17b2-4c7e-b9ec-e89612c49792">
+            <MetadataEntries>
+              <MetadataEntry Guid="edf01e5d-3644-4dbc-ab9d-f8954e6db6ea" Name="ThreadId" ColumnMetadata="EndThreadId" />
+              <MetadataEntry Guid="bbfc990a-b6c9-4dcd-858b-f040ab4a1efe" Name="Time" ColumnMetadata="StartTime" />
+              <MetadataEntry Guid="bbfc990a-b6c9-4dcd-858b-f040ab4a1efe" Name="Time" ColumnMetadata="EndTime" />
+            </MetadataEntries>
+            <HighlightEntries />
+            <Columns>
+              <Column Guid="7ee6a5ff-1faf-428a-a7c2-7d2cb2b5cf26" Name="Process" SortPriority="17" Width="186" IsVisible="true" />
+              <Column Guid="8b4c40f8-0d99-437d-86ab-56ec200137dc" Name="Provider Name" SortPriority="12" Width="135" IsVisible="true" />
+              <Column Guid="2a23f9b1-65d6-46d2-87b2-72f3606b7f75" Name="Provider Id" SortPriority="18" Width="100" />
+              <Column Guid="511777f7-30ef-4e86-bd0b-0facaf23a0d3" Name="Task Name" SortPriority="13" Width="80" IsVisible="true" />
+              <Column Guid="5b51716b-b88f-443a-a396-c6316296d5f8" Name="Opcode Name" SortPriority="14" Width="100" IsVisible="true" />
+              <Column Guid="c72e1c5a-f6db-4c84-8c0b-85989e514075" Name="Id" SortPriority="15" Width="80" />
+              <Column Guid="d446a182-5203-4a29-aca1-4ab9bea0d1b5" Name="Version" SortPriority="1" Width="80" />
+              <Column Guid="cb796d44-2927-5ac1-d231-4b71904c18f5" Name="Thread Name" SortPriority="2" Width="80" />
+              <Column Guid="82ddfdff-ee93-5f35-08ac-4705069618dc" Name="Thread Activity Tag" SortPriority="3" Width="80" />
+              <Column Guid="2818954f-2d30-5569-4510-dade0a5a605c" Name="Annotation" SortPriority="4" Width="80" />
+              <Column Guid="90fe0b49-e3bb-440f-b829-5813c42108a1" Name="Event Name" SortPriority="16" Width="239" />
+              <Column Guid="72892fbe-0f55-426a-9aa1-26b6baf09ffb" Name="Event Type" SortPriority="19" Width="100" />
+              <Column Guid="0734f1a4-fbd9-4ff6-aec0-cf43875c8253" Name="Message" SortPriority="20" Width="100" />
+              <Column Guid="3be8610c-babb-4154-9970-1b2210928024" Name="Cpu" SortPriority="21" Width="45" />
+              <Column Guid="342f7677-17b2-4c7e-b9ec-e89612c49792" Name="Count" AggregationMode="Sum" SortOrder="Descending" Width="80" IsVisible="true" />
+              <Column Guid="edf01e5d-3644-4dbc-ab9d-f8954e6db6ea" Name="ThreadId" SortPriority="22" Width="63" IsVisible="true" />
+              <Column Guid="0c5cf8cd-9b9e-5798-1a5d-09d429f7fa3c" Name="Field 1" AggregationMode="Average" SortPriority="5" Width="111" IsVisible="true" />
+              <Column Guid="71badd11-26e5-56bc-44ec-12f4cc6a8f3e" Name="Field 2" AggregationMode="Average" SortPriority="6" Width="80" IsVisible="true" />
+              <Column Guid="411dba2d-5d6e-5272-8287-636d0841768c" Name="Field 3" AggregationMode="Average" SortPriority="7" Width="80" IsVisible="true" />
+              <Column Guid="048f5050-1f17-59b3-fa22-4b0781ee630b" Name="Field 4" AggregationMode="Average" SortPriority="8" Width="80" IsVisible="true" />
+              <Column Guid="c1054028-424a-59ba-e760-6d30abbd69c5" Name="Field 6" AggregationMode="Average" SortPriority="10" Width="80" IsVisible="true" />
+              <Column Guid="5cbc4b58-2de1-5449-55b2-4651d4edf90a" Name="Field 7" AggregationMode="Average" SortPriority="11" Width="80" IsVisible="true" />
+              <Column Guid="bbfc990a-b6c9-4dcd-858b-f040ab4a1efe" Name="Time" SortPriority="23" Width="80" IsVisible="true" />
+              <Column Guid="94e48f22-d499-5227-bb04-be011b4159b0" Name="Field 5" AggregationMode="Average" SortPriority="9" Width="80" IsVisible="true" />
+            </Columns>
+          </Preset>
+          <Preset Name="Randomascii Graph Field 6" GraphChartType="StackedBars" BarGraphIntervalCount="50" GraphColumnCount="26" KeyColumnCount="8" LeftFrozenColumnCount="7" RightFrozenColumnCount="25" InitialFilterQuery="[Provider Name]:*&quot;Multi-.*|Chrome.*&quot;" InitialFilterShouldKeep="true" GraphFilterColumnGuid="342f7677-17b2-4c7e-b9ec-e89612c49792">
+            <MetadataEntries>
+              <MetadataEntry Guid="edf01e5d-3644-4dbc-ab9d-f8954e6db6ea" Name="ThreadId" ColumnMetadata="EndThreadId" />
+              <MetadataEntry Guid="bbfc990a-b6c9-4dcd-858b-f040ab4a1efe" Name="Time" ColumnMetadata="StartTime" />
+              <MetadataEntry Guid="bbfc990a-b6c9-4dcd-858b-f040ab4a1efe" Name="Time" ColumnMetadata="EndTime" />
+            </MetadataEntries>
+            <HighlightEntries />
+            <Columns>
+              <Column Guid="7ee6a5ff-1faf-428a-a7c2-7d2cb2b5cf26" Name="Process" SortPriority="17" Width="186" IsVisible="true" />
+              <Column Guid="8b4c40f8-0d99-437d-86ab-56ec200137dc" Name="Provider Name" SortPriority="12" Width="135" IsVisible="true" />
+              <Column Guid="2a23f9b1-65d6-46d2-87b2-72f3606b7f75" Name="Provider Id" SortPriority="18" Width="100" />
+              <Column Guid="511777f7-30ef-4e86-bd0b-0facaf23a0d3" Name="Task Name" SortPriority="13" Width="80" IsVisible="true" />
+              <Column Guid="5b51716b-b88f-443a-a396-c6316296d5f8" Name="Opcode Name" SortPriority="14" Width="100" IsVisible="true" />
+              <Column Guid="c72e1c5a-f6db-4c84-8c0b-85989e514075" Name="Id" SortPriority="15" Width="80" />
+              <Column Guid="d446a182-5203-4a29-aca1-4ab9bea0d1b5" Name="Version" SortPriority="1" Width="80" />
+              <Column Guid="cb796d44-2927-5ac1-d231-4b71904c18f5" Name="Thread Name" SortPriority="2" Width="80" />
+              <Column Guid="82ddfdff-ee93-5f35-08ac-4705069618dc" Name="Thread Activity Tag" SortPriority="3" Width="80" />
+              <Column Guid="2818954f-2d30-5569-4510-dade0a5a605c" Name="Annotation" SortPriority="4" Width="80" />
+              <Column Guid="90fe0b49-e3bb-440f-b829-5813c42108a1" Name="Event Name" SortPriority="16" Width="239" />
+              <Column Guid="72892fbe-0f55-426a-9aa1-26b6baf09ffb" Name="Event Type" SortPriority="19" Width="100" />
+              <Column Guid="0734f1a4-fbd9-4ff6-aec0-cf43875c8253" Name="Message" SortPriority="20" Width="100" />
+              <Column Guid="3be8610c-babb-4154-9970-1b2210928024" Name="Cpu" SortPriority="21" Width="45" />
+              <Column Guid="342f7677-17b2-4c7e-b9ec-e89612c49792" Name="Count" AggregationMode="Sum" SortOrder="Descending" Width="80" IsVisible="true" />
+              <Column Guid="edf01e5d-3644-4dbc-ab9d-f8954e6db6ea" Name="ThreadId" SortPriority="22" Width="63" IsVisible="true" />
+              <Column Guid="0c5cf8cd-9b9e-5798-1a5d-09d429f7fa3c" Name="Field 1" AggregationMode="Average" SortPriority="5" Width="111" IsVisible="true" />
+              <Column Guid="71badd11-26e5-56bc-44ec-12f4cc6a8f3e" Name="Field 2" AggregationMode="Average" SortPriority="6" Width="80" IsVisible="true" />
+              <Column Guid="411dba2d-5d6e-5272-8287-636d0841768c" Name="Field 3" AggregationMode="Average" SortPriority="7" Width="80" IsVisible="true" />
+              <Column Guid="048f5050-1f17-59b3-fa22-4b0781ee630b" Name="Field 4" AggregationMode="Average" SortPriority="8" Width="80" IsVisible="true" />
+              <Column Guid="94e48f22-d499-5227-bb04-be011b4159b0" Name="Field 5" AggregationMode="Average" SortPriority="9" Width="80" IsVisible="true" />
+              <Column Guid="5cbc4b58-2de1-5449-55b2-4651d4edf90a" Name="Field 7" AggregationMode="Average" SortPriority="11" Width="80" IsVisible="true" />
+              <Column Guid="bbfc990a-b6c9-4dcd-858b-f040ab4a1efe" Name="Time" SortPriority="23" Width="80" IsVisible="true" />
+              <Column Guid="c1054028-424a-59ba-e760-6d30abbd69c5" Name="Field 6" AggregationMode="Average" SortPriority="10" Width="80" IsVisible="true" />
+            </Columns>
+          </Preset>
+          <Preset Name="Trace markers" BarGraphIntervalCount="50" GraphColumnCount="33" KeyColumnCount="6" LeftFrozenColumnCount="4" RightFrozenColumnCount="31" InitialFilterQuery="[Provider Id]:=&quot;b7a19fcd-15ba-41ba-a3d7-dc352d5f79ba&quot;" InitialFilterShouldKeep="true" HelpText="{}{\rtf1\ansi\ansicpg1252\uc1\htmautsp\deff2{\fonttbl{\f0\fcharset0 Times New Roman;}{\f2\fcharset0 Segoe UI;}}{\colortbl\red0\green0\blue0;\red255\green255\blue255;}\loch\hich\dbch\pard\plain\ltrpar\itap0{\lang1033\fs18\f2\cf0 \cf0\ql{\f2 {\ltrch Only shows any trace markers that were fired during trace capture.}\li0\ri0\sa0\sb0\fi0\ql\par}&#xD;&#xA;}&#xD;&#xA;}">
+            <MetadataEntries>
+              <MetadataEntry Guid="edf01e5d-3644-4dbc-ab9d-f8954e6db6ea" Name="ThreadId" ColumnMetadata="EndThreadId" />
+              <MetadataEntry Guid="bbfc990a-b6c9-4dcd-858b-f040ab4a1efe" Name="Time" ColumnMetadata="StartTime" />
+              <MetadataEntry Guid="bbfc990a-b6c9-4dcd-858b-f040ab4a1efe" Name="Time" ColumnMetadata="EndTime" />
+            </MetadataEntries>
+            <HighlightEntries />
+            <Columns>
+              <Column Guid="511777f7-30ef-4e86-bd0b-0facaf23a0d3" Name="Task Name" Width="80" IsVisible="true" />
+              <Column Guid="71badd11-26e5-56bc-44ec-12f4cc6a8f3e" Name="Field 2" SortPriority="1" Width="115" IsVisible="true" />
+              <Column Guid="8b4c40f8-0d99-437d-86ab-56ec200137dc" Name="Provider Name" SortPriority="24" Width="180" />
+              <Column Guid="0c5cf8cd-9b9e-5798-1a5d-09d429f7fa3c" Name="Field 1" SortPriority="23" Width="176" IsVisible="true" />
+              <Column Guid="5b51716b-b88f-443a-a396-c6316296d5f8" Name="Opcode Name" Width="80" IsVisible="true" />
+              <Column Guid="cb796d44-2927-5ac1-d231-4b71904c18f5" Name="Thread Name" Width="80" />
+              <Column Guid="82ddfdff-ee93-5f35-08ac-4705069618dc" Name="Thread Activity Tag" Width="80" />
+              <Column Guid="2a23f9b1-65d6-46d2-87b2-72f3606b7f75" Name="Provider Id" SortPriority="29" Width="100" />
+              <Column Guid="7ee6a5ff-1faf-428a-a7c2-7d2cb2b5cf26" Name="Process" SortPriority="31" Width="150" />
+              <Column Guid="511777f7-30ef-4e86-bd0b-0facaf23a0d3" Name="Task Name" SortPriority="25" Width="80" />
+              <Column Guid="5b51716b-b88f-443a-a396-c6316296d5f8" Name="Opcode Name" SortPriority="26" Width="80" />
+              <Column Guid="c72e1c5a-f6db-4c84-8c0b-85989e514075" Name="Id" SortPriority="27" Width="80" />
+              <Column Guid="d446a182-5203-4a29-aca1-4ab9bea0d1b5" Name="Version" SortPriority="21" Width="80" />
+              <Column Guid="2818954f-2d30-5569-4510-dade0a5a605c" Name="Annotation" SortPriority="22" Width="80" />
+              <Column Guid="90fe0b49-e3bb-440f-b829-5813c42108a1" Name="Event Name" SortPriority="28" Width="144" />
+              <Column Guid="72892fbe-0f55-426a-9aa1-26b6baf09ffb" Name="Event Type" SortPriority="30" Width="100" />
+              <Column Guid="0734f1a4-fbd9-4ff6-aec0-cf43875c8253" Name="Message" SortPriority="32" Width="100" />
+              <Column Guid="411dba2d-5d6e-5272-8287-636d0841768c" Name="Field 3" SortPriority="2" Width="80" />
+              <Column Guid="048f5050-1f17-59b3-fa22-4b0781ee630b" Name="Field 4" SortPriority="3" Width="80" />
+              <Column Guid="94e48f22-d499-5227-bb04-be011b4159b0" Name="Field 5" SortPriority="4" Width="80" />
+              <Column Guid="c1054028-424a-59ba-e760-6d30abbd69c5" Name="Field 6" SortPriority="5" Width="80" />
+              <Column Guid="5cbc4b58-2de1-5449-55b2-4651d4edf90a" Name="Field 7" SortPriority="6" Width="80" />
+              <Column Guid="fc01e6c9-a43b-51a1-fd2e-112ba48aff65" Name="Field 8" SortPriority="7" Width="80" />
+              <Column Guid="e3dcf300-46e2-5c43-ef4b-2c3db489ec25" Name="Field 9" SortPriority="8" Width="80" />
+              <Column Guid="87c21ddb-4b29-58e3-5ddc-f114c5ca209a" Name="Field 10" SortPriority="9" Width="80" />
+              <Column Guid="65f8fe42-ad02-5016-3521-f93329c76227" Name="Field 11" SortPriority="10" Width="80" />
+              <Column Guid="03d48fd3-0fe4-57f5-a477-49beb0d70a1f" Name="Field 12" SortPriority="11" Width="80" />
+              <Column Guid="998f8e2d-0f5a-5a54-0133-226e2de62c0b" Name="Field 13" SortPriority="12" Width="80" />
+              <Column Guid="bb772c34-9600-5bf7-3f54-e6080f8a0611" Name="Field 14" SortPriority="13" Width="80" />
+              <Column Guid="342f7677-17b2-4c7e-b9ec-e89612c49792" Name="Count" AggregationMode="Sum" SortOrder="Descending" Width="80" IsVisible="true" />
+              <Column Guid="bbfc990a-b6c9-4dcd-858b-f040ab4a1efe" Name="Time" SortPriority="33" Width="80" IsVisible="true" />
+            </Columns>
+          </Preset>
+          <Preset Name="User Marks" BarGraphIntervalCount="50" GraphColumnCount="26" KeyColumnCount="9" LeftFrozenColumnCount="8" RightFrozenColumnCount="25" InitialFilterQuery="[Provider Name]:=&quot;Multi-Input&quot; [Task Name]:=&quot;Keyboard&quot; [Field 2]:~=&quot;Ctrl+Alt+Win+F&quot;" InitialFilterShouldKeep="true">
+            <MetadataEntries>
+              <MetadataEntry Guid="edf01e5d-3644-4dbc-ab9d-f8954e6db6ea" Name="ThreadId" ColumnMetadata="EndThreadId" />
+              <MetadataEntry Guid="bbfc990a-b6c9-4dcd-858b-f040ab4a1efe" Name="Time" ColumnMetadata="StartTime" />
+              <MetadataEntry Guid="bbfc990a-b6c9-4dcd-858b-f040ab4a1efe" Name="Time" ColumnMetadata="EndTime" />
+            </MetadataEntries>
+            <HighlightEntries />
+            <Columns>
+              <Column Guid="71badd11-26e5-56bc-44ec-12f4cc6a8f3e" Name="Field 2" AggregationMode="Average" SortPriority="6" Width="80" IsVisible="true" />
+              <Column Guid="7ee6a5ff-1faf-428a-a7c2-7d2cb2b5cf26" Name="Process" SortPriority="28" Width="186" />
+              <Column Guid="8b4c40f8-0d99-437d-86ab-56ec200137dc" Name="Provider Name" SortPriority="18" Width="135" />
+              <Column Guid="2a23f9b1-65d6-46d2-87b2-72f3606b7f75" Name="Provider Id" SortPriority="23" Width="100" />
+              <Column Guid="511777f7-30ef-4e86-bd0b-0facaf23a0d3" Name="Task Name" SortPriority="19" Width="80" />
+              <Column Guid="5b51716b-b88f-443a-a396-c6316296d5f8" Name="Opcode Name" SortPriority="20" Width="100" />
+              <Column Guid="c72e1c5a-f6db-4c84-8c0b-85989e514075" Name="Id" SortPriority="21" Width="80" />
+              <Column Guid="d446a182-5203-4a29-aca1-4ab9bea0d1b5" Name="Version" SortPriority="1" Width="80" />
+              <Column Guid="cb796d44-2927-5ac1-d231-4b71904c18f5" Name="Thread Name" SortPriority="2" Width="80" />
+              <Column Guid="82ddfdff-ee93-5f35-08ac-4705069618dc" Name="Thread Activity Tag" SortPriority="3" Width="80" />
+              <Column Guid="2818954f-2d30-5569-4510-dade0a5a605c" Name="Annotation" SortPriority="4" Width="80" />
+              <Column Guid="90fe0b49-e3bb-440f-b829-5813c42108a1" Name="Event Name" SortPriority="22" Width="239" />
+              <Column Guid="72892fbe-0f55-426a-9aa1-26b6baf09ffb" Name="Event Type" SortPriority="24" Width="100" />
+              <Column Guid="0734f1a4-fbd9-4ff6-aec0-cf43875c8253" Name="Message" SortPriority="25" Width="100" />
+              <Column Guid="3be8610c-babb-4154-9970-1b2210928024" Name="Cpu" SortPriority="26" Width="45" />
+              <Column Guid="342f7677-17b2-4c7e-b9ec-e89612c49792" Name="Count" AggregationMode="Sum" SortOrder="Descending" Width="80" />
+              <Column Guid="edf01e5d-3644-4dbc-ab9d-f8954e6db6ea" Name="ThreadId" SortPriority="27" Width="63" />
+              <Column Guid="0c5cf8cd-9b9e-5798-1a5d-09d429f7fa3c" Name="Field 1" AggregationMode="Average" SortPriority="5" Width="111" />
+              <Column Guid="411dba2d-5d6e-5272-8287-636d0841768c" Name="Field 3" AggregationMode="Average" SortPriority="7" Width="80" />
+              <Column Guid="048f5050-1f17-59b3-fa22-4b0781ee630b" Name="Field 4" AggregationMode="Average" SortPriority="8" Width="80" />
+              <Column Guid="94e48f22-d499-5227-bb04-be011b4159b0" Name="Field 5" AggregationMode="Average" SortPriority="9" Width="80" />
+              <Column Guid="c1054028-424a-59ba-e760-6d30abbd69c5" Name="Field 6" AggregationMode="Average" SortPriority="10" Width="80" />
+              <Column Guid="5cbc4b58-2de1-5449-55b2-4651d4edf90a" Name="Field 7" AggregationMode="Average" SortPriority="11" Width="80" />
+              <Column Guid="bbfc990a-b6c9-4dcd-858b-f040ab4a1efe" Name="Time" SortPriority="29" Width="80" IsVisible="true" />
+            </Columns>
+          </Preset>
+        </PersistedPresets>
+      </GraphSchema>
+      <GraphSchema Guid="b855361e-7be0-4bc8-a754-3e8507715ca5" HelpText="{}{\rtf1\ansi\ansicpg1252\uc1\htmautsp\deff2{\fonttbl{\f0\fcharset0 Times New Roman;}{\f2\fcharset0 Segoe UI;}}{\colortbl\red0\green0\blue0;\red255\green255\blue255;}\loch\hich\dbch\pard\plain\ltrpar\itap0{\lang1033\fs18\f2\cf0 \cf0\ql{\f2 {\ltrch This graph shows CPU usage events logged at a regular sampling interval, usually about 1ms.  Each event logs the CPU, thread, address and optionally the call stack.}\li0\ri0\sa0\sb0\fi0\ql\par}&#xD;&#xA;}&#xD;&#xA;}">
+        <ModifiedPresets>
+          <Preset Name="Randomascii Inclusive (stack)" BarGraphIntervalCount="50" GraphColumnCount="23" KeyColumnCount="12" RightFrozenColumnCount="22" InitialFilterQuery="[DPC/ISR]:=&quot;DPC&quot; OR [DPC/ISR]:=&quot;ISR&quot;" InitialSelectionQuery="([Series Name]:=&quot;Process&quot; AND NOT ([Process]:=&quot;Idle (0)&quot;))">
+            <MetadataEntries>
+              <MetadataEntry Guid="05100ece-df05-40c7-aad6-ffff99b60491" Name="Thread ID" ColumnMetadata="EndThreadId" />
+              <MetadataEntry Guid="0bbf4299-0176-445e-b1d9-991df475d631" Name="TimeStamp" ColumnMetadata="EndTime" />
+              <MetadataEntry Guid="e0c6cb9e-04c2-4bb5-ba5f-4ed765f4ecaa" Name="Weight" ColumnMetadata="Duration" />
+              <MetadataEntry Guid="55d56ebb-77af-4af5-a056-6122751ea093" Name="CPU" ColumnMetadata="ResourceId" />
+            </MetadataEntries>
+            <HighlightEntries />
+            <Columns>
+              <Column Guid="9c1ceec3-ef4a-4865-b678-d774881187b9" Name="Process Name" SortPriority="1" Width="180" />
+              <Column Guid="00875e0c-482f-418d-ab40-decf05030541" Name="Display Name" SortPriority="2" Width="200" />
+              <Column Guid="5b77e48f-6d24-4f29-8972-69c30e32f87d" Name="Process" SortPriority="3" Width="200" IsVisible="true" />
+              <Column Guid="842af11e-661d-477e-b7b6-556ed8181177" Name="Stack" SortPriority="4" Width="200">
+                <StackOptionsParameter Mode="StackTag" FrameTagFold="True" />
+              </Column>
+              <Column Guid="842af11e-661d-477e-b7b6-556ed8181177" Name="Stack" SortPriority="5" Width="200">
+                <StackOptionsParameter Mode="FrameTags" FrameTagFold="True" />
+              </Column>
+              <Column Guid="05100ece-df05-40c7-aad6-ffff99b60491" Name="Thread ID" SortPriority="11" TextAlignment="Right" Width="80" IsVisible="true" />
+              <Column Guid="842af11e-661d-477e-b7b6-556ed8181177" Name="Stack" SortPriority="6" Width="535" IsVisible="true">
+                <StackOptionsParameter FrameTagFold="True" />
+              </Column>
+              <Column Guid="ccdb05c1-04a9-4289-aaa6-a376d1d66012" Name="Module" SortPriority="7" Width="124" />
+              <Column Guid="7ad93780-708c-471c-9e3f-5a497cbefdd7" Name="Function" SortPriority="8" Width="184" />
+              <Column Guid="d0028ea0-aa66-452a-882a-616fd8b9fdce" Name="DPC/ISR" SortPriority="9" Width="184" />
+              <Column Guid="9aa2e00d-db0a-4207-a0bd-964aa492356e" Name="Address" SortPriority="10" TextAlignment="Right" Width="140" />
+              <Column Guid="cb796d44-2927-5ac1-d231-4b71904c18f5" Name="Thread Name" SortPriority="12" Width="80" />
+              <Column Guid="82ddfdff-ee93-5f35-08ac-4705069618dc" Name="Thread Activity Tag" SortPriority="13" Width="80" />
+              <Column Guid="2818954f-2d30-5569-4510-dade0a5a605c" Name="Annotation" SortPriority="14" Width="80" />
+              <Column Guid="55d56ebb-77af-4af5-a056-6122751ea093" Name="CPU" SortPriority="15" TextAlignment="Right" Width="40" />
+              <Column Guid="01a82c2c-5048-4c9d-ac37-eaf6556f6af5" Name="Count" AggregationMode="Sum" SortOrder="Descending" TextAlignment="Right" Width="60" IsVisible="true" />
+              <Column Guid="63cfb4e2-a24c-4e9d-80f2-393f03794d60" Name="Weight (in view)" AggregationMode="Sum" SortPriority="16" TextAlignment="Right" Width="100" IsVisible="true" />
+              <Column Guid="0bbf4299-0176-445e-b1d9-991df475d631" Name="TimeStamp" SortPriority="17" TextAlignment="Right" Width="100" />
+              <Column Guid="ab54241e-ce5d-4ef7-a28c-bbcb5b8d39d4" Name="Rank" SortPriority="18" TextAlignment="Right" Width="80" />
+              <Column Guid="5a1e1ba4-6a14-43e5-96eb-3b462be470fe" Name="Priority" SortPriority="19" TextAlignment="Right" Width="80" />
+              <Column Guid="f5ebf01b-f7cb-4afb-877d-c36edb2a62b6" Name="% Weight" AggregationMode="Sum" SortOrder="Descending" SortPriority="20" TextAlignment="Right" Width="80" />
+            </Columns>
+          </Preset>
+          <Preset Name="Randomascii Exclusive (module and function)" BarGraphIntervalCount="50" GraphColumnCount="23" KeyColumnCount="12" RightFrozenColumnCount="22" InitialFilterQuery="[DPC/ISR]:=&quot;DPC&quot; OR [DPC/ISR]:=&quot;ISR&quot;" InitialSelectionQuery="([Series Name]:=&quot;Process&quot; AND NOT ([Process]:=&quot;Idle (0)&quot;))">
+            <MetadataEntries>
+              <MetadataEntry Guid="05100ece-df05-40c7-aad6-ffff99b60491" Name="Thread ID" ColumnMetadata="EndThreadId" />
+              <MetadataEntry Guid="0bbf4299-0176-445e-b1d9-991df475d631" Name="TimeStamp" ColumnMetadata="EndTime" />
+              <MetadataEntry Guid="e0c6cb9e-04c2-4bb5-ba5f-4ed765f4ecaa" Name="Weight" ColumnMetadata="Duration" />
+              <MetadataEntry Guid="55d56ebb-77af-4af5-a056-6122751ea093" Name="CPU" ColumnMetadata="ResourceId" />
+            </MetadataEntries>
+            <HighlightEntries />
+            <Columns>
+              <Column Guid="9c1ceec3-ef4a-4865-b678-d774881187b9" Name="Process Name" SortPriority="1" Width="180" />
+              <Column Guid="00875e0c-482f-418d-ab40-decf05030541" Name="Display Name" SortPriority="2" Width="200" />
+              <Column Guid="5b77e48f-6d24-4f29-8972-69c30e32f87d" Name="Process" SortPriority="3" Width="200" IsVisible="true" />
+              <Column Guid="842af11e-661d-477e-b7b6-556ed8181177" Name="Stack" SortPriority="4" Width="200">
+                <StackOptionsParameter Mode="StackTag" FrameTagFold="True" />
+              </Column>
+              <Column Guid="842af11e-661d-477e-b7b6-556ed8181177" Name="Stack" SortPriority="5" Width="200">
+                <StackOptionsParameter Mode="FrameTags" FrameTagFold="True" />
+              </Column>
+              <Column Guid="05100ece-df05-40c7-aad6-ffff99b60491" Name="Thread ID" SortPriority="11" TextAlignment="Right" Width="80" IsVisible="true" />
+              <Column Guid="842af11e-661d-477e-b7b6-556ed8181177" Name="Stack" SortPriority="6" Width="535">
+                <StackOptionsParameter FrameTagFold="True" />
+              </Column>
+              <Column Guid="ccdb05c1-04a9-4289-aaa6-a376d1d66012" Name="Module" SortPriority="7" Width="124" IsVisible="true" />
+              <Column Guid="7ad93780-708c-471c-9e3f-5a497cbefdd7" Name="Function" SortPriority="8" Width="240" IsVisible="true" />
+              <Column Guid="d0028ea0-aa66-452a-882a-616fd8b9fdce" Name="DPC/ISR" SortPriority="9" Width="184" />
+              <Column Guid="9aa2e00d-db0a-4207-a0bd-964aa492356e" Name="Address" SortPriority="10" TextAlignment="Right" Width="140" />
+              <Column Guid="cb796d44-2927-5ac1-d231-4b71904c18f5" Name="Thread Name" SortPriority="12" Width="80" />
+              <Column Guid="82ddfdff-ee93-5f35-08ac-4705069618dc" Name="Thread Activity Tag" SortPriority="13" Width="80" />
+              <Column Guid="2818954f-2d30-5569-4510-dade0a5a605c" Name="Annotation" SortPriority="14" Width="80" />
+              <Column Guid="55d56ebb-77af-4af5-a056-6122751ea093" Name="CPU" SortPriority="15" TextAlignment="Right" Width="40" />
+              <Column Guid="01a82c2c-5048-4c9d-ac37-eaf6556f6af5" Name="Count" AggregationMode="Sum" SortOrder="Descending" TextAlignment="Right" Width="60" IsVisible="true" />
+              <Column Guid="63cfb4e2-a24c-4e9d-80f2-393f03794d60" Name="Weight (in view)" AggregationMode="Sum" SortPriority="16" TextAlignment="Right" Width="100" IsVisible="true" />
+              <Column Guid="0bbf4299-0176-445e-b1d9-991df475d631" Name="TimeStamp" SortPriority="17" TextAlignment="Right" Width="100" />
+              <Column Guid="ab54241e-ce5d-4ef7-a28c-bbcb5b8d39d4" Name="Rank" SortPriority="18" TextAlignment="Right" Width="80" />
+              <Column Guid="5a1e1ba4-6a14-43e5-96eb-3b462be470fe" Name="Priority" SortPriority="19" TextAlignment="Right" Width="80" />
+              <Column Guid="f5ebf01b-f7cb-4afb-877d-c36edb2a62b6" Name="% Weight" AggregationMode="Sum" SortOrder="Descending" SortPriority="20" TextAlignment="Right" Width="80" />
+            </Columns>
+          </Preset>
+        </ModifiedPresets>
+        <PersistedPresets />
+      </GraphSchema>
+    </ModifiedGraphs>
+  </Content>
+</WpaProfileContainer>
