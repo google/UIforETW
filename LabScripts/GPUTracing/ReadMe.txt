@@ -20,5 +20,8 @@ The analysis of the traces could be done on a different machine.
 These batch files should work on Windows 7 but have actually only been tested on
 Windows 10. If somebody tests on other operating systems then they should update
 this comment for easy PR points.
+
+Details on how the export works have previously been written up at:
+https://randomascii.wordpress.com/2013/11/04/exporting-arbitrary-data-from-xperf-etl-files/
  
 * For meanings of trivial that assume years of training in the dark arts.
