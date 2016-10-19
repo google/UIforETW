@@ -1,6 +1,7 @@
 *.aps
 # wpaexporter drops these
 *.csv
+*.etl
 *.exe
 *.exp
 *.ilk
