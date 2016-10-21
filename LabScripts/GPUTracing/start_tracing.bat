@@ -23,6 +23,10 @@ set DX_Flags=DX:0x2F
 @set FileAndCompressFlags="%FileName%" -compress
 @set UserProviders=%DX_Flags%
 
+@rem Stop any previous tracing sessions that may have accidentally been left
+@rem running. Otherwise the start command will fail with incredibly cryptic
+@rem errors. Ignore all warnings because in most cases they are expected.
+@xperf -stop %SessionName% -stop 2>nul
 xperf.exe -start %logger% -on PROC_THREAD+LOADER -buffersize 1024 -minbuffers 60 -maxbuffers 60 -f "%kernelfile%" -start %SessionName% -on %UserProviders% -f "%userfile%
 @rem You have to invoke -capturestate because otherwise the ETW gnomes will not
 @rem reliably record the user-mode data to your trace. Do not anger the gnomes.
