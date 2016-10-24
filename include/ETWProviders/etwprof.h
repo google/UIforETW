@@ -98,6 +98,8 @@ PLATFORM_INTERFACE void __cdecl ETWMarkBatteryStatus(_In_z_ PCSTR powerState, fl
 // slightly noisy.
 PLATFORM_INTERFACE void __cdecl ETWMarkCPUThrottling(float initialMHz, float measuredMHz, float promisedMHz, float percentage, _In_z_ PCWSTR status);
 
+PLATFORM_INTERFACE void __cdecl ETWMarkPerfCounter(unsigned sampleNumber, _In_z_ PCWSTR pCounterName, double value);
+
 // Record CPU/package frequency, power usage, and temperature. Currently Intel only.
 PLATFORM_INTERFACE void __cdecl ETWMarkCPUFrequency(_In_z_ PCWSTR MSRName, double frequencyMHz);
 PLATFORM_INTERFACE void __cdecl ETWMarkCPUPower(_In_z_ PCWSTR MSRName, double powerW, double energymWh);
@@ -176,6 +178,7 @@ inline void ETWWorkerMarkPrintf(PCSTR, ...) {}
 inline void ETWMarkWorkingSet(PCWSTR, PCWSTR, unsigned, unsigned, unsigned, unsigned) {}
 inline void ETWMarkBatteryStatus(PCSTR, float, PCSTR) {}
 inline void ETWMarkCPUThrottling(float, float, float, float, PCWSTR) {}
+inline void ETWMarkPerfCounter(unsigned, PCWSTR, double) {}
 inline void ETWMarkCPUFrequency(PCWSTR, double) {}
 inline void ETWMarkCPUPower(PCWSTR, double, double) {}
 inline void ETWMarkCPUTemp(PCWSTR, double, double) {}

@@ -25,6 +25,10 @@ limitations under the License.
 #include <stdio.h>
 #include "ETWProviders\etwprof.h"
 
+// Disable bogus warning from incorrect annotation of vsnprintf_s
+// warning C6054: String 'buffer' might not be zero-terminated.
+#pragma warning(disable : 6054)
+
 #ifdef ETW_MARKS_ENABLED
 
 // After building the DLL if it has never been registered on this machine or
@@ -279,6 +283,11 @@ void ETWMarkBatteryStatus(_In_z_ PCSTR powerState, float batteryPercentage, _In_
 PLATFORM_INTERFACE void ETWMarkCPUThrottling(float initialMHz, float measuredMHz, float promisedMHz, float percentage, _In_z_ PCWSTR status)
 {
 	EventWriteMarkCPUThrottling(initialMHz, measuredMHz, promisedMHz, percentage, status);
+}
+
+PLATFORM_INTERFACE void __cdecl ETWMarkPerfCounter(unsigned sampleNumber, _In_z_ PCWSTR pCounterName, double value)
+{
+	EventWriteMarkPerfCounter(sampleNumber, pCounterName, value);
 }
 
 PLATFORM_INTERFACE void ETWMarkCPUFrequency(_In_z_ PCWSTR MSRName, double frequencyMHz)

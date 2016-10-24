@@ -19,6 +19,11 @@ limitations under the License.
 #include "Settings.h"
 #include "Utility.h"
 
+#include <pdh.h>
+#include <pdhmsg.h>
+
+#pragma comment(lib, "pdh.lib")
+
 /*
 When doing Chrome profilng it is possible to ask various Chrome tracing
 categories to emit ETW events. The filtered_event_group_names array
@@ -84,9 +89,9 @@ void CSettings::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_WSMONITOREDPROCESSES, btWSMonitoredProcesses_);
 	DDX_Control(pDX, IDC_EXPENSIVEWS, btExpensiveWSMonitoring_);
 	DDX_Control(pDX, IDC_EXTRAKERNELFLAGS, btExtraKernelFlags_);
-	DDX_Control(pDX, IDC_EXTRASTACKWALKS, btExtraStackwalks_);
+	DDX_Control(pDX, IDC_EXTRASTACKWALKS, btExtraStackwalks_);;
 	DDX_Control(pDX, IDC_EXTRAUSERMODEPROVIDERS, btExtraUserProviders_);
-	DDX_Control(pDX, IDC_BUFFERSIZES, btBufferSizes_);
+	DDX_Control(pDX, IDC_PERFORMANCECOUNTERS, btPerfCounters_);
 	DDX_Control(pDX, IDC_COPYSTARTUPPROFILE, btCopyStartupProfile_);
 	DDX_Control(pDX, IDC_CHROMEDEVELOPER, btChromeDeveloper_);
 	DDX_Control(pDX, IDC_AUTOVIEWTRACES, btAutoViewTraces_);
@@ -107,6 +112,7 @@ BEGIN_MESSAGE_MAP(CSettings, CDialog)
 	ON_BN_CLICKED(IDC_VIRTUALALLOCSTACKS, &CSettings::OnBnClickedVirtualallocstacks)
 	ON_BN_CLICKED(IDC_EXPENSIVEWS, &CSettings::OnBnClickedExpensivews)
 	ON_BN_CLICKED(IDC_CHECKFORNEWVERSIONS, &CSettings::OnBnClickedCheckfornewversions)
+	ON_BN_CLICKED(IDC_SELECT_PERF_COUNTERS, &CSettings::OnBnClickedSelectPerfCounters)
 END_MESSAGE_MAP()
 
 BOOL CSettings::OnInitDialog()
@@ -120,7 +126,6 @@ BOOL CSettings::OnInitDialog()
 	CheckDlgButton(IDC_VIRTUALALLOCSTACKS, bVirtualAllocStacks_);
 	CheckDlgButton(IDC_CHECKFORNEWVERSIONS, bVersionChecks_);
 
-	btBufferSizes_.EnableWindow(FALSE);
 	if (IsWindows8Point1OrGreater())
 	{
 		// The working set monitoring is not needed on Windows 8.1 and above because
@@ -142,6 +147,7 @@ BOOL CSettings::OnInitDialog()
 	btExtraKernelFlags_.SetWindowTextW(extraKernelFlags_.c_str());
 	btExtraStackwalks_.SetWindowTextW(extraKernelStacks_.c_str());
 	btExtraUserProviders_.SetWindowTextW(extraUserProviders_.c_str());
+	btPerfCounters_.SetWindowTextW(perfCounters_.c_str());
 
 	if (toolTip_.Create(this))
 	{
@@ -164,6 +170,7 @@ BOOL CSettings::OnInitDialog()
 					L"\n\"Microsoft-Windows-Audio+Microsoft-Windows-HttpLog\". See \"xperf -providers\" "
 					L"for the full list. "
 					L"Note that incorrect user providers will cause tracing to fail to start.");
+		toolTip_.AddTool(&btPerfCounters_, L"Arbitrary performance counters to be logged occasionally.");
 		toolTip_.AddTool(&btWSMonitoredProcesses_, L"Names of processes whose working sets will be "
 					L"monitored, separated by semi-colons. An empty string means no monitoring. A '*' means "
 					L"that all processes will be monitored. For instance 'chrome.exe;notepad.exe'");
@@ -217,6 +224,7 @@ void CSettings::OnOK()
 	extraKernelStacks_ = GetEditControlText(btExtraStackwalks_);
 	extraKernelFlags_ = GetEditControlText(btExtraKernelFlags_);
 	extraUserProviders_ = GetEditControlText(btExtraUserProviders_);
+	perfCounters_ = GetEditControlText(btPerfCounters_);
 
 	// Extract the Chrome categories settings and put the result in chromeKeywords_.
 	chromeKeywords_ = 0;
@@ -283,4 +291,78 @@ void CSettings::OnBnClickedExpensivews()
 void CSettings::OnBnClickedCheckfornewversions()
 {
 	bVersionChecks_ = !bVersionChecks_;
+}
+
+struct CallbackArg {
+	std::vector<std::wstring>* counters;
+	PDH_BROWSE_DLG_CONFIG* config;
+	std::vector<wchar_t> counter_names;
+};
+
+PDH_STATUS __stdcall CounterCallBack(
+	_In_ DWORD_PTR dwArg
+) {
+	CallbackArg* arg = reinterpret_cast<CallbackArg*>(dwArg);
+
+	/*
+	// The documentation suggests that this code will be used, but I have
+	// never been able to invoke it.
+	if (arg->config->CallBackStatus == PDH_MORE_DATA) {
+		arg->counter_names.resize(arg->counter_names.size() * 2); // Annoyingly, the callback does not tell us how much space is needed
+		arg->config->szReturnPathBuffer = arg->counter_names.data();
+		arg->config->cchReturnPathLength = (DWORD)arg->counter_names.size();
+		return PDH_RETRY;
+	}
+	*/
+
+	wchar_t* counters = arg->config->szReturnPathBuffer;
+	while (*counters != '\0') {
+		arg->counters->push_back(counters);
+		counters += arg->counters->back().length();
+		counters++; // Skip the null terminator to move to the first character of the next counter, or second null terminator
+	}
+	return ERROR_SUCCESS;
+}
+
+void CSettings::OnBnClickedSelectPerfCounters()
+{
+	std::vector<std::wstring> counters;
+	PDH_BROWSE_DLG_CONFIG config = {};
+	CallbackArg arg = {};
+	const size_t arbitrary_magic_buffer_size = 10000;
+	arg.counter_names.resize(arbitrary_magic_buffer_size);
+	arg.config = &config;
+	arg.counters = &counters;
+	config.bSingleCounterPerDialog = false;
+	config.bIncludeCostlyObjects = false;
+	config.bIncludeInstanceIndex = true;
+
+	// I get crashes deep inside pdhui.dll if I set this to false and select
+	// something (All Instances) that results in a wildcard. WTF?
+	config.bWildCardInstances = true;
+	config.bDisableMachineSelection = true;
+	config.szDialogBoxCaption = const_cast<wchar_t*>(L"Select performance counters");
+
+	config.hWndOwner = *this;
+
+	config.pCallBack = &CounterCallBack;
+	config.dwCallBackArg = reinterpret_cast<DWORD_PTR>(&arg);
+	config.dwDefaultDetailLevel = PERF_DETAIL_EXPERT;
+	config.szReturnPathBuffer = arg.counter_names.data();
+	config.cchReturnPathLength = (DWORD)arg.counter_names.size();;
+	// Need some way to initialize the dialog with the previous settings?
+	PDH_STATUS status = PdhBrowseCounters(&config);
+	if (status == ERROR_SUCCESS || status == PDH_DIALOG_CANCELLED)
+	{
+		std::wstring counters_string;
+		for (auto& counter : counters)
+		{
+			counters_string += counter;
+			counters_string += ';'; // I hope that is a valid separator.
+		}
+		// Trim the trailing ';'
+		if (!counters_string.empty())
+			counters_string.resize(counters_string.size() - 1);
+		SetDlgItemTextW(IDC_PERFORMANCECOUNTERS, counters_string.c_str());
+	}
 }

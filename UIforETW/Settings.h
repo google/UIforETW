@@ -39,6 +39,7 @@ public:
 	std::wstring extraKernelFlags_;
 	std::wstring extraKernelStacks_;
 	std::wstring extraUserProviders_;
+	std::wstring perfCounters_;
 	bool bChromeDeveloper_ = false;
 	bool bAutoViewTraces_ = false;
 	bool bHeapStacks_ = false;
@@ -53,7 +54,7 @@ protected:
 	CEdit btExtraKernelFlags_;
 	CEdit btExtraStackwalks_;
 	CEdit btExtraUserProviders_;
-	CComboBox btBufferSizes_;
+	CEdit btPerfCounters_;
 
 	CButton btCopyStartupProfile_;
 
@@ -85,4 +86,5 @@ public:
 	afx_msg void OnBnClickedVirtualallocstacks();
 	afx_msg void OnBnClickedExpensivews();
 	afx_msg void OnBnClickedCheckfornewversions();
+	afx_msg void OnBnClickedSelectPerfCounters();
 };

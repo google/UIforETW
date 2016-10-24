@@ -131,6 +131,7 @@ void CUIforETWDlg::TransferSettings(bool saving)
 		{ L"ExtraKernelFlags", &extraKernelFlags_ },
 		{ L"ExtraStackWalks", &extraKernelStacks_ },
 		{ L"ExtraUserProviders", &extraUserProviders_ },
+		{ L"PerfCounters", &perfCounters_ },
 	};
 
 	for (auto& m : strings)

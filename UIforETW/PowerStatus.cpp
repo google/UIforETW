@@ -29,6 +29,10 @@ limitations under the License.
 #include <Poclass.h>
 #include <Batclass.h>
 
+#include <pdh.h>
+#include <pdhmsg.h>
+#include <winperf.h>
+
 #pragma comment(lib, "setupapi.lib")
 
 // This sampling frequency leads to roughly 20 context switches per second, which is
@@ -348,8 +352,34 @@ DWORD __stdcall CPowerStatusMonitor::StaticPowerMonitorThread(LPVOID param)
 	return 0;
 }
 
+struct Counter {
+	explicit Counter(std::wstring counter_name) : name(counter_name) {}
+	std::wstring name;
+	PDH_HCOUNTER handle;
+};
+
 void CPowerStatusMonitor::PowerMonitorThread()
 {
+	std::vector<Counter> counters;
+
+	PDH_HQUERY query = nullptr;
+	if (!perfCounters_.empty())
+	{
+		PdhOpenQuery(nullptr, NULL, &query);
+
+		for (auto& counter_name : split(perfCounters_, ';'))
+			counters.push_back(Counter(counter_name));
+
+		for (Counter& counter : counters) {
+			PdhAddCounter(query, counter.name.c_str(), NULL, &counter.handle);
+		}
+
+		// Do an initial query and discard the results - most counters only return
+		// valid data on subsequent queries.
+		PdhCollectQueryData(query);
+	}
+
+	unsigned sampleNumber = 0;
 	for (;;)
 	{
 		DWORD result = WaitForSingleObject(hExitEvent_, kSamplingInterval);
@@ -359,7 +389,28 @@ void CPowerStatusMonitor::PowerMonitorThread()
 		SampleBatteryStat();
 		SampleCPUPowerState();
 		SampleTimerState();
+
+		if (query)
+		{
+			PdhCollectQueryData(query);
+			for (const Counter& counter : counters)
+			{
+				DWORD counter_type = 0;
+				PDH_FMT_COUNTERVALUE value = {};
+				PDH_STATUS pdh_result = PdhGetFormattedCounterValue(counter.handle, PDH_FMT_DOUBLE, &counter_type, &value);
+				if (pdh_result == ERROR_SUCCESS)
+				{
+					//debugPrintf(L"Value for %s is %f\n", counter.name.c_str(), value.doubleValue);
+					ETWMarkPerfCounter(sampleNumber, counter.name.c_str(), value.doubleValue);
+				}
+				else
+					debugPrintf(L"Failure code %08x for %s\n", pdh_result, counter.name.c_str());
+			}
+		}
+		++sampleNumber;
 	}
+
+	PdhCloseQuery(query);
 }
 
 CPowerStatusMonitor::CPowerStatusMonitor()
@@ -408,6 +459,16 @@ void CPowerStatusMonitor::ClearEnergyLibFunctionPointers()
 	GetMsrFunc = nullptr;
 	GetPowerData = nullptr;
 	ReadSample = nullptr;
+}
+
+void CPowerStatusMonitor::SetPerfCounters(std::wstring& perfCounters)
+{
+	// Make sure threads aren't running!
+	UIETWASSERT(!hThread_);
+	if (!hThread_)
+	{
+		perfCounters_ = perfCounters;
+	}
 }
 
 void CPowerStatusMonitor::StartThreads()

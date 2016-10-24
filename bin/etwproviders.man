@@ -168,6 +168,10 @@ Adjust that to match your games actual install path.
             <data inType="win:Float" name="Percentage"/>
             <data inType="win:UnicodeString" name="Status"/>
           </template>
+          <template tid="T_PerfCounter">
+            <data inType="win:UnicodeString" name="Counter name" />
+            <data inType="win:Double" name="Value" />
+          </template>"
         </templates>
         <keywords>
           <keyword name="HighFrequency" mask="0x2" />
@@ -190,6 +194,7 @@ Adjust that to match your games actual install path.
           <task name="TempStatus" symbol="TempStatus_Task" value="7" eventGUID="{D94A8004-28EF-467E-98E2-12B00E3DC1EE}"/>
           <task name="TimerStatus" symbol="TimerStatus_Task" value="8" eventGUID="{F8B8947D-1201-4674-95A5-E1FC60AD92E1}"/>
           <task name="ThrottlingStatus" symbol="ThrottlingStatus_Task" value="9" eventGUID="{49D92EB0-A3D4-4140-B5E1-D12EE17410DB}"/>
+          <task name="PerfCounter" symbol="PerfCounter_Task" value="10" eventGUID="{7E0A80DB-4DCD-44F4-ABF8-2FA402E68783}"/>
         </tasks>
         <events>
           <event symbol="Start" template="T_Start" value="100" task="Block" opcode="Begin" keywords="NormalFrequency" />
@@ -212,6 +217,7 @@ Adjust that to match your games actual install path.
           <event symbol="Mark4F" template="T_Mark4F" value="117" task="Block" opcode="Mark" keywords="NormalFrequency" />
           <event symbol="Mark3I" template="T_Mark3I" value="118" task="Block" opcode="Mark" keywords="NormalFrequency" />
           <event symbol="Mark4I" template="T_Mark4I" value="119" task="Block" opcode="Mark" keywords="NormalFrequency" />
+          <event symbol="PerfCounter" template="T_PerfCounter" value="120" task="PerfCounter" keywords="NormalFrequency" />
         </events>
       </provider>
 

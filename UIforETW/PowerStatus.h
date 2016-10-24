@@ -31,6 +31,10 @@ public:
 	CPowerStatusMonitor();
 	~CPowerStatusMonitor();
 
+	// Tell the system which perf counters (if any) to monitor. Only call
+	// this when the threads are stopped.
+	void SetPerfCounters(std::wstring& perfCounters);
+
 	// Start and stop the sampling threads so that they aren't running
 	// when tracing is not running.
 	void StartThreads();
@@ -56,6 +60,8 @@ private:
 	GetPowerData_t GetPowerData = nullptr;
 	ReadSample_t ReadSample = nullptr;
 	int maxTemperature_ = 0;
+
+	std::wstring perfCounters_;
 
 	CPowerStatusMonitor& operator=(const CPowerStatusMonitor&) = delete;
 	CPowerStatusMonitor(const CPowerStatusMonitor&) = delete;

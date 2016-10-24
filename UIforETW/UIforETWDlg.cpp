@@ -445,7 +445,7 @@ BOOL CUIforETWDlg::OnInitDialog()
 					L"then WPT will be automatically installed. Exiting.").c_str());
 		}
 		else
-		{
+		{ 
 			if (xperfVersion)
 				AfxMessageBox((GetXperfPath() + L" must be version 10.0.10586.15 or higher. You'll need to find the installer in the Windows "
 					L"Windows 10 SDK or you can xcopy install it. Exiting.").c_str());
@@ -868,6 +868,7 @@ void CUIforETWDlg::StartEventThreads()
 	SetTimer(kTimerID, 30000, nullptr);
 
 	CPUFrequencyMonitor_.StartThreads();
+	PowerMonitor_.SetPerfCounters(perfCounters_);
 	PowerMonitor_.StartThreads();
 	workingSetThread_.StartThreads();
 }
@@ -1728,6 +1729,7 @@ void CUIforETWDlg::OnBnClickedSettings()
 	dlgSettings.extraKernelFlags_ = extraKernelFlags_;
 	dlgSettings.extraKernelStacks_ = extraKernelStacks_;
 	dlgSettings.extraUserProviders_ = extraUserProviders_;
+	dlgSettings.perfCounters_ = perfCounters_;
 	dlgSettings.bChromeDeveloper_ = bChromeDeveloper_;
 	dlgSettings.bAutoViewTraces_ = bAutoViewTraces_;
 	dlgSettings.bHeapStacks_ = bHeapStacks_;
@@ -1763,6 +1765,7 @@ void CUIforETWDlg::OnBnClickedSettings()
 		extraKernelFlags_ = dlgSettings.extraKernelFlags_;
 		extraKernelStacks_ = dlgSettings.extraKernelStacks_;
 		extraUserProviders_ = dlgSettings.extraUserProviders_;
+		perfCounters_ = dlgSettings.perfCounters_;
 		workingSetThread_.SetProcessFilter(WSMonitoredProcesses_, bExpensiveWSMonitoring_);
 
 		bAutoViewTraces_ = dlgSettings.bAutoViewTraces_;
