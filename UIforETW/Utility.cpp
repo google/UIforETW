@@ -19,7 +19,8 @@ limitations under the License.
 #include <fstream>
 #include <direct.h>
 #include <ShlObj.h>
-
+#include <atlbase.h>
+#include <Shellapi.h>
 
 namespace {
 PCWSTR const kWPAStartupFileName = L"Startup.wpaProfile";
@@ -894,6 +895,8 @@ void CloseValidHandle(_In_ _Pre_valid_ _Post_ptr_invalid_ const HANDLE handle)
 	ATLVERIFY(::CloseHandle(handle) != 0);
 }
 
+#ifdef IS_MFC_APP
+// Put MFC specific code here
 void MoveControl(CWnd* pParent, CWnd& control, int xDelta, int yDelta)
 {
 	const UINT flags = SWP_NOSIZE | SWP_NOOWNERZORDER | SWP_NOZORDER | SWP_NOACTIVATE;
@@ -903,3 +906,4 @@ void MoveControl(CWnd* pParent, CWnd& control, int xDelta, int yDelta)
 	pParent->ScreenToClient(&p);
 	control.SetWindowPos(nullptr, p.x + xDelta, p.y + yDelta, 0, 0, flags);
 }
+#endif

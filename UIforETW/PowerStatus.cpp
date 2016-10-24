@@ -34,6 +34,8 @@ limitations under the License.
 #include <winperf.h>
 
 #pragma comment(lib, "setupapi.lib")
+#pragma comment(lib, "pdh.lib")
+
 
 // This sampling frequency leads to roughly 20 context switches per second, which is
 // perhaps okay when tracing but must be avoided when tracing is not running.

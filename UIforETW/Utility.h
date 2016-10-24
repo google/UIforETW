@@ -141,4 +141,7 @@ void CopyStartupProfiles(const std::wstring& exeDir, bool force);
 
 void CloseValidHandle(_In_ _Pre_valid_ _Post_ptr_invalid_ HANDLE handle);
 
+#ifdef IS_MFC_APP
+// Put MFC specific code here
 void MoveControl(CWnd* pParent, CWnd& control, int xDelta, int yDelta);
+#endif

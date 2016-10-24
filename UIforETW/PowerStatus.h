@@ -16,6 +16,8 @@ limitations under the License.
 
 #pragma once
 
+#include <string>
+
 // https://software.intel.com/en-us/blogs/2012/12/13/using-the-intel-power-gadget-api-on-mac-os-x
 typedef int(*IntelEnergyLibInitialize_t)();
 typedef int(*GetNumMsrs_t)(int* nMsr);
