@@ -21,7 +21,7 @@ set DX_Flags=DX:0x2F
 @set SessionName=usersession
 @set FileName=trace.etl
 @set FileAndCompressFlags="%FileName%" -compress
-@set UserProviders=%DX_Flags%
+@set UserProviders=%DX_Flags%+Microsoft-Windows-Win32k:0xfdffffffefffffff+Multi-MAIN+Multi-FrameRate+Multi-Input+Multi-Worker+Microsoft-Windows-Kernel-Memory:0xE0
 
 @rem Stop any previous tracing sessions that may have accidentally been left
 @rem running. Otherwise the start command will fail with incredibly cryptic
