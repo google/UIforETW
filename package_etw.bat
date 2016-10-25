@@ -63,6 +63,12 @@ rmdir x64\Release /s/q
 del UIforETWStatic.vcxproj
 del UIforETWStatic.sln
 
+cd %UIforETW%\EventEmitter
+devenv /rebuild "Release|x86" EventEmitter.sln
+@if ERRORLEVEL 1 goto BuildFailure
+devenv /rebuild "Release|x64" EventEmitter.sln
+@if ERRORLEVEL 1 goto BuildFailure
+
 xcopy %UIforETW%CONTRIBUTING %destdir%
 xcopy %UIforETW%CONTRIBUTORS %destdir%
 xcopy %UIforETW%AUTHORS %destdir%
@@ -79,8 +85,14 @@ echo >%destdir%\bin\UIforETW.exe
 echo >%destdir%\bin\UIforETW32.exe
 xcopy %UIforETW%bin\UIforETWStatic_devrel32.exe %destdir%\bin\UIforETW32.exe /y
 xcopy %UIforETW%bin\UIforETWStatic_devrel.exe %destdir%\bin\UIforETW.exe /y
+xcopy %UIforETW%bin\EventEmitter.exe %destdir%\bin /y
+xcopy %UIforETW%bin\EventEmitter64.exe %destdir%\bin /y
 @rem Copy the official binaries back to the local copy, for development purposes.
 xcopy /exclude:%UIforETW%excludecopy.txt %destdir%\bin\UIforETW*.exe %UIforETW%bin /y
+@if ERRORLEVEL 1 goto BuildFailure
+
+@rem Grab all of the lab scripts
+xcopy /exclude:%UIforETW%excludecopy.txt %UIforETW%LabScripts %destdir%\LabScripts /y /i /s
 @if ERRORLEVEL 1 goto BuildFailure
 
 xcopy %UIforETW%\bin\UIforETWStatic_devrel*.pdb %symboldir%

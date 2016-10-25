@@ -1,7 +1,7 @@
 .aps
 
 .csv
-
+.etl
 .exp
 .ilk
 .opensdf
@@ -22,3 +22,6 @@ present.txt
 .gitignore
 _dev
 flamegraph.pl
+
+.iobj
+.ipdb
