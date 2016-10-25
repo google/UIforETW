@@ -133,6 +133,56 @@ private:
 	LARGE_INTEGER start_;
 };
 
+// Lock and locker classes, to avoid using the MFC classes which
+// bloat non-MFC apps.
+class CriticalSection
+{
+public:
+	CriticalSection()
+	{
+		InitializeCriticalSection(&cs_);
+	}
+	~CriticalSection()
+	{
+		DeleteCriticalSection(&cs_);
+	}
+
+	void Lock()
+	{
+		EnterCriticalSection(&cs_);
+	}
+	void Unlock()
+	{
+		LeaveCriticalSection(&cs_);
+	}
+
+private:
+	CRITICAL_SECTION cs_;
+
+	CriticalSection(const CriticalSection&) = delete;
+	CriticalSection& operator=(const CriticalSection&) = delete;
+};
+
+class Locker
+{
+public:
+	Locker(CriticalSection* lock)
+		: lock_(lock)
+	{
+		lock_->Lock();
+	}
+	~Locker()
+	{
+		lock_->Unlock();
+	}
+
+private:
+	CriticalSection* lock_;
+
+	Locker(const Locker&) = delete;
+	Locker& operator=(const Locker&) = delete;
+};
+
 std::wstring GetEXEBuildTime();
 
 void SetCurrentThreadName(PCSTR threadName);

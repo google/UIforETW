@@ -9,11 +9,8 @@
 
 #define WIN32_LEAN_AND_MEAN             // Exclude rarely-used stuff from Windows headers
 
-// Needed just for CCriticalSection and CSingleLock. Uggh.
-#include <afxmt.h>
-
 // Windows Header Files:
-//#include <windows.h>
+#include <windows.h>
 #include <VersionHelpers.h>
 
 // C RunTime Header Files

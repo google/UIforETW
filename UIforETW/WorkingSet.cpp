@@ -30,7 +30,7 @@ const DWORD kSamplingInterval = 1000;
 
 void CWorkingSetMonitor::SampleWorkingSets()
 {
-	CSingleLock locker(&processesLock_);
+	Locker locker(&processesLock_);
 	if (processes_.empty() && !processAll_)
 		return;
 
@@ -224,7 +224,7 @@ void CWorkingSetMonitor::SetProcessFilter(const std::wstring& processes, bool bE
 	// full working set of 64-bit processes, so don't even try.
 	if (Is64BitWindows() && !Is64BitBuild())
 		return;
-	CSingleLock locker(&processesLock_);
+	Locker locker(&processesLock_);
 	if (processes == L"*")
 	{
 		processAll_ = true;

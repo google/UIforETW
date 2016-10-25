@@ -181,6 +181,7 @@
     <ClInclude Include="..\UIforETW\CPUFrequency.h" />
     <ClInclude Include="..\UIforETW\KeyLoggerThread.h" />
     <ClInclude Include="..\UIforETW\PowerStatus.h" />
+    <ClInclude Include="..\UIforETW\Utility.h" />
     <ClInclude Include="..\UIforETW\WorkingSet.h" />
     <ClInclude Include="EventEmitter.h" />
     <ClInclude Include="Resource.h" />

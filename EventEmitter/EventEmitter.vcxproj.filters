@@ -42,6 +42,9 @@
     <ClInclude Include="..\UIforETW\WorkingSet.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\UIforETW\Utility.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">

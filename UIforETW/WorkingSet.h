@@ -18,6 +18,7 @@ limitations under the License.
 
 #include <vector>
 #include <string>
+#include "Utility.h"
 
 class CWorkingSetMonitor
 {
@@ -44,7 +45,7 @@ private:
 	HANDLE hThread_ = nullptr;
 	HANDLE hExitEvent_ = nullptr;
 
-	CCriticalSection processesLock_;
+	CriticalSection processesLock_;
 	// This is a list of process names to monitor. If the list is
 	// empty then no processes are monitored. If this list has one
 	// entry that is '*' then all processes are monitored. Otherwise
