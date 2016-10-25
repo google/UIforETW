@@ -1,6 +1,8 @@
 @setlocal
 
 xperf -stop %SessionName% -stop
+@rem Stop the event emitter process, if running.
+%~dp0..\..\bin\EventEmitter.exe -kill
 
 xperf -merge "%kernelfile%" "%userfile%" %FileAndCompressFlags%
 

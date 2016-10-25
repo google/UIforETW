@@ -23,10 +23,16 @@ set DX_Flags=DX:0x2F
 @set FileAndCompressFlags="%FileName%" -compress
 @set UserProviders=%DX_Flags%+Microsoft-Windows-Win32k:0xfdffffffefffffff+Multi-MAIN+Multi-FrameRate+Multi-Input+Multi-Worker+Microsoft-Windows-Kernel-Memory:0xE0
 
+@rem Stop any previous event emitter binaries
+@%~dp0..\..\bin\EventEmitter.exe -kill
 @rem Stop any previous tracing sessions that may have accidentally been left
 @rem running. Otherwise the start command will fail with incredibly cryptic
 @rem errors. Ignore all warnings because in most cases they are expected.
 @xperf -stop %SessionName% -stop 2>nul
+@rem Start emitting ETW events for the tracing to record.
+@if not exist %~dp0..\..\bin\EventEmitter.exe goto SkipEventEmitting
+start %~dp0..\..\bin\EventEmitter.exe
+:SkipEventEmitting
 xperf.exe -start %logger% -on PROC_THREAD+LOADER -buffersize 1024 -minbuffers 60 -maxbuffers 60 -f "%kernelfile%" -start %SessionName% -on %UserProviders% -f "%userfile%
 @rem You have to invoke -capturestate because otherwise the ETW gnomes will not
 @rem reliably record the user-mode data to your trace. Do not anger the gnomes.
