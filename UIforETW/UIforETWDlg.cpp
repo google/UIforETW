@@ -956,9 +956,22 @@ void CUIforETWDlg::OnBnClickedStarttracing()
 
 	// DWM providers can be helpful also. Uncomment to enable.
 	//userProviders += L"+Microsoft-Windows-Dwm-Dwm";
-	// Theoretically better power monitoring data, Windows 7+, but it doesn't
-	// seem to work.
-	//userProviders += L"+Microsoft-Windows-Kernel-Processor-Power+Microsoft-Windows-Kernel-Power";
+
+	// Monitoring of timer frequency changes from timeBeginPeriod and
+	// NtSetTimerResolution. Windows 7 and above.
+	// Like most providers the information provide by this one is undocumented and
+	// therefore only easily usable by those who created it. However, a bit of
+	// exploration will find useful information. The timer changes are contained
+	// in events such as SystemTimeResolutionChange and SystemTimeResolutionKernelChange
+	// for changes by normal processes and the kernel.
+	// The "Randomascii System Time Resolution" preset for the Generic Events is set up
+	// with a filter to show just these events. To configure this filtering I used the
+	// View Editor, Advanced, and the syntax that is lightly documented here:
+	// https://msdn.microsoft.com/en-us/windows/hardware/commercialize/test/wpt/wpa-query-syntax
+	// Look at SystemTimeResolutionChange and SystemTimeResolutionKernelChange, and in
+	// particular at the RequestedResolution field (units are 0.1 microseconds, so 
+	// 0x2710 == 10,000 = 1 ms).
+	userProviders += L"+Microsoft-Windows-Kernel-Power";
 
 	// If the Chrome providers were successfully registered and if the user has requested tracing
 	// some of Chrome's categories (keywords/flags) then add chrome:flags to the list of user
