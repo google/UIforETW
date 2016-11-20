@@ -1743,6 +1743,7 @@ void CUIforETWDlg::OnBnClickedSettings()
 	dlgSettings.extraKernelStacks_ = extraKernelStacks_;
 	dlgSettings.extraUserProviders_ = extraUserProviders_;
 	dlgSettings.perfCounters_ = perfCounters_;
+	dlgSettings.bUseOtherKernelLogger_ = bUseOtherKernelLogger_;
 	dlgSettings.bChromeDeveloper_ = bChromeDeveloper_;
 	dlgSettings.bAutoViewTraces_ = bAutoViewTraces_;
 	dlgSettings.bHeapStacks_ = bHeapStacks_;
@@ -1773,6 +1774,7 @@ void CUIforETWDlg::OnBnClickedSettings()
 		}
 
 		// Copy over the remaining settings.
+		bUseOtherKernelLogger_ = dlgSettings.bUseOtherKernelLogger_;
 		WSMonitoredProcesses_ = dlgSettings.WSMonitoredProcesses_;
 		bExpensiveWSMonitoring_ = dlgSettings.bExpensiveWSMonitoring_;
 		extraKernelFlags_ = dlgSettings.extraKernelFlags_;

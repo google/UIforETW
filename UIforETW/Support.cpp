@@ -64,6 +64,7 @@ void CUIforETWDlg::TransferSettings(bool saving)
 		{ L"GPUTracing", &bGPUTracing_ },
 		{ L"CLRTracing", &bCLRTracing_ },
 		{ L"ShowCommands", &bShowCommands_ },
+		{ L"UseOtherKernelLogger", &bUseOtherKernelLogger_ },
 		{ L"ChromeDeveloper", &bChromeDeveloper_ },
 		{ L"AutoViewTraces", &bAutoViewTraces_ },
 		{ L"HeapStacks", &bHeapStacks_ },

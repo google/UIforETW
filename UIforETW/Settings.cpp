@@ -85,6 +85,7 @@ CSettings::~CSettings()
 
 void CSettings::DoDataExchange(CDataExchange* pDX)
 {
+	// This is needed to get tooltips working.
 	DDX_Control(pDX, IDC_HEAPEXE, btHeapTracingExe_);
 	DDX_Control(pDX, IDC_WSMONITOREDPROCESSES, btWSMonitoredProcesses_);
 	DDX_Control(pDX, IDC_EXPENSIVEWS, btExpensiveWSMonitoring_);
@@ -93,6 +94,7 @@ void CSettings::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_EXTRAUSERMODEPROVIDERS, btExtraUserProviders_);
 	DDX_Control(pDX, IDC_PERFORMANCECOUNTERS, btPerfCounters_);
 	DDX_Control(pDX, IDC_COPYSTARTUPPROFILE, btCopyStartupProfile_);
+	DDX_Control(pDX, IDC_USE_OTHER_KERNEL_LOGGER, btUseOtherKernelLogger_);
 	DDX_Control(pDX, IDC_CHROMEDEVELOPER, btChromeDeveloper_);
 	DDX_Control(pDX, IDC_AUTOVIEWTRACES, btAutoViewTraces_);
 	DDX_Control(pDX, IDC_HEAPSTACKS, btHeapStacks_);
@@ -113,6 +115,7 @@ BEGIN_MESSAGE_MAP(CSettings, CDialog)
 	ON_BN_CLICKED(IDC_EXPENSIVEWS, &CSettings::OnBnClickedExpensivews)
 	ON_BN_CLICKED(IDC_CHECKFORNEWVERSIONS, &CSettings::OnBnClickedCheckfornewversions)
 	ON_BN_CLICKED(IDC_SELECT_PERF_COUNTERS, &CSettings::OnBnClickedSelectPerfCounters)
+	ON_BN_CLICKED(IDC_USE_OTHER_KERNEL_LOGGER, &CSettings::OnBnClickedUseOtherKernelLogger)
 END_MESSAGE_MAP()
 
 BOOL CSettings::OnInitDialog()
@@ -120,6 +123,7 @@ BOOL CSettings::OnInitDialog()
 	CDialog::OnInitDialog();
 
 	SetDlgItemText(IDC_HEAPEXE, heapTracingExes_.c_str());
+	CheckDlgButton(IDC_USE_OTHER_KERNEL_LOGGER, bUseOtherKernelLogger_);
 	CheckDlgButton(IDC_CHROMEDEVELOPER, bChromeDeveloper_);
 	CheckDlgButton(IDC_AUTOVIEWTRACES, bAutoViewTraces_);
 	CheckDlgButton(IDC_HEAPSTACKS, bHeapStacks_);
@@ -181,6 +185,8 @@ BOOL CSettings::OnInitDialog()
 		toolTip_.AddTool(&btCopyStartupProfile_, L"Copies startup.wpaProfile files for WPA 8.1 and "
 					L"10 to the appropriate destinations so that the next time WPA starts up it will have "
 					L"reasonable analysis defaults.");
+		toolTip_.AddTool(&btUseOtherKernelLogger_, L"Check this to have UIforETW use the alternate kernel "
+					L"logger. This is needed on some machines where the main kernel logger is in use.");
 		toolTip_.AddTool(&btChromeDeveloper_, L"Check this to enable Chrome specific behavior such as "
 					L"setting the Chrome symbol server path, and preprocessing of Chrome symbols and "
 					L"traces.");
@@ -365,4 +371,10 @@ void CSettings::OnBnClickedSelectPerfCounters()
 			counters_string.resize(counters_string.size() - 1);
 		SetDlgItemTextW(IDC_PERFORMANCECOUNTERS, counters_string.c_str());
 	}
+}
+
+
+void CSettings::OnBnClickedUseOtherKernelLogger()
+{
+	bUseOtherKernelLogger_ = !bUseOtherKernelLogger_;
 }

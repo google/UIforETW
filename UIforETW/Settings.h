@@ -40,6 +40,7 @@ public:
 	std::wstring extraKernelStacks_;
 	std::wstring extraUserProviders_;
 	std::wstring perfCounters_;
+	bool bUseOtherKernelLogger_ = false;
 	bool bChromeDeveloper_ = false;
 	bool bAutoViewTraces_ = false;
 	bool bHeapStacks_ = false;
@@ -58,6 +59,7 @@ protected:
 
 	CButton btCopyStartupProfile_;
 
+	CButton btUseOtherKernelLogger_;
 	CButton btChromeDeveloper_;
 	CButton btAutoViewTraces_;
 	CButton btHeapStacks_;
@@ -87,4 +89,5 @@ public:
 	afx_msg void OnBnClickedExpensivews();
 	afx_msg void OnBnClickedCheckfornewversions();
 	afx_msg void OnBnClickedSelectPerfCounters();
+	afx_msg void OnBnClickedUseOtherKernelLogger();
 };

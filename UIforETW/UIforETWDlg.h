@@ -193,9 +193,10 @@ private:
 	std::wstring GetHeapFile() const { return GetTempTraceDir() + L"heap.etl"; }
 
 	// Get session name for kernel logger
-	const std::wstring kernelLogger_ = L"\"NT Kernel Logger\"";
-	//const std::wstring logger_ = L"\"Circular Kernel Context Logger\"";
-	std::wstring GetKernelLogger() const { return kernelLogger_; }
+	const std::wstring NTKernelLogger_ = L"\"NT Kernel Logger\"";
+	const std::wstring CircularKernellogger_ = L"\"Circular Kernel Context Logger\"";
+	bool bUseOtherKernelLogger_ = false;
+	std::wstring GetKernelLogger() const { return bUseOtherKernelLogger_ ? CircularKernellogger_ : NTKernelLogger_; }
 
 	int initialWidth_ = 0;
 	int initialHeight_ = 0;
