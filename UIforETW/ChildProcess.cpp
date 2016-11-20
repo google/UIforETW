@@ -22,8 +22,8 @@ limitations under the License.
 
 static const wchar_t* kPipeName = L"\\\\.\\PIPE\\UIforETWPipe";
 
-ChildProcess::ChildProcess(std::wstring exePath)
-	: exePath_(std::move(exePath))
+ChildProcess::ChildProcess(std::wstring exePath, bool printFailedExitCodes)
+	: exePath_(std::move(exePath)), printFailedExitCodes_(printFailedExitCodes)
 {
 	// Create the pipe here so that it is guaranteed to be created before
 	// we try starting the process.
@@ -44,8 +44,9 @@ ChildProcess::~ChildProcess()
 {
 	if (hProcess_)
 	{
+		// Always get the exit code since this also waits for the process to exit.
 		DWORD exitCode = GetExitCode();
-		if (exitCode)
+		if (printFailedExitCodes_ && exitCode)
 			outputPrintf(L"Process exit code was %08x (%lu)\n", exitCode, exitCode);
 		CloseHandle(hProcess_);
 	}

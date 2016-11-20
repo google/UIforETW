@@ -188,9 +188,9 @@ private:
 	// the same result across multiple calls!
 	std::wstring GenerateResultFilename() const;
 	std::wstring GetTempTraceDir() const { return tempTraceDir_; }
-	std::wstring GetKernelFile() const { return CUIforETWDlg::GetTempTraceDir() + L"kernel.etl"; }
-	std::wstring GetUserFile() const { return GetTempTraceDir() + L"user.etl"; }
-	std::wstring GetHeapFile() const { return GetTempTraceDir() + L"heap.etl"; }
+	std::wstring GetKernelFile() const { return CUIforETWDlg::GetTempTraceDir() + L"UIForETWkernel.etl"; }
+	std::wstring GetUserFile() const { return GetTempTraceDir() + L"UIForETWuser.etl"; }
+	std::wstring GetHeapFile() const { return GetTempTraceDir() + L"UIForETWheap.etl"; }
 
 	// Get session name for kernel logger
 	const std::wstring NTKernelLogger_ = L"\"NT Kernel Logger\"";

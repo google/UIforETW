@@ -898,6 +898,15 @@ void CUIforETWDlg::OnBnClickedStarttracing()
 	else
 		UIETWASSERT(0);
 
+	{
+		// Force any existing sessions to stop. This makes starting tracing much more robust.
+		// Never show the commands executing, and never print the exit code.
+		ChildProcess child(GetXperfPath(), false);
+		child.Run(false, L"xperf.exe -stop UIforETWHeapSession -stop UIforETWSession -stop " + GetKernelLogger());
+		// Swallow all of the output so that the normal failures will be silent.
+		child.GetOutput();
+	}
+
 	std::wstring kernelProviders = L" Latency+POWER+DISPATCHER+DISK_IO_INIT+FILE_IO+FILE_IO_INIT+VIRT_ALLOC+MEMINFO";
 	if (!extraKernelFlags_.empty())
 		kernelProviders += L"+" + extraKernelFlags_;
@@ -1030,7 +1039,7 @@ void CUIforETWDlg::OnBnClickedStarttracing()
 	std::wstring heapStackWalk;
 	if (bHeapStacks_)
 		heapStackWalk = L" -stackwalk HeapCreate+HeapDestroy+HeapAlloc+HeapRealloc";
-	std::wstring heapArgs = L" -start xperfHeapSession -heap -Pids 0" + heapStackWalk + heapBuffers + heapFile;
+	std::wstring heapArgs = L" -start UIforETWHeapSession -heap -Pids 0" + heapStackWalk + heapBuffers + heapFile;
 
 	DWORD exitCode = 0;
 	bool started = true;
@@ -1158,7 +1167,7 @@ void CUIforETWDlg::StopTracingAndMaybeRecord(bool bSaveTrace)
 			if (tracingMode_ == kHeapTracingToFile)
 			{
 				ETWMark("Tracing type was heap tracing to file.");
-				child.Run(bShowCommands_, L"xperf.exe -stop xperfHeapSession -stop UIforETWSession -stop " + GetKernelLogger());
+				child.Run(bShowCommands_, L"xperf.exe -stop UIforETWHeapSession -stop UIforETWSession -stop " + GetKernelLogger());
 			}
 			else
 			{
@@ -1430,7 +1439,7 @@ void CUIforETWDlg::UpdateTraceList()
 	tempTraces.insert(tempTraces.end(), tempZips.begin(), tempZips.end());
 	std::sort(tempTraces.begin(), tempTraces.end());
 	// Function to stop the temporary traces from showing up.
-	auto ifInvalid = [](const std::wstring& name) { return name == L"kernel.etl" || name == L"user.etl" || name == L"heap.etl"; };
+	auto ifInvalid = [](const std::wstring& name) { return name == L"UIForETWkernel.etl" || name == L"UIForETWuser.etl" || name == L"UIForETWheap.etl"; };
 	tempTraces.erase(std::remove_if(tempTraces.begin(), tempTraces.end(), ifInvalid), tempTraces.end());
 	for (auto& name : tempTraces)
 	{

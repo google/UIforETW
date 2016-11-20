@@ -32,7 +32,7 @@ limitations under the License.
 class ChildProcess
 {
 public:
-	ChildProcess(std::wstring exePath);
+	ChildProcess(std::wstring exePath, bool printFailedExitCodes = true);
 	// This waits for the child process to terminate, and prints
 	// output with outputPrintf as it arrives.
 	~ChildProcess();
@@ -56,6 +56,9 @@ public:
 private:
 	// Path to the executable to be run, and its process handle.
 	std::wstring exePath_;
+
+	bool printFailedExitCodes_ = true;
+
 	// Process, thread, and event handles have an uninitialized state
 	// of zero. Pipes and files have an uninitialized state of
 	// INVALID_HANDLE_VALUE. Yay Windows!
