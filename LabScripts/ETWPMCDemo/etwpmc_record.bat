@@ -67,4 +67,4 @@ tracelog.exe -start pmc_counters -f pmc_counter_test.etl -eflag CSWITCH+PROC_THR
 xperf -stop pmc_counters >nul
 xperf -merge pmc_counter_test.etl pmc_counters_test_merged.etl
 xperf -i pmc_counters_test_merged.etl -o pmc_counters_test.txt
-python etwpmc_parser.py ConditionalCount
+python etwpmc_parser.py pmc_counters_test.txt ConditionalCount

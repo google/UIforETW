@@ -64,7 +64,17 @@ Error: Description for thread state (9) could not be found. Thread state array o
 
 import sys
 
-l = open("pmc_counters_test.txt").readlines()
+if len(sys.argv) <= 1:
+  print 'Usage: %s xperfoutput [processname]' % sys.argv[0]
+  print 'The first parameter is the name of a file containing the results'
+  print 'of "xperf -i trace.etl". The second (optional) parameter is a'
+  print 'process name substring filter used to restrict which results are'
+  print 'shown - only processes that match are displayed.'
+  sys.exit(0)
+
+xperfoutputfilename = sys.argv[1]
+
+l = open(xperfoutputfilename).readlines()
 
 # Scan through the counter data looking for Pmc and CSwitch records.
 # If adjacent records are found that contain Pmc and CSwitch data then
@@ -131,5 +141,6 @@ print "%43s: counter1/counter2, counters" % "Process name"
 for process in countersByProcess.keys():
   totals = countersByProcess[process]
   if totals[0] > 100000: # Arbitrary filtering
-    if len(sys.argv) == 1 or process.lower().count(sys.argv[1].lower()) > 0:
+    # Filter to the specific process substring if requested.
+    if len(sys.argv) == 2 or process.lower().count(sys.argv[2].lower()) > 0:
       print "%43s: %5.2f%%, %s, %d context switches, time: %d" % (process, totals[0] * 100.0 / totals[1], totals, contextSwitchesByProcess[process], cpuTimeByProcess[process])
