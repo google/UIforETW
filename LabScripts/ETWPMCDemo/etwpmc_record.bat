@@ -23,6 +23,7 @@ if exist "C:\Program Files (x86)\Windows Kits\10\bin\x64\tracelog.exe" goto trac
 
 @set batchdir=%~dp0
 @set demo_app=%batchdir%ConditionalCount\Release\ConditionalCount.exe
+@set demo_app_name=ConditionalCount
 
 @if exist "%demo_app%" goto demo_exists
 @echo Please build the release configuration of ConditionalCount.exe. It needs
@@ -67,4 +68,4 @@ tracelog.exe -start pmc_counters -f pmc_counter_test.etl -eflag CSWITCH+PROC_THR
 xperf -stop pmc_counters >nul
 xperf -merge pmc_counter_test.etl pmc_counters_test_merged.etl
 xperf -i pmc_counters_test_merged.etl -o pmc_counters_test.txt
-python etwpmc_parser.py pmc_counters_test.txt ConditionalCount
+python %batchdir%etwpmc_parser.py pmc_counters_test.txt %demo_app_name%
