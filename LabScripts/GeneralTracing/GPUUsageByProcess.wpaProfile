@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<WpaProfileContainer xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Version="2" xmlns="http://tempuri.org/SerializableElement.xsd">
+  <Content xsi:type="WpaProfile2">
+    <Sessions>
+      <Session Index="0">
+        <FileReferences />
+      </Session>
+    </Sessions>
+    <Views>
+      <View Guid="67b8486a-9cc3-4d36-978b-cfc07051f750" Title="Analysis" IsVisible="true">
+        <Graphs>
+          <Graph Guid="b859d131-dfb5-4605-be19-810b298b6975" LayoutStyle="DataTable" Color="#FFFFA500" GraphHeight="125" IsMinimized="false" IsShown="true" IsExpanded="false">
+            <Preset Name="Randomascii GPU Summary by Process" GraphChartType="StackedLine" BarGraphIntervalCount="50" IsThreadActivityTable="false" GraphColumnCount="19" KeyColumnCount="4" LeftFrozenColumnCount="1" RightFrozenColumnCount="18" InitialFilterShouldKeep="true" GraphFilterTopValue="0" GraphFilterThresholdValue="0">
+              <MetadataEntries>
+                <MetadataEntry Name="Start Execution" Guid="267ef708-7c6d-11e2-be78-b4b52fe06835" ColumnMetadata="StartTime" />
+                <MetadataEntry Name="GPU Time" Guid="267ef705-7c6d-11e2-be78-b4b52fe06835" ColumnMetadata="Duration" />
+              </MetadataEntries>
+              <HighlightEntries />
+              <Columns>
+                <Column Name="Process" Guid="267ef702-7c6d-11e2-be78-b4b52fe06835" Width="199" IsVisible="true" SortPriority="1" />
+                <Column Name="Process Name" Guid="267ef701-7c6d-11e2-be78-b4b52fe06835" Width="140" IsVisible="false" SortPriority="2" />
+                <Column Name="ThreadId" Guid="267ef703-7c6d-11e2-be78-b4b52fe06835" Width="60" IsVisible="false" SortPriority="3" TextAlignment="Right" />
+                <Column Name="Thread Name" Guid="cb796d44-2927-5ac1-d231-4b71904c18f5" Width="80" IsVisible="false" SortPriority="4" />
+                <Column Name="Thread Activity Tag" Guid="82ddfdff-ee93-5f35-08ac-4705069618dc" Width="80" IsVisible="false" SortPriority="5" />
+                <Column Name="Annotation" Guid="2818954f-2d30-5569-4510-dade0a5a605c" Width="80" IsVisible="false" SortPriority="6" />
+                <Column Name="Count" Guid="267ef704-7c6d-11e2-be78-b4b52fe06835" Width="77" IsVisible="true" AggregationMode="Count" SortPriority="7" TextAlignment="Right" />
+                <Column Name="GPU Time" Guid="267ef705-7c6d-11e2-be78-b4b52fe06835" Width="90" IsVisible="false" AggregationMode="Sum" SortPriority="8" TextAlignment="Right" CellFormat="uN" />
+                <Column Name="Initialized" Guid="267ef706-7c6d-11e2-be78-b4b52fe06835" Width="90" IsVisible="false" AggregationMode="Min" SortPriority="9" TextAlignment="Right" />
+                <Column Name="Submitted To HW" Guid="267ef707-7c6d-11e2-be78-b4b52fe06835" Width="130" IsVisible="false" AggregationMode="Min" SortPriority="10" TextAlignment="Right" />
+                <Column Name="Start Execution" Guid="267ef708-7c6d-11e2-be78-b4b52fe06835" Width="130" IsVisible="false" AggregationMode="Min" SortPriority="11" TextAlignment="Right" />
+                <Column Name="Finished" Guid="267ef709-7c6d-11e2-be78-b4b52fe06835" Width="90" IsVisible="false" AggregationMode="Max" SortPriority="12" TextAlignment="Right" />
+                <Column Name="GPU Time" Guid="267ef705-7c6d-11e2-be78-b4b52fe06835" Width="106" IsVisible="true" AggregationMode="Sum" SortOrder="Descending" SortPriority="0" TextAlignment="Right" CellFormat="uN" />
+                <Column Name="Type" Guid="267ef700-7c6d-11e2-be78-b4b52fe06835" Width="146" IsVisible="false" SortPriority="14" />
+                <Column Name="A/N/E" Guid="267ef70a-7c6d-11e2-be78-b4b52fe06835" Width="50" IsVisible="false" SortPriority="15" />
+                <Column Name="Percentage" Guid="267ef70b-7c6d-11e2-be78-b4b52fe06835" Width="150" IsVisible="false" AggregationMode="Sum" SortPriority="16" TextAlignment="Right" CellFormat="N2" />
+              </Columns>
+            </Preset>
+          </Graph>
+        </Graphs>
+        <SessionIndices>
+          <SessionIndex>0</SessionIndex>
+        </SessionIndices>
+      </View>
+    </Views>
+    <ModifiedGraphs>
+      <GraphSchema Guid="b859d131-dfb5-4605-be19-810b298b6975">
+        <ModifiedPresets>
+          <Preset Name="Randomascii GPU Summary by Process" GraphChartType="StackedLine" BarGraphIntervalCount="50" IsThreadActivityTable="false" GraphColumnCount="19" KeyColumnCount="4" LeftFrozenColumnCount="1" RightFrozenColumnCount="18" InitialFilterShouldKeep="true" GraphFilterTopValue="0" GraphFilterThresholdValue="0">
+            <MetadataEntries>
+              <MetadataEntry Name="Start Execution" Guid="267ef708-7c6d-11e2-be78-b4b52fe06835" ColumnMetadata="StartTime" />
+              <MetadataEntry Name="GPU Time" Guid="267ef705-7c6d-11e2-be78-b4b52fe06835" ColumnMetadata="Duration" />
+            </MetadataEntries>
+            <HighlightEntries />
+            <Columns>
+              <Column Name="Process" Guid="267ef702-7c6d-11e2-be78-b4b52fe06835" Width="199" IsVisible="true" SortPriority="1" />
+              <Column Name="Process Name" Guid="267ef701-7c6d-11e2-be78-b4b52fe06835" Width="140" IsVisible="false" SortPriority="2" />
+              <Column Name="ThreadId" Guid="267ef703-7c6d-11e2-be78-b4b52fe06835" Width="60" IsVisible="false" SortPriority="3" TextAlignment="Right" />
+              <Column Name="Thread Name" Guid="cb796d44-2927-5ac1-d231-4b71904c18f5" Width="80" IsVisible="false" SortPriority="4" />
+              <Column Name="Thread Activity Tag" Guid="82ddfdff-ee93-5f35-08ac-4705069618dc" Width="80" IsVisible="false" SortPriority="5" />
+              <Column Name="Annotation" Guid="2818954f-2d30-5569-4510-dade0a5a605c" Width="80" IsVisible="false" SortPriority="6" />
+              <Column Name="Count" Guid="267ef704-7c6d-11e2-be78-b4b52fe06835" Width="77" IsVisible="true" AggregationMode="Count" SortPriority="7" TextAlignment="Right" />
+              <Column Name="GPU Time" Guid="267ef705-7c6d-11e2-be78-b4b52fe06835" Width="90" IsVisible="false" AggregationMode="Sum" SortPriority="8" TextAlignment="Right" CellFormat="uN" />
+              <Column Name="Initialized" Guid="267ef706-7c6d-11e2-be78-b4b52fe06835" Width="90" IsVisible="false" AggregationMode="Min" SortPriority="9" TextAlignment="Right" />
+              <Column Name="Submitted To HW" Guid="267ef707-7c6d-11e2-be78-b4b52fe06835" Width="130" IsVisible="false" AggregationMode="Min" SortPriority="10" TextAlignment="Right" />
+              <Column Name="Start Execution" Guid="267ef708-7c6d-11e2-be78-b4b52fe06835" Width="130" IsVisible="false" AggregationMode="Min" SortPriority="11" TextAlignment="Right" />
+              <Column Name="Finished" Guid="267ef709-7c6d-11e2-be78-b4b52fe06835" Width="90" IsVisible="false" AggregationMode="Max" SortPriority="12" TextAlignment="Right" />
+              <Column Name="GPU Time" Guid="267ef705-7c6d-11e2-be78-b4b52fe06835" Width="106" IsVisible="true" AggregationMode="Sum" SortOrder="Descending" SortPriority="0" TextAlignment="Right" CellFormat="uN" />
+              <Column Name="Type" Guid="267ef700-7c6d-11e2-be78-b4b52fe06835" Width="146" IsVisible="false" SortPriority="14" />
+              <Column Name="A/N/E" Guid="267ef70a-7c6d-11e2-be78-b4b52fe06835" Width="50" IsVisible="false" SortPriority="15" />
+              <Column Name="Percentage" Guid="267ef70b-7c6d-11e2-be78-b4b52fe06835" Width="150" IsVisible="false" AggregationMode="Sum" SortPriority="16" TextAlignment="Right" CellFormat="N2" />
+            </Columns>
+          </Preset>
+        </ModifiedPresets>
+        <PersistedPresets />
+      </GraphSchema>
+    </ModifiedGraphs>
+  </Content>
+</WpaProfileContainer>
