@@ -163,8 +163,12 @@ void CUIforETWDlg::TransferSettings(bool saving)
 // a larger boost.
 int CUIforETWDlg::BufferCountBoost(int requestCount) const
 {
+	// Saving traces from circular buffers in memory seems to be really
+	// slow on some (dual socket?) machines and the 600 MB on medium to
+	// large memory machines is excessive anyway - who wants traces that
+	// big. So, this neatly haves the buffer sizes.
 	if (tracingMode_ == kTracingToMemory)
-		return requestCount;
+		return requestCount / 2;
 
 	int numerator = 1;
 	int denominator = 1;
