@@ -913,15 +913,16 @@ void CUIforETWDlg::OnBnClickedStarttracing()
 	std::wstring kernelStackWalk;
 	// Record CPU sampling call stacks, from the PROFILE provider
 	if (bSampledStacks_)
-		kernelStackWalk += L"+PROFILE";
+		kernelStackWalk += L"+Profile";
 	// Record context-switch (switch in) and readying-thread (SetEvent, etc.)
 	// call stacks from DISPATCHER provider.
 	if (bCswitchStacks_)
-		kernelStackWalk += L"+CSWITCH+READYTHREAD";
-	// Record VirtualAlloc call stacks from the VIRT_ALLOC provider. Could
-	// also record VirtualFree.
+		kernelStackWalk += L"+CSwitch+ReadyThread";
+	// Record VirtualAlloc call stacks from the VIRT_ALLOC provider. Also
+	// record VirtualFree to allow investigation of memory leaks, even though
+	// WPA fails to display these stacks.
 	if (bVirtualAllocStacks_ || tracingMode_ == kHeapTracingToFile)
-		kernelStackWalk += L"+VirtualAlloc";
+		kernelStackWalk += L"+VirtualAlloc+VirtualFree";
 	// Add in any manually requested call stack flags.
 	if (!extraKernelStacks_.empty())
 		kernelStackWalk += L"+" + extraKernelStacks_;
