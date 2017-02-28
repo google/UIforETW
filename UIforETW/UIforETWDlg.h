@@ -50,6 +50,8 @@ private:
 	HICON m_hIcon;
 
 	bool bIsTracing_ = false;
+	// This tracks whether GetFinalImageTraceFile() was recorded to.
+	bool bPreTraceRecorded_ = false;
 	ULONGLONG traceStartTime_ = 0;
 	// Auto-save trace if tracing to a file runs for longer than this length of time.
 	// Otherwise the trace files can fill hard drives and be unusably large.
@@ -191,6 +193,9 @@ private:
 	std::wstring GetKernelFile() const { return CUIforETWDlg::GetTempTraceDir() + L"UIForETWkernel.etl"; }
 	std::wstring GetUserFile() const { return GetTempTraceDir() + L"UIForETWuser.etl"; }
 	std::wstring GetHeapFile() const { return GetTempTraceDir() + L"UIForETWheap.etl"; }
+	// Trace files for recording binary image data at the start of tracing.
+	std::wstring GetTempImageTraceFile() const { return GetTempTraceDir() + L"UIForETWTempPretraceImages.etl"; }
+	std::wstring GetFinalImageTraceFile() const { return GetTempTraceDir() + L"UIForETWPretraceImages.etl"; }
 
 	// Get session name for kernel logger
 	const std::wstring NTKernelLogger_ = L"\"NT Kernel Logger\"";

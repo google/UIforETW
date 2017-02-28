@@ -1041,8 +1041,42 @@ void CUIforETWDlg::OnBnClickedStarttracing()
 		heapStackWalk = L" -stackwalk HeapCreate+HeapDestroy+HeapAlloc+HeapRealloc";
 	std::wstring heapArgs = L" -start UIforETWHeapSession -heap -Pids 0" + heapStackWalk + heapBuffers + heapFile;
 
+	bPreTraceRecorded_ = false;
+
 	DWORD exitCode = 0;
 	bool started = true;
+	if (tracingMode_ == kTracingToFile && bChromeDeveloper_)
+	{
+		// Implement the fix to https://github.com/google/UIforETW/issues/97
+		// Grab an initial trace that will contain imageID, fileversion, etc., so that ETW
+		// traces that cover a Chrome upgrade will get before and after information. This
+		// *could* be applicable to non-Chrome developers, but it is unlikely, so rather than
+		// creating yet-another-obscure-setting I just piggyback off of the bChromeDeveloper_
+		// flag, in order to keep things simple.
+		const std::wstring imageIDCommands[] = {
+			// Start tracing with minimal flags
+			L"xperf.exe -start " + GetKernelLogger() + L" -on PROC_THREAD+LOADER -f \"" + GetTempImageTraceFile() + L"\"",
+			// Immediately stop tracing
+			L"xperf.exe -stop " + GetKernelLogger(),
+			// Merge just the image ID information over to GetFinalImageTraceFile()
+			L"xperf.exe -merge \"" + GetTempImageTraceFile() + L"\" \"" + GetFinalImageTraceFile() + L"\" -injectonly",
+		};
+
+		outputPrintf(L"Recording pre-trace image data...\n");
+		for (auto& command : imageIDCommands)
+		{
+			ChildProcess child(GetXperfPath());
+
+			started = child.Run(bShowCommands_, command);
+			(void)child.GetOutput(); // Swallow output - failures and status are to be ignored.
+			exitCode = child.GetExitCode();
+			if (!started || exitCode)
+				break;
+		}
+		if (started && !exitCode)
+			bPreTraceRecorded_ = true;
+	}
+
 	{
 		ChildProcess child(GetXperfPath());
 
@@ -1194,6 +1228,8 @@ void CUIforETWDlg::StopTracingAndMaybeRecord(bool bSaveTrace)
 			std::wstring args = L" -merge \"" + GetKernelFile() + L"\" \"" + GetUserFile() + L"\"";
 			if (tracingMode_ == kHeapTracingToFile)
 				args += L" \"" + GetHeapFile() + L"\"";
+			if (bPreTraceRecorded_)
+				args += L" \"" + GetFinalImageTraceFile() + L"\"";
 			args += L" \"" + traceFilename + L"\"";
 			if (bCompress_)
 				args += L" -compress";
