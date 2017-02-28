@@ -317,6 +317,7 @@ BOOL CUIforETWDlg::OnInitDialog()
 	{
 		AfxMessageBox(L"Couldn't register hot key.");
 		btSaveTraceBuffers_.SetWindowTextW(L"Sa&ve Trace Buffers");
+		btStartTracing_.SetWindowTextW(L"Start &Tracing");
 	}
 
 	// Add "About..." menu item to system menu.
@@ -1701,9 +1702,13 @@ LRESULT CUIforETWDlg::OnHotKey(WPARAM wParam, LPARAM /*lParam*/)
 	switch (wParam)
 	{
 	case kRecordTraceHotKey:
-		// Don't record a trace if we haven't started tracing.
+		// The magic hot key can be used to start or stop tracing. Doing both
+		// of these without having to change away from the app being profiled
+		// has been shown to be useful.
 		if (bIsTracing_)
 			StopTracingAndMaybeRecord(true);
+		else
+			OnBnClickedStarttracing();
 		break;
 	}
 
