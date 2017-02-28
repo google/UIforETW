@@ -143,12 +143,14 @@ powershell ..\GitHub-Source-Indexer\github-sourceindexer.ps1 -symbolsFolder etws
 @echo %temp%\srcsrv\pdbstr -r -p:etwsymbols\UIforETWStatic_devrel32.pdb -s:srcsrv
 :NoSourceIndexing
 
+del *.zip 2>nul
 call python make_zip_file.py etwpackage.zip etwpackage
 @echo on
 call python make_zip_file.py etwsymbols.zip etwsymbols
+call python rename_to_version.py UIforETW\Version.h
 @echo on
 
-@echo Now upload the new etwpackage.zip and etwsymbols.zip
+@echo Now upload the new etwpackage*.zip and etwsymbols*.zip
 @echo But make sure that the PersistedPresets section from startup10.wpaProfile
 @echo been deleted to avoid shipping modified presets and bloating the file.
 @exit /b
