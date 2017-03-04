@@ -24,6 +24,7 @@ limitations under the License.
 #include "Utility.h"
 #include "WorkingSet.h"
 #include "Version.h"
+#include "TraceLoggingSupport.h"
 
 #include <algorithm>
 #include <direct.h>
@@ -82,6 +83,48 @@ void CUIforETWDlg::vprintf(const wchar_t* pFormat, va_list args)
 	PeekMessage(&msg, *this, 0, 0, PM_NOREMOVE);
 }
 
+
+static std::wstring TranslateTraceLoggingProvider(const std::wstring& provider)
+{
+	std::wstring providerOptions;
+	std::wstring justProviderName(provider);
+	auto endOfProvider = justProviderName.find(L':');
+	if (endOfProvider != std::wstring::npos)
+	{
+		providerOptions = justProviderName.substr(endOfProvider);
+		justProviderName.resize(endOfProvider);
+	}
+
+	std::wstring providerGUID = TraceLoggingProviderNameToGUID(justProviderName);
+
+	providerGUID += providerOptions;
+	return providerGUID;
+}
+
+static std::wstring TranslateUserModeProviders(const std::wstring& providers)
+{
+	std::wstring translatedProviders;
+	translatedProviders.reserve(providers.size());
+	for (const auto& provider : split(providers, '+'))
+	{
+		if (provider.empty())
+		{
+			continue;
+		}
+		translatedProviders += '+';
+		if (provider.front() != '*')
+		{
+			translatedProviders += provider;
+			continue;
+		}
+		// if the provider name begins with a *, it follows the EventSource / TraceLogging
+		// convention and must be translated to a GUID.
+		// remove the leading '*' before calling the function
+		translatedProviders += TranslateTraceLoggingProvider(provider.substr(1));
+	}
+
+	return translatedProviders;
+}
 
 CUIforETWDlg::CUIforETWDlg(CWnd* pParent /*=NULL*/)
 	: CDialog(CUIforETWDlg::IDD, pParent)
@@ -963,7 +1006,18 @@ void CUIforETWDlg::OnBnClickedStarttracing()
 	userProviders += L"+Microsoft-Windows-Kernel-Memory:0xE0";
 
 	if (!extraUserProviders_.empty())
-		userProviders += L"+" + extraUserProviders_;
+	{
+		try
+		{
+			userProviders += TranslateUserModeProviders(extraUserProviders_);
+		}
+		catch (const std::exception& e)
+		{
+			outputPrintf(L"Check the extra user providers; failed to translate them from the TraceLogging name to a GUID.\n%hs\n", e.what());
+			StopEventThreads();
+			return;
+		}
+	}
 
 	// DWM providers can be helpful also. Uncomment to enable.
 	//userProviders += L"+Microsoft-Windows-Dwm-Dwm";
