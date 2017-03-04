@@ -173,6 +173,7 @@ BOOL CSettings::OnInitDialog()
 		toolTip_.AddTool(&btExtraUserProviders_, L"Extra user providers, separated by '+', such as "
 					L"\n\"Microsoft-Windows-Audio+Microsoft-Windows-HttpLog\". See \"xperf -providers\" "
 					L"for the full list. "
+					L"TraceLogging and EventSource providers must be prefixed by '*'. "
 					L"Note that incorrect user providers will cause tracing to fail to start.");
 		toolTip_.AddTool(&btPerfCounters_, L"Arbitrary performance counters to be logged occasionally.");
 		toolTip_.AddTool(&btWSMonitoredProcesses_, L"Names of processes whose working sets will be "

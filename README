@@ -24,6 +24,12 @@ associated with each one.
 UIforETW has some features that are specific to Chrome developers - but
 it is fully functional for non-Chrome developers as well.
 
+When adding TraceLogging and EventSource providers, UIforETW supports
+the same *Name naming convention as other ETW tools. See 
+https://blogs.msdn.microsoft.com/dcook/2015/09/08/etw-provider-names-and-guids/
+to ensure that your provider name and GUID conform to the convention.
+EventSource providers should automatically match.
+
 If you want to use UIforETW then you should download the latest
 etwpackage.zip from the releases page at:
 https://github.com/google/UIforETW/releases
