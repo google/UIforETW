@@ -575,11 +575,11 @@ int DeleteFiles(const HWND hwnd, const std::vector<std::wstring>& paths)
 	{
 		// Push the file name and its NULL terminator onto the vector.
 		fileNames.insert(fileNames.end(), path.c_str(), path.c_str() + path.size());
-		fileNames.emplace_back(static_cast<wchar_t>(0));
+		fileNames.push_back(0);
 	}
 
 	// Double null-terminate.
-	fileNames.emplace_back(static_cast<wchar_t>(0));
+	fileNames.push_back(0);
 
 	SHFILEOPSTRUCT fileOp =
 	{
