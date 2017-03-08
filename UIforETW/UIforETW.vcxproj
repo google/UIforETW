@@ -267,6 +267,7 @@
     <ClInclude Include="Settings.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
+    <ClInclude Include="TraceLoggingSupport.h" />
     <ClInclude Include="Utility.h" />
     <ClInclude Include="UIforETW.h" />
     <ClInclude Include="UIforETWDlg.h" />
@@ -289,6 +290,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="Support.cpp" />
+    <ClCompile Include="TraceLoggingSupport.cpp" />
     <ClCompile Include="Utility.cpp" />
     <ClCompile Include="UIforETW.cpp" />
     <ClCompile Include="UIforETWDlg.cpp" />
