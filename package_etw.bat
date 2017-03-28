@@ -143,11 +143,18 @@ powershell ..\GitHub-Source-Indexer\github-sourceindexer.ps1 -symbolsFolder etws
 @echo %temp%\srcsrv\pdbstr -r -p:etwsymbols\UIforETWStatic_devrel32.pdb -s:srcsrv
 :NoSourceIndexing
 
+@rem Sign the important (requiring elevation) binaries
+set path=%path%;C:\Program Files (x86)\Windows Kits\10\bin\x64
+signtool sign /d "UIforETW" /du "https://github.com/google/UIforETW/releases" /n "Bruce Dawson" /tr http://timestamp.digicert.com /td SHA256 /fd SHA256 %~dp0bin\UIforETW.exe %~dp0bin\UIforETW32.exe
+@if not %errorlevel% equ 0 goto signing_failure
+
 del *.zip 2>nul
 call python make_zip_file.py etwpackage.zip etwpackage
 @echo on
 call python make_zip_file.py etwsymbols.zip etwsymbols
+@echo on
 call python rename_to_version.py UIforETW\Version.h
+call makeandsigncab.bat
 @echo on
 
 @echo Now upload the new etwpackage*.zip and etwsymbols*.zip
@@ -177,4 +184,8 @@ call python rename_to_version.py UIforETW\Version.h
 
 :copyfailure
 @echo Failed to copy file. Aborting.
+@exit /b
+
+:signing_failure
+@echo Failed to sign files. Aborting.
 @exit /b
