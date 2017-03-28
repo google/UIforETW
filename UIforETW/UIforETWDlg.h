@@ -225,6 +225,7 @@ private:
 	// Editable only by the settings dialog.
 	bool bChromeDeveloper_ = false;
 	bool bAutoViewTraces_ = false;
+	bool bRecordPreTrace_ = false;
 	std::wstring extraKernelFlags_;
 	std::wstring extraKernelStacks_;
 	std::wstring extraUserProviders_;

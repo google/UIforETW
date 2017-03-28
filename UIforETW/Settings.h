@@ -43,6 +43,7 @@ public:
 	bool bUseOtherKernelLogger_ = false;
 	bool bChromeDeveloper_ = false;
 	bool bAutoViewTraces_ = false;
+	bool bRecordPreTrace_ = false;
 	bool bHeapStacks_ = false;
 	bool bVirtualAllocStacks_ = false;
 	bool bVersionChecks_ = false;
@@ -62,6 +63,7 @@ protected:
 	CButton btUseOtherKernelLogger_;
 	CButton btChromeDeveloper_;
 	CButton btAutoViewTraces_;
+	CButton btRecordPreTrace_;
 	CButton btHeapStacks_;
 	CButton btVirtualAllocStacks_;
 	CButton btVersionChecks_;
@@ -90,4 +92,5 @@ public:
 	afx_msg void OnBnClickedCheckfornewversions();
 	afx_msg void OnBnClickedSelectPerfCounters();
 	afx_msg void OnBnClickedUseOtherKernelLogger();
+	afx_msg void OnBnClickedRecordPreTrace();
 };

@@ -1101,14 +1101,11 @@ void CUIforETWDlg::OnBnClickedStarttracing()
 
 	DWORD exitCode = 0;
 	bool started = true;
-	if (tracingMode_ == kTracingToFile && bChromeDeveloper_)
+	if (tracingMode_ == kTracingToFile && bRecordPreTrace_)
 	{
 		// Implement the fix to https://github.com/google/UIforETW/issues/97
 		// Grab an initial trace that will contain imageID, fileversion, etc., so that ETW
-		// traces that cover a Chrome upgrade will get before and after information. This
-		// *could* be applicable to non-Chrome developers, but it is unlikely, so rather than
-		// creating yet-another-obscure-setting I just piggyback off of the bChromeDeveloper_
-		// flag, in order to keep things simple.
+		// traces that cover a Chrome upgrade will get before and after information.
 		const std::wstring imageIDCommands[] = {
 			// Start tracing with minimal flags
 			L"xperf.exe -start " + GetKernelLogger() + L" -on PROC_THREAD+LOADER -f \"" + GetTempImageTraceFile() + L"\"",
@@ -1851,6 +1848,7 @@ void CUIforETWDlg::OnBnClickedSettings()
 	dlgSettings.bUseOtherKernelLogger_ = bUseOtherKernelLogger_;
 	dlgSettings.bChromeDeveloper_ = bChromeDeveloper_;
 	dlgSettings.bAutoViewTraces_ = bAutoViewTraces_;
+	dlgSettings.bRecordPreTrace_ = bRecordPreTrace_;
 	dlgSettings.bHeapStacks_ = bHeapStacks_;
 	dlgSettings.bVirtualAllocStacks_ = bVirtualAllocStacks_;
 	dlgSettings.bVersionChecks_ = bVersionChecks_;
@@ -1880,6 +1878,7 @@ void CUIforETWDlg::OnBnClickedSettings()
 
 		// Copy over the remaining settings.
 		bUseOtherKernelLogger_ = dlgSettings.bUseOtherKernelLogger_;
+		bRecordPreTrace_ = dlgSettings.bRecordPreTrace_;
 		WSMonitoredProcesses_ = dlgSettings.WSMonitoredProcesses_;
 		bExpensiveWSMonitoring_ = dlgSettings.bExpensiveWSMonitoring_;
 		extraKernelFlags_ = dlgSettings.extraKernelFlags_;

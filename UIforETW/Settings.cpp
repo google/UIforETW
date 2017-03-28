@@ -97,6 +97,7 @@ void CSettings::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_USE_OTHER_KERNEL_LOGGER, btUseOtherKernelLogger_);
 	DDX_Control(pDX, IDC_CHROMEDEVELOPER, btChromeDeveloper_);
 	DDX_Control(pDX, IDC_AUTOVIEWTRACES, btAutoViewTraces_);
+	DDX_Control(pDX, IDC_RECORD_PRE_TRACE, btRecordPreTrace_);
 	DDX_Control(pDX, IDC_HEAPSTACKS, btHeapStacks_);
 	DDX_Control(pDX, IDC_VIRTUALALLOCSTACKS, btVirtualAllocStacks_);
 	DDX_Control(pDX, IDC_CHECKFORNEWVERSIONS, btVersionChecks_);
@@ -116,6 +117,7 @@ BEGIN_MESSAGE_MAP(CSettings, CDialog)
 	ON_BN_CLICKED(IDC_CHECKFORNEWVERSIONS, &CSettings::OnBnClickedCheckfornewversions)
 	ON_BN_CLICKED(IDC_SELECT_PERF_COUNTERS, &CSettings::OnBnClickedSelectPerfCounters)
 	ON_BN_CLICKED(IDC_USE_OTHER_KERNEL_LOGGER, &CSettings::OnBnClickedUseOtherKernelLogger)
+	ON_BN_CLICKED(IDC_RECORD_PRE_TRACE, &CSettings::OnBnClickedRecordPreTrace)
 END_MESSAGE_MAP()
 
 BOOL CSettings::OnInitDialog()
@@ -126,6 +128,7 @@ BOOL CSettings::OnInitDialog()
 	CheckDlgButton(IDC_USE_OTHER_KERNEL_LOGGER, bUseOtherKernelLogger_);
 	CheckDlgButton(IDC_CHROMEDEVELOPER, bChromeDeveloper_);
 	CheckDlgButton(IDC_AUTOVIEWTRACES, bAutoViewTraces_);
+	CheckDlgButton(IDC_RECORD_PRE_TRACE, bRecordPreTrace_);
 	CheckDlgButton(IDC_HEAPSTACKS, bHeapStacks_);
 	CheckDlgButton(IDC_VIRTUALALLOCSTACKS, bVirtualAllocStacks_);
 	CheckDlgButton(IDC_CHECKFORNEWVERSIONS, bVersionChecks_);
@@ -193,6 +196,9 @@ BOOL CSettings::OnInitDialog()
 					L"traces.");
 		toolTip_.AddTool(&btAutoViewTraces_, L"Check this to have UIforETW launch the trace viewer "
 					L"immediately after a trace is recorded.");
+		toolTip_.AddTool(&btRecordPreTrace_, L"Check this to enable recording of a startup trace "
+					L"to grab a snapshot of module version and symbol information. This allows analyzing "
+					L"traces across upgrades, such as chrome restart upgrades.");
 		toolTip_.AddTool(&btHeapStacks_, L"Check this to record call stacks on HeapAlloc, HeapRealloc, "
 					L"and similar calls, when doing heap traces.");
 		toolTip_.AddTool(&btVirtualAllocStacks_, L"Check this to record call stacks on VirtualAlloc on all "
@@ -378,4 +384,10 @@ void CSettings::OnBnClickedSelectPerfCounters()
 void CSettings::OnBnClickedUseOtherKernelLogger()
 {
 	bUseOtherKernelLogger_ = !bUseOtherKernelLogger_;
+}
+
+
+void CSettings::OnBnClickedRecordPreTrace()
+{
+	bRecordPreTrace_ = !bRecordPreTrace_;
 }
