@@ -145,10 +145,11 @@ powershell ..\GitHub-Source-Indexer\github-sourceindexer.ps1 -symbolsFolder etws
 
 @rem Sign the important (requiring elevation) binaries
 set path=%path%;C:\Program Files (x86)\Windows Kits\10\bin\x64
-signtool sign /d "UIforETW" /du "https://github.com/google/UIforETW/releases" /n "Bruce Dawson" /tr http://timestamp.digicert.com /td SHA256 /fd SHA256 %~dp0bin\UIforETW.exe %~dp0bin\UIforETW32.exe
+signtool sign /d "UIforETW" /du "https://github.com/google/UIforETW/releases" /n "Bruce Dawson" /tr http://timestamp.digicert.com /td SHA256 /fd SHA256 %~dp0etwpackage\bin\UIforETW.exe %~dp0etwpackage\bin\UIforETW32.exe
 @if not %errorlevel% equ 0 goto signing_failure
 
 del *.zip 2>nul
+del *.cab 2>nul
 call python make_zip_file.py etwpackage.zip etwpackage
 @echo on
 call python make_zip_file.py etwsymbols.zip etwsymbols
