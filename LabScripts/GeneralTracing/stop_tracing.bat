@@ -1,26 +1,47 @@
-@setlocal
+@rem Copyright 2017 Google Inc. All Rights Reserved.
+@rem
+@rem Licensed under the Apache License, Version 2.0 (the "License");
+@rem you may not use this file except in compliance with the License.
+@rem You may obtain a copy of the License at
+@rem
+@rem     http://www.apache.org/licenses/LICENSE-2.0
+@rem
+@rem Unless required by applicable law or agreed to in writing, software
+@rem distributed under the License is distributed on an "AS IS" BASIS,
+@rem WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+@rem See the License for the specific language governing permissions and
+@rem limitations under the License.
 
-@rem Insert a mark just before tracing starts
-xperf -m Stopping
+@echo off
+setlocal
+
+call %~dp0set_vars.bat
+
+rem Insert a mark just before tracing starts
+xperf -m LabScriptsStopping
 
 xperf -stop %SessionName% -stop
-@rem Stop the event emitter process, if running.
+
+if not "%USE_EVENT_EMITTER%" == "1" goto SkipEventEmitting
+rem Stop the event emitter process, if running.
 %~dp0..\..\bin\EventEmitter.exe -kill
+:SkipEventEmitting
 
 xperf -merge "%kernelfile%" "%userfile%" %FileAndCompressFlags%
 
-@rem Clean up any previous results
-@del *.csv
+rem Clean up any previous results
+del *.csv
 
-@rem Export the marks that indicate the valid length of the trace. Put this
-@rem .csv into the 'special' folder.
-wpaexporter %FileName% -outputfolder special -profile special\Marks.wpaProfile 2>nul
-@rem 'call' is needed for those systems where python is python.bat. Sigh...
-call python CreateRangeBatch.py special\Marks_Summary_Table_Randomascii_Marks.csv >RangeBatch.bat
-call RangeBatch.bat
+rem Generate an exporter config file based on marks in the trace and all the
+rem .wpaProfile files found.
+rem 'call' is needed for those systems where python is python.bat. Sigh...
+call python CreateExporterConfig.py %FileName% >exporterconfig.json
+rem Export multiple sets of data for the specified time range
+wpaexporter -exporterconfig exporterconfig.json 2>nul
 
-@for %%P in (*.wpaProfile) do (
-    @echo wpaexporter %FileName% %RANGE% -profile %%P 2>nul
-    @rem Ignore spurious warnings about upgrading field names that aren't even used
-    wpaexporter %FileName% %RANGE% -profile %%P 2>nul
-)
+rem for %%P in (*summary*.csv) do (
+rem     echo Contents of %%P are:
+rem     type %%P
+rem )
+
+call python SummarizeData.py

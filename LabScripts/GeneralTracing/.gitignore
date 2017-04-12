@@ -1,2 +1,4 @@
-# This file is created by CreateRangeBatch.py and should not be committed.
-RangeBatch.bat
+# This file is created by CreateExporterConfig.py and should not be committed.
+exporterconfig.json
+# This file is created by SummarizeData.py and should not be committed.
+results.json

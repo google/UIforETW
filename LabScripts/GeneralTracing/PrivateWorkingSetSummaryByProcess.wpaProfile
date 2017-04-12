@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<WpaProfileContainer xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Version="2" xmlns="http://tempuri.org/SerializableElement.xsd">
+  <Content xsi:type="WpaProfile2">
+    <Sessions>
+      <Session Index="0">
+        <FileReferences />
+      </Session>
+    </Sessions>
+    <Views>
+      <View Guid="80d970f0-17f5-4fc2-bd5a-395c415709a1" Title="Analysis" IsVisible="true">
+        <Graphs>
+          <Graph Guid="3dd69094-4675-4607-9fb4-0042b9e1a610" LayoutStyle="All" Color="#FF0000FF" GraphHeight="125" IsMinimized="false" IsShown="true" IsExpanded="false">
+            <Preset Name="Randomascii Private Working Set Summary by Process" BarGraphIntervalCount="50" AggregationOverTime="OutstandingPeak" IsThreadActivityTable="false" GraphColumnCount="10" KeyColumnCount="2" LeftFrozenColumnCount="3" RightFrozenColumnCount="9" InitialFilterShouldKeep="true" GraphFilterColumnName="Working Set" GraphFilterColumnGuid="88ed32fc-2790-4491-9445-9437142c0bb5" GraphFilterTopValue="0" GraphFilterThresholdValue="0">
+              <MetadataEntries>
+                <MetadataEntry Guid="7f8e5887-fef5-4f40-9c15-138a03cef7c6" Name="Time" ColumnMetadata="StartTime" />
+                <MetadataEntry Guid="b71a93c1-90cf-4e7c-be52-d6757f04ca65" Name="EndTime(internal use)" ColumnMetadata="EndTime" />
+              </MetadataEntries>
+              <HighlightEntries />
+              <Columns>
+                <Column Guid="f011fe6d-e0a7-4123-9019-bd02e848192b" Name="Process" SortPriority="5" Width="200" IsVisible="true" />
+                <Column Guid="7d259814-3b78-4f86-bf3c-95c079eabce8" Name="Process Name" SortPriority="-1" Width="100" IsVisible="false" />
+                <Column Guid="cb796d44-2927-5ac1-d231-4b71904c18f5" Name="Thread Name" SortPriority="0" Width="80" IsVisible="false" />
+                <Column Guid="82ddfdff-ee93-5f35-08ac-4705069618dc" Name="Thread Activity Tag" SortPriority="0" Width="80" IsVisible="false" />
+                <Column Guid="2818954f-2d30-5569-4510-dade0a5a605c" Name="Annotation" SortPriority="0" Width="80" IsVisible="false" />
+                <Column Guid="b71a93c1-90cf-4e7c-be52-d6757f04ca65" Name="EndTime(internal use)" SortPriority="6" Width="100" CellFormat="sN" IsVisible="false" />
+                <Column Guid="7f8e5887-fef5-4f40-9c15-138a03cef7c6" Name="Time" SortOrder="Ascending" SortPriority="0" Width="100" CellFormat="sN" IsVisible="false" />
+                <Column Guid="88ed32fc-2790-4491-9445-9437142c0bb5" Name="Working Set" AggregationMode="Max" SortOrder="Descending" SortPriority="1" TextAlignment="Right" Width="100" CellFormat="B" IsVisible="false" />
+                <Column Guid="c7022d26-68dc-474b-83ce-2a24b9534612" Name="Private Working Set" AggregationMode="Max" SortOrder="Descending" SortPriority="2" TextAlignment="Right" Width="100" CellFormat="MB" IsVisible="true" />
+                <Column Guid="8f3f770f-9245-430c-b4d4-5bba1f02017a" Name="Commit" AggregationMode="Max" SortOrder="Descending" SortPriority="3" TextAlignment="Right" Width="100" CellFormat="B" IsVisible="false" />
+                <Column Guid="9069e66b-271d-478f-9604-661980cfaa18" Name="Virtual Size" AggregationMode="Max" SortOrder="Descending" SortPriority="4" TextAlignment="Right" Width="100" CellFormat="B" IsVisible="false" />
+              </Columns>
+            </Preset>
+          </Graph>
+        </Graphs>
+        <SessionIndices>
+          <SessionIndex>0</SessionIndex>
+        </SessionIndices>
+      </View>
+    </Views>
+  </Content>
+</WpaProfileContainer>
