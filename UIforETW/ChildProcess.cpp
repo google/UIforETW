@@ -78,6 +78,7 @@ std::wstring ChildProcess::RemoveOutputText()
 
 DWORD WINAPI ChildProcess::ListenerThreadStatic(LPVOID pVoidThis)
 {
+	SetCurrentThreadName("Child-process listener");
 	ChildProcess* pThis = static_cast<ChildProcess*>(pVoidThis);
 	return pThis->ListenerThread();
 }

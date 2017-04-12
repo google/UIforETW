@@ -94,7 +94,7 @@ void CCPUFrequencyMonitor::PerCPUSamplingThread(int cpuNumber)
 
 DWORD __stdcall CCPUFrequencyMonitor::StaticPerCPUSamplingThread(LPVOID param)
 {
-	SetCurrentThreadName("CPU frequency measuring thread");
+	SetCurrentThreadName("CPU frequency measurer");
 
 	auto* pState = reinterpret_cast<CPUSamplerState*>(param);
 	pState->pOwner->PerCPUSamplingThread(pState->cpuNumber);
@@ -192,7 +192,7 @@ void CCPUFrequencyMonitor::MonitorThread()
 
 DWORD __stdcall CCPUFrequencyMonitor::StaticMonitorThread(LPVOID param)
 {
-	SetCurrentThreadName("CPU frequency monitor thread");
+	SetCurrentThreadName("CPU frequency monitor");
 
 	auto* pThis = reinterpret_cast<CCPUFrequencyMonitor*>(param);
 	pThis->MonitorThread();

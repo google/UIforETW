@@ -160,7 +160,7 @@ void CWorkingSetMonitor::SampleWorkingSets()
 
 DWORD __stdcall CWorkingSetMonitor::StaticWSMonitorThread(LPVOID param)
 {
-	SetCurrentThreadName("Working set monitor thread");
+	SetCurrentThreadName("Working set monitor");
 
 	CWorkingSetMonitor* pThis = reinterpret_cast<CWorkingSetMonitor*>(param);
 	pThis->WSMonitorThread();

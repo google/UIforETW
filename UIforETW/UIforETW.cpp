@@ -161,7 +161,7 @@ CUIforETWApp::CUIforETWApp()
 	// support Restart Manager
 	m_dwRestartManagerSupportFlags = AFX_RESTART_MANAGER_SUPPORT_RESTART;
 
-	SetCurrentThreadName("Main thread");
+	SetCurrentThreadName("Main");
 }
 
 

@@ -27,7 +27,7 @@ DirectoryMonitor::DirectoryMonitor(CWnd* pMainWindow)
 // whenever anything changes. That's it. All UI work is done in the main thread.
 DWORD WINAPI DirectoryMonitor::DirectoryMonitorThreadStatic(LPVOID pVoidThis)
 {
-	SetCurrentThreadName("Directory monitor thread");
+	SetCurrentThreadName("Directory monitor");
 	DirectoryMonitor* pThis = static_cast<DirectoryMonitor*>(pVoidThis);
 	return pThis->DirectoryMonitorThread();
 }

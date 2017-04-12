@@ -347,7 +347,7 @@ void CPowerStatusMonitor::SampleTimerState()
 
 DWORD __stdcall CPowerStatusMonitor::StaticPowerMonitorThread(LPVOID param)
 {
-	SetCurrentThreadName("Power monitor thread");
+	SetCurrentThreadName("Power monitor");
 
 	CPowerStatusMonitor* pThis = reinterpret_cast<CPowerStatusMonitor*>(param);
 	pThis->PowerMonitorThread();
