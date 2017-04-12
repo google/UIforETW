@@ -31,7 +31,8 @@ import sys
 
 process_name_re = re.compile(r'(.*) \(\d+\)')
 
-def Summarize(filename, interesting_processes, label, units, results):
+def Summarize(filename, interesting_processes, label, units, results,
+      count_browser_processes=False):
   chrome_processes = ['chrome.exe']
   edge_processes = ['MicrosoftEdge.exe <MicrosoftEdge>',
                     'MicrosoftEdgeCP.exe <MicrosoftEdge>']
@@ -48,6 +49,7 @@ def Summarize(filename, interesting_processes, label, units, results):
       chrome_processes + edge_processes + interesting_processes)
 
   first_line = True
+  browser_process_count = 0
   with open(filename) as file_handle:
     for row in csv.reader(
         file_handle, delimiter = ',', quotechar = '"', skipinitialspace=True):
@@ -75,9 +77,11 @@ def Summarize(filename, interesting_processes, label, units, results):
         if process_name in edge_processes:
           process_name = 'Browser'
           is_edge = True
+          browser_process_count += 1
         if process_name in chrome_processes:
           process_name = 'Browser'
           is_chrome = True
+          browser_process_count += 1
         staging[process_name] += payload
       else:
         if record_other_process:
@@ -96,6 +100,9 @@ def Summarize(filename, interesting_processes, label, units, results):
                     'units' : units})
   results.append({'label' : 'Biggest other ' + label,
                   'value' : other_process})
+  if count_browser_processes:
+    results.append({'label' : 'Browser process count',
+                    'value' : browser_process_count})
 
 
 def main():
@@ -106,7 +113,8 @@ def main():
            ['dwm.exe', 'csrss.exe'], 'GPU usage', 'ms', results)
   Summarize('Virtual_Memory_Snapshots_Randomascii_Private_Working_Set_Summary'
             '_by_Process.csv',
-           [], 'Private Working set', 'MiB', results)
+            [], 'Private Working set', 'MiB', results,
+            count_browser_processes=True)
 
   json.dump(results, open('results.json', 'wt'))
 

@@ -39,9 +39,4 @@ call python CreateExporterConfig.py %FileName% >exporterconfig.json
 rem Export multiple sets of data for the specified time range
 wpaexporter -exporterconfig exporterconfig.json 2>nul
 
-rem for %%P in (*summary*.csv) do (
-rem     echo Contents of %%P are:
-rem     type %%P
-rem )
-
 call python SummarizeData.py
