@@ -111,7 +111,10 @@ def main():
 
   print("Chrome PIDs by process type:\r")
   for browserPid in pidsByParent.keys():
-    exePath = pathByBrowserPid[browserPid]
+    # I hit one trace where there was a crash-handler process that was the
+    # child of another crash-handler process, which caused this script to
+    # fail here. Avoiding the script crash with .get() seems sufficient.
+    exePath = pathByBrowserPid.get(browserPid, "Unknown exe path")
     # Any paths with no entries in them should be ignored.
     pidsByType = pidsByParent[browserPid]
     if len(pidsByType) == 0:
