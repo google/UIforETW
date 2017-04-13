@@ -412,8 +412,8 @@ BOOL CUIforETWDlg::OnInitDialog()
 
 	auto xperfVersion = GetFileVersion(GetXperfPath());
 	const int64_t requiredXperfVersion = (10llu << 48) + 0 + (10586llu << 16) + (15llu << 0);
-	// Windows 10 Anniversary Edition version (August 2016) - requires Windows 8 or higher.
-	const int64_t preferredXperfVersion = (10llu << 48) + 0 + (14393llu << 16) + (33llu << 0);
+	// Windows 10 Creators Update version (April 2017) - requires Windows 8 or higher?
+	const int64_t preferredXperfVersion = (10llu << 48) + 0 + (15063llu << 16) + (137llu << 0);
 
 	wchar_t systemDir[MAX_PATH];
 	systemDir[0] = 0;
@@ -462,7 +462,7 @@ BOOL CUIforETWDlg::OnInitDialog()
 					DWORD installResult10 = child.GetExitCode();
 					if (!installResult10)
 					{
-						outputPrintf(L"WPT version 10.0.14393 was installed.\n");
+						outputPrintf(L"WPT version 10.0.15063 was installed.\n");
 					}
 					else
 					{
@@ -1310,7 +1310,11 @@ void CUIforETWDlg::StopTracingAndMaybeRecord(bool bSaveTrace)
 
 	if (bSaveTrace)
 	{
-		if (bChromeDeveloper_)
+		// It looks like all of the Chrome symbol processing bugs (slow symbol
+		// processing for various reasons and an inability to download symbols from
+		// Chrome's symbol server) are fixed in Creators Edition, so disable this
+		// hack, except for those on Windows 7 who can't use the latest version.
+		if (IsWindowsSevenOrLesser() && bChromeDeveloper_)
 			StripChromeSymbols(traceFilename);
 		PreprocessTrace(traceFilename);
 

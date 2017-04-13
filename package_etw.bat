@@ -87,6 +87,12 @@ xcopy %UIforETW%bin\UIforETWStatic_devrel32.exe %destdir%\bin\UIforETW32.exe /y
 xcopy %UIforETW%bin\UIforETWStatic_devrel.exe %destdir%\bin\UIforETW.exe /y
 xcopy %UIforETW%bin\EventEmitter.exe %destdir%\bin /y
 xcopy %UIforETW%bin\EventEmitter64.exe %destdir%\bin /y
+
+@rem Sign the important (requiring elevation) binaries
+set path=%path%;C:\Program Files (x86)\Windows Kits\10\bin\x64
+signtool sign /d "UIforETW" /du "https://github.com/google/UIforETW/releases" /n "Bruce Dawson" /tr http://timestamp.digicert.com /td SHA256 /fd SHA256 %~dp0etwpackage\bin\UIforETW.exe %~dp0etwpackage\bin\UIforETW32.exe
+@if not %errorlevel% equ 0 goto signing_failure
+
 @rem Copy the official binaries back to the local copy, for development purposes.
 xcopy /exclude:%UIforETW%excludecopy.txt %destdir%\bin\UIforETW*.exe %UIforETW%bin /y
 @if ERRORLEVEL 1 goto BuildFailure
@@ -142,11 +148,6 @@ powershell ..\GitHub-Source-Indexer\github-sourceindexer.ps1 -symbolsFolder etws
 @echo %temp%\srcsrv\pdbstr -r -p:etwsymbols\UIforETWStatic_devrel.pdb -s:srcsrv
 @echo %temp%\srcsrv\pdbstr -r -p:etwsymbols\UIforETWStatic_devrel32.pdb -s:srcsrv
 :NoSourceIndexing
-
-@rem Sign the important (requiring elevation) binaries
-set path=%path%;C:\Program Files (x86)\Windows Kits\10\bin\x64
-signtool sign /d "UIforETW" /du "https://github.com/google/UIforETW/releases" /n "Bruce Dawson" /tr http://timestamp.digicert.com /td SHA256 /fd SHA256 %~dp0etwpackage\bin\UIforETW.exe %~dp0etwpackage\bin\UIforETW32.exe
-@if not %errorlevel% equ 0 goto signing_failure
 
 del *.zip 2>nul
 del *.cab 2>nul

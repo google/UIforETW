@@ -861,6 +861,9 @@ typedef struct tagTHREADNAME_INFO
 // warning C6320 : Exception - filter expression is the constant EXCEPTION_EXECUTE_HANDLER.This might mask exceptions that were not intended to be handled.
 // warning C6322 : Empty _except block.
 
+typedef HRESULT(WINAPI* SetThreadDescription_t)(HANDLE hThread,
+	PCWSTR lpThreadDescription);
+
 void SetCurrentThreadName(PCSTR const threadName)
 {
 	const DWORD dwThreadID = ::GetCurrentThreadId();
@@ -873,6 +876,20 @@ void SetCurrentThreadName(PCSTR const threadName)
 	}
 	__except (EXCEPTION_EXECUTE_HANDLER)
 	{
+	}
+
+	// SetThreadDescription shows up in Windows 10 Creators Edition (April 2017),
+	// probably in response to this blog post:
+	// https://randomascii.wordpress.com/2015/10/26/thread-naming-in-windows-time-for-something-better/
+	auto SetThreadDescription_p =
+		reinterpret_cast<SetThreadDescription_t>(::GetProcAddress(
+			::GetModuleHandle(L"Kernel32.dll"), "SetThreadDescription"));
+	if (SetThreadDescription_p)
+	{
+		wchar_t wThreadName[200];
+		size_t numConverted = 0;
+		mbstowcs_s(&numConverted, wThreadName, threadName, _TRUNCATE);
+		SetThreadDescription_p(GetCurrentThread(), wThreadName);
 	}
 }
 #pragma warning(pop)
