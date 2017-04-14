@@ -39,7 +39,7 @@ rem which we optionally enable for lab tracing.
 rem This extra information will distort timings. This is particularly true
 rem of the CSwitch and ReadyThread stackwalk flags.
 set KernelProviders=%KernelProviders%+CSWITCH+DISK_IO+HARD_FAULTS+DPC+INTERRUPT+PROFILE
-set KernelProviders=%KernelProviders%+POWER+DISPATCHER+DISK_IO_INIT+FILE_IO+FILE_IO_INIT+VIRT_ALLOC+MEMINFO
+set KernelProviders=%KernelProviders%+DISPATCHER+DISK_IO_INIT+FILE_IO+FILE_IO_INIT+VIRT_ALLOC+MEMINFO
 set StackWalkFlags=Profile+CSwitch+ReadyThread
 xperf.exe -start %logger% -on %KernelProviders% -stackwalk %StackWalkFlags% -buffersize 1024 -minbuffers 160 -maxbuffers 160 -f "%kernelfile%" -start %SessionName% -on %UserProviders% -f "%userfile%
 :skipdetailed

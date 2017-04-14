@@ -40,8 +40,9 @@ rem PROC_THREAD+LOADER are required in order to know what binaries are loaded
 rem and what threads are running.
 rem CSWITCH records context switch data so that precise CPU usage and context
 rem switch counts can be recorded. So, these three flags are our minimum set
-rem of kernel providers.
-set KernelProviders=PROC_THREAD+LOADER+CSWITCH
+rem of kernel providers. I then add in +POWER so that we can see CPU frequency
+rem and power-state changes.
+set KernelProviders=PROC_THREAD+LOADER+CSWITCH+POWER
 
 rem These user providers record GPU usage, window-in-focus, eventemitter events
 rem (if emitted), and process working-set samples.
