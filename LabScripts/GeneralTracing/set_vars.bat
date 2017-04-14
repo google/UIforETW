@@ -26,12 +26,6 @@ set DX_Flags=DX:0x2F
 
 :Windows8
 
-rem These are some typical flags used by UIforETW:
-rem Kernel flags: Latency+POWER+DISPATCHER+DISK_IO_INIT+FILE_IO+FILE_IO_INIT+VIRT_ALLOC+MEMINFO
-rem Stackwalk flags: Profile+CSwitch+ReadyThread+VirtualAlloc+VirtualFree
-rem Buffer size flags: -buffersize 1024 -minbuffers 1200 -maxbuffers 1200 
-rem User session flags: Microsoft-Windows-Win32k:0xfdffffffefffffff+Multi-MAIN+Multi-FrameRate+Multi-Input+Multi-Worker+Microsoft-Windows-Kernel-Memory:0xE0+Microsoft-Windows-Kernel-Power+chrome:0x8000000000000200
-
 rem %temp% should be a good location for temporary traces.
 rem Make sure this is a fast drive, preferably an SSD.
 set xperftemptracedir=%temp%
@@ -41,5 +35,14 @@ set userfile=%xperftemptracedir%\user.etl
 set SessionName=usersession
 set FileName=trace.etl
 set FileAndCompressFlags="%FileName%" -compress
+
+rem PROC_THREAD+LOADER are required in order to know what binaries are loaded
+rem and what threads are running.
+rem CSWITCH records context switch data so that precise CPU usage and context
+rem switch counts can be recorded. So, these three flags are our minimum set
+rem of kernel providers.
 set KernelProviders=PROC_THREAD+LOADER+CSWITCH
+
+rem These user providers record GPU usage, window-in-focus, eventemitter events
+rem (if emitted), and process working-set samples.
 set UserProviders=%DX_Flags%+Microsoft-Windows-Win32k:0xfdffffffefffffff+Multi-MAIN+Multi-FrameRate+Multi-Input+Multi-Worker+Microsoft-Windows-Kernel-Memory:0xE0
