@@ -67,6 +67,8 @@ def main():
         match = processTypeRe.match(commandLine)
         if match:
           type = match.groups()[0]
+          if commandLine.count(" --extension-process ") > 0:
+            type = "extension"
           browserPid = parentPid
         else:
           type = "browser"
