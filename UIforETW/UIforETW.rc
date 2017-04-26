@@ -149,7 +149,8 @@ BEGIN
     CONTROL         "Perf counters:",IDC_STATIC,"Static",SS_LEFTNOWORDWRAP | WS_GROUP,7,112,52,8
     PUSHBUTTON      "Se&lect...",IDC_SELECT_PERF_COUNTERS,61,109,38,14
     EDITTEXT        IDC_PERFORMANCECOUNTERS,102,109,133,14,ES_AUTOHSCROLL
-    PUSHBUTTON      "&Copy startup profiles",IDC_COPYSTARTUPPROFILE,7,144,75,14
+    PUSHBUTTON      "&Copy startup profiles",IDC_COPYSTARTUPPROFILE,7,134,75,14
+    CONTROL         "&Identify Chrome CPU",IDC_IDENTIFY_CHROME_CPU,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,154,83,10
     CONTROL         "Record pre-trace",IDC_RECORD_PRE_TRACE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,167,71,10
     CONTROL         "Use other kernel logger",IDC_USE_OTHER_KERNEL_LOGGER,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,180,91,10
@@ -266,8 +267,10 @@ BEGIN
         END
         POPUP "&Scripts"
         BEGIN
-            MENUITEM "&Strip Chrome symbols",       ID_TRACES_STRIPCHROMESYMBOLS
             MENUITEM "&Identify Chrome processes",  ID_TRACES_IDENTIFYCHROMEPROCESSES
+            MENUITEM "Identify Chrome processes, with &CPU", ID_TRACES_IDENTIFYCHROMEPROCESSESWITHCPU
+            MENUITEM SEPARATOR
+            MENUITEM "&Strip Chrome symbols",       ID_TRACES_STRIPCHROMESYMBOLS
             MENUITEM "Create &flame graph",         ID_SCRIPTS_CREATEFLAMEGRAPH
         END
     END

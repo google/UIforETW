@@ -66,6 +66,7 @@ void CUIforETWDlg::TransferSettings(bool saving)
 		{ L"ShowCommands", &bShowCommands_ },
 		{ L"UseOtherKernelLogger", &bUseOtherKernelLogger_ },
 		{ L"ChromeDeveloper", &bChromeDeveloper_ },
+		{ L"IdentifyChromeProcessesCPU", &bIdentifyChromeProcessesCPU_ },
 		{ L"AutoViewTraces", &bAutoViewTraces_ },
 		{ L"RecordPreTrace", &bRecordPreTrace_ },
 		{ L"HeapStacks", &bHeapStacks_ },

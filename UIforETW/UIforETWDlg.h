@@ -224,6 +224,7 @@ private:
 
 	// Editable only by the settings dialog.
 	bool bChromeDeveloper_ = false;
+	bool bIdentifyChromeProcessesCPU_ = false;
 	bool bAutoViewTraces_ = false;
 	bool bRecordPreTrace_ = false;
 	std::wstring extraKernelFlags_;
@@ -237,7 +238,7 @@ private:
 	void UpdateEnabling();
 	void UpdateNotesState();
 	void StripChromeSymbols(const std::wstring& traceFilename);
-	void IdentifyChromeProcesses(const std::wstring& traceFilename);
+	void IdentifyChromeProcesses(const std::wstring& traceFilename, bool withCPU = false);
 	void PreprocessTrace(const std::wstring& traceFilename);
 	void CreateFlameGraph(const std::wstring& traceFilename);
 	void LaunchTraceViewer(const std::wstring traceFilename, const std::wstring viewerPath);

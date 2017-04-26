@@ -1851,6 +1851,7 @@ void CUIforETWDlg::OnBnClickedSettings()
 	dlgSettings.perfCounters_ = perfCounters_;
 	dlgSettings.bUseOtherKernelLogger_ = bUseOtherKernelLogger_;
 	dlgSettings.bChromeDeveloper_ = bChromeDeveloper_;
+	dlgSettings.bIdentifyChromeProcessesCPU_ = bIdentifyChromeProcessesCPU_;
 	dlgSettings.bAutoViewTraces_ = bAutoViewTraces_;
 	dlgSettings.bRecordPreTrace_ = bRecordPreTrace_;
 	dlgSettings.bHeapStacks_ = bHeapStacks_;
@@ -1879,6 +1880,7 @@ void CUIforETWDlg::OnBnClickedSettings()
 			bChromeDeveloper_ = dlgSettings.bChromeDeveloper_;
 			SetSymbolPath();
 		}
+		bIdentifyChromeProcessesCPU_ = dlgSettings.bIdentifyChromeProcessesCPU_;
 
 		// Copy over the remaining settings.
 		bUseOtherKernelLogger_ = dlgSettings.bUseOtherKernelLogger_;
@@ -1953,6 +1955,7 @@ void CUIforETWDlg::OnContextMenu(CWnd* pWnd, CPoint point)
 				//ID_TRACES_BROWSEFOLDER,
 				ID_TRACES_STRIPCHROMESYMBOLS,
 				ID_TRACES_IDENTIFYCHROMEPROCESSES,
+				ID_TRACES_IDENTIFYCHROMEPROCESSESWITHCPU,
 				ID_TRACES_TRACEPATHTOCLIPBOARD,
 				ID_SCRIPTS_CREATEFLAMEGRAPH,
 			};
@@ -2016,6 +2019,12 @@ void CUIforETWDlg::OnContextMenu(CWnd* pWnd, CPoint point)
 				SaveNotesIfNeeded();
 				outputPrintf(L"\n");
 				IdentifyChromeProcesses(tracePath);
+				UpdateNotesState();
+				break;
+			case ID_TRACES_IDENTIFYCHROMEPROCESSESWITHCPU:
+				SaveNotesIfNeeded();
+				outputPrintf(L"\n");
+				IdentifyChromeProcesses(tracePath, true);
 				UpdateNotesState();
 				break;
 			case ID_SCRIPTS_CREATEFLAMEGRAPH:
@@ -2200,15 +2209,20 @@ void CUIforETWDlg::StripChromeSymbols(const std::wstring& traceFilename)
 }
 
 
-void CUIforETWDlg::IdentifyChromeProcesses(const std::wstring& traceFilename)
+void CUIforETWDlg::IdentifyChromeProcesses(const std::wstring& traceFilename, bool withCPU)
 {
-	outputPrintf(L"Preprocessing trace to identify Chrome processes...\n");
+	if (withCPU)
+		outputPrintf(L"Preprocessing trace to identify Chrome processes and summarize CPU usage. This may take a little while...\n");
+	else
+		outputPrintf(L"Preprocessing trace to identify Chrome processes...\n");
 	// There was a version of this that was written in C++. See the history for details.
 	std::wstring pythonPath = FindPython();
 	if (!pythonPath.empty())
 	{
 		ChildProcess child(pythonPath);
 		std::wstring args = L" -u \"" + GetExeDir() + L"IdentifyChromeProcesses.py\" \"" + traceFilename + L"\"";
+		if (withCPU)
+			args += L" --cpuusage";
 		child.Run(bShowCommands_, GetFilePart(pythonPath) + args);
 		std::wstring output = child.GetOutput();
 		// The output of the script is appended to the trace description file.
@@ -2246,7 +2260,7 @@ void CUIforETWDlg::PreprocessTrace(const std::wstring& traceFilename)
 {
 	if (bChromeDeveloper_)
 	{
-		IdentifyChromeProcesses(traceFilename);
+		IdentifyChromeProcesses(traceFilename, bIdentifyChromeProcessesCPU_);
 	}
 }
 

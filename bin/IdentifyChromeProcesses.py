@@ -12,16 +12,72 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""
+This script analyzes the specified trace to identify Chrome's processes by path
+and by type. It optionally prints information about the number of context
+switches by process and type, as well as CPU usage.
+"""
+
 from __future__ import print_function
 
-import sys
+import argparse
+import csv
 import os
 import re
+import subprocess
+import sys
 
 def main():
-  if len(sys.argv) < 2:
-    print("Usage: %s tracename" % sys.argv[0])
+  parser = argparse.ArgumentParser(description="Identify and categorize chrome processes in an ETW trace.")
+  parser.add_argument("trace", type=str, nargs=1, help="ETW trace to be processed")
+  parser.add_argument("-c", "--cpuusage", help="Summarize CPU usage and context switches per process", action="store_true")
+  args = parser.parse_args()
+
+  show_cpu_usage = args.cpuusage
+  tracename = args.trace[0]
+
+  if not os.path.exists(tracename):
+    print("Trace file '%s' does not exist." % tracename)
+    print("Usage: %s tracename [-cpuusage]" % sys.argv[0])
     sys.exit(0)
+
+  script_dir = os.path.split(sys.argv[0])[0]
+  if len(script_dir) == 0:
+    script_dir = "."
+
+  cpu_usage_by_pid = {}
+  context_switches_by_pid = {}
+  if show_cpu_usage:
+    csv_filename = os.path.join(script_dir, "CPU_Usage_(Precise)_Randomascii_CPU_Summary_by_Process.csv")
+    profile_filename = os.path.join(script_dir, "CPUSummaryByProcess.wpaProfile")
+    try:
+      # Try to delete any old results files but continue if this fails.
+      os.remove(csv_filename)
+    except:
+      pass
+    command = 'wpaexporter "%s" -outputfolder "%s" -profile "%s"' % (tracename, script_dir, profile_filename)
+    output = str(subprocess.check_output(command, stderr=subprocess.STDOUT))
+    # Typical output in the .csv file looks like this:
+    # New Process,Count,CPU Usage (in view) (ms)
+    # Idle (0),7237,"26,420.482528"
+    # We can't just split on commas because the CPU Usage often has embedded commas so
+    # we need to use an actual csv reader.
+    if os.path.exists(csv_filename):
+      lines = open(csv_filename, "r").readlines()
+      process_and_pid_re = re.compile(r"(.*) \(([\d ]*)\)")
+      for row_parts in csv.reader(lines[1:], delimiter = ",", quotechar = '"', skipinitialspace=True):
+        process, context_switches, cpu_usage = row_parts
+        process_name, pid = process_and_pid_re.match(process).groups()
+        # We could record this for all processes, but this script is all about
+        # Chrome so I don't.
+        if process_name == "chrome.exe":
+          pid = int(pid)
+          cpu_usage_by_pid[pid] = float(cpu_usage.replace(",", ""));
+          context_switches_by_pid[pid] = int(context_switches)
+    else:
+      print("Expected output file not found.")
+      print("Expected to find: %s" % csv_filename)
+      print("Should have been produced by: %s" % command)
 
   # Typical output of -a process -withcmdline looks like:
   #        MIN,   24656403, Process, 0XA1141C60,       chrome.exe ( 748),      10760,          1, 0x11e8c260, "C:\...\chrome.exe" --type=renderer ...
@@ -31,7 +87,6 @@ def main():
   # be the first command-line option, but that is likely to not always be true.
   processTypeRe = re.compile(r".* --type=([^ ]*) .*")
 
-  tracename = sys.argv[1]
   #-tle = tolerate lost events
   #-tti = tolerate time ivnersions
   #-a process = show process, thread, image information (see xperf -help processing)
@@ -69,6 +124,8 @@ def main():
           type = match.groups()[0]
           if commandLine.count(" --extension-process ") > 0:
             type = "extension"
+          if type == "crashpad-handler":
+            type = "crashpad" # Shorten the tag for better formatting
           browserPid = parentPid
         else:
           type = "browser"
@@ -129,8 +186,23 @@ def main():
     # output will be compatible with Windows edit controls.
     for type in keys:
       print("    %-11s : " % type, end="")
+      context_switches = 0
+      cpu_usage = 0
+      if show_cpu_usage:
+        for pid in pidsByType[type]:
+          if pid in cpu_usage_by_pid:
+            context_switches += context_switches_by_pid[pid]
+            cpu_usage += cpu_usage_by_pid[pid]
+        print("total - %6d context switches, %8.2f ms CPU" % (context_switches, cpu_usage), end="")
       for pid in pidsByType[type]:
-        print("%d " % pid, end="")
+        if show_cpu_usage:
+          print("\r\n        ", end="")
+          if pid in cpu_usage_by_pid:
+            print("%5d - %6d context switches, %8.2f ms CPU" % (pid, context_switches_by_pid[pid], cpu_usage_by_pid[pid]), end="")
+          else:
+            print("%5d" % pid, end="")
+        else:
+          print("%d " % pid, end="")
       print("\r")
     print("\r")
 

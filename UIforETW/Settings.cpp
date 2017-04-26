@@ -102,6 +102,7 @@ void CSettings::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_VIRTUALALLOCSTACKS, btVirtualAllocStacks_);
 	DDX_Control(pDX, IDC_CHECKFORNEWVERSIONS, btVersionChecks_);
 	DDX_Control(pDX, IDC_CHROME_CATEGORIES, btChromeCategories_);
+	DDX_Control(pDX, IDC_IDENTIFY_CHROME_CPU, btIdentifyChromeProcessesCPU_);
 
 	CDialog::DoDataExchange(pDX);
 }
@@ -118,6 +119,7 @@ BEGIN_MESSAGE_MAP(CSettings, CDialog)
 	ON_BN_CLICKED(IDC_SELECT_PERF_COUNTERS, &CSettings::OnBnClickedSelectPerfCounters)
 	ON_BN_CLICKED(IDC_USE_OTHER_KERNEL_LOGGER, &CSettings::OnBnClickedUseOtherKernelLogger)
 	ON_BN_CLICKED(IDC_RECORD_PRE_TRACE, &CSettings::OnBnClickedRecordPreTrace)
+	ON_BN_CLICKED(IDC_IDENTIFY_CHROME_CPU, &CSettings::OnBnClickedIdentifyChromeCpu)
 END_MESSAGE_MAP()
 
 BOOL CSettings::OnInitDialog()
@@ -127,12 +129,14 @@ BOOL CSettings::OnInitDialog()
 	SetDlgItemText(IDC_HEAPEXE, heapTracingExes_.c_str());
 	CheckDlgButton(IDC_USE_OTHER_KERNEL_LOGGER, bUseOtherKernelLogger_);
 	CheckDlgButton(IDC_CHROMEDEVELOPER, bChromeDeveloper_);
+	CheckDlgButton(IDC_IDENTIFY_CHROME_CPU, bIdentifyChromeProcessesCPU_);
 	CheckDlgButton(IDC_AUTOVIEWTRACES, bAutoViewTraces_);
 	CheckDlgButton(IDC_RECORD_PRE_TRACE, bRecordPreTrace_);
 	CheckDlgButton(IDC_HEAPSTACKS, bHeapStacks_);
 	CheckDlgButton(IDC_VIRTUALALLOCSTACKS, bVirtualAllocStacks_);
 	CheckDlgButton(IDC_CHECKFORNEWVERSIONS, bVersionChecks_);
 
+	btIdentifyChromeProcessesCPU_.EnableWindow(bChromeDeveloper_);
 	if (IsWindows8Point1OrGreater())
 	{
 		// The working set monitoring is not needed on Windows 8.1 and above because
@@ -192,8 +196,7 @@ BOOL CSettings::OnInitDialog()
 		toolTip_.AddTool(&btUseOtherKernelLogger_, L"Check this to have UIforETW use the alternate kernel "
 					L"logger. This is needed on some machines where the main kernel logger is in use.");
 		toolTip_.AddTool(&btChromeDeveloper_, L"Check this to enable Chrome specific behavior such as "
-					L"setting the Chrome symbol server path, and preprocessing of Chrome symbols and "
-					L"traces.");
+					L"setting the Chrome symbol server path, and identifying Chrome processes.");
 		toolTip_.AddTool(&btAutoViewTraces_, L"Check this to have UIforETW launch the trace viewer "
 					L"immediately after a trace is recorded.");
 		toolTip_.AddTool(&btRecordPreTrace_, L"Check this to enable recording of a startup trace "
@@ -208,6 +211,9 @@ BOOL CSettings::OnInitDialog()
 					L"to emit ETW events for. This requires running Chrome version 46 or later, and "
 					L"using chrome://flags/ to \"Enable exporting of tracing events to ETW\" - search for "
 					L"trace-export on the chrome://flags/ page.");
+		toolTip_.AddTool(&btIdentifyChromeProcessesCPU_, L"If this is checked and \"Chrome developer\" is "
+					L"checked then CPU usage details of Chrome processes will be added to the trace information "
+					L"file when traces are recorded. Calculating the CPU usage details can take a while.");
 	}
 
 	// Initialize the list of check boxes with all of the Chrome categories which
@@ -274,6 +280,13 @@ void CSettings::OnBnClickedCopystartupprofile()
 void CSettings::OnBnClickedChromedeveloper()
 {
 	bChromeDeveloper_ = !bChromeDeveloper_;
+	btIdentifyChromeProcessesCPU_.EnableWindow(bChromeDeveloper_);
+}
+
+
+void CSettings::OnBnClickedIdentifyChromeCpu()
+{
+	bIdentifyChromeProcessesCPU_ = !bIdentifyChromeProcessesCPU_;
 }
 
 
