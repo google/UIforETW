@@ -85,7 +85,10 @@ def main():
   pidsRe = re.compile(r".*\(([\d ]*)\), *(\d*),.*")
   # Find the space-terminated word after 'type='. This used to require that it
   # be the first command-line option, but that is likely to not always be true.
-  processTypeRe = re.compile(r".* --type=([^ ]*) .*")
+  # Mark the first .* as lazy/ungreedy/reluctant so that if there are multiple
+  # --type options (such as with the V8 Proxy Resolver utility process) the
+  # first one will win.
+  processTypeRe = re.compile(r".*? --type=([^ ]*) .*")
 
   #-tle = tolerate lost events
   #-tti = tolerate time ivnersions
