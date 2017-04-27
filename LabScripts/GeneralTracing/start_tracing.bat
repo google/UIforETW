@@ -12,6 +12,9 @@
 @rem See the License for the specific language governing permissions and
 @rem limitations under the License.
 
+@rem Sample usage:
+@rem start_tracing.bat [detailed]
+
 @echo off
 setlocal
 

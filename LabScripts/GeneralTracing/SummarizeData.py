@@ -22,10 +22,14 @@ buckets:
 - other
 
 The summarized data is currently CPU usage, GPU usage and private working set.
+
+Sample usage:
+    call python SummarizeData.py OutputDir
 """
 
 import csv
 import json
+import os
 import re
 import sys
 
@@ -108,17 +112,22 @@ def Summarize(filename, interesting_processes, label, units, results,
 
 
 def main():
+  data_dir = sys.argv[1]
+
   results = []
-  Summarize('CPU_Usage_(Precise)_Randomascii_CPU_Summary_by_Process.csv',
-           ['dwm.exe', 'audiodg.exe', 'System'], 'CPU usage', 'ms', results)
-  Summarize('GPU_Utilization_Table_Randomascii_GPU_Summary_by_Process.csv',
-           ['dwm.exe', 'csrss.exe'], 'GPU usage', 'ms', results)
-  Summarize('Virtual_Memory_Snapshots_Randomascii_Private_Working_Set_Summary'
-            '_by_Process.csv',
+  Summarize(os.path.join(data_dir,
+              'CPU_Usage_(Precise)_Randomascii_CPU_Summary_by_Process.csv'),
+            ['dwm.exe', 'audiodg.exe', 'System'], 'CPU usage', 'ms', results)
+  Summarize(os.path.join(data_dir,
+              'GPU_Utilization_Table_Randomascii_GPU_Summary_by_Process.csv'),
+            ['dwm.exe', 'csrss.exe'], 'GPU usage', 'ms', results)
+  Summarize(os.path.join(data_dir,
+              'Virtual_Memory_Snapshots_Randomascii_Private_Working_Set_Summary'
+              '_by_Process.csv'),
             [], 'Private Working set', 'MiB', results,
             count_browser_processes=True)
 
-  json.dump(results, open('results.json', 'wt'))
+  json.dump(results, open(os.path.join(data_dir, 'results.json'), 'wt'))
 
 
 if __name__ == '__main__':

@@ -22,17 +22,25 @@ in the directory, and creates a wpaExporter config file (a .json file) that
 says to export data for the Starting/Stopping time range for each .wpaProfile
 file. This is much faster than invoking wpaExporter once for each .wpaProfile
 file.
+
+Sample usage:
+    call python CreateExporterConfig.py trace.etl >exporterconfig.json
 """
 
 import glob
+import os
 import subprocess
 import sys
 
 def main():
   etl_name = sys.argv[1]
 
-  # Use the built-in xperf action to export tha marks. This is much faster than
-  # invoking wpaExporter.
+  script_dir = os.path.dirname(sys.argv[0])
+  if len(script_dir) == 0:
+    script_dir = "."
+
+  # Use the built-in xperf action to export the marks. This is much faster than
+  # invoking wpaExporter. These marks are required.
   command = 'xperf -i "%s" -a marks' % etl_name
   lines = str(subprocess.check_output(command)).splitlines()
 
@@ -84,11 +92,11 @@ def main():
   }
   """
 
-  print config_start % etl_name,
+  print config_start % etl_name.replace("\\", "\\\\"),
 
-  profiles = glob.glob("*.wpaprofile")
+  profiles = glob.glob(os.path.join(script_dir, "*.wpaprofile"))
   for index, profile in enumerate(profiles):
-    print profile_base % (profile, start_time, stop_time),
+    print profile_base % (profile.replace("\\", "\\\\"), start_time, stop_time),
     if index != len(profiles)-1:
       print ",",
 

@@ -33,8 +33,6 @@ rem Select locations for the temporary kernel and user trace files.
 set kernelfile=%xperftemptracedir%\kernel.etl
 set userfile=%xperftemptracedir%\user.etl
 set SessionName=usersession
-set FileName=trace.etl
-set FileAndCompressFlags="%FileName%" -compress
 
 rem PROC_THREAD+LOADER are required in order to know what binaries are loaded
 rem and what threads are running.

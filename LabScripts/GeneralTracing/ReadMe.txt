@@ -4,6 +4,17 @@ start_tracing.bat and stop_tracing.bat must be run from an administrator command
 prompt. It is assumed that WPT is in the path, either from being installed or
 from being copied to the test machine.
 
+Sample usage:
+Run an administrator command prompt. Then, make an output directory:
+> mkdir %temp%\output
+Start tracing, optionally with the detailed flag:
+> start_tracing.bat detailed
+Do the action that you want profiled, then stop tracing, telling the script to
+put the results in %temp%\output:
+> stop_tracing.bat %temp%\output
+Data will be found in .csv files in %temp%\output, and will be summarized in
+results.json.
+
 start_tracing.bat starts tracing with the minimal flags needed to record
 process information, CPU usage, context switches, and GPU usage.
 
@@ -11,7 +22,8 @@ stop_tracing.bat stops tracing, merges the kernel and user traces. It then uses
 CreateExporterConfig.py to create a .json file which uses the marks inserted
 into the trace by "xperf -m" to tightly bound the relevant section of the trace.
 This information plus the set of summary .wpaProfile files is put into the
-.json file.
+.json file. You can optionally pass an output directory to stop_tracing.bat and
+the .etl, .csv, and .json files will be put there.
 
 Then wpaexporter is invoked with the .json file to create a set of .csv files
 that summarize the data in the trace. The .csv files are then summarized using

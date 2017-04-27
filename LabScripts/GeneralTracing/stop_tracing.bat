@@ -12,6 +12,9 @@
 @rem See the License for the specific language governing permissions and
 @rem limitations under the License.
 
+@rem Sample usage:
+@rem stop_tracing.bat [outputdir]
+
 @echo off
 setlocal
 
@@ -27,16 +30,28 @@ rem Stop the event emitter process, if running.
 %~dp0..\..\bin\EventEmitter.exe -kill
 :SkipEventEmitting
 
-xperf -merge "%kernelfile%" "%userfile%" %FileAndCompressFlags%
+if "%1" == "" goto DefaultOutput
+set OutputDir=%1\
+goto SpecifiedOutput
+:DefaultOutput
+set OutputDir=.\
+:SpecifiedOutput
 
 rem Clean up any previous results
-del *.csv
+del %OutputDir%*.csv 2>nul
+del %OutputDir%*.etl 2>nul
+del %OutputDir%*.json 2>nul
+
+set FileName=%OutputDir%trace.etl
+set FileAndCompressFlags="%FileName%" -compress
+
+xperf -merge "%kernelfile%" "%userfile%" %FileAndCompressFlags%
 
 rem Generate an exporter config file based on marks in the trace and all the
 rem .wpaProfile files found.
 rem 'call' is needed for those systems where python is python.bat. Sigh...
-call python CreateExporterConfig.py %FileName% >exporterconfig.json
+call python %~dp0CreateExporterConfig.py %FileName% >%OutputDir%exporterconfig.json
 rem Export multiple sets of data for the specified time range
-wpaexporter -exporterconfig exporterconfig.json 2>nul
+wpaexporter -exporterconfig %OutputDir%exporterconfig.json -outputfolder %OutputDir% 2>nul
 
-call python SummarizeData.py
+call python %~dp0SummarizeData.py %OutputDir%
