@@ -47,6 +47,7 @@ def Summarize(filename, interesting_processes, label, units, results,
   record_other_process = True
   interesting_processes = (
       chrome_processes + edge_processes + interesting_processes)
+  other_process = None
 
   first_line = True
   browser_process_count = 0
@@ -98,8 +99,9 @@ def Summarize(filename, interesting_processes, label, units, results,
     results.append({'label' : key + ' ' + label,
                     'value' : staging[key],
                     'units' : units})
-  results.append({'label' : 'Biggest other ' + label,
-                  'value' : other_process})
+  if other_process:
+    results.append({'label' : 'Biggest other ' + label,
+                    'value' : other_process})
   if count_browser_processes:
     results.append({'label' : 'Browser process count',
                     'value' : browser_process_count})
