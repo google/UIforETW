@@ -78,7 +78,7 @@ def main():
     print("Chromium symbol server is not in _NT_SYMBOL_PATH. No symbol stripping needed.")
     sys.exit(0)
 
-  script_dir = os.path.split(sys.argv[0])[0]
+  script_dir = os.path.dirname(sys.argv[0])
   retrieve_path = os.path.join(script_dir, "RetrieveSymbols.exe")
   pdbcopy_path = os.path.join(script_dir, "pdbcopy.exe")
   if os.environ.has_key("programfiles(x86)"):

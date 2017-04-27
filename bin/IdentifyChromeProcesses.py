@@ -41,7 +41,7 @@ def main():
     print("Usage: %s tracename [-cpuusage]" % sys.argv[0])
     sys.exit(0)
 
-  script_dir = os.path.split(sys.argv[0])[0]
+  script_dir = os.path.dirname(sys.argv[0])
   if len(script_dir) == 0:
     script_dir = "."
 
