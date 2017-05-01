@@ -30,9 +30,9 @@ rem %temp% should be a good location for temporary traces.
 rem Make sure this is a fast drive, preferably an SSD.
 set xperftemptracedir=%temp%
 rem Select locations for the temporary kernel and user trace files.
-set kernelfile=%xperftemptracedir%\kernel.etl
-set userfile=%xperftemptracedir%\user.etl
-set SessionName=usersession
+set kernelfile=%xperftemptracedir%\lab_etw_kernel.etl
+set userfile=%xperftemptracedir%\lab_etw_user.etl
+set SessionName=lab_etw_usersession
 
 rem PROC_THREAD+LOADER are required in order to know what binaries are loaded
 rem and what threads are running.

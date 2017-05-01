@@ -46,6 +46,7 @@ set FileName=%OutputDir%trace.etl
 set FileAndCompressFlags="%FileName%" -compress
 
 xperf -merge "%kernelfile%" "%userfile%" %FileAndCompressFlags%
+del "%kernelfile%" "%userfile%"
 
 rem Generate an exporter config file based on marks in the trace and all the
 rem .wpaProfile files found.
