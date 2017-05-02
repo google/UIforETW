@@ -132,6 +132,9 @@ PLATFORM_INTERFACE void __cdecl ETWKeyDown(unsigned nChar, _In_opt_z_ PCSTR keyN
 #ifdef __cplusplus
 } // end of extern "C"
 
+#ifdef __cplusplus
+} // end of extern "C"
+
 // This class calls the ETW Begin and End functions in order to insert a
 // pair of events to bracket some work.
 class CETWScope
