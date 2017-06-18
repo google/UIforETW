@@ -28,12 +28,17 @@ xcopy "%wpt10%%wptredistmsi%" %destdir%\third_party\wpt10
 @if errorlevel 1 goto copyfailure
 xcopy "%wpt10%%oldwptredistmsi%" %destdir%\third_party\oldwpt10
 @if errorlevel 1 goto copyfailure
-xcopy "%wpt10%Licenses\10.0.10586.0\sdk_license.rtf" %destdir%\third_party\wpt10
+xcopy "%wpt10%Licenses\10.0.15063.0\sdk_license.rtf" %destdir%\third_party\wpt10
 @if errorlevel 1 goto copyfailure
 ren %destdir%\third_party\wpt10\sdk_license.rtf LICENSE.rtf
 
 @rem Add VS tools to the path
-@call "%vs140comntools%vsvars32.bat"
+@rem @call "%vs140comntools%vsvars32.bat"
+set vcvars32="C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars32.bat"
+if exist %vcvars32% goto community_installed
+set vcvars32="C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Auxiliary\Build\vcvars32.bat"
+:community_installed
+call %vcvars32%
 
 cd /d %UIforETW%ETWInsights
 devenv /rebuild "release|Win32" ETWInsights.sln
@@ -51,8 +56,8 @@ devenv /rebuild "release|Win32" UIforETWStatic.sln
 
 @rem Now prepare for the real builds
 sed "s/UseOfMfc>Dynamic/UseOfMfc>Static/" <UIforETW.vcxproj >UIforETWStatic.vcxproj
-rmdir Release /s/q
-rmdir x64\Release /s/q
+if exist Release rmdir Release /s/q
+if exist x64\Release rmdir x64\Release /s/q
 devenv /rebuild "release|Win32" UIforETWStatic.sln
 @if ERRORLEVEL 1 goto BuildFailure
 devenv /rebuild "release|x64" UIforETWStatic.sln
@@ -125,6 +130,7 @@ cd /d %UIforETW%
 @rem         return $gitexe
 @rem     }
 if not exist ..\GitHub-Source-Indexer\github-sourceindexer.ps1 goto NoSourceIndexing
+if exist %temp%\srcsrv rmdir %temp%\srcsrv /s/q
 mkdir %temp%\srcsrv
 xcopy /s /y "c:\Program Files (x86)\Windows Kits\10\Debuggers\x64\srcsrv" %temp%\srcsrv
 
