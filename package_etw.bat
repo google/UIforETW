@@ -32,8 +32,7 @@ xcopy "%wpt10%Licenses\10.0.15063.0\sdk_license.rtf" %destdir%\third_party\wpt10
 @if errorlevel 1 goto copyfailure
 ren %destdir%\third_party\wpt10\sdk_license.rtf LICENSE.rtf
 
-@rem Add VS tools to the path
-@rem @call "%vs140comntools%vsvars32.bat"
+@rem Add VS tools to the path. Also adds signtool.exe to the path.
 set vcvars32="C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars32.bat"
 if exist %vcvars32% goto community_installed
 set vcvars32="C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Auxiliary\Build\vcvars32.bat"
@@ -94,7 +93,6 @@ xcopy %UIforETW%bin\EventEmitter.exe %destdir%\bin /y
 xcopy %UIforETW%bin\EventEmitter64.exe %destdir%\bin /y
 
 @rem Sign the important (requiring elevation) binaries
-set path=%path%;C:\Program Files (x86)\Windows Kits\10\bin\x64
 signtool sign /d "UIforETW" /du "https://github.com/google/UIforETW/releases" /n "Bruce Dawson" /tr http://timestamp.digicert.com /td SHA256 /fd SHA256 %~dp0etwpackage\bin\UIforETW.exe %~dp0etwpackage\bin\UIforETW32.exe
 @if not %errorlevel% equ 0 goto signing_failure
 
@@ -156,13 +154,11 @@ powershell ..\GitHub-Source-Indexer\github-sourceindexer.ps1 -symbolsFolder etws
 :NoSourceIndexing
 
 del *.zip 2>nul
-del *.cab 2>nul
 call python make_zip_file.py etwpackage.zip etwpackage
 @echo on
 call python make_zip_file.py etwsymbols.zip etwsymbols
 @echo on
 call python rename_to_version.py UIforETW\Version.h
-call makeandsigncab.bat
 @echo on
 
 @echo Now upload the new etwpackage*.zip and etwsymbols*.zip
