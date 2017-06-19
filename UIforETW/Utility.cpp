@@ -202,7 +202,9 @@ std::vector<std::wstring> GetFileList(const std::wstring& pattern, const bool fu
 	{
 		// If there are NO matching files, then FindFirstFileExW returns
 		// INVALID_HANDLE_VALUE and the last error is ERROR_FILE_NOT_FOUND.
-		UIETWASSERT(lastError == ERROR_FILE_NOT_FOUND);
+		// Or, apparently, ERROR_PATH_NOT_FOUND, if the directory itself
+		// doesn't exist (pathological case that I actually hit).
+		UIETWASSERT(lastError == ERROR_FILE_NOT_FOUND || lastError == ERROR_PATH_NOT_FOUND);
 		return result;
 	}
 	do
