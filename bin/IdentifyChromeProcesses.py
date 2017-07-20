@@ -147,7 +147,7 @@ def main():
   # to get. See crbug.com/614502 for how this happened.
   # This should probably be deleted at some point, along with the declaration and
   # initialization of lineByPid.
-  for pid in pathByBrowserPid.keys()[:]:
+  for pid in list(pathByBrowserPid.keys())[:]:
     # Checking that there is only one entry (itself) in the list is important
     # to avoid problems caused by Pid reuse that could cause one browser process
     # to appear to be another browser process' parent.
@@ -172,7 +172,7 @@ def main():
         del pidsByParent[pid]
 
   print("Chrome PIDs by process type:\r")
-  for browserPid in pidsByParent.keys():
+  for browserPid in list(pidsByParent.keys()):
     # I hit one trace where there was a crash-handler process that was the
     # child of another crash-handler process, which caused this script to
     # fail here. Avoiding the script crash with .get() seems sufficient.
