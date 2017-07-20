@@ -197,10 +197,11 @@ def main():
             context_switches += context_switches_by_pid[pid]
             cpu_usage += cpu_usage_by_pid[pid]
         print("total - %6d context switches, %8.2f ms CPU" % (context_switches, cpu_usage), end="")
-      for pid in pidsByType[type]:
+      list_by_type = pidsByType[type]
+      for pid in list_by_type:
         if show_cpu_usage:
           print("\r\n        ", end="")
-          if pid in cpu_usage_by_pid:
+          if pid in cpu_usage_by_pid and len(list_by_type) > 1: # Skip per-process details if there's only one.:
             print("%5d - %6d context switches, %8.2f ms CPU" % (pid, context_switches_by_pid[pid], cpu_usage_by_pid[pid]), end="")
           else:
             print("%5d" % pid, end="")
