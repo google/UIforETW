@@ -30,6 +30,11 @@ typedef int(*GetMaxTemperature_t)(int iNode, int* degreeC);
 class CPowerStatusMonitor
 {
 public:
+	enum class MonitorType
+	{
+		LightLoad,
+		HeavyLoad
+	};
 	CPowerStatusMonitor();
 	~CPowerStatusMonitor();
 
@@ -39,7 +44,7 @@ public:
 
 	// Start and stop the sampling threads so that they aren't running
 	// when tracing is not running.
-	void StartThreads();
+	void StartThreads(MonitorType monitorType);
 	void StopThreads();
 
 private:
@@ -53,6 +58,7 @@ private:
 
 	HANDLE hThread_ = nullptr;
 	HANDLE hExitEvent_ = nullptr;
+	MonitorType monitorType_ = MonitorType::HeavyLoad;
 
 	HMODULE energyLib_ = nullptr;
 	IntelEnergyLibInitialize_t IntelEnergyLibInitialize = nullptr;

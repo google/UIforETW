@@ -911,10 +911,15 @@ void CUIforETWDlg::StartEventThreads()
 	// that has run "too long". Checking every thirty seconds should be fine.
 	SetTimer(kTimerID, 30000, nullptr);
 
-	CPUFrequencyMonitor_.StartThreads();
+	if (bBackgroundMonitoring_)
+	{
+		CPUFrequencyMonitor_.StartThreads();
+		workingSetThread_.StartThreads();
+	}
 	PowerMonitor_.SetPerfCounters(perfCounters_);
-	PowerMonitor_.StartThreads();
-	workingSetThread_.StartThreads();
+	PowerMonitor_.StartThreads(bBackgroundMonitoring_ ?
+		CPowerStatusMonitor::MonitorType::HeavyLoad :
+		CPowerStatusMonitor::MonitorType::LightLoad);
 }
 
 void CUIforETWDlg::StopEventThreads()
@@ -1850,6 +1855,7 @@ void CUIforETWDlg::OnBnClickedSettings()
 	dlgSettings.extraUserProviders_ = extraUserProviders_;
 	dlgSettings.perfCounters_ = perfCounters_;
 	dlgSettings.bUseOtherKernelLogger_ = bUseOtherKernelLogger_;
+	dlgSettings.bBackgroundTracing_ = bBackgroundMonitoring_;
 	dlgSettings.bChromeDeveloper_ = bChromeDeveloper_;
 	dlgSettings.bIdentifyChromeProcessesCPU_ = bIdentifyChromeProcessesCPU_;
 	dlgSettings.bAutoViewTraces_ = bAutoViewTraces_;
@@ -1883,6 +1889,7 @@ void CUIforETWDlg::OnBnClickedSettings()
 		bIdentifyChromeProcessesCPU_ = dlgSettings.bIdentifyChromeProcessesCPU_;
 
 		// Copy over the remaining settings.
+		bBackgroundMonitoring_ = dlgSettings.bBackgroundTracing_;
 		bUseOtherKernelLogger_ = dlgSettings.bUseOtherKernelLogger_;
 		bRecordPreTrace_ = dlgSettings.bRecordPreTrace_;
 		WSMonitoredProcesses_ = dlgSettings.WSMonitoredProcesses_;

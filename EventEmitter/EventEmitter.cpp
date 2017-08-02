@@ -55,7 +55,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	CPowerStatusMonitor powerMonitor;
 	powerMonitor.SetPerfCounters(perfCounters);
 	if (bMonitorPowerStuff)
-		powerMonitor.StartThreads();
+		powerMonitor.StartThreads(CPowerStatusMonitor::MonitorType::HeavyLoad);
 
 	CCPUFrequencyMonitor CPUFrequencyMonitor;
 	if (bMonitorFrequencyStuff)

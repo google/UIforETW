@@ -103,6 +103,7 @@ void CSettings::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_CHECKFORNEWVERSIONS, btVersionChecks_);
 	DDX_Control(pDX, IDC_CHROME_CATEGORIES, btChromeCategories_);
 	DDX_Control(pDX, IDC_IDENTIFY_CHROME_CPU, btIdentifyChromeProcessesCPU_);
+	DDX_Control(pDX, IDC_BACKGROUND_MONITORING, btBackgroundMonitoring_);
 
 	CDialog::DoDataExchange(pDX);
 }
@@ -120,6 +121,7 @@ BEGIN_MESSAGE_MAP(CSettings, CDialog)
 	ON_BN_CLICKED(IDC_USE_OTHER_KERNEL_LOGGER, &CSettings::OnBnClickedUseOtherKernelLogger)
 	ON_BN_CLICKED(IDC_RECORD_PRE_TRACE, &CSettings::OnBnClickedRecordPreTrace)
 	ON_BN_CLICKED(IDC_IDENTIFY_CHROME_CPU, &CSettings::OnBnClickedIdentifyChromeCpu)
+	ON_BN_CLICKED(IDC_BACKGROUND_MONITORING, &CSettings::OnBnClickedBackgroundMonitoring)
 END_MESSAGE_MAP()
 
 BOOL CSettings::OnInitDialog()
@@ -128,6 +130,7 @@ BOOL CSettings::OnInitDialog()
 
 	SetDlgItemText(IDC_HEAPEXE, heapTracingExes_.c_str());
 	CheckDlgButton(IDC_USE_OTHER_KERNEL_LOGGER, bUseOtherKernelLogger_);
+	CheckDlgButton(IDC_BACKGROUND_MONITORING, bBackgroundTracing_);
 	CheckDlgButton(IDC_CHROMEDEVELOPER, bChromeDeveloper_);
 	CheckDlgButton(IDC_IDENTIFY_CHROME_CPU, bIdentifyChromeProcessesCPU_);
 	CheckDlgButton(IDC_AUTOVIEWTRACES, bAutoViewTraces_);
@@ -214,6 +217,10 @@ BOOL CSettings::OnInitDialog()
 		toolTip_.AddTool(&btIdentifyChromeProcessesCPU_, L"If this is checked and \"Chrome developer\" is "
 					L"checked then CPU usage details of Chrome processes will be added to the trace information "
 					L"file when traces are recorded. Calculating the CPU usage details can take a while.");
+		toolTip_.AddTool(&btBackgroundMonitoring_, L"When this is checked background threads will periodically "
+					L"(a few times per second) record information about system performance to the trace being "
+					L"recorded. This can be helpful in understanding performance problems but may affect "
+					L"power consumption.");
 	}
 
 	// Initialize the list of check boxes with all of the Chrome categories which
@@ -403,4 +410,10 @@ void CSettings::OnBnClickedUseOtherKernelLogger()
 void CSettings::OnBnClickedRecordPreTrace()
 {
 	bRecordPreTrace_ = !bRecordPreTrace_;
+}
+
+
+void CSettings::OnBnClickedBackgroundMonitoring()
+{
+	bBackgroundTracing_ = !bBackgroundTracing_;
 }

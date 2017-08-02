@@ -41,6 +41,7 @@ public:
 	std::wstring extraUserProviders_;
 	std::wstring perfCounters_;
 	bool bUseOtherKernelLogger_ = false;
+	bool bBackgroundTracing_ = true;
 	bool bChromeDeveloper_ = false;
 	bool bIdentifyChromeProcessesCPU_ = false;
 	bool bAutoViewTraces_ = false;
@@ -64,6 +65,7 @@ protected:
 	CButton btUseOtherKernelLogger_;
 	CButton btChromeDeveloper_;
 	CButton btIdentifyChromeProcessesCPU_;
+	CButton btBackgroundMonitoring_;
 	CButton btAutoViewTraces_;
 	CButton btRecordPreTrace_;
 	CButton btHeapStacks_;
@@ -96,4 +98,5 @@ public:
 	afx_msg void OnBnClickedUseOtherKernelLogger();
 	afx_msg void OnBnClickedRecordPreTrace();
 	afx_msg void OnBnClickedIdentifyChromeCpu();
+	afx_msg void OnBnClickedBackgroundMonitoring();
 };

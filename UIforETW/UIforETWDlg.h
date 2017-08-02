@@ -223,6 +223,7 @@ private:
 	CToolTipCtrl toolTip_;
 
 	// Editable only by the settings dialog.
+	bool bBackgroundMonitoring_ = true;
 	bool bChromeDeveloper_ = false;
 	bool bIdentifyChromeProcessesCPU_ = false;
 	bool bAutoViewTraces_ = false;

@@ -65,6 +65,7 @@ void CUIforETWDlg::TransferSettings(bool saving)
 		{ L"CLRTracing", &bCLRTracing_ },
 		{ L"ShowCommands", &bShowCommands_ },
 		{ L"UseOtherKernelLogger", &bUseOtherKernelLogger_ },
+		{ L"BackgroundMonitoring", &bBackgroundMonitoring_ },
 		{ L"ChromeDeveloper", &bChromeDeveloper_ },
 		{ L"IdentifyChromeProcessesCPU", &bIdentifyChromeProcessesCPU_ },
 		{ L"AutoViewTraces", &bAutoViewTraces_ },

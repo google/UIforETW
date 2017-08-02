@@ -39,7 +39,8 @@ limitations under the License.
 
 // This sampling frequency leads to roughly 20 context switches per second, which is
 // perhaps okay when tracing but must be avoided when tracing is not running.
-const int kSamplingInterval = 200;
+const int kHeavySamplingInterval = 200;
+const int kLightSamplingInterval = 1000;
 
 // These correspond to the funcID values returned by GetMsrFunc
 // They are documented here:
@@ -382,13 +383,19 @@ void CPowerStatusMonitor::PowerMonitorThread()
 	}
 
 	unsigned sampleNumber = 0;
+	DWORD samplingInterval = (monitorType_ == MonitorType::HeavyLoad) ?
+		kHeavySamplingInterval :
+		kLightSamplingInterval;
 	for (;;)
 	{
-		DWORD result = WaitForSingleObject(hExitEvent_, kSamplingInterval);
+		DWORD result = WaitForSingleObject(hExitEvent_, samplingInterval);
 		if (result == WAIT_OBJECT_0)
 			break;
 
-		SampleBatteryStat();
+		if (monitorType_ == MonitorType::HeavyLoad)
+		{
+			SampleBatteryStat();
+		}
 		SampleCPUPowerState();
 		SampleTimerState();
 
@@ -473,12 +480,13 @@ void CPowerStatusMonitor::SetPerfCounters(std::wstring& perfCounters)
 	}
 }
 
-void CPowerStatusMonitor::StartThreads()
+void CPowerStatusMonitor::StartThreads(MonitorType monitorType)
 {
 	UIETWASSERT(!hExitEvent_);
 
 	if (!hExitEvent_)
 	{
+		monitorType_ = monitorType;
 		hExitEvent_ = CreateEvent(nullptr, FALSE, FALSE, nullptr);
 		hThread_ = CreateThread(NULL, 0, StaticPowerMonitorThread, this, 0, nullptr);
 	}
