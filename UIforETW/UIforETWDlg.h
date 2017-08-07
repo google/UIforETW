@@ -246,6 +246,8 @@ private:
 	void SaveNotesIfNeeded();
 	void ShutdownTasks();
 	bool bShutdownCompleted_ = false;
+	void OnMinimize();
+	NOTIFYICONDATA trayData;
 
 	// Generated message map functions
 	virtual BOOL OnInitDialog() override;
@@ -290,6 +292,7 @@ private:
 	afx_msg void NotesPaste();
 	afx_msg void OnActivate(UINT nState, CWnd* pWndOther, BOOL bMinimized);
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
+	afx_msg LRESULT OnTrayNotify(WPARAM wParam, LPARAM lParam);
 public:
 	afx_msg void OnBnClickedGPUtracing();
 	afx_msg void OnBnClickedClrtracing();

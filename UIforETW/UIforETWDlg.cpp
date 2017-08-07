@@ -172,6 +172,7 @@ void CUIforETWDlg::ShutdownTasks()
 		SetSamplingSpeed();
 		bFastSampling_ = true;
 	}
+	Shell_NotifyIcon(NIM_DELETE, &trayData);
 }
 
 void CUIforETWDlg::OnCancel()
@@ -261,6 +262,7 @@ BEGIN_MESSAGE_MAP(CUIforETWDlg, CDialog)
 	ON_WM_ACTIVATE()
 	ON_WM_TIMER()
 	ON_BN_CLICKED( IDC_CLRTRACING, &CUIforETWDlg::OnBnClickedClrtracing )
+	ON_MESSAGE(WM_TRAY_MESSAGE, &CUIforETWDlg::OnTrayNotify)
 END_MESSAGE_MAP()
 
 
@@ -800,10 +802,15 @@ void CUIforETWDlg::UpdateEnabling()
 
 void CUIforETWDlg::OnSysCommand(UINT nID, LPARAM lParam)
 {
-	if ((nID & 0xFFF0) == IDM_ABOUTBOX)
+	UINT id = nID & 0xFFF0;
+	if (id == IDM_ABOUTBOX)
 	{
 		CATLAboutDlg dlgAbout;
 		dlgAbout.DoModal();
+	}
+	else if (id == SC_MINIMIZE) 
+	{
+		OnMinimize();
 	}
 	else
 	{
@@ -2408,4 +2415,42 @@ void CUIforETWDlg::OnActivate(UINT nState, CWnd* pWndOther, BOOL bMinimized)
 		SaveNotesIfNeeded();
 	}
 	CDialog::OnActivate(nState, pWndOther, bMinimized);
+}
+
+void CUIforETWDlg::OnMinimize()
+{
+	trayData.cbSize = sizeof(NOTIFYICONDATA);
+	trayData.hWnd = this->m_hWnd;
+	trayData.uID = 1;
+	trayData.uCallbackMessage = WM_TRAY_MESSAGE;
+	trayData.hIcon = this->m_hIcon;
+	wcscpy_s(trayData.szTip, L"UI for ETW");
+	trayData.uFlags = NIF_ICON | NIF_MESSAGE | NIF_TIP;
+	
+	BOOL bSuccess = Shell_NotifyIcon(NIM_ADD, &trayData);
+	if (bSuccess)
+	{
+		this->ShowWindow(SW_MINIMIZE);
+		this->ShowWindow(SW_HIDE);
+	}
+}
+
+LRESULT CUIforETWDlg::OnTrayNotify(WPARAM wParam, LPARAM lParam)
+{
+	UINT uID = (UINT)wParam;
+	UINT uMsg = (UINT)lParam;
+
+	if (uID != 1)
+		return 0;
+
+	if (uMsg == WM_LBUTTONDOWN) 
+	{
+		BOOL bSuccess = Shell_NotifyIcon(NIM_DELETE, &trayData);
+		if (bSuccess)
+		{
+			this->ShowWindow(SW_SHOW);
+			this->ShowWindow(SW_RESTORE);
+		}
+	}
+	return 0;
 }
