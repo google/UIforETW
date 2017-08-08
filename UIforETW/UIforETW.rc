@@ -92,7 +92,7 @@ BEGIN
     DEFPUSHBUTTON   "OK",IDOK,154,61,50,14,WS_GROUP
     CONTROL         "Initially/mostly written by Bruce Dawson",IDC_STATIC,
                     "Static",SS_LEFTNOWORDWRAP | WS_GROUP,42,38,162,8
-    CONTROL         "Build date goes here",IDC_BUILDDATE,"Static",SS_LEFTNOWORDWRAP | WS_GROUP,42,50,134,8
+    CONTROL         "Build date goes here",IDC_BUILDDATE,"Static",SS_LEFTNOWORDWRAP | WS_GROUP,42,50,162,8
 END
 
 IDD_UIFORETW_DIALOG DIALOGEX 0, 0, 569, 221
