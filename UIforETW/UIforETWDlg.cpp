@@ -354,9 +354,11 @@ BOOL CUIforETWDlg::OnInitDialog()
 	initialWidth_ = lastWidth_ = windowRect.Width();
 	initialHeight_ = lastHeight_ = windowRect.Height();
 
-	// Win+Ctrl+C is used to trigger recording of traces. This is compatible with
+	// Win+Ctrl+R is used to trigger recording of traces. This is compatible with
 	// wprui. If this is changed then be sure to change the button text.
-	if (!RegisterHotKey(*this, kRecordTraceHotKey, MOD_WIN + MOD_CONTROL, 'C'))
+	// It used to be Win+Ctrl+C but the Fall Creators [sic] Update stole that
+	// shortcut, globally, which I think is a really rude thing to do.
+	if (!RegisterHotKey(*this, kRecordTraceHotKey, MOD_WIN + MOD_CONTROL, 'R'))
 	{
 		AfxMessageBox(L"Couldn't register hot key.");
 		btSaveTraceBuffers_.SetWindowTextW(L"Sa&ve Trace Buffers");
