@@ -27,7 +27,7 @@ present.txt
 
 # VS 2015 drops these
 *.VC.opendb
-/.vs/
+.vs/
 
 # Temporary flamegraph files
 flamegraph.txt
