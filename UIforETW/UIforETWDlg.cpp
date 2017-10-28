@@ -355,7 +355,8 @@ BOOL CUIforETWDlg::OnInitDialog()
 	initialHeight_ = lastHeight_ = windowRect.Height();
 
 	// Win+Ctrl+R is used to trigger recording of traces. This is compatible with
-	// wprui. If this is changed then be sure to change the button text.
+	// wprui. If this is changed then be sure to change the text on *both* buttons
+	// in the main window.
 	// It used to be Win+Ctrl+C but the Fall Creators [sic] Update stole that
 	// shortcut, globally, which I think is a really rude thing to do.
 	if (!RegisterHotKey(*this, kRecordTraceHotKey, MOD_WIN + MOD_CONTROL, 'R'))
