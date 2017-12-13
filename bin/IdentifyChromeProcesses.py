@@ -67,7 +67,11 @@ def main():
       process_and_pid_re = re.compile(r"(.*) \(([\d ]*)\)")
       for row_parts in csv.reader(lines[1:], delimiter = ",", quotechar = '"', skipinitialspace=True):
         process, context_switches, cpu_usage = row_parts
-        process_name, pid = process_and_pid_re.match(process).groups()
+        match = process_and_pid_re.match(process)
+        if match:
+          process_name, pid = match.groups()
+        else:
+          process_name, pid = "Unknown", "-1"
         # We could record this for all processes, but this script is all about
         # Chrome so I don't.
         if process_name == "chrome.exe":
