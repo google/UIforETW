@@ -7,6 +7,10 @@ input and CPU temperature in order to make trace analysis easier
  - making trace management easier for developers
  - working around bugs in WPT (Windows Performance Toolkit)
 
+Tutorials on how to use ETW to investigate performance problems on
+Windows can be found here:
+https://tinyurl.com/etwcentral
+
 For specific details on this project see this post which includes
 some documentation and an explanation for why this project was
 created:
