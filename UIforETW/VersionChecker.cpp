@@ -19,7 +19,7 @@ void CVersionChecker::VersionCheckerThread()
 		// of the buffer.
 		while (totalBytesRead < sizeof(buffer) - 1)
 		{
-			UINT bytesRead = webFile->Read(buffer + totalBytesRead, sizeof(buffer) - 1 - totalBytesRead);
+			const UINT bytesRead = webFile->Read(buffer + totalBytesRead, sizeof(buffer) - 1 - totalBytesRead);
 			if (!bytesRead)
 				break;
 			totalBytesRead += bytesRead;
@@ -56,18 +56,18 @@ void CVersionChecker::VersionCheckerThread()
 
 DWORD __stdcall CVersionChecker::StaticVersionCheckerThread(LPVOID pParam)
 {
-	CVersionChecker* pThis = (CVersionChecker*)pParam;
+	CVersionChecker* pThis = static_cast<CVersionChecker*>(pParam);
 	pThis->VersionCheckerThread();
 	return 0;
 }
 
-void CVersionChecker::StartVersionCheckerThread(CWnd* pWindow)
+void CVersionChecker::StartVersionCheckerThread(CWnd* pWindow) noexcept
 {
 	pWindow_ = pWindow;
 	hThread_ = CreateThread(nullptr, 0, StaticVersionCheckerThread, this, 0, nullptr);
 }
 
-CVersionChecker::CVersionChecker()
+CVersionChecker::CVersionChecker() noexcept
 {
 }
 

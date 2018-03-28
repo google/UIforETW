@@ -30,12 +30,12 @@ limitations under the License.
 class CUIforETWApp : public CWinApp
 {
 public:
-	CUIforETWApp();
+	CUIforETWApp() noexcept;
 
 // Overrides
 public:
 	virtual BOOL InitInstance() override;
-	afx_msg void OnHelp();
+	afx_msg void OnHelp() noexcept;
 
 // Implementation
 

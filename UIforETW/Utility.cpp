@@ -26,7 +26,7 @@ namespace {
 PCWSTR const kWPAStartupFileName = L"Startup.wpaProfile";
 PCWSTR const kChromeRegionsFileName = L"chrome_regions_of_interest.xml";
 
-void UnlockGlobalMemory(_In_ const HGLOBAL hmem)
+void UnlockGlobalMemory(_In_ const HGLOBAL hmem) noexcept
 {
 	const BOOL unlockRes = ::GlobalUnlock(hmem);
 	if (!unlockRes)
@@ -101,7 +101,7 @@ void copyWPAProfileToLocalAppData(const std::wstring& exeDir, const bool force)
 
 		ATLVERIFY(::CreateDirectoryW(destDir.c_str(), NULL) || ::GetLastError() == ERROR_ALREADY_EXISTS);
 
-		BOOL copyResult = ::CopyFileW(source.c_str(), dest.c_str(), FALSE);
+		const BOOL copyResult = ::CopyFileW(source.c_str(), dest.c_str(), FALSE);
 		if (force) // Print status of copy
 		{
 			if (copyResult)
@@ -119,7 +119,7 @@ void copyWPAProfileToLocalAppData(const std::wstring& exeDir, const bool force)
 		const std::wstring presets = destDir + L"MyPresets.wpaPresets";
 		if (PathFileExistsW(presets.c_str()))
 		{
-			int deleteResult = DeleteOneFile(NULL, presets);
+			const int deleteResult = DeleteOneFile(NULL, presets);
 			if (force) // Print status of delete
 			{
 				if (deleteResult)
@@ -146,7 +146,7 @@ void outputLastError(const DWORD lastErr)
 	outputPrintf(errBuff);
 }
 
-void debugLastError(const DWORD lastErr)
+void debugLastError(const DWORD lastErr) noexcept
 {
 	const DWORD errMsgSize = 1024u;
 	wchar_t errBuff[errMsgSize] = {};
@@ -195,7 +195,7 @@ std::vector<std::wstring> GetFileList(const std::wstring& pattern, const bool fu
 				&findData, FindExSearchNameMatch, NULL, 0);
 	// Call GetLastError() here because on VC++ 2015 debug builds the memory
 	// allocations in the result constructor zero the last error value.
-	DWORD lastError = ::GetLastError();
+	const DWORD lastError = ::GetLastError();
 
 	std::vector<std::wstring> result;
 	if (hFindFile == INVALID_HANDLE_VALUE)
@@ -284,7 +284,7 @@ std::wstring ConvertToCRLF(const std::wstring& input)
 	std::wstring result;
 	result.reserve(input.size());
 
-	for (wchar_t c : input)
+	for (const wchar_t c : input)
 	{
 		// Replace '\n' with '\r\n' and ignore any '\r' characters that were
 		// previously present.
@@ -298,7 +298,7 @@ std::wstring ConvertToCRLF(const std::wstring& input)
 	return result;
 }
 
-void SetRegistryDWORD(const HKEY root, const std::wstring& subkey, const std::wstring& valueName, const DWORD value)
+void SetRegistryDWORD(const HKEY root, const std::wstring& subkey, const std::wstring& valueName, const DWORD value) noexcept
 {
 	HKEY key;
 	if (::RegOpenKeyExW(root, subkey.c_str(), 0, KEY_ALL_ACCESS, &key) != ERROR_SUCCESS)
@@ -307,7 +307,7 @@ void SetRegistryDWORD(const HKEY root, const std::wstring& subkey, const std::ws
 	ATLVERIFY(::RegCloseKey(key) == ERROR_SUCCESS);
 }
 
-void CreateRegistryKey(const HKEY root, const std::wstring& subkey, const std::wstring& newKey)
+void CreateRegistryKey(const HKEY root, const std::wstring& subkey, const std::wstring& newKey) noexcept
 {
 	HKEY key;
 	if (::RegOpenKeyExW(root, subkey.c_str(), 0, KEY_ALL_ACCESS, &key) != ERROR_SUCCESS)
@@ -361,7 +361,7 @@ std::wstring GetEditControlText(const HWND hEdit)
 // the output buffer can easily be overrun
 // if this function is not first called with cchWideChar set to 0
 // in order to obtain the required size.
-int RequiredNumberOfWideChars(const std::string& text)
+int RequiredNumberOfWideChars(const std::string& text) noexcept
 {
 	static_assert(sizeof(std::string::value_type) == 1 == sizeof(text[0]),
 		"bad assumptions!");
@@ -426,7 +426,7 @@ std::wstring stringPrintf(_Printf_format_string_ PCWSTR const pFormat, ...)
 }
 
 // Call OutputDebugString with a format string and some printf-style arguments.
-void debugPrintf(_Printf_format_string_ PCWSTR const pFormat, ...)
+void debugPrintf(_Printf_format_string_ PCWSTR const pFormat, ...) noexcept
 {
 	va_list args;
 	va_start(args, pFormat);
@@ -440,7 +440,7 @@ void debugPrintf(_Printf_format_string_ PCWSTR const pFormat, ...)
 // Get the next/previous dialog item (next/prev in window order and tab order) allowing
 // for disabled controls, invisible controls, and wrapping at the end of the tab order.
 
-static bool ControlOK(const HWND win)
+static bool ControlOK(const HWND win) noexcept
 {
 	if (!win)
 		return false;
@@ -458,7 +458,7 @@ static bool ControlOK(const HWND win)
 	return true;
 }
 
-static HWND GetNextDlgItem(const HWND win, const bool Wrap)
+static HWND GetNextDlgItem(const HWND win, const bool Wrap) noexcept
 {
 	HWND next = ::GetWindow(win, GW_HWNDNEXT);
 	while ((next != win) && (!::ControlOK(next)))
@@ -478,7 +478,7 @@ static HWND GetNextDlgItem(const HWND win, const bool Wrap)
 }
 
 _Pre_satisfies_(Win != NULL)
-void SmartEnableWindow(const HWND Win, const BOOL Enable)
+void SmartEnableWindow(const HWND Win, const BOOL Enable) noexcept
 {
 	UIETWASSERT(Win);
 	if (!Enable)
@@ -643,7 +643,7 @@ std::wstring GetClipboardText()
 	return result;
 }
 
-int64_t GetFileSize(const std::wstring& path)
+int64_t GetFileSize(const std::wstring& path) noexcept
 {
 	LARGE_INTEGER result = {};
 	HANDLE hFile = ::CreateFileW(path.c_str(), GENERIC_READ,
@@ -671,7 +671,7 @@ int64_t GetFileSize(const std::wstring& path)
 
 uint64_t GetFileVersion(const std::wstring& path)
 {
-	DWORD  infoSize = GetFileVersionInfoSizeW(path.c_str(), nullptr);
+	const DWORD  infoSize = GetFileVersionInfoSizeW(path.c_str(), nullptr);
 	uint64_t result = 0;
 
 	if (infoSize)
@@ -686,7 +686,7 @@ uint64_t GetFileVersion(const std::wstring& path)
 			{
 				if (size)
 				{
-					auto* verInfo = static_cast<VS_FIXEDFILEINFO *>(pData);
+					const auto* const verInfo = static_cast<VS_FIXEDFILEINFO *>(pData);
 					if (verInfo->dwSignature == 0xFEEF04BD)
 					{
 						result = (static_cast<uint64_t>(verInfo->dwFileVersionMS) << 32) + verInfo->dwFileVersionLS;
@@ -699,7 +699,7 @@ uint64_t GetFileVersion(const std::wstring& path)
 	return result;
 }
 
-bool Is64BitWindows()
+bool Is64BitWindows() noexcept
 {
 #if defined(_WIN64)
 	return true;
@@ -710,7 +710,7 @@ bool Is64BitWindows()
 #endif
 }
 
-bool Is64BitBuild()
+bool Is64BitBuild() noexcept
 {
 #if defined(_WIN64)
 	return true;
@@ -805,7 +805,7 @@ std::wstring GetBuildTimeFromAddress(_In_ const void* const codeAddress)
 	const void* const ModuleHandle = memoryInfo.AllocationBase;
 
 	// Walk the PE data structures to find the link time stamp.
-	const IMAGE_DOS_HEADER* const DosHeader = reinterpret_cast<const IMAGE_DOS_HEADER*>(ModuleHandle);
+	const IMAGE_DOS_HEADER* const DosHeader = static_cast<const IMAGE_DOS_HEADER*>(ModuleHandle);
 	if (IMAGE_DOS_SIGNATURE != DosHeader->e_magic)
 	{
 		UIETWASSERT(0);
@@ -866,7 +866,7 @@ typedef struct tagTHREADNAME_INFO
 typedef HRESULT(WINAPI* SetThreadDescription_t)(HANDLE hThread,
 	PCWSTR lpThreadDescription);
 
-void SetCurrentThreadName(PCSTR const threadName)
+void SetCurrentThreadName(PCSTR const threadName) noexcept
 {
 	const DWORD dwThreadID = ::GetCurrentThreadId();
 	const THREADNAME_INFO info = { 0x1000, threadName, dwThreadID, 0 };
@@ -909,14 +909,14 @@ void CopyStartupProfiles(const std::wstring& exeDir, const bool force)
 	copyWPAProfileToLocalAppData(exeDir, force);
 }
 
-void CloseValidHandle(_In_ _Pre_valid_ _Post_ptr_invalid_ const HANDLE handle)
+void CloseValidHandle(_In_ _Pre_valid_ _Post_ptr_invalid_ const HANDLE handle) noexcept
 {
 	ATLVERIFY(::CloseHandle(handle) != 0);
 }
 
 #ifdef IS_MFC_APP
 // Put MFC specific code here
-void MoveControl(CWnd* pParent, CWnd& control, int xDelta, int yDelta)
+void MoveControl(const CWnd* pParent, CWnd& control, int xDelta, int yDelta)
 {
 	const UINT flags = SWP_NOSIZE | SWP_NOOWNERZORDER | SWP_NOZORDER | SWP_NOACTIVATE;
 	CRect controlRect;

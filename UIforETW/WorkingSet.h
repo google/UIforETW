@@ -23,13 +23,13 @@ limitations under the License.
 class CWorkingSetMonitor
 {
 public:
-	CWorkingSetMonitor();
+	CWorkingSetMonitor() noexcept;
 	~CWorkingSetMonitor();
 
 	// Start and stop the sampling threads so that they aren't running
 	// when tracing is not running.
 	void StartThreads();
-	void StopThreads();
+	void StopThreads() noexcept;
 
 	// Pass in a semi-colon separated list of process names that
 	// the working set display should monitor. If this is the
@@ -61,4 +61,9 @@ private:
 	// Incrementing counter that will be the same for all samples recorded
 	// at the same time.
 	unsigned counter_ = 0;
+
+	CWorkingSetMonitor(const CWorkingSetMonitor&) = delete;
+	CWorkingSetMonitor(const CWorkingSetMonitor&&) = delete;
+	CWorkingSetMonitor& operator=(const CWorkingSetMonitor&) = delete;
+	CWorkingSetMonitor& operator=(const CWorkingSetMonitor&&) = delete;
 };

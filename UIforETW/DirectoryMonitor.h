@@ -21,13 +21,13 @@ limitations under the License.
 class DirectoryMonitor
 {
 public:
-	DirectoryMonitor(CWnd* pMainWindow);
+	DirectoryMonitor(CWnd* pMainWindow) noexcept;
 	~DirectoryMonitor();
 
 
 	_Pre_satisfies_(this->hThread_ == 0)
 	_Pre_satisfies_(this->hShutdownRequest_ == 0)
-	void StartThread(const std::wstring* traceDir);
+	void StartThread(const std::wstring* traceDir) noexcept;
 
 private:
 	static DWORD WINAPI DirectoryMonitorThreadStatic(LPVOID);
@@ -38,4 +38,9 @@ private:
 
 	CWnd* mainWindow_ = nullptr;
 	const std::wstring* traceDir_ = nullptr;
+
+	DirectoryMonitor(const DirectoryMonitor&) = delete;
+	DirectoryMonitor(const DirectoryMonitor&&) = delete;
+	DirectoryMonitor& operator=(const DirectoryMonitor&) = delete;
+	DirectoryMonitor& operator=(const DirectoryMonitor&&) = delete;
 };

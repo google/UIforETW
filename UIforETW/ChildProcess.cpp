@@ -22,7 +22,7 @@ limitations under the License.
 
 static const wchar_t* kPipeName = L"\\\\.\\PIPE\\UIforETWPipe";
 
-ChildProcess::ChildProcess(std::wstring exePath, bool printFailedExitCodes)
+ChildProcess::ChildProcess(std::wstring exePath, bool printFailedExitCodes) noexcept
 	: exePath_(std::move(exePath)), printFailedExitCodes_(printFailedExitCodes)
 {
 	// Create the pipe here so that it is guaranteed to be created before
@@ -45,7 +45,7 @@ ChildProcess::~ChildProcess()
 	if (hProcess_)
 	{
 		// Always get the exit code since this also waits for the process to exit.
-		DWORD exitCode = GetExitCode();
+		const DWORD exitCode = GetExitCode();
 		if (printFailedExitCodes_ && exitCode)
 			outputPrintf(L"Process exit code was %08x (%lu)\n", exitCode, exitCode);
 		CloseHandle(hProcess_);
@@ -56,14 +56,14 @@ ChildProcess::~ChildProcess()
 	}
 }
 
-bool ChildProcess::IsStillRunning()
+bool ChildProcess::IsStillRunning() noexcept
 {
 	HANDLE handles[] =
 	{
 		hProcess_,
 		hOutputAvailable_,
 	};
-	DWORD waitIndex = WaitForMultipleObjects(ARRAYSIZE(handles), &handles[0], FALSE, INFINITE);
+	const DWORD waitIndex = WaitForMultipleObjects(ARRAYSIZE(handles), &handles[0], FALSE, INFINITE);
 	// Return true if hProcess_ was not signaled.
 	return waitIndex != 0;
 }
@@ -143,11 +143,11 @@ bool ChildProcess::Run(bool showCommand, std::wstring args)
 	startupInfo.dwFlags = STARTF_USESTDHANDLES;
 
 	PROCESS_INFORMATION processInfo = {};
-	DWORD flags = CREATE_NO_WINDOW;
+	const DWORD flags = CREATE_NO_WINDOW;
 	// Wacky CreateProcess rules say args has to be writable!
 	std::vector<wchar_t> argsCopy(args.size() + 1);
 	wcscpy_s(&argsCopy[0], argsCopy.size(), args.c_str());
-	BOOL success = CreateProcess(exePath_.c_str(), &argsCopy[0], NULL, NULL,
+	const BOOL success = CreateProcess(exePath_.c_str(), &argsCopy[0], NULL, NULL,
 		TRUE, flags, NULL, NULL, &startupInfo, &processInfo);
 	if (success)
 	{

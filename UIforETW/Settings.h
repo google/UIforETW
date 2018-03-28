@@ -26,8 +26,8 @@ class CSettings : public CDialog
 	DECLARE_DYNAMIC(CSettings)
 
 public:
-	CSettings(CWnd* pParent, const std::wstring& exeDir, const std::wstring& wpt81Dir, const std::wstring& wpt10Dir);   // standard constructor
-	virtual ~CSettings();
+	CSettings(CWnd* pParent, const std::wstring& exeDir, const std::wstring& wpt81Dir, const std::wstring& wpt10Dir) noexcept;   // standard constructor
+	~CSettings();
 
 // Dialog Data
 	enum { IDD = IDD_SETTINGS };
@@ -84,19 +84,24 @@ protected:
 	const std::wstring wpt10Dir_;
 
 	DECLARE_MESSAGE_MAP()
-	afx_msg void OnOK();
+	afx_msg void OnOK() override;
 public:
 	afx_msg void OnBnClickedCopystartupprofile();
 	afx_msg BOOL PreTranslateMessage(MSG* pMsg);
 	afx_msg void OnBnClickedChromedeveloper();
-	afx_msg void OnBnClickedAutoviewtraces();
-	afx_msg void OnBnClickedHeapstacks();
-	afx_msg void OnBnClickedVirtualallocstacks();
-	afx_msg void OnBnClickedExpensivews();
-	afx_msg void OnBnClickedCheckfornewversions();
+	afx_msg void OnBnClickedAutoviewtraces() noexcept;
+	afx_msg void OnBnClickedHeapstacks() noexcept;
+	afx_msg void OnBnClickedVirtualallocstacks() noexcept;
+	afx_msg void OnBnClickedExpensivews() noexcept;
+	afx_msg void OnBnClickedCheckfornewversions() noexcept;
 	afx_msg void OnBnClickedSelectPerfCounters();
-	afx_msg void OnBnClickedUseOtherKernelLogger();
-	afx_msg void OnBnClickedRecordPreTrace();
-	afx_msg void OnBnClickedIdentifyChromeCpu();
-	afx_msg void OnBnClickedBackgroundMonitoring();
+	afx_msg void OnBnClickedUseOtherKernelLogger() noexcept;
+	afx_msg void OnBnClickedRecordPreTrace() noexcept;
+	afx_msg void OnBnClickedIdentifyChromeCpu() noexcept;
+	afx_msg void OnBnClickedBackgroundMonitoring() noexcept;
+
+	CSettings& operator=(const CSettings&) = delete;
+	CSettings& operator=(const CSettings&&) = delete;
+	CSettings(const CSettings&) = delete;
+	CSettings(const CSettings&&) = delete;
 };

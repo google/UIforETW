@@ -29,7 +29,6 @@ namespace {
 
 struct HMODULEhelper
 {
-
 	HMODULE hModule;
 
 	HMODULEhelper(_In_z_ PCSTR const moduleName)
@@ -51,6 +50,10 @@ struct HMODULEhelper
 		ATLVERIFY( FreeLibrary(hModule) );
 	}
 
+	HMODULEhelper(const HMODULEhelper&) = delete;
+	HMODULEhelper(const HMODULEhelper&&) = delete;
+	HMODULEhelper& operator=(const HMODULEhelper&) = delete;
+	HMODULEhelper& operator=(const HMODULEhelper&&) = delete;
 };
 
 typedef BOOL(WINAPI* SetProcessMitigationPolicy_t)(\
@@ -154,7 +157,7 @@ END_MESSAGE_MAP()
 
 // CUIforETWApp construction
 
-CUIforETWApp::CUIforETWApp()
+CUIforETWApp::CUIforETWApp() noexcept
 {
 	// support Restart Manager
 	m_dwRestartManagerSupportFlags = AFX_RESTART_MANAGER_SUPPORT_RESTART;
@@ -198,7 +201,7 @@ BOOL CUIforETWApp::InitInstance()
 	{
 		CUIforETWDlg dlg;
 		m_pMainWnd = &dlg;
-		INT_PTR nResponse = dlg.DoModal();
+		const INT_PTR nResponse = dlg.DoModal();
 		if (nResponse == -1)
 		{
 			ATLTRACE("Warning: dialog creation failed, "
@@ -215,7 +218,7 @@ BOOL CUIforETWApp::InitInstance()
 	return FALSE;
 }
 
-void CUIforETWApp::OnHelp()
+void CUIforETWApp::OnHelp() noexcept
 {
 	ShellExecute(NULL, NULL, L"https://randomascii.wordpress.com/2015/04/14/uiforetw-windows-performance-made-easier/", NULL, NULL, SW_SHOWNORMAL);
 }

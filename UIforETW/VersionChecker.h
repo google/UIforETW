@@ -11,10 +11,10 @@ union PackagedFloatVersion
 class CVersionChecker
 {
 public:
-	CVersionChecker();
+	CVersionChecker() noexcept;
 	~CVersionChecker();
 
-	void StartVersionCheckerThread(CWnd* pWindow);
+	void StartVersionCheckerThread(CWnd* pWindow) noexcept;
 	
 private:
 	static DWORD __stdcall StaticVersionCheckerThread(LPVOID);
@@ -22,4 +22,9 @@ private:
 
 	HANDLE hThread_ = nullptr;
 	CWnd* pWindow_ = nullptr;
+
+	CVersionChecker(const CVersionChecker&) = delete;
+	CVersionChecker(const CVersionChecker&&) = delete;
+	CVersionChecker& operator=(const CVersionChecker&) = delete;
+	CVersionChecker& operator=(const CVersionChecker&&) = delete;
 };

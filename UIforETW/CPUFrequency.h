@@ -22,7 +22,7 @@ limitations under the License.
 class CCPUFrequencyMonitor
 {
 public:
-	CCPUFrequencyMonitor();
+	CCPUFrequencyMonitor() noexcept;
 	~CCPUFrequencyMonitor();
 
 	// Start and stop the sampling threads so that they aren't running
@@ -71,5 +71,7 @@ private:
 	HANDLE hExitEvent_ = nullptr;
 
 	CCPUFrequencyMonitor(const CCPUFrequencyMonitor&) = delete;
+	CCPUFrequencyMonitor(const CCPUFrequencyMonitor&&) = delete;
 	CCPUFrequencyMonitor& operator=(const CCPUFrequencyMonitor&) = delete;
+	CCPUFrequencyMonitor& operator=(const CCPUFrequencyMonitor&&) = delete;
 };

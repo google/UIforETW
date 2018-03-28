@@ -137,7 +137,7 @@ PLATFORM_INTERFACE void __cdecl ETWKeyDown(unsigned nChar, _In_opt_z_ PCSTR keyN
 class CETWScope
 {
 public:
-	CETWScope(_In_z_ PCSTR pMessage)
+	CETWScope(_In_z_ PCSTR pMessage) noexcept
 		: m_pMessage(pMessage)
 	{
 		m_nStartTime = ETWBegin(pMessage);
@@ -147,10 +147,17 @@ public:
 		ETWEnd(m_pMessage, m_nStartTime);
 	}
 private:
-	// Disable copying. Don't use "= delete" because this header
-	// should work with older compilers like VC++ 2010.
+#if _MSC_VER >= 1900
+	CETWScope& operator=(const CETWScope&) = delete;
+	CETWScope& operator=(const CETWScope&&) = delete;
+	CETWScope(const CETWScope&) = delete;
+	CETWScope(const CETWScope&&) = delete;
+#else
+	// Disable copying. Don't use "= delete" when compiling with older versions
+	// of VC++.
 	CETWScope(const CETWScope& rhs);
 	CETWScope& operator=(const CETWScope& rhs);
+#endif
 
 	PCSTR m_pMessage;
 	int64 m_nStartTime;

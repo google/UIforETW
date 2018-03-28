@@ -33,8 +33,8 @@ void WriteTextAsFile(const std::wstring& fileName, const std::wstring& text);
 // Convert a string that may have '\n' line endings to '\r\n' line endings.
 std::wstring ConvertToCRLF(const std::wstring& input);
 
-void SetRegistryDWORD(HKEY root, const std::wstring& subkey, const std::wstring& valueName, DWORD value);
-void CreateRegistryKey(HKEY root, const std::wstring& subkey, const std::wstring& newKey);
+void SetRegistryDWORD(HKEY root, const std::wstring& subkey, const std::wstring& valueName, DWORD value) noexcept;
+void CreateRegistryKey(HKEY root, const std::wstring& subkey, const std::wstring& newKey) noexcept;
 
 std::wstring GetEditControlText(HWND hwnd);
 std::wstring AnsiToUnicode(const std::string& text);
@@ -43,15 +43,15 @@ std::wstring AnsiToUnicode(const std::string& text);
 // Maximum output size is 4 K - larger outputs will be truncated.
 std::wstring stringPrintf(_Printf_format_string_ PCWSTR pFormat, ...);
 // Call OutputDebugString with a format string and some printf-style arguments.
-void debugPrintf(_Printf_format_string_ PCWSTR pFormat, ...);
+void debugPrintf(_Printf_format_string_ PCWSTR pFormat, ...) noexcept;
 void outputLastError(DWORD lastErr = ::GetLastError());
-void debugLastError(DWORD lastErr = ::GetLastError());
+void debugLastError(DWORD lastErr = ::GetLastError()) noexcept;
 
 // This function checks to see whether a control has focus before
 // disabling it. If it does have focus then it moves the focus, to
 // avoid breaking keyboard mnemonics.
 _Pre_satisfies_(Win != NULL)
-void SmartEnableWindow(HWND Win, BOOL Enable);
+void SmartEnableWindow(HWND Win, BOOL Enable) noexcept;
 
 // Return the string after the final '\' or after the final '.' in
 // the file part of a path. If the last character is '\' then GetFilePart
@@ -76,7 +76,7 @@ std::wstring CanonicalizePath(const std::wstring& path);
 // a dialog and deleted files will go to the recycle bin.
 int DeleteOneFile(HWND hwnd, const std::wstring& path);
 int DeleteFiles(HWND hwnd, const std::vector<std::wstring>& paths);
-int64_t GetFileSize(const std::wstring& path);
+int64_t GetFileSize(const std::wstring& path) noexcept;
 
 void SetClipboardText(const std::wstring& text);
 std::wstring GetClipboardText();
@@ -88,8 +88,8 @@ std::wstring GetEnvironmentVariableString(_In_z_ PCWSTR variable);
 // order. That is, it is dwFileVersionMS and dwFileVersionLS from VS_FIXEDFILEINFO.
 uint64_t GetFileVersion(const std::wstring& path);
 
-bool Is64BitWindows();
-bool Is64BitBuild();
+bool Is64BitWindows() noexcept;
+bool Is64BitBuild() noexcept;
 bool IsWindowsTenOrGreater();
 bool IsWindowsXPOrLesser();
 bool IsWindowsSevenOrLesser();
@@ -101,7 +101,7 @@ std::wstring FindPython(); // Returns a full path to python.exe or nothing.
 class ElapsedTimer final
 {
 public:
-	double ElapsedSeconds() const
+	double ElapsedSeconds() const noexcept
 	{
 		const auto duration = std::chrono::steady_clock::now() - start_;
 		const auto microseconds =
@@ -117,11 +117,11 @@ private:
 class QPCElapsedTimer final
 {
 public:
-	QPCElapsedTimer()
+	QPCElapsedTimer() noexcept
 	{
 		QueryPerformanceCounter(&start_);
 	}
-	double ElapsedSeconds() const
+	double ElapsedSeconds() const noexcept
 	{
 		LARGE_INTEGER stop;
 		QueryPerformanceCounter(&stop);
@@ -138,7 +138,7 @@ private:
 class CriticalSection
 {
 public:
-	CriticalSection()
+	CriticalSection() noexcept
 	{
 		InitializeCriticalSection(&cs_);
 	}
@@ -147,11 +147,11 @@ public:
 		DeleteCriticalSection(&cs_);
 	}
 
-	void Lock()
+	void Lock() noexcept
 	{
 		EnterCriticalSection(&cs_);
 	}
-	void Unlock()
+	void Unlock() noexcept
 	{
 		LeaveCriticalSection(&cs_);
 	}
@@ -160,13 +160,15 @@ private:
 	CRITICAL_SECTION cs_;
 
 	CriticalSection(const CriticalSection&) = delete;
+	CriticalSection(const CriticalSection&&) = delete;
 	CriticalSection& operator=(const CriticalSection&) = delete;
+	CriticalSection& operator=(const CriticalSection&&) = delete;
 };
 
 class Locker
 {
 public:
-	Locker(CriticalSection* lock)
+	Locker(CriticalSection* lock) noexcept
 		: lock_(lock)
 	{
 		lock_->Lock();
@@ -180,18 +182,20 @@ private:
 	CriticalSection* lock_;
 
 	Locker(const Locker&) = delete;
+	Locker(const Locker&&) = delete;
 	Locker& operator=(const Locker&) = delete;
+	Locker& operator=(const Locker&&) = delete;
 };
 
 std::wstring GetEXEBuildTime();
 
-void SetCurrentThreadName(PCSTR threadName);
+void SetCurrentThreadName(PCSTR threadName) noexcept;
 
 void CopyStartupProfiles(const std::wstring& exeDir, bool force);
 
-void CloseValidHandle(_In_ _Pre_valid_ _Post_ptr_invalid_ HANDLE handle);
+void CloseValidHandle(_In_ _Pre_valid_ _Post_ptr_invalid_ HANDLE handle) noexcept;
 
 #ifdef IS_MFC_APP
 // Put MFC specific code here
-void MoveControl(CWnd* pParent, CWnd& control, int xDelta, int yDelta);
+void MoveControl(const CWnd* pParent, CWnd& control, int xDelta, int yDelta);
 #endif

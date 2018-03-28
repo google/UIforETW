@@ -31,7 +31,7 @@ limitations under the License.
 
 static std::system_error MakeSystemErrorFromWin32Error(DWORD errorCode, const char* context)
 {
-	std::error_code code(errorCode, std::system_category());
+	const std::error_code code(errorCode, std::system_category());
 	return std::system_error(code, context);
 }
 namespace
@@ -44,14 +44,16 @@ class SHA1HashProvider
 	// this is just to force the destructor to be called
 	// after this constructor finishes, regardless of whether or not
 	// the calling constructor throws an exception
-	SHA1HashProvider(secret_init)
+	SHA1HashProvider(secret_init) noexcept
 		: algHandle_(nullptr)
 		, hashHandle_(nullptr)
 	{
 	}
 public:
 	SHA1HashProvider(const SHA1HashProvider&) = delete;
+	SHA1HashProvider(const SHA1HashProvider&&) = delete;
 	SHA1HashProvider& operator=(const SHA1HashProvider&) = delete;
+	SHA1HashProvider& operator=(const SHA1HashProvider&&) = delete;
 
 	// /analyze warns that this should be tagged as noexcept, but it throws an exception.
 	SHA1HashProvider()
@@ -100,7 +102,7 @@ public:
 		// ugh. how did an API written for an OS released in 2006 not consider constness?
 		// if this cast isn't safe, we'll crash as the namespace bytes should be in
 		// .rdata.
-		NTSTATUS error = BCryptHashData(hashHandle_, const_cast<unsigned char*>(blob), bytes, 0);
+		const NTSTATUS error = BCryptHashData(hashHandle_, const_cast<unsigned char*>(blob), bytes, 0);
 		if (error != 0)
 		{
 			throw MakeSystemErrorFromWin32Error(error, "CryptHashData");
@@ -109,7 +111,7 @@ public:
 	std::array<unsigned char, 20> FinishHash() const
 	{
 		std::array<unsigned char, 20> hashData;
-		NTSTATUS error = BCryptFinishHash(hashHandle_, hashData.data(), static_cast<ULONG>(hashData.size()), 0);
+		const NTSTATUS error = BCryptFinishHash(hashHandle_, hashData.data(), static_cast<ULONG>(hashData.size()), 0);
 		if (error != 0)
 		{
 			throw MakeSystemErrorFromWin32Error(error, "CryptGetHashParam");

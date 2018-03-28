@@ -88,7 +88,7 @@ static std::wstring TranslateTraceLoggingProvider(const std::wstring& provider)
 {
 	std::wstring providerOptions;
 	std::wstring justProviderName(provider);
-	auto endOfProvider = justProviderName.find(L':');
+	const auto endOfProvider = justProviderName.find(L':');
 	if (endOfProvider != std::wstring::npos)
 	{
 		providerOptions = justProviderName.substr(endOfProvider);
@@ -126,7 +126,7 @@ static std::wstring TranslateUserModeProviders(const std::wstring& providers)
 	return translatedProviders;
 }
 
-CUIforETWDlg::CUIforETWDlg(CWnd* pParent /*=NULL*/)
+CUIforETWDlg::CUIforETWDlg(CWnd* pParent /*=NULL*/) noexcept
 	: CDialog(CUIforETWDlg::IDD, pParent)
 	, monitorThread_(this)
 {
@@ -294,7 +294,7 @@ void CUIforETWDlg::CheckSymbolDLLs()
 	// needed so it is deleted at the same time.
 	// Previously the old copies were used to handle these issues:
 	// https://randomascii.wordpress.com/2012/10/04/xperf-symbol-loading-pitfalls/
-	const wchar_t* fileNames[] =
+	const wchar_t* const fileNames[] =
 	{
 		L"dbghelp.dll",
 		L"symsrv.dll",
@@ -326,7 +326,7 @@ void CUIforETWDlg::CheckSymbolDLLs()
 	// Previous versions of symsrv.dll may not be multithreading safe and therefore can't
 	// be used with the latest WPA.
 	const int64_t requiredSymsrvVersion = (10llu << 48) + 0 + (14321llu << 16) + (1024llu << 0);
-	auto symsrvVersion = GetFileVersion(symsrv_path);
+	const auto symsrvVersion = GetFileVersion(symsrv_path);
 	if (symsrvVersion < requiredSymsrvVersion)
 	{
 		AfxMessageBox((L"symsrv.dll (" + symsrv_path +
@@ -439,7 +439,7 @@ BOOL CUIforETWDlg::OnInitDialog()
 					ChildProcess child(msiExecPath);
 					std::wstring args = L" /i \"" + installPathOld10 + L"\"";
 					child.Run(true, L"msiexec.exe" + args);
-					DWORD installResult10 = child.GetExitCode();
+					const DWORD installResult10 = child.GetExitCode();
 					if (!installResult10)
 					{
 						outputPrintf(L"WPT version 10.0.10586 was installed.\n");
@@ -462,7 +462,7 @@ BOOL CUIforETWDlg::OnInitDialog()
 					ChildProcess child(msiExecPath);
 					std::wstring args = L" /i \"" + installPath10 + L"\"";
 					child.Run(true, L"msiexec.exe" + args);
-					DWORD installResult10 = child.GetExitCode();
+					const DWORD installResult10 = child.GetExitCode();
 					if (!installResult10)
 					{
 						outputPrintf(L"WPT version 10.0.15063 was installed.\n");
@@ -765,7 +765,7 @@ void CUIforETWDlg::RegisterProviders()
 			child.Run(bShowCommands_, L"wevtutil.exe" + args);
 			if (pass)
 			{
-				DWORD exitCode = child.GetExitCode();
+				const DWORD exitCode = child.GetExitCode();
 				if (!exitCode)
 				{
 					useChromeProviders_ = true;
@@ -788,7 +788,7 @@ void CUIforETWDlg::DisablePagingExecutive()
 	}
 }
 
-void CUIforETWDlg::UpdateEnabling()
+void CUIforETWDlg::UpdateEnabling() noexcept
 {
 	SmartEnableWindow(btStartTracing_.m_hWnd, !bIsTracing_);
 	SmartEnableWindow(btSaveTraceBuffers_.m_hWnd, bIsTracing_);
@@ -827,12 +827,12 @@ void CUIforETWDlg::OnPaint()
 		SendMessage(WM_ICONERASEBKGND, reinterpret_cast<WPARAM>(dc.GetSafeHdc()), 0);
 
 		// Center icon in client rectangle
-		int cxIcon = GetSystemMetrics(SM_CXICON);
-		int cyIcon = GetSystemMetrics(SM_CYICON);
+		const int cxIcon = GetSystemMetrics(SM_CXICON);
+		const int cyIcon = GetSystemMetrics(SM_CYICON);
 		CRect rect;
 		GetClientRect(&rect);
-		int x = (rect.Width() - cxIcon + 1) / 2;
-		int y = (rect.Height() - cyIcon + 1) / 2;
+		const int x = (rect.Width() - cxIcon + 1) / 2;
+		const int y = (rect.Height() - cyIcon + 1) / 2;
 
 		// Draw the icon
 		dc.DrawIcon(x, y, m_hIcon);
@@ -845,9 +845,10 @@ void CUIforETWDlg::OnPaint()
 
 // The system calls this function to obtain the cursor to display while the user drags
 // the minimized window.
-HCURSOR CUIforETWDlg::OnQueryDragIcon()
+HCURSOR CUIforETWDlg::OnQueryDragIcon() noexcept
 {
-	return static_cast<HCURSOR>(m_hIcon);
+	// HCURSOR and HICON are the same type, so no cast is needed.
+	return m_hIcon;
 }
 
 
@@ -1103,7 +1104,7 @@ void CUIforETWDlg::OnBnClickedStarttracing()
 	std::wstring heapStackWalk;
 	if (bHeapStacks_)
 		heapStackWalk = L" -stackwalk HeapCreate+HeapDestroy+HeapAlloc+HeapRealloc";
-	std::wstring heapArgs = L" -start UIforETWHeapSession -heap -Pids 0" + heapStackWalk + heapBuffers + heapFile;
+	const std::wstring heapArgs = L" -start UIforETWHeapSession -heap -Pids 0" + heapStackWalk + heapBuffers + heapFile;
 
 	bPreTraceRecorded_ = false;
 
@@ -1229,13 +1230,13 @@ void CUIforETWDlg::StopTracingAndMaybeRecord(bool bSaveTrace)
 	// Note that this has to be done before the -flush step -- it makes both it
 	// and the -merge step painfully slow.
 	DeleteFile(compatFileTemp.c_str());
-	BOOL moveSuccess = MoveFile(compatFile.c_str(), compatFileTemp.c_str());
+	const BOOL moveSuccess = MoveFile(compatFile.c_str(), compatFileTemp.c_str());
 	// Don't print this message - it just cause confusion, especially since the renaming fails
 	// on most machines without it mattering.
 	//if (bShowCommands_ && !moveSuccess)
 	//	outputPrintf(L"Failed to rename %s to %s\n", compatFile.c_str(), compatFileTemp.c_str());
 
-	ElapsedTimer saveTimer;
+	const ElapsedTimer saveTimer;
 	{
 		// Stop the kernel and user sessions.
 		ChildProcess child(GetXperfPath());
@@ -1273,7 +1274,7 @@ void CUIforETWDlg::StopTracingAndMaybeRecord(bool bSaveTrace)
 			StopEventThreads();
 		}
 	}
-	double saveTime = saveTimer.ElapsedSeconds();
+	const double saveTime = saveTimer.ElapsedSeconds();
 	if (bShowCommands_ && bSaveTrace)
 		outputPrintf(L"Trace save took %1.1f s\n", saveTime);
 
@@ -1281,7 +1282,7 @@ void CUIforETWDlg::StopTracingAndMaybeRecord(bool bSaveTrace)
 	if (bSaveTrace)
 	{
 		outputPrintf(L"Merging trace...\n");
-		ElapsedTimer mergeTimer;
+		const ElapsedTimer mergeTimer;
 		{
 			// Separate merge step to allow compression on Windows 8+
 			// https://randomascii.wordpress.com/2015/03/02/etw-trace-compression-and-xperf-syntax-refresher/
@@ -1370,7 +1371,7 @@ void CUIforETWDlg::OnTimer(UINT_PTR)
 {
 	if (bIsTracing_ && (tracingMode_ == kTracingToFile || tracingMode_ == kHeapTracingToFile))
 	{
-		ULONGLONG elapsed = GetTickCount64() - traceStartTime_;
+		const ULONGLONG elapsed = GetTickCount64() - traceStartTime_;
 		if (elapsed > kMaxFileTraceMs)
 		{
 			outputPrintf(L"\nTracing to disk ran excessively long. Auto-saving and stopping.\n");
@@ -1416,7 +1417,7 @@ void CUIforETWDlg::LaunchTraceViewer(const std::wstring traceFilename, const std
 	wcscpy_s(&argsCopy[0], argsCopy.size(), args.c_str());
 	STARTUPINFO startupInfo = {};
 	PROCESS_INFORMATION processInfo = {};
-	BOOL result = CreateProcess(viewerPath.c_str(), &argsCopy[0], nullptr, nullptr, FALSE, 0, nullptr, nullptr, &startupInfo, &processInfo);
+	const BOOL result = CreateProcess(viewerPath.c_str(), &argsCopy[0], nullptr, nullptr, FALSE, 0, nullptr, nullptr, &startupInfo, &processInfo);
 	if (result)
 	{
 		// Close the handles to avoid leaks.
@@ -1429,25 +1430,25 @@ void CUIforETWDlg::LaunchTraceViewer(const std::wstring traceFilename, const std
 	}
 }
 
-void CUIforETWDlg::OnBnClickedCompresstrace()
+void CUIforETWDlg::OnBnClickedCompresstrace() noexcept
 {
 	bCompress_ = !bCompress_;
 }
 
 
-void CUIforETWDlg::OnBnClickedCpusamplingcallstacks()
+void CUIforETWDlg::OnBnClickedCpusamplingcallstacks() noexcept
 {
 	bSampledStacks_ = !bSampledStacks_;
 }
 
 
-void CUIforETWDlg::OnBnClickedContextswitchcallstacks()
+void CUIforETWDlg::OnBnClickedContextswitchcallstacks() noexcept
 {
 	bCswitchStacks_ = !bCswitchStacks_;
 }
 
 
-void CUIforETWDlg::OnBnClickedShowcommands()
+void CUIforETWDlg::OnBnClickedShowcommands() noexcept
 {
 	bShowCommands_ = !bShowCommands_;
 }
@@ -1488,19 +1489,19 @@ void CUIforETWDlg::OnBnClickedFastsampling()
 }
 
 
-void CUIforETWDlg::OnBnClickedGPUtracing()
+void CUIforETWDlg::OnBnClickedGPUtracing() noexcept
 {
 	bGPUTracing_ = !bGPUTracing_;
 }
 
-void CUIforETWDlg::OnBnClickedClrtracing()
+void CUIforETWDlg::OnBnClickedClrtracing() noexcept
 {
 	bCLRTracing_ = !bCLRTracing_;
 }
 
 void CUIforETWDlg::OnCbnSelchangeInputtracing()
 {
-	InputTracing_ = (KeyLoggerState)btInputTracing_.GetCurSel();
+	InputTracing_ = static_cast<KeyLoggerState>(btInputTracing_.GetCurSel());
 	switch (InputTracing_)
 	{
 	case kKeyLoggerOff:
@@ -1527,7 +1528,7 @@ void CUIforETWDlg::UpdateTraceList()
 	lastTraceFilename_.clear();
 
 	int curSel = btTraces_.GetCurSel();
-	if (selectedTraceName.empty() && curSel >= 0 && curSel < (int)traces_.size())
+	if (selectedTraceName.empty() && curSel >= 0 && curSel < static_cast<int>(traces_.size()))
 	{
 		selectedTraceName = traces_[curSel];
 	}
@@ -1561,7 +1562,7 @@ void CUIforETWDlg::UpdateTraceList()
 		btTraces_.SetRedraw(FALSE);
 		// Erase all entries and replace them.
 		btTraces_.ResetContent();
-		for (int curIndex = 0; curIndex < (int)traces_.size(); ++curIndex)
+		for (int curIndex = 0; curIndex < static_cast<int>(traces_.size()); ++curIndex)
 		{
 			const auto& name = traces_[curIndex];
 			btTraces_.AddString(name.c_str());
@@ -1573,8 +1574,8 @@ void CUIforETWDlg::UpdateTraceList()
 				curSel = curIndex;
 			}
 		}
-		if (curSel >= (int)traces_.size())
-			curSel = (int)traces_.size() - 1;
+		if (curSel >= static_cast<int>(traces_.size()))
+			curSel = static_cast<int>(traces_.size()) - 1;
 		btTraces_.SetCurSel(curSel);
 		btTraces_.SetRedraw(TRUE);
 	}
@@ -1600,7 +1601,7 @@ LRESULT CUIforETWDlg::NewVersionAvailable(WPARAM wParam, LPARAM /*lParam*/)
 		"The version you have installed is %1.2f and the new version is %1.2f.\n"
 		"Would you like to download the new version?", kCurrentVersion, newVersion.f);
 
-	int result = AfxMessageBox(message.c_str(), MB_YESNO);
+	const int result = AfxMessageBox(message.c_str(), MB_YESNO);
 	if (result == IDYES)
 		ShellExecute(*this, L"open", L"https://github.com/google/UIforETW/releases/", 0, L".", SW_SHOWNORMAL);
 	if (result == IDNO)
@@ -1612,15 +1613,15 @@ LRESULT CUIforETWDlg::NewVersionAvailable(WPARAM wParam, LPARAM /*lParam*/)
 
 void CUIforETWDlg::OnLbnDblclkTracelist()
 {
-	int selIndex = btTraces_.GetCurSel();
+	const int selIndex = btTraces_.GetCurSel();
 	// This check shouldn't be necessary, but who knows?
-	if (selIndex < 0 || selIndex >= (int)traces_.size())
+	if (selIndex < 0 || selIndex >= static_cast<int>(traces_.size()))
 		return;
 	std::wstring tracename = GetTraceDir() + traces_[selIndex] + L".etl";
 	LaunchTraceViewer(tracename, wpaDefaultPath());
 }
 
-void CUIforETWDlg::OnGetMinMaxInfo(MINMAXINFO* lpMMI)
+void CUIforETWDlg::OnGetMinMaxInfo(MINMAXINFO* lpMMI) noexcept
 {
 	if (!initialWidth_)
 		return;
@@ -1638,9 +1639,9 @@ void CUIforETWDlg::OnSize(UINT nType, int /*cx*/, int /*cy*/)
 		// Calculate xDelta and yDelta -- the change in the window's size.
 		CRect windowRect;
 		GetWindowRect(&windowRect);
-		int xDelta = windowRect.Width() - lastWidth_;
+		const int xDelta = windowRect.Width() - lastWidth_;
 		lastWidth_ += xDelta;
-		int yDelta = windowRect.Height() - lastHeight_;
+		const int yDelta = windowRect.Height() - lastHeight_;
 		lastHeight_ += yDelta;
 
 		const UINT flags = SWP_NOMOVE | SWP_NOOWNERZORDER | SWP_NOZORDER | SWP_NOACTIVATE;
@@ -1656,7 +1657,7 @@ void CUIforETWDlg::OnSize(UINT nType, int /*cx*/, int /*cy*/)
 		CRect listRect;
 		btTraces_.GetWindowRect(&listRect);
 		btTraces_.SetWindowPos(nullptr, 0, 0, listRect.Width(), listRect.Height() + yDelta, flags);
-		int curSel = btTraces_.GetCurSel();
+		const int curSel = btTraces_.GetCurSel();
 		if (curSel != LB_ERR)
 		{
 			// Make the selected line visible.
@@ -1703,8 +1704,8 @@ void CUIforETWDlg::UpdateNotesState()
 {
 	SaveNotesIfNeeded();
 
-	int curSel = btTraces_.GetCurSel();
-	if (curSel >= 0 && curSel < (int)traces_.size())
+	const int curSel = btTraces_.GetCurSel();
+	if (curSel >= 0 && curSel < static_cast<int>(traces_.size()))
 	{
 		SmartEnableWindow(btTraceNotes_.m_hWnd, true);
 		std::wstring traceName = traces_[curSel];
@@ -1826,7 +1827,7 @@ void CUIforETWDlg::SetHeapTracing(bool forceOff)
 
 void CUIforETWDlg::OnCbnSelchangeTracingmode()
 {
-	tracingMode_ = (TracingMode)btTracingMode_.GetCurSel();
+	tracingMode_ = static_cast<TracingMode>(btTracingMode_.GetCurSel());
 	switch (tracingMode_)
 	{
 	case kTracingToMemory:
@@ -1916,7 +1917,7 @@ void CUIforETWDlg::OnContextMenu(CWnd* pWnd, CPoint point)
 	// See if we right-clicked on the trace list.
 	if (pWnd == &btTraces_)
 	{
-		int selIndex = btTraces_.GetCurSel();
+		const int selIndex = btTraces_.GetCurSel();
 
 		CMenu PopupMenu;
 		PopupMenu.LoadMenu(IDR_TRACESCONTEXTMENU);
@@ -1982,7 +1983,7 @@ void CUIforETWDlg::OnContextMenu(CWnd* pWnd, CPoint point)
 			pContextMenu->EnableMenuItem(ID_TRACES_COMPRESSTRACES, MF_BYCOMMAND | MF_GRAYED);
 		}
 
-		int selection = pContextMenu->TrackPopupMenu(TPM_LEFTALIGN | TPM_LEFTBUTTON |
+		const int selection = pContextMenu->TrackPopupMenu(TPM_LEFTALIGN | TPM_LEFTBUTTON |
 			TPM_RIGHTBUTTON | TPM_RETURNCMD | TPM_NONOTIFY,
 			point.x, point.y, pWnd, NULL);
 
@@ -2055,7 +2056,7 @@ void CUIforETWDlg::OnContextMenu(CWnd* pWnd, CPoint point)
 
 void CUIforETWDlg::DeleteTrace()
 {
-	int selIndex = btTraces_.GetCurSel();
+	const int selIndex = btTraces_.GetCurSel();
 
 	if (selIndex >= 0)
 	{
@@ -2077,7 +2078,7 @@ void CUIforETWDlg::DeleteTrace()
 
 void CUIforETWDlg::CopyTraceName()
 {
-	int selIndex = btTraces_.GetCurSel();
+	const int selIndex = btTraces_.GetCurSel();
 
 	if (selIndex >= 0)
 	{
@@ -2094,7 +2095,7 @@ void CUIforETWDlg::CopyTraceName()
 
 void CUIforETWDlg::OnOpenTraceWPA()
 {
-	int selIndex = btTraces_.GetCurSel();
+	const int selIndex = btTraces_.GetCurSel();
 
 	if (selIndex >= 0)
 	{
@@ -2106,7 +2107,7 @@ void CUIforETWDlg::OnOpenTraceWPA()
 
 void CUIforETWDlg::OnOpenTrace10WPA()
 {
-	int selIndex = btTraces_.GetCurSel();
+	const int selIndex = btTraces_.GetCurSel();
 
 	if (selIndex >= 0)
 	{
@@ -2117,7 +2118,7 @@ void CUIforETWDlg::OnOpenTrace10WPA()
 
 void CUIforETWDlg::OnOpenTraceGPUView()
 {
-	int selIndex = btTraces_.GetCurSel();
+	const int selIndex = btTraces_.GetCurSel();
 
 	if (selIndex >= 0)
 	{
@@ -2172,7 +2173,7 @@ void CUIforETWDlg::CompressAllTraces() const
 	int compressedCount = 0;
 	for (const auto& traceName : traces_)
 	{
-		auto result = CompressTrace(GetTraceDir() + traceName + L".etl");
+		const auto result = CompressTrace(GetTraceDir() + traceName + L".etl");
 		if (result.first == result.second)
 		{
 			++notCompressedCount;
@@ -2201,7 +2202,7 @@ void CUIforETWDlg::StripChromeSymbols(const std::wstring& traceFilename)
 	if (!pythonPath.empty())
 	{
 		outputPrintf(L"Stripping Chrome symbols - this may take a while...\n");
-		ElapsedTimer stripTimer;
+		const ElapsedTimer stripTimer;
 		{
 			ChildProcess child(pythonPath);
 			// Must pass -u to disable Python's output buffering when printing to
@@ -2278,8 +2279,8 @@ void CUIforETWDlg::PreprocessTrace(const std::wstring& traceFilename)
 void CUIforETWDlg::StartRenameTrace(bool fullRename)
 {
 	SaveNotesIfNeeded();
-	int curSel = btTraces_.GetCurSel();
-	if (curSel >= 0 && curSel < (int)traces_.size())
+	const int curSel = btTraces_.GetCurSel();
+	if (curSel >= 0 && curSel < static_cast<int>(traces_.size()))
 	{
 		std::wstring traceName = traces_[curSel];
 		// If the trace name starts with the default date/time pattern
@@ -2291,7 +2292,7 @@ void CUIforETWDlg::StartRenameTrace(bool fullRename)
 			validRenameDate_ = true;
 			for (size_t i = 0; i < kPrefixLength; ++i)
 			{
-				wchar_t c = traceName[i];
+				const wchar_t c = traceName[i];
 				if (c != '-' && c != '_' && c != '.' && !iswdigit(c))
 					validRenameDate_ = false;
 			}

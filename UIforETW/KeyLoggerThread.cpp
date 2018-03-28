@@ -45,7 +45,7 @@ LRESULT CALLBACK LowLevelKeyboardHook(int nCode, WPARAM wParam, LPARAM lParam)
 	UIETWASSERT(nCode == HC_ACTION);
 	// wParam is WM_KEYDOWN, WM_KEYUP, WM_SYSKEYDOWN, or WM_SYSKEYUP
 
-	KBDLLHOOKSTRUCT* pKbdLLHook = (KBDLLHOOKSTRUCT*)lParam;
+	const KBDLLHOOKSTRUCT* const pKbdLLHook = reinterpret_cast<KBDLLHOOKSTRUCT*>(lParam);
 
 	if (wParam == WM_KEYDOWN || wParam == WM_SYSKEYDOWN)
 	{
@@ -154,7 +154,7 @@ LRESULT CALLBACK LowLevelKeyboardHook(int nCode, WPARAM wParam, LPARAM lParam)
 				break;
 			default:
 				// Handle miscellaneous keys that are otherwise missed.
-				if (UINT translated = MapVirtualKey(code, MAPVK_VK_TO_CHAR))
+				if (const UINT translated = MapVirtualKey(code, MAPVK_VK_TO_CHAR))
 					sprintf_s(buffer, "%c", translated);
 				else
 					pLabel = "<unknown key>";
@@ -169,11 +169,11 @@ LRESULT CALLBACK LowLevelKeyboardHook(int nCode, WPARAM wParam, LPARAM lParam)
 }
 
 _Pre_satisfies_(nCode == HC_ACTION)
-LRESULT CALLBACK LowLevelMouseHook(int nCode, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK LowLevelMouseHook(int nCode, WPARAM wParam, LPARAM lParam) noexcept
 {
 	UIETWASSERT(nCode == HC_ACTION);
 
-	MSLLHOOKSTRUCT* pMouseLLHook = (MSLLHOOKSTRUCT*)lParam;
+	const MSLLHOOKSTRUCT* const pMouseLLHook = reinterpret_cast<MSLLHOOKSTRUCT*>(lParam);
 
 	int whichButton = -1;
 	bool pressed = true;
@@ -218,7 +218,7 @@ LRESULT CALLBACK LowLevelMouseHook(int nCode, WPARAM wParam, LPARAM lParam)
 	{
 		if (wParam == WM_MOUSEWHEEL)
 		{
-			int wheelDelta = GET_WHEEL_DELTA_WPARAM(pMouseLLHook->mouseData);
+			const int wheelDelta = GET_WHEEL_DELTA_WPARAM(pMouseLLHook->mouseData);
 			ETWMouseWheel(0, wheelDelta, pMouseLLHook->pt.x, pMouseLLHook->pt.y);
 		}
 
@@ -233,7 +233,7 @@ LRESULT CALLBACK LowLevelMouseHook(int nCode, WPARAM wParam, LPARAM lParam)
 
 
 
-DWORD __stdcall InputThread(LPVOID)
+DWORD __stdcall InputThread(LPVOID) noexcept
 {
 	SetCurrentThreadName("Input logger");
 
@@ -287,7 +287,7 @@ DWORD __stdcall InputThread(LPVOID)
 
 }
 
-void SetKeyloggingState(enum KeyLoggerState state)
+void SetKeyloggingState(enum KeyLoggerState state) noexcept
 {
 	static HANDLE s_hThread = 0;
 	static DWORD s_threadID;

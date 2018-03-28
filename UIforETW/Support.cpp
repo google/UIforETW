@@ -117,7 +117,7 @@ void CUIforETWDlg::TransferSettings(bool saving)
 	{
 		if (saving)
 		{
-			pApp->WriteProfileBinary(pSettings, m.pName, (LPBYTE)m.pSetting, sizeof(*m.pSetting));
+			pApp->WriteProfileBinary(pSettings, m.pName, reinterpret_cast<LPBYTE>(m.pSetting), sizeof(*m.pSetting));
 		}
 		else
 		{
@@ -125,7 +125,7 @@ void CUIforETWDlg::TransferSettings(bool saving)
 			UINT byteCount = sizeof(uint64_t);
 			pApp->GetProfileBinary(pSettings, m.pName, &temp, &byteCount);
 			if (byteCount == sizeof(uint64_t))
-				*m.pSetting = *(uint64_t*)temp;
+				*m.pSetting = *reinterpret_cast<uint64_t*>(temp);
 			delete [] temp;
 		}
 	}
@@ -166,7 +166,7 @@ void CUIforETWDlg::TransferSettings(bool saving)
 // Machines with over 15 GB of RAM (16 GB minus some overhead) should
 // get a modest boost, and machines with over 30 GB of RAM should get
 // a larger boost.
-int CUIforETWDlg::BufferCountBoost(int requestCount) const
+int CUIforETWDlg::BufferCountBoost(int requestCount) const noexcept
 {
 	// Saving traces from circular buffers in memory seems to be really
 	// slow on some (dual socket?) machines and the 600 MB on medium to
@@ -181,7 +181,7 @@ int CUIforETWDlg::BufferCountBoost(int requestCount) const
 	if (!GlobalMemoryStatusEx(&memoryStatus))
 		return requestCount;
 
-	const int64_t oneGB = int64_t(1024) * 1024 * 1024;
+	const int64_t oneGB = static_cast<int64_t>(1024) * 1024 * 1024;
 	const int64_t physicalRam = memoryStatus.ullTotalPhys;
 	if (physicalRam > 15 * oneGB)
 	{

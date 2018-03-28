@@ -54,7 +54,7 @@ const int MSR_FUNC_MAX_POWER = 3; /* ????? */
 
 namespace
 {
-	void markETWEvent(const BATTERY_STATUS& bs, const BATTERY_INFORMATION& bi)
+	void markETWEvent(const BATTERY_STATUS& bs, const BATTERY_INFORMATION& bi) noexcept
 	{
 		char powerState[100];
 		powerState[0] = 0;
@@ -102,7 +102,7 @@ namespace
 	struct HDEVINFO_battery final
 	{
 		HDEVINFO hdev;
-		HDEVINFO_battery()
+		HDEVINFO_battery() noexcept
 		{
 			hdev = SetupDiGetClassDevs(&GUID_DEVCLASS_BATTERY,
 									   0,
@@ -124,13 +124,15 @@ namespace
 			}
 		}
 		HDEVINFO_battery(const HDEVINFO_battery&) = delete;
+		HDEVINFO_battery(const HDEVINFO_battery&&) = delete;
 		HDEVINFO_battery& operator=(const HDEVINFO_battery&) = delete;
+		HDEVINFO_battery& operator=(const HDEVINFO_battery&&) = delete;
 	};
 
 	struct Battery final
 	{
 		HANDLE hBattery;
-		Battery(PCTSTR DevicePath)
+		Battery(PCTSTR DevicePath) noexcept
 		{
 			hBattery = CreateFile(DevicePath,
 								   (GENERIC_READ | GENERIC_WRITE),
@@ -151,12 +153,14 @@ namespace
 			CloseValidHandle( hBattery );
 		}
 		Battery(const Battery&) = delete;
+		Battery(const Battery&&) = delete;
 		Battery& operator=(const Battery&) = delete;
+		Battery& operator=(const Battery&&) = delete;
 	};
 
 } //namespace
 
-void CPowerStatusMonitor::SampleCPUPowerState()
+void CPowerStatusMonitor::SampleCPUPowerState() noexcept
 {
 	if (!IntelEnergyLibInitialize || !GetNumMsrs || !GetMsrName || !GetMsrFunc ||
 		!GetPowerData || !ReadSample)
@@ -180,7 +184,7 @@ void CPowerStatusMonitor::SampleCPUPowerState()
 
 		if (funcID == MSR_FUNC_FREQ)
 		{
-			ETWMarkCPUFrequency(MSRName, (float)data[0]);
+			ETWMarkCPUFrequency(MSRName, static_cast<float>(data[0]));
 			//outputPrintf(L"%s = %4.0f MHz\n", MSRName, data[0]);
 		}
 		else if (funcID == MSR_FUNC_POWER)
@@ -257,7 +261,7 @@ void CPowerStatusMonitor::SampleBatteryStat()
 		#pragma warning(suppress : 6102)
 		std::vector<char> detailDataMemory(bytesNeeded);
 
-		auto const pDeviceIfaceData = reinterpret_cast<PSP_DEVICE_INTERFACE_DETAIL_DATA>(detailDataMemory.data());
+		const auto pDeviceIfaceData = reinterpret_cast<PSP_DEVICE_INTERFACE_DETAIL_DATA>(detailDataMemory.data());
 		pDeviceIfaceData->cbSize = sizeof(*pDeviceIfaceData);
 
 		if (!SetupDiGetDeviceInterfaceDetail(hDev.hdev, &did, pDeviceIfaceData,
@@ -336,10 +340,10 @@ extern "C" NTSYSAPI NTSTATUS NTAPI NtQueryTimerResolution(
 	_Out_ PULONG currentResolution);
 // Link to ntdll.lib to allow calling of NtQueryTimerResolution
 #pragma comment(lib, "ntdll")
-void CPowerStatusMonitor::SampleTimerState()
+void CPowerStatusMonitor::SampleTimerState() noexcept
 {
 	ULONG minResolution, maxResolution, curResolution;
-	NTSTATUS status = NtQueryTimerResolution(&minResolution, &maxResolution, &curResolution);
+	const NTSTATUS status = NtQueryTimerResolution(&minResolution, &maxResolution, &curResolution);
 	if (status == STATUS_SUCCESS) {
 		// Convert from 100 ns (0.1 microsecond) units to milliseconds.
 		ETWMarkTimerInterval(curResolution * 1e-4);
@@ -350,7 +354,7 @@ DWORD __stdcall CPowerStatusMonitor::StaticPowerMonitorThread(LPVOID param)
 {
 	SetCurrentThreadName("Power monitor");
 
-	CPowerStatusMonitor* pThis = reinterpret_cast<CPowerStatusMonitor*>(param);
+	CPowerStatusMonitor* pThis = static_cast<CPowerStatusMonitor*>(param);
 	pThis->PowerMonitorThread();
 	return 0;
 }
@@ -358,7 +362,7 @@ DWORD __stdcall CPowerStatusMonitor::StaticPowerMonitorThread(LPVOID param)
 struct Counter {
 	explicit Counter(std::wstring counter_name) : name(counter_name) {}
 	std::wstring name;
-	PDH_HCOUNTER handle;
+	PDH_HCOUNTER handle = 0;
 };
 
 void CPowerStatusMonitor::PowerMonitorThread()
@@ -383,12 +387,12 @@ void CPowerStatusMonitor::PowerMonitorThread()
 	}
 
 	unsigned sampleNumber = 0;
-	DWORD samplingInterval = (monitorType_ == MonitorType::HeavyLoad) ?
+	const DWORD samplingInterval = (monitorType_ == MonitorType::HeavyLoad) ?
 		kHeavySamplingInterval :
 		kLightSamplingInterval;
 	for (;;)
 	{
-		DWORD result = WaitForSingleObject(hExitEvent_, samplingInterval);
+		const DWORD result = WaitForSingleObject(hExitEvent_, samplingInterval);
 		if (result == WAIT_OBJECT_0)
 			break;
 
@@ -406,7 +410,7 @@ void CPowerStatusMonitor::PowerMonitorThread()
 			{
 				DWORD counter_type = 0;
 				PDH_FMT_COUNTERVALUE value = {};
-				PDH_STATUS pdh_result = PdhGetFormattedCounterValue(counter.handle, PDH_FMT_DOUBLE, &counter_type, &value);
+				const PDH_STATUS pdh_result = PdhGetFormattedCounterValue(counter.handle, PDH_FMT_DOUBLE, &counter_type, &value);
 				if (pdh_result == ERROR_SUCCESS)
 				{
 					//debugPrintf(L"Value for %s is %f\n", counter.name.c_str(), value.doubleValue);
@@ -423,7 +427,7 @@ void CPowerStatusMonitor::PowerMonitorThread()
 		PdhCloseQuery(query);
 }
 
-CPowerStatusMonitor::CPowerStatusMonitor()
+CPowerStatusMonitor::CPowerStatusMonitor() noexcept
 {
 	// If Intel Power Gadget is installed then use it to get CPU power data.
 #if _M_X64
@@ -437,13 +441,13 @@ CPowerStatusMonitor::CPowerStatusMonitor()
 		energyLib_ = LoadLibrary((std::wstring(powerGadgetDir) + dllName).c_str());
 	if (energyLib_)
 	{
-		IntelEnergyLibInitialize = (IntelEnergyLibInitialize_t)GetProcAddress(energyLib_, "IntelEnergyLibInitialize");
-		GetNumMsrs = (GetNumMsrs_t)GetProcAddress(energyLib_, "GetNumMsrs");
-		GetMsrName = (GetMsrName_t)GetProcAddress(energyLib_, "GetMsrName");
-		GetMsrFunc = (GetMsrFunc_t)GetProcAddress(energyLib_, "GetMsrFunc");
-		GetPowerData = (GetPowerData_t)GetProcAddress(energyLib_, "GetPowerData");
-		ReadSample = (ReadSample_t)GetProcAddress(energyLib_, "ReadSample");
-		auto GetMaxTemperature = (GetMaxTemperature_t)GetProcAddress(energyLib_, "GetMaxTemperature");
+		IntelEnergyLibInitialize = reinterpret_cast<IntelEnergyLibInitialize_t>(GetProcAddress(energyLib_, "IntelEnergyLibInitialize"));
+		GetNumMsrs = reinterpret_cast<GetNumMsrs_t>(GetProcAddress(energyLib_, "GetNumMsrs"));
+		GetMsrName = reinterpret_cast<GetMsrName_t>(GetProcAddress(energyLib_, "GetMsrName"));
+		GetMsrFunc = reinterpret_cast<GetMsrFunc_t>(GetProcAddress(energyLib_, "GetMsrFunc"));
+		GetPowerData = reinterpret_cast<GetPowerData_t>(GetProcAddress(energyLib_, "GetPowerData"));
+		ReadSample = reinterpret_cast<ReadSample_t>(GetProcAddress(energyLib_, "ReadSample"));
+		auto GetMaxTemperature = reinterpret_cast<GetMaxTemperature_t>(GetProcAddress(energyLib_, "GetMaxTemperature"));
 		if (IntelEnergyLibInitialize && ReadSample)
 		{
 			if (IntelEnergyLibInitialize())
@@ -461,7 +465,7 @@ CPowerStatusMonitor::CPowerStatusMonitor()
 	}
 }
 
-void CPowerStatusMonitor::ClearEnergyLibFunctionPointers()
+void CPowerStatusMonitor::ClearEnergyLibFunctionPointers() noexcept
 {
 	IntelEnergyLibInitialize = nullptr;
 	GetNumMsrs = nullptr;
@@ -471,7 +475,7 @@ void CPowerStatusMonitor::ClearEnergyLibFunctionPointers()
 	ReadSample = nullptr;
 }
 
-void CPowerStatusMonitor::SetPerfCounters(std::wstring& perfCounters)
+void CPowerStatusMonitor::SetPerfCounters(const std::wstring& perfCounters)
 {
 	// Make sure threads aren't running!
 	UIETWASSERT(!hThread_);
@@ -481,7 +485,7 @@ void CPowerStatusMonitor::SetPerfCounters(std::wstring& perfCounters)
 	}
 }
 
-void CPowerStatusMonitor::StartThreads(MonitorType monitorType)
+void CPowerStatusMonitor::StartThreads(MonitorType monitorType) noexcept
 {
 	UIETWASSERT(!hExitEvent_);
 
@@ -493,7 +497,7 @@ void CPowerStatusMonitor::StartThreads(MonitorType monitorType)
 	}
 }
 
-void CPowerStatusMonitor::StopThreads()
+void CPowerStatusMonitor::StopThreads() noexcept
 {
 	if (hExitEvent_)
 	{

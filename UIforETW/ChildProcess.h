@@ -32,7 +32,7 @@ limitations under the License.
 class ChildProcess
 {
 public:
-	ChildProcess(std::wstring exePath, bool printFailedExitCodes = true);
+	ChildProcess(std::wstring exePath, bool printFailedExitCodes = true) noexcept;
 	// This waits for the child process to terminate, and prints
 	// output with outputPrintf as it arrives.
 	~ChildProcess();
@@ -87,7 +87,7 @@ private:
 	// IsStillRunning returns when the child process exits or
 	// when new output is available. It returns true if the
 	// child is still running.
-	bool IsStillRunning();
+	bool IsStillRunning() noexcept;
 	// Remove and return the accumulated output text. Typically
 	// this is called in an IsStillRunning() loop.
 	std::wstring RemoveOutputText();
@@ -97,4 +97,9 @@ private:
 	// for the process to end. This is called by the destructor
 	// so calling this is strictly optional.
 	void WaitForCompletion(bool printOutput);
+
+	ChildProcess& operator=(const ChildProcess&) = delete;
+	ChildProcess& operator=(const ChildProcess&&) = delete;
+	ChildProcess(const ChildProcess&) = delete;
+	ChildProcess(const ChildProcess&&) = delete;
 };

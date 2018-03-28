@@ -18,7 +18,7 @@ limitations under the License.
 #include "DirectoryMonitor.h"
 #include "Utility.h"
 
-DirectoryMonitor::DirectoryMonitor(CWnd* pMainWindow)
+DirectoryMonitor::DirectoryMonitor(CWnd* pMainWindow) noexcept
 	: mainWindow_(pMainWindow)
 {
 }
@@ -46,7 +46,7 @@ DWORD DirectoryMonitor::DirectoryMonitorThread()
 	HANDLE handles[] = { hChangeHandle, hShutdownRequest_ };
 	for (;;)
 	{
-		DWORD dwWaitStatus = WaitForMultipleObjects(ARRAYSIZE(handles), &handles[0], FALSE, INFINITE);
+		const DWORD dwWaitStatus = WaitForMultipleObjects(ARRAYSIZE(handles), &handles[0], FALSE, INFINITE);
 
 		switch (dwWaitStatus)
 		{
@@ -72,7 +72,7 @@ DWORD DirectoryMonitor::DirectoryMonitorThread()
 
 _Pre_satisfies_(this->hThread_ == 0)
 _Pre_satisfies_(this->hShutdownRequest_ == 0)
-void DirectoryMonitor::StartThread(const std::wstring* traceDir)
+void DirectoryMonitor::StartThread(const std::wstring* traceDir) noexcept
 {
 	UIETWASSERT(hThread_ == 0);
 	UIETWASSERT(hShutdownRequest_ == 0);

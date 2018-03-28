@@ -27,4 +27,4 @@ enum KeyLoggerState
 // be done. If the key logging thread is not started then it will
 // be started. Call it with kKeyLoggerOff to shut down the key
 // logging thread and stop key logging.
-void SetKeyloggingState(KeyLoggerState);
+void SetKeyloggingState(KeyLoggerState) noexcept;

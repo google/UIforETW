@@ -35,26 +35,26 @@ public:
 		LightLoad,
 		HeavyLoad
 	};
-	CPowerStatusMonitor();
+	CPowerStatusMonitor() noexcept;
 	~CPowerStatusMonitor();
 
 	// Tell the system which perf counters (if any) to monitor. Only call
 	// this when the threads are stopped.
-	void SetPerfCounters(std::wstring& perfCounters);
+	void SetPerfCounters(const std::wstring& perfCounters);
 
 	// Start and stop the sampling threads so that they aren't running
 	// when tracing is not running.
-	void StartThreads(MonitorType monitorType);
-	void StopThreads();
+	void StartThreads(MonitorType monitorType) noexcept;
+	void StopThreads() noexcept;
 
 private:
 	static DWORD __stdcall StaticPowerMonitorThread(LPVOID);
 	void PowerMonitorThread();
 
 	void SampleBatteryStat();
-	void SampleCPUPowerState();
-	void SampleTimerState();
-	void ClearEnergyLibFunctionPointers();
+	void SampleCPUPowerState() noexcept;
+	void SampleTimerState() noexcept;
+	void ClearEnergyLibFunctionPointers() noexcept;
 
 	HANDLE hThread_ = nullptr;
 	HANDLE hExitEvent_ = nullptr;
@@ -72,5 +72,7 @@ private:
 	std::wstring perfCounters_;
 
 	CPowerStatusMonitor& operator=(const CPowerStatusMonitor&) = delete;
+	CPowerStatusMonitor& operator=(const CPowerStatusMonitor&&) = delete;
 	CPowerStatusMonitor(const CPowerStatusMonitor&) = delete;
+	CPowerStatusMonitor(const CPowerStatusMonitor&&) = delete;
 };

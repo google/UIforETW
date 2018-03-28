@@ -70,7 +70,7 @@ uint64_t disabled_other_events_keyword_bit = 1ULL << 62;
 
 IMPLEMENT_DYNAMIC(CSettings, CDialog)
 
-CSettings::CSettings(CWnd* pParent /*=NULL*/, const std::wstring& exeDir, const std::wstring& wpt81Dir, const std::wstring& wpt10Dir)
+CSettings::CSettings(CWnd* pParent /*=NULL*/, const std::wstring& exeDir, const std::wstring& wpt81Dir, const std::wstring& wpt10Dir) noexcept
 	: CDialog(CSettings::IDD, pParent)
 	, exeDir_(exeDir)
 	, wpt81Dir_(wpt81Dir)
@@ -291,37 +291,37 @@ void CSettings::OnBnClickedChromedeveloper()
 }
 
 
-void CSettings::OnBnClickedIdentifyChromeCpu()
+void CSettings::OnBnClickedIdentifyChromeCpu() noexcept
 {
 	bIdentifyChromeProcessesCPU_ = !bIdentifyChromeProcessesCPU_;
 }
 
 
-void CSettings::OnBnClickedAutoviewtraces()
+void CSettings::OnBnClickedAutoviewtraces() noexcept
 {
 	bAutoViewTraces_ = !bAutoViewTraces_;
 }
 
 
-void CSettings::OnBnClickedHeapstacks()
+void CSettings::OnBnClickedHeapstacks() noexcept
 {
 	bHeapStacks_ = !bHeapStacks_;
 }
 
 
-void CSettings::OnBnClickedVirtualallocstacks()
+void CSettings::OnBnClickedVirtualallocstacks() noexcept
 {
 	bVirtualAllocStacks_ = !bVirtualAllocStacks_;
 }
 
 
-void CSettings::OnBnClickedExpensivews()
+void CSettings::OnBnClickedExpensivews() noexcept
 {
 	bExpensiveWSMonitoring_ = !bExpensiveWSMonitoring_;
 }
 
 
-void CSettings::OnBnClickedCheckfornewversions()
+void CSettings::OnBnClickedCheckfornewversions() noexcept
 {
 	bVersionChecks_ = !bVersionChecks_;
 }
@@ -385,9 +385,9 @@ void CSettings::OnBnClickedSelectPerfCounters()
 	config.dwCallBackArg = reinterpret_cast<DWORD_PTR>(&arg);
 	config.dwDefaultDetailLevel = PERF_DETAIL_EXPERT;
 	config.szReturnPathBuffer = arg.counter_names.data();
-	config.cchReturnPathLength = (DWORD)arg.counter_names.size();;
+	config.cchReturnPathLength = static_cast<DWORD>(arg.counter_names.size());
 	// Need some way to initialize the dialog with the previous settings?
-	PDH_STATUS status = PdhBrowseCounters(&config);
+	const PDH_STATUS status = PdhBrowseCounters(&config);
 	if (status == ERROR_SUCCESS || status == PDH_DIALOG_CANCELLED)
 	{
 		std::wstring counters_string;
@@ -404,19 +404,19 @@ void CSettings::OnBnClickedSelectPerfCounters()
 }
 
 
-void CSettings::OnBnClickedUseOtherKernelLogger()
+void CSettings::OnBnClickedUseOtherKernelLogger() noexcept
 {
 	bUseOtherKernelLogger_ = !bUseOtherKernelLogger_;
 }
 
 
-void CSettings::OnBnClickedRecordPreTrace()
+void CSettings::OnBnClickedRecordPreTrace() noexcept
 {
 	bRecordPreTrace_ = !bRecordPreTrace_;
 }
 
 
-void CSettings::OnBnClickedBackgroundMonitoring()
+void CSettings::OnBnClickedBackgroundMonitoring() noexcept
 {
 	bBackgroundTracing_ = !bBackgroundTracing_;
 }

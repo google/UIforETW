@@ -79,7 +79,7 @@ void CWorkingSetMonitor::SampleWorkingSets()
 		}
 		if (match)
 		{
-			DWORD pid = peInfo.th32ProcessID;
+			const DWORD pid = peInfo.th32ProcessID;
 			// Get a handle to the process.
 			HANDLE hProcess =
 				OpenProcess(PROCESS_QUERY_INFORMATION |
@@ -162,7 +162,7 @@ DWORD __stdcall CWorkingSetMonitor::StaticWSMonitorThread(LPVOID param)
 {
 	SetCurrentThreadName("Working set monitor");
 
-	CWorkingSetMonitor* pThis = reinterpret_cast<CWorkingSetMonitor*>(param);
+	CWorkingSetMonitor* pThis = static_cast<CWorkingSetMonitor*>(param);
 	pThis->WSMonitorThread();
 	return 0;
 }
@@ -172,7 +172,7 @@ void CWorkingSetMonitor::WSMonitorThread()
 
 	for (;;)
 	{
-		DWORD result = WaitForSingleObject(hExitEvent_, kSamplingInterval);
+		const DWORD result = WaitForSingleObject(hExitEvent_, kSamplingInterval);
 		if (result == WAIT_OBJECT_0)
 			break;
 
@@ -180,7 +180,7 @@ void CWorkingSetMonitor::WSMonitorThread()
 	}
 }
 
-CWorkingSetMonitor::CWorkingSetMonitor()
+CWorkingSetMonitor::CWorkingSetMonitor() noexcept
 {
 }
 
@@ -199,7 +199,7 @@ void CWorkingSetMonitor::StartThreads()
 	}
 }
 
-void CWorkingSetMonitor::StopThreads()
+void CWorkingSetMonitor::StopThreads() noexcept
 {
 	if (hExitEvent_)
 	{

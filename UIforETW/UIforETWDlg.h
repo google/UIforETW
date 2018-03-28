@@ -36,7 +36,7 @@ enum TracingMode
 class CUIforETWDlg : public CDialog
 {
 public:
-	CUIforETWDlg(CWnd* pParent = NULL);	// standard constructor
+	CUIforETWDlg(CWnd* pParent = NULL) noexcept;	// standard constructor
 	~CUIforETWDlg();
 
 // Dialog Data
@@ -46,6 +46,11 @@ public:
 
 private:
 	virtual void DoDataExchange(CDataExchange* pDX) override;	// DDX/DDV support
+
+	CUIforETWDlg(const CUIforETWDlg&) = delete;
+	CUIforETWDlg(const CUIforETWDlg&&) = delete;
+	CUIforETWDlg& operator=(const CUIforETWDlg&) = delete;
+	CUIforETWDlg& operator=(const CUIforETWDlg&&) = delete;
 
 	HICON m_hIcon;
 
@@ -104,7 +109,7 @@ private:
 	TracingMode tracingMode_ = kTracingToMemory;
 	// Increase the buffer count by some proportion when tracing to a file
 	// on a large-memory machine.
-	int BufferCountBoost(int requestCount) const;
+	int BufferCountBoost(int requestCount) const noexcept;
 	CComboBox btTracingMode_;
 	std::wstring heapTracingExes_ = L"chrome.exe";
 	void SetHeapTracing(bool forceOff);
@@ -236,7 +241,7 @@ private:
 	std::pair<uint64_t, uint64_t> CompressTrace(const std::wstring& tracePath) const;
 	void CompressAllTraces() const;
 	// Update the enabled/disabled states of buttons.
-	void UpdateEnabling();
+	void UpdateEnabling() noexcept;
 	void UpdateNotesState();
 	void StripChromeSymbols(const std::wstring& traceFilename);
 	void IdentifyChromeProcesses(const std::wstring& traceFilename, bool withCPU = false);
@@ -251,29 +256,29 @@ private:
 	virtual BOOL OnInitDialog() override;
 	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
 	afx_msg void OnPaint();
-	afx_msg HCURSOR OnQueryDragIcon();
+	afx_msg HCURSOR OnQueryDragIcon() noexcept;
 	DECLARE_MESSAGE_MAP()
 	afx_msg void OnBnClickedStarttracing();
 	afx_msg void OnBnClickedStoptracing();
-	afx_msg void OnBnClickedCompresstrace();
-	afx_msg void OnBnClickedCpusamplingcallstacks();
-	afx_msg void OnBnClickedContextswitchcallstacks();
-	afx_msg void OnBnClickedShowcommands();
+	afx_msg void OnBnClickedCompresstrace() noexcept;
+	afx_msg void OnBnClickedCpusamplingcallstacks() noexcept;
+	afx_msg void OnBnClickedContextswitchcallstacks() noexcept;
+	afx_msg void OnBnClickedShowcommands() noexcept;
 	afx_msg void OnBnClickedFastsampling();
 	afx_msg void OnCbnSelchangeInputtracing();
 	afx_msg LRESULT UpdateTraceListHandler(WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT NewVersionAvailable(WPARAM wParam, LPARAM lParam);
 	afx_msg void OnLbnDblclkTracelist();
-	afx_msg void OnGetMinMaxInfo(MINMAXINFO* lpMMI);
+	afx_msg void OnGetMinMaxInfo(MINMAXINFO* lpMMI) noexcept;
 	afx_msg void OnSize(UINT, int, int);
 	afx_msg void OnLbnSelchangeTracelist();
 	afx_msg void OnBnClickedAbout();
 	afx_msg void OnBnClickedSavetracebuffers();
 	afx_msg LRESULT OnHotKey(WPARAM wParam, LPARAM lParam);
-	afx_msg BOOL PreTranslateMessage(MSG* pMsg);
+	afx_msg BOOL PreTranslateMessage(MSG* pMsg) override;
 	afx_msg void OnClose(); 
-	afx_msg void OnCancel();
-	afx_msg void OnOK();
+	afx_msg void OnCancel() override;
+	afx_msg void OnOK() override;
 	afx_msg void OnCbnSelchangeTracingmode();
 	afx_msg void OnBnClickedSettings();
 	afx_msg void OnContextMenu(CWnd* pWnd, CPoint point);
@@ -291,6 +296,6 @@ private:
 	afx_msg void OnActivate(UINT nState, CWnd* pWndOther, BOOL bMinimized);
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 public:
-	afx_msg void OnBnClickedGPUtracing();
-	afx_msg void OnBnClickedClrtracing();
+	afx_msg void OnBnClickedGPUtracing() noexcept;
+	afx_msg void OnBnClickedClrtracing() noexcept;
 };
