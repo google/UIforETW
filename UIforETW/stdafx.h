@@ -77,6 +77,64 @@ const int WM_NEWVERSIONAVAILABLE = WM_USER + 11;
 // https://connect.microsoft.com/VisualStudio/feedback/details/1570481/vs-2015-analyze-warns-that-vsprintf-s-doesnt-null-terminate-buffers
 #pragma warning(disable : 6054)
 
+// Disable these CppCoreCheck warnings:
+
+// This seems to require a lot of restructuring for little benefit:
+// warning C26485 : No array to pointer decay
+// warning C26482 : Only index into arrays using constant expressions
+#pragma warning(disable : 26485)
+#pragma warning(disable : 26482)
+
+// This seems to happen every time I (legitimately) pass the address of a local to a
+// function, such as the address of an HKEY to RegOpenKeyExW
+// warning C26486 : Don't pass a pointer that may be invalid to a function.
+#pragma warning(disable : 26486)
+
+// These fire whenever I use va_start:
+// warning C26492 : Don't use const_cast to cast away const
+// warning C26481 : Don't use pointer arithmetic. Use span instead
+#pragma warning(disable : 26492)
+#pragma warning(disable : 26481)
+
+// I'm not convinced of the solution yet:
+// warning C26429: Symbol is never tested for nullness, it can be marked as not_null
+#pragma warning(disable : 26429)
+
+// I disagree, for now anyway:
+// warning C26494: Variable is uninitialized. Always initialize an object
+#pragma warning(disable : 26494)
+
+// This warning appears to be spurious in many cases:
+// warning C26489 : Don't dereference a pointer that may be invalid
+#pragma warning(disable : 26489)
+
+// Maybe some other day. Disabling now to reduce the noise level.
+// warning C26472 : Don't use a static_cast for arithmetic conversions. Use brace initialization, gsl::narrow_cast or gsl::narow
+// warning C26490 : Don't use reinterpret_cast
+#pragma warning(disable : 26472)
+#pragma warning(disable : 26490)
+
+// This warning fires when it says that it shouldn't, on unnamed objects passed
+// as function parameters. This makes it useless.
+// warning C26444 : Avoid unnamed objects with custom construction and destruction
+#pragma warning(disable : 26444)
+
+// This is basically how MFC *works*, so this warning is useless to me.
+// warning C26434: Function '*::*' hides a non-virtual function 'CWnd::*'
+#pragma warning(disable : 26434)
+
+// I'm not convinced I want to buy into more annotations
+// warning C26135: Missing annotation _Acquires_lock_(this->cs_) at function 'CriticalSection::Lock'.
+#pragma warning(disable : 26135)
+
+// This is a bad warning when the cast is between two typedefs that may or may not match
+// warning C26473: Don't cast between pointer types where the source type and the target type are the same
+#pragma warning(disable : 26473)
+
+// This warning fires when multiplying two constants whose product can fit in a BYTE,
+// so this warning is annoying and not helpful.
+//  warning C26451: Arithmetic overflow: Using operator '*' on a 4 byte value and then casting the result to a 8 byte value.
+#pragma warning(disable : 26451)
 
 #define UIETWASSERT( x ) ATLASSERT( x )
 

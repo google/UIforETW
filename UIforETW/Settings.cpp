@@ -374,6 +374,9 @@ void CSettings::OnBnClickedSelectPerfCounters()
 	// something (All Instances) that results in a wildcard. WTF?
 	config.bWildCardInstances = true;
 	config.bDisableMachineSelection = true;
+	// /analyze warns that this const_cast is not needed, but when compiling with
+	// /Zc:strictStrings it absolutely is. The type of szDialogBoxCaption needs to
+	// be changed for this to work cleanly.
 	config.szDialogBoxCaption = const_cast<wchar_t*>(L"Select performance counters");
 
 	config.hWndOwner = *this;

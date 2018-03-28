@@ -53,6 +53,7 @@ public:
 	SHA1HashProvider(const SHA1HashProvider&) = delete;
 	SHA1HashProvider& operator=(const SHA1HashProvider&) = delete;
 
+	// /analyze warns that this should be tagged as noexcept, but it throws an exception.
 	SHA1HashProvider()
 		: SHA1HashProvider(secret_init())
 	{
