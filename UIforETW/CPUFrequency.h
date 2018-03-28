@@ -52,7 +52,7 @@ private:
 
 	// The number of CPUs that we monitor - may be less than the actual number
 	// of CPUs on some crazy multi-core machines.
-	unsigned numCPUs_;
+	unsigned numCPUs_ = 0;
 	// Startup information for sampling threads.
 	std::vector<CPUSamplerState> threads_;
 

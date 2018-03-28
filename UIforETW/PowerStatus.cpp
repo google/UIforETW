@@ -419,7 +419,8 @@ void CPowerStatusMonitor::PowerMonitorThread()
 		++sampleNumber;
 	}
 
-	PdhCloseQuery(query);
+	if (query)
+		PdhCloseQuery(query);
 }
 
 CPowerStatusMonitor::CPowerStatusMonitor()

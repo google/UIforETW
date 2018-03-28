@@ -127,7 +127,7 @@ public:
 		QueryPerformanceCounter(&stop);
 		LARGE_INTEGER frequency;
 		QueryPerformanceFrequency(&frequency);
-		return (stop.QuadPart - start_.QuadPart) / float(frequency.QuadPart);
+		return (stop.QuadPart - start_.QuadPart) / static_cast<double>(frequency.QuadPart);
 	}
 private:
 	LARGE_INTEGER start_;

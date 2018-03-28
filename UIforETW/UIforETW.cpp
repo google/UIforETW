@@ -129,16 +129,14 @@ void enableAggressiveProcessMitigations()
 	}
 
 	HMODULEhelper kern32("kernel32.dll");
-	PVOID const address =
-		reinterpret_cast<PVOID>(GetProcAddress(kern32.hModule, "SetProcessMitigationPolicy"));
-	if (address == NULL)
+	const SetProcessMitigationPolicy_t SetProcessMitigationPolicy_f =
+		reinterpret_cast<SetProcessMitigationPolicy_t>(GetProcAddress(kern32.hModule, "SetProcessMitigationPolicy"));
+	if (SetProcessMitigationPolicy_f == NULL)
 	{
 		const DWORD lastErr = GetLastError();
 		ATLTRACE(L"Failed to get address of SetProcessMitigationPolicy! Error code: %u\r\n", lastErr);
 		return;
 	}
-	const SetProcessMitigationPolicy_t SetProcessMitigationPolicy_f =
-		reinterpret_cast<SetProcessMitigationPolicy_t>(address);
 	enableASLRMitigation(SetProcessMitigationPolicy_f);
 	enableExtensionPointMitigations(SetProcessMitigationPolicy_f);
 	enableStrictHandleCheckingMitigations(SetProcessMitigationPolicy_f);

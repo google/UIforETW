@@ -83,12 +83,14 @@ void CUIforETWDlg::TransferSettings(bool saving)
 			*m.pSetting = pApp->GetProfileIntW(pSettings, m.pName, *m.pSetting) != false;
 	}
 
+	static_assert(sizeof(InputTracing_) == sizeof(int), "Size mismatch.");
+	static_assert(sizeof(tracingMode_) == sizeof(int), "Size mismatch.");
 	NameToRangedInt ints[] =
 	{
 		// Note that a setting of kKeyLoggerFull cannot be restored from
 		// settings, to avoid privacy problems.
-		{ L"InputTracing", (int*)&InputTracing_, kKeyLoggerOff, kKeyLoggerAnonymized },
-		{ L"TracingMode", (int*)&tracingMode_, kTracingToMemory, kHeapTracingToFile },
+		{ L"InputTracing", reinterpret_cast<int*>(&InputTracing_), kKeyLoggerOff, kKeyLoggerAnonymized },
+		{ L"TracingMode", reinterpret_cast<int*>(&tracingMode_), kTracingToMemory, kHeapTracingToFile },
 	};
 
 	for (auto& m : ints)
@@ -120,9 +122,9 @@ void CUIforETWDlg::TransferSettings(bool saving)
 		else
 		{
 			LPBYTE temp = 0;
-			UINT byteCount = sizeof(temp);
+			UINT byteCount = sizeof(uint64_t);
 			pApp->GetProfileBinary(pSettings, m.pName, &temp, &byteCount);
-			if (byteCount == sizeof(temp))
+			if (byteCount == sizeof(uint64_t))
 				*m.pSetting = *(uint64_t*)temp;
 			delete [] temp;
 		}

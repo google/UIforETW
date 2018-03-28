@@ -157,7 +157,7 @@ bool ChildProcess::Run(bool showCommand, std::wstring args)
 	}
 	else
 	{
-		outputPrintf(L"Error %d starting %s, %s\n", (int)GetLastError(), exePath_.c_str(), args.c_str());
+		outputPrintf(L"Error %lu starting %s, %s\n", GetLastError(), exePath_.c_str(), args.c_str());
 	}
 
 	return false;
