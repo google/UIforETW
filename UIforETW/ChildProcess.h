@@ -16,13 +16,15 @@ limitations under the License.
 
 #pragma once
 
+#include <afxmt.h>
+
 #include <string>
 
 // This class encapsulates running a child thread and reading
 // its output. Typical usage is:
 //   ChildProcess child(fullPathToExecutable);
-//   std::wstring args = L" -go";
-//   child.Run(bShowCommands_, L"exename.exe" + args);
+//   std::string args = _T(" -go");
+//   child.Run(bShowCommands_, _T("exename.exe") + args);
 // Run returns immediately. The destructor, GetExitCode(), and
 // GetOutput() will all wait for the process to exit. The
 // destructor and GetExitCode() both print all output as it
@@ -32,7 +34,12 @@ limitations under the License.
 class ChildProcess
 {
 public:
-	ChildProcess(std::wstring exePath, bool printFailedExitCodes = true) noexcept;
+#ifdef _UNICODE
+	typedef std::wstring string_type;
+#else
+	typedef std::string string_type;
+#endif
+	ChildProcess(string_type exePath, bool printFailedExitCodes = true) noexcept;
 	// This waits for the child process to terminate, and prints
 	// output with outputPrintf as it arrives.
 	~ChildProcess();
@@ -40,7 +47,7 @@ public:
 	// Returns true if the process started. This function returns
 	// immediately without waiting for process completion.
 	_Pre_satisfies_(!(this->hProcess_))
-	bool Run(bool showCommand, std::wstring args);
+	bool Run(bool showCommand, string_type args);
 
 	// This can be called even if the process doesn't start, but
 	// it will return zero. If the process is still running it
@@ -51,11 +58,11 @@ public:
 	// Normally all output is printed as it is received. If this function
 	// is called after Run() then all output will be returned, and not
 	// printed.
-	std::wstring GetOutput();
+	string_type GetOutput();
 
 private:
 	// Path to the executable to be run, and its process handle.
-	std::wstring exePath_;
+	string_type exePath_;
 
 	bool printFailedExitCodes_ = true;
 
@@ -70,7 +77,7 @@ private:
 	// The processOutput_ string is written to by the listener thread.
 	// Don't modify processOutput_ without acquiring the lock.
 	CCriticalSection outputLock_;
-	std::wstring processOutput_;
+	string_type processOutput_;
 
 	// Output handles for the child process -- connected to the pipe.
 	HANDLE hStdOutput_ = INVALID_HANDLE_VALUE;
@@ -90,7 +97,7 @@ private:
 	bool IsStillRunning() noexcept;
 	// Remove and return the accumulated output text. Typically
 	// this is called in an IsStillRunning() loop.
-	std::wstring RemoveOutputText();
+	string_type RemoveOutputText();
 
 	// This can be called even if the process doesn't start, but
 	// it will just return immediately. Otherwise it will wait
