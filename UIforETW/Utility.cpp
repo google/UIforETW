@@ -105,10 +105,10 @@ void copyWPAProfileToLocalAppData(const std::wstring& exeDir, const bool force)
 		if (force) // Print status of copy
 		{
 			if (copyResult)
-				outputPrintf(L"%s", L"Copied Startup.10wpaProfile to %localappdata%\\Windows Performance Analyzer\n");
+				outputPrintf(L"%s", L"Copied Startup10.wpaProfile to %localappdata%\\Windows Performance Analyzer\n");
 			else
 			{
-				outputPrintf(L"%s", L"Failed to copy Startup.10wpaProfile to %localappdata%\\Windows Performance Analyzer\n");
+				outputPrintf(L"%s", L"Failed to copy Startup10.wpaProfile to %localappdata%\\Windows Performance Analyzer\n");
 				outputLastError();
 			}
 		}
