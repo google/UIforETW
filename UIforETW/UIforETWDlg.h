@@ -152,7 +152,6 @@ private:
 	// this string object, so don't change it without adding synchronization.
 	std::wstring traceDir_;
 	std::wstring tempTraceDir_;
-	std::wstring windowsKitsDir_; // C:\\Program Files (x86)\\Windows Kits
 	std::wstring wpt81Dir_; // This points to the WPT 8.1 directory if it exists, else nothing.
 	std::wstring wpt10Dir_; // If WPT 10 isn't installed UIforETW will exit.
 	std::wstring wpa81Path_;

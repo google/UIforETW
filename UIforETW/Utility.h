@@ -35,6 +35,7 @@ std::wstring ConvertToCRLF(const std::wstring& input);
 
 void SetRegistryDWORD(HKEY root, const std::wstring& subkey, const std::wstring& valueName, DWORD value) noexcept;
 void CreateRegistryKey(HKEY root, const std::wstring& subkey, const std::wstring& newKey) noexcept;
+std::wstring ReadRegistryString(HKEY root, const std::wstring& subkey, const std::wstring& valueName, bool force32Bit);
 
 std::wstring GetEditControlText(HWND hwnd);
 std::wstring AnsiToUnicode(const std::string& text);
@@ -62,6 +63,9 @@ std::wstring GetFileExt(const std::wstring& path);
 // Return the path part only, or an empty string if there is no '\'.
 // The '\' character is returned.
 std::wstring GetDirPart(const std::wstring& path);
+// Ensures that a non-empty string ends with '\'.
+// Empty strings are left untouched.
+void EnsureEndsWithDirSeparator(std::wstring& path);
 // Pass this a path and it returns the pre extension part of
 // the file part of the path (which could conceivably be an
 // empty string).
