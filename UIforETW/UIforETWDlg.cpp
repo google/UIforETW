@@ -400,18 +400,40 @@ BOOL CUIforETWDlg::OnInitDialog()
 	systemDrive_ = static_cast<char>(windowsDir_[0]);
 	systemDrive_ += ":\\";
 
-	// The WPT 8.1 installer is always a 32-bit installer, so we look for it in
-	// ProgramFilesX86, on 32-bit and 64-bit operating systems.
-	wchar_t* progFilesx86Dir = nullptr;
-	if (!SUCCEEDED(SHGetKnownFolderPath(FOLDERID_ProgramFilesX86, 0, NULL, &progFilesx86Dir)))
-		std::terminate();
-	windowsKitsDir_ = progFilesx86Dir;
-	CoTaskMemFree(progFilesx86Dir);
-	progFilesx86Dir = nullptr;
 
-	windowsKitsDir_ += L"\\Windows Kits\\";
-	wpt81Dir_ = windowsKitsDir_ + L"8.1\\Windows Performance Toolkit\\";
-	wpt10Dir_ = windowsKitsDir_ + L"10\\Windows Performance Toolkit\\";
+	// The WPT installer is always a 32-bit installer, so we look for it in
+	// ProgramFilesX86 / WOW6432Node, on 32-bit and 64-bit operating systems.
+	wpt81Dir_ = ReadRegistryString(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Microsoft SDKs\\Windows\\v8.1", L"InstallationFolder", true);
+	wpt10Dir_ = ReadRegistryString(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Microsoft SDKs\\Windows\\v10.0", L"InstallationFolder", true);
+	if (!wpt81Dir_.empty())
+	{
+		EnsureEndsWithDirSeparator(wpt81Dir_);
+		wpt81Dir_ += L"Windows Performance Toolkit\\";
+	}
+	if (!wpt10Dir_.empty())
+	{
+		EnsureEndsWithDirSeparator(wpt10Dir_);
+		wpt10Dir_ += L"Windows Performance Toolkit\\";
+	}
+
+	// If the registry entries were unavailable, fall back to assuming their installation directory.
+	if (wpt81Dir_.empty() || wpt10Dir_.empty())
+	{
+		wchar_t* progFilesx86Dir = nullptr;
+		if (!SUCCEEDED(SHGetKnownFolderPath(FOLDERID_ProgramFilesX86, 0, nullptr, &progFilesx86Dir)))
+			std::terminate();
+		std::wstring windowsKitsDir = progFilesx86Dir;
+		CoTaskMemFree(progFilesx86Dir);
+		windowsKitsDir += L"\\Windows Kits\\";
+		if (wpt81Dir_.empty())
+		{
+			wpt81Dir_ = windowsKitsDir + L"8.1\\Windows Performance Toolkit\\";
+		}
+		if (wpt10Dir_.empty())
+		{
+			wpt10Dir_ = windowsKitsDir + L"10\\Windows Performance Toolkit\\";
+		}
+	}
 
 	auto xperfVersion = GetFileVersion(GetXperfPath());
 	const int64_t requiredXperfVersion = (10llu << 48) + 0 + (10586llu << 16) + (15llu << 0);

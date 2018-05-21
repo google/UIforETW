@@ -298,6 +298,47 @@ std::wstring ConvertToCRLF(const std::wstring& input)
 	return result;
 }
 
+std::wstring ReadRegistryString(HKEY root, const std::wstring& subkey, const std::wstring& valueName, bool force32Bit)
+{
+	std::wstring value;
+	const DWORD flags = RRF_RT_REG_SZ | RRF_RT_REG_EXPAND_SZ | RRF_ZEROONFAILURE;
+
+	REGSAM openOptions = KEY_QUERY_VALUE;
+	if (force32Bit)
+	{
+		openOptions |= KEY_WOW64_32KEY;
+	}
+
+	HKEY key;
+	if (::RegOpenKeyExW(root, subkey.c_str(), 0, openOptions, &key) != ERROR_SUCCESS)
+	{
+		return value;
+	}
+
+
+	DWORD bufSize = 50 * sizeof(wchar_t);
+	LSTATUS result = ERROR_MORE_DATA;
+	while (result == ERROR_MORE_DATA)
+	{
+		value.resize(bufSize / sizeof(wchar_t));
+		DWORD type;
+		result = ::RegGetValueW(key, nullptr, valueName.c_str(), flags, &type, const_cast<wchar_t*>(value.data()), &bufSize);
+	}
+	if (result == ERROR_SUCCESS && bufSize > 0)
+	{
+		// remove the space for the NUL teminator written by RegGetValueW
+		value.resize((bufSize / sizeof(wchar_t)) - 1);
+	}
+	else
+	{
+		value.clear();
+	}
+	ATLVERIFY(::RegCloseKey(key) == ERROR_SUCCESS);
+
+	return value;
+}
+
+
 void SetRegistryDWORD(const HKEY root, const std::wstring& subkey, const std::wstring& valueName, const DWORD value) noexcept
 {
 	HKEY key;
@@ -561,6 +602,13 @@ std::wstring CanonicalizePath(const std::wstring& path)
 	return output;
 }
 
+void EnsureEndsWithDirSeparator(std::wstring& path)
+{
+	if (path.back() != '\\')
+	{
+		path.push_back(L'\\');
+	}
+}
 int DeleteOneFile(const HWND hwnd, const std::wstring& path)
 {
 	// {path} uses std::vector list initialization
