@@ -49,13 +49,14 @@ const PCWSTR filtered_event_group_names[] =
 	L"gpu",                                             // 0x20
 	L"input",                                           // 0x40
 	L"netlog",                                          // 0x80
-	L"renderer.scheduler",                              // 0x100
+	L"sequence_manager",                                // 0x100
 	L"toplevel",                                        // 0x200
 	L"v8",                                              // 0x400
 	L"disabled-by-default-cc.debug",                    // 0x800
 	L"disabled-by-default-cc.debug.picture",            // 0x1000
 	L"disabled-by-default-toplevel.flow",               // 0x2000
 	L"startup",                                         // 0x4000
+	L"latency",                                         // 0x8000
 };
 
 // 1ULL << 61 and 1ULL << 62 are special values that indicate to Chrome to
