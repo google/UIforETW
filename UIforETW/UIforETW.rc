@@ -197,7 +197,7 @@ BEGIN
             VALUE "InternalName", "UIforETW.exe"
             VALUE "LegalCopyright", "RandomASCII"
             VALUE "OriginalFilename", "UIforETW.exe"
-            VALUE "ProductName", "TODO: <Product name>"
+            VALUE "ProductName", "UI for ETW"
             VALUE "ProductVersion", "1.0.0.1"
         END
     END
