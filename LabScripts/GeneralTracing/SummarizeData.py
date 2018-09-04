@@ -39,7 +39,8 @@ def Summarize(filename, interesting_processes, label, units, results,
       count_browser_processes=False):
   chrome_processes = ['chrome.exe']
   edge_processes = ['MicrosoftEdge.exe <MicrosoftEdge>',
-                    'MicrosoftEdgeCP.exe <MicrosoftEdge>']
+                    'MicrosoftEdgeCP.exe <MicrosoftEdge>',
+                    'MicrosoftEdgeCP.exe <ContentProcess>']
   staging = {}
   for process_name in interesting_processes:
     staging[process_name] = 0.0
