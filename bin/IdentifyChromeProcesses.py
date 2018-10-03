@@ -175,12 +175,34 @@ def main():
         del pathByBrowserPid[pid]
         del pidsByParent[pid]
 
+  # In many cases there are two crash-handler processes and one is the
+  # parent of the other. This seems to be related to --monitor-self.
+  # This script will initially report the parent crashpad process as being a
+  # browser process, leaving the child orphaned. This fixes that up by
+  # looking for singleton crashpad browsers and then finding their real
+  # crashpad parent. This will then cause two crashpad processes to be
+  # listed, which is correct.
+  for browserPid in list(pidsByParent.keys()):
+    childPids = pidsByParent[browserPid]
+    if len(childPids) == 1 and 'crashpad' in childPids:
+      # Scan the list of child processes to see if this processes parent can be
+      # found, as one of the crashpad processes.
+      for innerBrowserPid in list(pidsByParent.keys()):
+        innerChildPids = pidsByParent[innerBrowserPid]
+        if 'crashpad' in innerChildPids and browserPid in innerChildPids['crashpad']:
+          # Append the orphaned crashpad process to the right list, then
+          # delete it from the list of browser processes.
+          innerChildPids['crashpad'].append(childPids['crashpad'][0])
+          del pidsByParent[browserPid]
+          # It's important to break out of this loop now that we have
+          # deleted an entry, or else we might try to look it up.
+          break
+
   print("Chrome PIDs by process type:\r")
   for browserPid in list(pidsByParent.keys()):
-    # I hit one trace where there was a crash-handler process that was the
-    # child of another crash-handler process, which caused this script to
-    # fail here. Avoiding the script crash with .get() seems sufficient.
-    exePath = pathByBrowserPid.get(browserPid, "Unknown exe path")
+    # The crashpad fixes above should avoid this situation, but I'm leaving the
+    # check to maintain robustness.
+    exePath = pathByBrowserPid.get(browserPid, "Unknown parent")
     # Any paths with no entries in them should be ignored.
     pidsByType = pidsByParent[browserPid]
     if len(pidsByType) == 0:
