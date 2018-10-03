@@ -205,7 +205,7 @@ void CUIforETWDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_CONTEXTSWITCHCALLSTACKS, btCswitchStacks_);
 	DDX_Control(pDX, IDC_FASTSAMPLING, btFastSampling_);
 	DDX_Control(pDX, IDC_GPUTRACING, btGPUTracing_);
-	DDX_Control(pDX, IDC_CLRTRACING, btCLRTracing_ );
+	DDX_Control(pDX, IDC_CLRTRACING, btCLRTracing_);
 	DDX_Control(pDX, IDC_SHOWCOMMANDS, btShowCommands_);
 
 	DDX_Control(pDX, IDC_INPUTTRACING, btInputTracing_);
@@ -260,7 +260,7 @@ BEGIN_MESSAGE_MAP(CUIforETWDlg, CDialog)
 	ON_BN_CLICKED(ID_PASTEOVERRIDE, &CUIforETWDlg::NotesPaste)
 	ON_WM_ACTIVATE()
 	ON_WM_TIMER()
-	ON_BN_CLICKED( IDC_CLRTRACING, &CUIforETWDlg::OnBnClickedClrtracing )
+	ON_BN_CLICKED(IDC_CLRTRACING, &CUIforETWDlg::OnBnClickedClrtracing)
 END_MESSAGE_MAP()
 
 
@@ -514,13 +514,13 @@ BOOL CUIforETWDlg::OnInitDialog()
 					L"then WPT will be automatically installed. Exiting.").c_str());
 		}
 		else
-		{ 
+		{
 			if (xperfVersion)
 				AfxMessageBox((GetXperfPath() + L" must be version 10.0.10586.15 or higher. You'll need to find the installer in the Windows "
 					L"Windows 10 SDK or you can xcopy install it. Exiting.").c_str());
 			else
 				AfxMessageBox((GetXperfPath() + L" does not exist. You'll need to find the installer in the Windows "
-				L"Windows 10 SDK or you can xcopy install it. Exiting.").c_str());
+					L"Windows 10 SDK or you can xcopy install it. Exiting.").c_str());
 		}
 		exit(10);
 	}
@@ -530,7 +530,7 @@ BOOL CUIforETWDlg::OnInitDialog()
 		if (IsWindowsSevenOrLesser())
 		{
 			AfxMessageBox(L"The installed version of Windows Performance Toolkit is not compatible with Windows 7. "
-										L"Please uninstall it and run UIforETW again.");
+				L"Please uninstall it and run UIforETW again.");
 		}
 		else
 		{
@@ -820,7 +820,7 @@ void CUIforETWDlg::UpdateEnabling() noexcept
 	SmartEnableWindow(btSampledStacks_.m_hWnd, !bIsTracing_);
 	SmartEnableWindow(btCswitchStacks_.m_hWnd, !bIsTracing_);
 	SmartEnableWindow(btGPUTracing_.m_hWnd, !bIsTracing_);
-	SmartEnableWindow(btCLRTracing_.m_hWnd, !bIsTracing_ );
+	SmartEnableWindow(btCLRTracing_.m_hWnd, !bIsTracing_);
 }
 
 void CUIforETWDlg::OnSysCommand(UINT nID, LPARAM lParam)
@@ -1757,7 +1757,7 @@ void CUIforETWDlg::OnSize(UINT nType, int /*cx*/, int /*cy*/)
 			MoveControl(this, btSampledStacks_, xDelta, 0);
 			MoveControl(this, btFastSampling_, xDelta, 0);
 			MoveControl(this, btGPUTracing_, xDelta, 0);
-			MoveControl(this, btCLRTracing_, xDelta, 0 );
+			MoveControl(this, btCLRTracing_, xDelta, 0);
 			MoveControl(this, btInputTracingLabel_, xDelta, 0);
 			MoveControl(this, btInputTracing_, xDelta, 0);
 			MoveControl(this, btTracingMode_, xDelta, 0);
