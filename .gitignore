@@ -1,3 +1,4 @@
+*.bak
 *.aps
 # wpaexporter drops these
 *.csv
