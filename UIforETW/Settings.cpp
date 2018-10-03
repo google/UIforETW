@@ -169,10 +169,13 @@ BOOL CSettings::OnInitDialog()
 		toolTip_.SetMaxTipWidth(400);
 		toolTip_.Activate(TRUE);
 
-		toolTip_.AddTool(&btHeapTracingExe_, L"Specify the file names of the exes to be heap traced, "
-					L"separated by semi-colons. "
-					L"Enter just the file parts (with the .exe extension) not a full path. For example, "
-					L"'chrome.exe;notepad.exe'. This is for use with the heap-tracing-to-file mode.");
+		toolTip_.AddTool(&btHeapTracingExe_, L"Specify which processes to heap trace when using "
+					L"heap-tracing-to-file mode. Three different methods can be used to specify the processes:\n"
+					L"1) A semi-colon separated list of process names, such as 'chrome.exe;notepad.exe'. "
+					L"The processes must be launched after this is set and heap-tracing-to-file is selected.\n"
+					L"2) A semi-colon separated list of process IDs (PIDs) - maximum of two - such as '1234;5678'.\n"
+					L"3) A fully specified path to an executable that will be launched by ETW when heap tracing is "
+					L"started.");
 		toolTip_.AddTool(&btExtraKernelFlags_, L"Extra kernel flags, separated by '+', such as "
 					L"\"REGISTRY+PERF_COUNTER\". See \"xperf -providers k\" for the full list. "
 					L"Note that incorrect kernel flags will cause tracing to fail to start.");

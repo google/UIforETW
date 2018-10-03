@@ -974,3 +974,58 @@ void MoveControl(const CWnd* pParent, CWnd& control, int xDelta, int yDelta)
 	control.SetWindowPos(nullptr, p.x + xDelta, p.y + yDelta, 0, 0, flags);
 }
 #endif
+
+// Parse the semi-colon separated heap trace settings
+HeapTracedProcesses ParseHeapTracingSettings(std::wstring heapTracingExes)
+{
+	HeapTracedProcesses result;
+	for (const auto& tracingName : split(heapTracingExes, ';'))
+	{
+		if (tracingName.size())
+		{
+			auto* p = tracingName.c_str();
+			// If the first character is a digit then assume that it's a PID.
+			if (iswdigit(p[0]))
+			{
+				if (wcschr(p, L' '))
+				{
+					outputPrintf(L"Error: don't use space separators between PIDs for heap tracing - use semicolons.\n");
+					continue;
+				}
+				// Convert to space separated PIDs because that is what the xperf -Pids
+				// option expects.
+				if (result.processIDs.size() > 0)
+					result.processIDs += L' ';
+				result.processIDs += tracingName;
+			}
+			else if (wcschr(p, '\\'))
+			{
+				// It must be a full path name.
+				result.pathName = tracingName;
+			}
+			else
+			{
+				if (wcschr(p, L' '))
+				{
+					outputPrintf(L"Error: don't use space separators between process names for heap tracing - use semicolons.\n");
+					continue;
+				}
+				result.processNames.push_back(tracingName);
+			}
+		}
+	}
+
+	// Since the three types of heap profiling are mutually exclusive, clear the
+	// ones that will not be used, to ensure consistency.
+	if (result.pathName.size())
+	{
+		result.processIDs = L"";
+		result.processNames.clear();
+	}
+	else if (result.processIDs.size())
+	{
+		result.processNames.clear();
+	}
+
+	return result;
+}

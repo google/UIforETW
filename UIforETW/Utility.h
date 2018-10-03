@@ -203,3 +203,36 @@ void CloseValidHandle(_In_ _Pre_valid_ _Post_ptr_invalid_ HANDLE handle) noexcep
 // Put MFC specific code here
 void MoveControl(const CWnd* pParent, CWnd& control, int xDelta, int yDelta);
 #endif
+
+// Heap tracing can be enabled for one or two PIDs (can be enabled when they are
+// already running, one or more process names (most enable through registry
+// prior to process launch), or for a single process which xperf launches.
+// These are all useful in different scenarios.
+// In the context of Chrome profiling:
+//   Profiling a single process (of any type) that is already running can be done
+// by specifying the PID of that process or pair of processes.
+//   Profiling all Chrome processes can be done by specifying chrome.exe. If this
+// specification is done after launching the browser process then this will only
+// heap-profile subsequently launched processes, so mostly newly created renderer
+// processes, potentially from startup.
+//   Profiling the *browser* process from startup can be done by specifying the
+// the full patch to the executable, and xperf will then launch this process and
+// start heap tracing. Note that this will run Chrome as admin, so be careful.
+// These options cannot be used together.
+
+// The heap tracing options can be specified as a semi-colon separated list of
+// process IDs (maximum of two) and process names *or* a single fully-qualified
+// path name.
+struct HeapTracedProcesses
+{
+	// Space-separated set of process IDs (as required by -Pids), or an empty string.
+	std::wstring processIDs;
+	// Vector of process names, including .exe but not any path information.
+	std::vector<std::wstring> processNames;
+	// A single fully qualified executable which xperf will launch when tracing
+	// starts.
+	std::wstring pathName;
+};
+
+// Parse the semi-colon separated heap trace settings
+HeapTracedProcesses ParseHeapTracingSettings(std::wstring heapTracingExes);

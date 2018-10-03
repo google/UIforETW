@@ -963,13 +963,37 @@ void CUIforETWDlg::StopEventThreads()
 void CUIforETWDlg::OnBnClickedStarttracing()
 {
 	RegisterProviders();
-	StartEventThreads();
 	if (tracingMode_ == kTracingToMemory)
 		outputPrintf(L"\nStarting tracing to in-memory circular buffers...\n");
 	else if (tracingMode_ == kTracingToFile)
 		outputPrintf(L"\nStarting tracing to disk...\n");
 	else if (tracingMode_ == kHeapTracingToFile)
-		outputPrintf(L"\nStarting heap tracing to disk of %s...\n", heapTracingExes_.c_str());
+	{
+		auto heapSettings = ParseHeapTracingSettings(heapTracingExes_);
+		if (heapSettings.pathName.size())
+		{
+			outputPrintf(L"");
+			// Launch and heap-profile the specified process, handy for heap-profiling
+			// the browser process from startup.
+			outputPrintf(L"\nLaunching and heap tracing to disk %s...\n", heapSettings.pathName.c_str());
+		}
+		else if (heapSettings.processIDs.size())
+		{
+			// Heap profile the processes specified by the PIDs (maximum of two).
+			outputPrintf(L"\nStarting heap tracing to disk of PIDs %s...\n", heapSettings.processIDs.c_str());
+		}
+		else
+		{
+			std::wstring processNames;
+			for (auto& name : heapSettings.processNames)
+			{
+				if (processNames.size() > 0)
+					processNames += L" and ";
+				processNames += name;
+			}
+			outputPrintf(L"\nStarting heap tracing to disk of the %s processes...\n", processNames.c_str());
+		}
+	}
 	else
 		UIETWASSERT(0);
 
@@ -983,15 +1007,24 @@ void CUIforETWDlg::OnBnClickedStarttracing()
 	}
 
 	std::wstring kernelProviders = L" Latency+POWER+DISPATCHER+DISK_IO_INIT+FILE_IO+FILE_IO_INIT+VIRT_ALLOC+MEMINFO";
+	bool cswitch_and_profile = true;
+	if (tracingMode_ == kHeapTracingToFile)
+	{
+		// Latency = PROC_THREAD+LOADER+DISK_IO+HARD_FAULTS+DPC+INTERRUPT+CSWITCH+PROFILE,
+		// but we don't need all that for heap tracing. The minimum set is PROC_THREAD+LOADER
+		// and we add on VIRT_ALLOC+MEMINFO because that seems appropriate for heap tracing.
+		kernelProviders = L" PROC_THREAD+LOADER+VIRT_ALLOC+MEMINFO";
+		cswitch_and_profile = false;
+	}
 	if (!extraKernelFlags_.empty())
 		kernelProviders += L"+" + extraKernelFlags_;
 	std::wstring kernelStackWalk;
 	// Record CPU sampling call stacks, from the PROFILE provider
-	if (bSampledStacks_)
+	if (bSampledStacks_ && cswitch_and_profile)
 		kernelStackWalk += L"+Profile";
 	// Record context-switch (switch in) and readying-thread (SetEvent, etc.)
 	// call stacks from DISPATCHER provider.
-	if (bCswitchStacks_)
+	if (bCswitchStacks_ && cswitch_and_profile)
 		kernelStackWalk += L"+CSwitch+ReadyThread";
 	// Record VirtualAlloc call stacks from the VIRT_ALLOC provider. Also
 	// record VirtualFree to allow investigation of memory leaks, even though
@@ -1045,7 +1078,6 @@ void CUIforETWDlg::OnBnClickedStarttracing()
 		catch (const std::exception& e)
 		{
 			outputPrintf(L"Check the extra user providers; failed to translate them from the TraceLogging name to a GUID.\n%hs\n", e.what());
-			StopEventThreads();
 			return;
 		}
 	}
@@ -1102,7 +1134,7 @@ void CUIforETWDlg::OnBnClickedStarttracing()
 		// CLR runtime provider
 		// https://msdn.microsoft.com/en-us/library/ff357718(v=vs.100).aspx
 		userProviders += L"+e13c0d23-ccbc-4e12-931b-d9cc2eee27e4:0x1CCBD:0x5";
-        
+
 		// note: this seems to be an updated version of
 		// userProviders += L"+ClrAll:0x98:5";
 		// which results in Invalid flags. (0x3ec) when I run it
@@ -1126,7 +1158,33 @@ void CUIforETWDlg::OnBnClickedStarttracing()
 	std::wstring heapStackWalk;
 	if (bHeapStacks_)
 		heapStackWalk = L" -stackwalk HeapCreate+HeapDestroy+HeapAlloc+HeapRealloc";
-	const std::wstring heapArgs = L" -start UIforETWHeapSession -heap -Pids 0" + heapStackWalk + heapBuffers + heapFile;
+	auto heapSettings = ParseHeapTracingSettings(heapTracingExes_);
+	std::wstring heapArgs;
+	if (heapSettings.pathName.size())
+	{
+		// Launch and heap-profile the specified process, handy for heap-profiling
+		// the browser process from startup.
+		heapArgs = L" -start UIforETWHeapSession -heap -PidNewProcess \"" + heapSettings.pathName + L"\"" + heapStackWalk + heapBuffers + heapFile;
+	}
+	else if (heapSettings.processIDs.size())
+	{
+		// Heap profile the processes specified by the PIDs (maximum of two).
+		heapArgs = L" -start UIforETWHeapSession -heap -Pids " + heapSettings.processIDs + heapStackWalk + heapBuffers + heapFile;
+	}
+	else if (heapSettings.processNames.size())
+	{
+		// Heap profile the processes specified by heapSettings.processNames that
+		// were launched when the registry key was set (when "Heap tracing to file"
+		// was the selected tracing type).
+		heapArgs = L" -start UIforETWHeapSession -heap -Pids 0" + heapStackWalk + heapBuffers + heapFile;
+	}
+	else
+	{
+		outputPrintf(L"Error: no heap-profiled processes settings found. Go to the Settings dialog to configure them.\n");
+		return;
+	}
+
+	StartEventThreads();
 
 	bPreTraceRecorded_ = false;
 
@@ -1836,7 +1894,10 @@ void CUIforETWDlg::SetHeapTracing(bool forceOff)
 	DWORD tracingFlags = tracingMode_ == kHeapTracingToFile ? 1 : 0;
 	if (forceOff)
 		tracingFlags = 0;
-	for (const auto& tracingName : split(heapTracingExes_, ';'))
+
+	auto heapSettings = ParseHeapTracingSettings(heapTracingExes_);
+
+	for (const auto& tracingName : heapSettings.processNames)
 	{
 		std::wstring targetKey = L"Software\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options";
 		CreateRegistryKey(HKEY_LOCAL_MACHINE, targetKey, tracingName);
