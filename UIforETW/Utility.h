@@ -33,6 +33,8 @@ void WriteTextAsFile(const std::wstring& fileName, const std::wstring& text);
 // Convert a string that may have '\n' line endings to '\r\n' line endings.
 std::wstring ConvertToCRLF(const std::wstring& input);
 
+// Returns true if something is read.
+bool GetRegistryDWORD(const HKEY root, const std::wstring& subkey, const std::wstring& valueName, DWORD* pValue) noexcept;
 void SetRegistryDWORD(HKEY root, const std::wstring& subkey, const std::wstring& valueName, DWORD value) noexcept;
 void CreateRegistryKey(HKEY root, const std::wstring& subkey, const std::wstring& newKey) noexcept;
 std::wstring ReadRegistryString(HKEY root, const std::wstring& subkey, const std::wstring& valueName, bool force32Bit);

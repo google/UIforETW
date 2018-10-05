@@ -1902,8 +1902,11 @@ void CUIforETWDlg::SetHeapTracing(bool forceOff)
 		std::wstring targetKey = L"Software\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options";
 		CreateRegistryKey(HKEY_LOCAL_MACHINE, targetKey, tracingName);
 		targetKey += L"\\" + tracingName;
+		DWORD oldValue = 0;
+		bool oldValueValid = GetRegistryDWORD(HKEY_LOCAL_MACHINE, targetKey, L"TracingFlags", &oldValue);
 		SetRegistryDWORD(HKEY_LOCAL_MACHINE, targetKey, L"TracingFlags", tracingFlags);
-		if (tracingFlags)
+		// Print a message when setting the flag or when clearing it if it was previously set.
+		if (tracingFlags || (oldValueValid && tracingFlags != oldValue))
 			outputPrintf(L"\"TracingFlags\" in \"HKEY_LOCAL_MACHINE\\%s\" set to %lu.\n", targetKey.c_str(), tracingFlags);
 	}
 }

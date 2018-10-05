@@ -338,6 +338,13 @@ std::wstring ReadRegistryString(HKEY root, const std::wstring& subkey, const std
 	return value;
 }
 
+bool GetRegistryDWORD(const HKEY root, const std::wstring& subkey, const std::wstring& valueName, DWORD* pValue) noexcept
+{
+	DWORD type = 0;
+	DWORD byteCount = sizeof(*pValue);
+	auto result = ::RegGetValueW(root, subkey.c_str(), valueName.c_str(), RRF_RT_REG_DWORD | RRF_ZEROONFAILURE, &type, pValue, &byteCount);
+	return result == ERROR_SUCCESS;
+}
 
 void SetRegistryDWORD(const HKEY root, const std::wstring& subkey, const std::wstring& valueName, const DWORD value) noexcept
 {
