@@ -516,10 +516,10 @@ BOOL CUIforETWDlg::OnInitDialog()
 		else
 		{
 			if (xperfVersion)
-				AfxMessageBox((GetXperfPath() + L" must be version 10.0.10586.15 or higher. You'll need to find the installer in the Windows "
+				AfxMessageBox((GetXperfPath() + L" must be version 10.0.10586.15 or higher. You'll need to find the installer in the "
 					L"Windows 10 SDK or you can xcopy install it. Exiting.").c_str());
 			else
-				AfxMessageBox((GetXperfPath() + L" does not exist. You'll need to find the installer in the Windows "
+				AfxMessageBox((GetXperfPath() + L" does not exist. You'll need to find the installer in the "
 					L"Windows 10 SDK or you can xcopy install it. Exiting.").c_str());
 		}
 		exit(10);
