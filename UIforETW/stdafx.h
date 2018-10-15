@@ -19,6 +19,10 @@ limitations under the License.
 // Include this first so that the requested version is known.
 #include "targetver.h"
 
+#ifdef _DEBUG
+#define OUTPUT_DEBUG_STRINGS
+#endif
+
 // disable the MFC "feature pack" controls
 // they end up bringing dependencies on DLLs that are not 
 // documented as available on the Server Core SKUs.

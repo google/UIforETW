@@ -560,7 +560,9 @@ BOOL CUIforETWDlg::OnInitDialog()
 	UIETWASSERT(getMyDocsResult);
 	if (!getMyDocsResult)
 	{
+#ifdef OUTPUT_DEBUG_STRINGS
 		OutputDebugStringA("Failed to find My Documents directory.\r\n");
+#endif
 		exit(10);
 	}
 	std::wstring defaultTraceDir = documents + std::wstring(L"\\etwtraces\\");

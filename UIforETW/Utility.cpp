@@ -43,7 +43,9 @@ std::wstring GetDocumentsFolderPath()
 		FOLDERID_Documents, KF_FLAG_NO_ALIAS, NULL, &docsPathTemp.m_pData);
 	if (FAILED(docsPathResult))
 	{
+#ifdef OUTPUT_DEBUG_STRINGS
 		debugPrintf(L"SHGetKnownFolderPath (for Documents) failed to retrieve the path.\n");
+#endif
 		std::terminate();
 	}
 	return docsPathTemp.m_pData;
@@ -148,6 +150,7 @@ void outputLastError(const DWORD lastErr)
 
 void debugLastError(const DWORD lastErr) noexcept
 {
+#ifdef OUTPUT_DEBUG_STRINGS
 	const DWORD errMsgSize = 1024u;
 	wchar_t errBuff[errMsgSize] = {};
 	const DWORD ret = ::FormatMessageW(
@@ -158,6 +161,9 @@ void debugLastError(const DWORD lastErr) noexcept
 	if (ret == 0)
 		return; // FormatMessageW failed.
 	debugPrintf(L"UIforETW encountered an error: %s\r\n", errBuff);
+#else
+	(void)lastErr;
+#endif
 }
 
 std::vector<std::wstring> split(const std::wstring& s, const char c)
@@ -707,7 +713,9 @@ int64_t GetFileSize(const std::wstring& path) noexcept
 
 	if (hFile == INVALID_HANDLE_VALUE)
 	{
+#ifdef OUTPUT_DEBUG_STRINGS
 		debugPrintf(L"Failed to get file size!\n");
+#endif
 		debugLastError();
 		return 0;
 	}

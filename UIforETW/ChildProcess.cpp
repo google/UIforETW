@@ -97,7 +97,9 @@ DWORD ChildProcess::ListenerThread()
 			{
 				CSingleLock locker(&outputLock_);
 				buffer[dwRead] = 0;
+#ifdef OUTPUT_DEBUG_STRINGS
 				OutputDebugStringA(buffer);
+#endif
 #ifdef _UNICODE
 				processOutput_ += AnsiToUnicode(buffer);
 #else
@@ -109,7 +111,9 @@ DWORD ChildProcess::ListenerThread()
 	}
 	else
 	{
-		OutputDebugString(_T("Connect failed.\n"));
+#ifdef OUTPUT_DEBUG_STRINGS
+			OutputDebugString(_T("Connect failed.\n"));
+#endif
 	}
 
 	DisconnectNamedPipe(hPipe_);

@@ -242,7 +242,9 @@ DWORD __stdcall InputThread(LPVOID) noexcept
 	// makes debugging painful - the timeout appears to be about ten seconds.
 	if (IsDebuggerPresent())
 	{
+#ifdef OUTPUT_DEBUG_STRINGS
 		OutputDebugString(L"Input logging disabled while debugging.\n");
+#endif
 		return 0;
 	}
 

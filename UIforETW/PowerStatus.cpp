@@ -417,7 +417,11 @@ void CPowerStatusMonitor::PowerMonitorThread()
 					ETWMarkPerfCounter(sampleNumber, counter.name.c_str(), value.doubleValue);
 				}
 				else
+				{
+#ifdef OUTPUT_DEBUG_STRINGS
 					debugPrintf(L"Failure code %08x for %s\n", pdh_result, counter.name.c_str());
+#endif
+				}
 			}
 		}
 		++sampleNumber;
