@@ -487,7 +487,10 @@ BOOL CUIforETWDlg::OnInitDialog()
 					const DWORD installResult10 = child.GetExitCode();
 					if (!installResult10)
 					{
-						outputPrintf(L"WPT version 10.0.15063 was installed.\n");
+						xperfVersion = GetFileVersion(GetXperfPath());
+						outputPrintf(L"WPT version %llu.%llu.%llu.%llu was installed.\n",
+							xperfVersion >> 48, (xperfVersion >> 32) & 0xFFFF,
+							(xperfVersion >> 16) & 0xFFFF, xperfVersion & 0xFFFF);
 					}
 					else
 					{
