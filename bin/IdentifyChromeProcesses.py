@@ -76,8 +76,14 @@ def main():
         # Chrome so I don't.
         if process_name == "chrome.exe":
           pid = int(pid)
-          cpu_usage_by_pid[pid] = float(cpu_usage.replace(",", ""));
+          cpu_usage_by_pid[pid] = float(cpu_usage.replace(",", ""))
           context_switches_by_pid[pid] = int(context_switches)
+        elif process_name in ['dwm.exe', 'audiodg.exe', 'System', 'MsMpEng.exe',
+                              'software_reporter_tool.exe']:
+          # Print information about other relevant processes:
+          print("%11s - %6d context switches, %8.2f ms CPU\r" % (process_name,
+                int(context_switches), float(cpu_usage.replace(",", ""))))
+      print("\r")
     else:
       print("Expected output file not found.")
       print("Expected to find: %s" % csv_filename)
@@ -145,6 +151,7 @@ def main():
         pidList.append(pid)
         pidsByType[type] = pidList
         pidsByParent[browserPid] = pidsByType
+
   # Scan a copy of the list of browser Pids looking for those with parents
   # in the list and no children. These represent child processes whose --type=
   # option was too far along in the command line for ETW's 512-character capture
@@ -198,7 +205,10 @@ def main():
           # deleted an entry, or else we might try to look it up.
           break
 
-  print("Chrome PIDs by process type:\r")
+  if len(pidsByParent.keys()) > 0:
+    print("Chrome PIDs by process type:\r")
+  else:
+    print("No Chrome processes found.\r")
   for browserPid in list(pidsByParent.keys()):
     # The crashpad fixes above should avoid this situation, but I'm leaving the
     # check to maintain robustness.
@@ -208,15 +218,29 @@ def main():
     if len(pidsByType) == 0:
       assert False
       continue
-    print("%s (%d)\r" % (exePath, browserPid))
     keys = list(pidsByType.keys())
     keys.sort()
+    total_processes = 0
+    total_context_switches = 0
+    total_cpu_usage = 0.0
+    for type in keys:
+      for pid in pidsByType[type]:
+        total_processes += 1
+        if show_cpu_usage and pid in cpu_usage_by_pid:
+          total_context_switches += context_switches_by_pid[pid]
+          total_cpu_usage += cpu_usage_by_pid[pid]
+    if show_cpu_usage:
+      print("%s (%d) - %d context switches, %8.2f ms CPU, %d processes\r" % (
+            exePath, browserPid, total_context_switches, total_cpu_usage,
+            total_processes))
+    else:
+      print("%s (%d) - %d processes\r" % (exePath, browserPid, total_processes))
     # Note the importance of printing the '\r' so that the
     # output will be compatible with Windows edit controls.
     for type in keys:
       print("    %-11s : " % type, end="")
       context_switches = 0
-      cpu_usage = 0
+      cpu_usage = 0.0
       if show_cpu_usage:
         for pid in pidsByType[type]:
           if pid in cpu_usage_by_pid:
@@ -227,7 +251,7 @@ def main():
       for pid in list_by_type:
         if show_cpu_usage:
           print("\r\n        ", end="")
-          if pid in cpu_usage_by_pid and len(list_by_type) > 1: # Skip per-process details if there's only one.:
+          if pid in cpu_usage_by_pid: # Skip per-process details if there's only one.:
             print("%5d - %6d context switches, %8.2f ms CPU" % (pid, context_switches_by_pid[pid], cpu_usage_by_pid[pid]), end="")
           else:
             print("%5d" % pid, end="")
