@@ -1154,39 +1154,42 @@ void CUIforETWDlg::OnBnClickedStarttracing()
 		userFile = L" -buffering";
 	std::wstring userArgs = L" -start UIforETWSession -on " + userProviders + userBuffers + userFile;
 
-	// Heap tracing settings -- only used for heap tracing.
-	// Could also record stacks on HeapFree
-	// Buffer sizes need to be huge for some programs - should be configurable.
-	const int numHeapBuffers = BufferCountBoost(1000);
-	std::wstring heapBuffers = stringPrintf(L" -buffersize 1024 -minbuffers %d -maxBuffers %d", numHeapBuffers, numHeapBuffers);
-	std::wstring heapFile = L" -f \"" + GetHeapFile() + L"\"";
-	std::wstring heapStackWalk;
-	if (bHeapStacks_)
-		heapStackWalk = L" -stackwalk HeapCreate+HeapDestroy+HeapAlloc+HeapRealloc";
-	auto heapSettings = ParseHeapTracingSettings(heapTracingExes_);
 	std::wstring heapArgs;
-	if (heapSettings.pathName.size())
+	if (tracingMode_ == kHeapTracingToFile)
 	{
-		// Launch and heap-profile the specified process, handy for heap-profiling
-		// the browser process from startup.
-		heapArgs = L" -start UIforETWHeapSession -heap -PidNewProcess \"" + heapSettings.pathName + L"\"" + heapStackWalk + heapBuffers + heapFile;
-	}
-	else if (heapSettings.processIDs.size())
-	{
-		// Heap profile the processes specified by the PIDs (maximum of two).
-		heapArgs = L" -start UIforETWHeapSession -heap -Pids " + heapSettings.processIDs + heapStackWalk + heapBuffers + heapFile;
-	}
-	else if (heapSettings.processNames.size())
-	{
-		// Heap profile the processes specified by heapSettings.processNames that
-		// were launched when the registry key was set (when "Heap tracing to file"
-		// was the selected tracing type).
-		heapArgs = L" -start UIforETWHeapSession -heap -Pids 0" + heapStackWalk + heapBuffers + heapFile;
-	}
-	else
-	{
-		outputPrintf(L"Error: no heap-profiled processes settings found. Go to the Settings dialog to configure them.\n");
-		return;
+		// Heap tracing settings -- only used for heap tracing.
+		// Could also record stacks on HeapFree
+		// Buffer sizes need to be huge for some programs - should be configurable.
+		const int numHeapBuffers = BufferCountBoost(1000);
+		std::wstring heapBuffers = stringPrintf(L" -buffersize 1024 -minbuffers %d -maxBuffers %d", numHeapBuffers, numHeapBuffers);
+		std::wstring heapFile = L" -f \"" + GetHeapFile() + L"\"";
+		std::wstring heapStackWalk;
+		if (bHeapStacks_)
+			heapStackWalk = L" -stackwalk HeapCreate+HeapDestroy+HeapAlloc+HeapRealloc";
+		auto heapSettings = ParseHeapTracingSettings(heapTracingExes_);
+		if (heapSettings.pathName.size())
+		{
+			// Launch and heap-profile the specified process, handy for heap-profiling
+			// the browser process from startup.
+			heapArgs = L" -start UIforETWHeapSession -heap -PidNewProcess \"" + heapSettings.pathName + L"\"" + heapStackWalk + heapBuffers + heapFile;
+		}
+		else if (heapSettings.processIDs.size())
+		{
+			// Heap profile the processes specified by the PIDs (maximum of two).
+			heapArgs = L" -start UIforETWHeapSession -heap -Pids " + heapSettings.processIDs + heapStackWalk + heapBuffers + heapFile;
+		}
+		else if (heapSettings.processNames.size())
+		{
+			// Heap profile the processes specified by heapSettings.processNames that
+			// were launched when the registry key was set (when "Heap tracing to file"
+			// was the selected tracing type).
+			heapArgs = L" -start UIforETWHeapSession -heap -Pids 0" + heapStackWalk + heapBuffers + heapFile;
+		}
+		else
+		{
+			outputPrintf(L"Error: no heap-profiled processes settings found. Go to the Settings dialog to configure them.\n");
+			return;
+		}
 	}
 
 	StartEventThreads();
