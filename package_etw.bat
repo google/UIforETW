@@ -167,7 +167,7 @@ del *.zip 2>nul
 call python make_zip_file.py etwpackage.zip etwpackage
 @echo on
 cd etwsymserver
-call python make_zip_file.py ..\etwsymbols.zip .
+call python ..\make_zip_file.py ..\etwsymbols.zip .
 cd ..
 @echo on
 call python rename_to_version.py UIforETW\Version.h
