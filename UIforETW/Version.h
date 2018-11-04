@@ -8,4 +8,4 @@ const float kCurrentVersion = 1.50f;
 // Put a "#define VERSION_SUFFIX 'b'" line here to add a minor version
 // increment that won't trigger the new-version checks, handy for minor
 // releases that I don't want to bother users about.
-//#define VERSION_SUFFIX 'b'
+#define VERSION_SUFFIX 'b'
