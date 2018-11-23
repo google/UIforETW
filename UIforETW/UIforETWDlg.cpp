@@ -734,10 +734,15 @@ void CUIforETWDlg::RegisterProviders()
 	// Be sure to register the version of the DLLs that we are actually using.
 	// This is important when adding new provider tasks, but should not otherwise
 	// matter.
-	if (Is64BitBuild())
-		dllSource += L"ETWProviders64.dll";
-	else
-		dllSource += L"ETWProviders.dll";
+#ifdef _M_ARM64
+	dllSource += L"ETWProvidersARM64.dll";
+#elif _M_X64
+	dllSource += L"ETWProviders64.dll";
+#elif _M_IX86
+	dllSource += L"ETWProviders.dll";
+#else
+#error Unknown CPU type
+#endif
 	const std::wstring temp = GetEnvironmentVariableString(L"temp");
 	if (temp.empty())
 		return;

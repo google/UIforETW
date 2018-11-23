@@ -1,22 +1,28 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.31101.0
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.106
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ETWProviders", "ETWProviders.vcxproj", "{5136829D-E7F2-48CA-971E-27D26821C00D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|ARM64 = Debug|ARM64
 		Debug|Win32 = Debug|Win32
 		Debug|x64 = Debug|x64
+		Release|ARM64 = Release|ARM64
 		Release|Win32 = Release|Win32
 		Release|x64 = Release|x64
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{5136829D-E7F2-48CA-971E-27D26821C00D}.Debug|ARM64.ActiveCfg = Debug|ARM64
+		{5136829D-E7F2-48CA-971E-27D26821C00D}.Debug|ARM64.Build.0 = Debug|ARM64
 		{5136829D-E7F2-48CA-971E-27D26821C00D}.Debug|Win32.ActiveCfg = Debug|Win32
 		{5136829D-E7F2-48CA-971E-27D26821C00D}.Debug|Win32.Build.0 = Debug|Win32
 		{5136829D-E7F2-48CA-971E-27D26821C00D}.Debug|x64.ActiveCfg = Debug|x64
 		{5136829D-E7F2-48CA-971E-27D26821C00D}.Debug|x64.Build.0 = Debug|x64
+		{5136829D-E7F2-48CA-971E-27D26821C00D}.Release|ARM64.ActiveCfg = Release|ARM64
+		{5136829D-E7F2-48CA-971E-27D26821C00D}.Release|ARM64.Build.0 = Release|ARM64
 		{5136829D-E7F2-48CA-971E-27D26821C00D}.Release|Win32.ActiveCfg = Release|Win32
 		{5136829D-E7F2-48CA-971E-27D26821C00D}.Release|Win32.Build.0 = Release|Win32
 		{5136829D-E7F2-48CA-971E-27D26821C00D}.Release|x64.ActiveCfg = Release|x64
@@ -24,5 +30,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {E8424D67-AADC-4F1A-8D20-BF9E99F6D5C5}
 	EndGlobalSection
 EndGlobal

@@ -25,6 +25,8 @@ limitations under the License.
 #include <stdio.h>
 #include "ETWProviders\etwprof.h"
 
+#pragma comment(lib, "Advapi32.lib")
+
 // Disable bogus warning from incorrect annotation of vsnprintf_s
 // warning C6054: String 'buffer' might not be zero-terminated.
 #pragma warning(disable : 6054)

@@ -27,9 +27,15 @@ typedef _Return_type_success_(return >= 0) LONG NTSTATUS;
 
 #pragma comment(lib, "PowrProf.lib")
 
+#if defined(_M_IX86) || defined(_M_X64)
+#define DO_SPIN_LOOP_MEASUREMENTS
+#endif
+
 // How many ms to wait between sampling the CPU speeds. Don't sample
 // 'too' fast or it will waste power and affect the results.
 const DWORD kSamplingInterval = 3000;
+
+#ifdef DO_SPIN_LOOP_MEASUREMENTS
 // Do this many samples each time and take the fastest. That helps to
 // avoid problems where an interrupt or other blip causes a CPU to miss
 // some cycles occasionally. This should be set as low as possible.
@@ -91,13 +97,18 @@ void CCPUFrequencyMonitor::PerCPUSamplingThread(int cpuNumber)
 		ReleaseSemaphore(resultsDoneSemaphore_, 1, nullptr);
 	}
 }
+#endif
 
 DWORD __stdcall CCPUFrequencyMonitor::StaticPerCPUSamplingThread(LPVOID param)
 {
 	SetCurrentThreadName("CPU frequency measurer");
 
+#ifdef DO_SPIN_LOOP_MEASUREMENTS
 	auto* pState = static_cast<CPUSamplerState*>(param);
 	pState->pOwner->PerCPUSamplingThread(pState->cpuNumber);
+#else
+	(void)param;
+#endif
 	return 0;
 }
 
@@ -244,10 +255,14 @@ void CCPUFrequencyMonitor::StartThreads()
 		const QPCElapsedTimer timer;
 		// Run the test long enough so that the OS will ramp up the CPU to
 		// full speed.
+#ifdef DO_SPIN_LOOP_MEASUREMENTS
 		startFrequency_ = MeasureFrequency(600);
 		const float testElapsed = static_cast<float>(timer.ElapsedSeconds());
 
 		ETWMark2F("Startup CPU frequency (MHz) and measurement time (s)", startFrequency_, testElapsed);
+#else
+		startFrequency_ = 0;
+#endif
 
 		// Once the monitor thread is created the other threads will start
 		// being told to do measurements occasionally.
