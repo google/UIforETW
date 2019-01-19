@@ -1749,7 +1749,7 @@ void CUIforETWDlg::OnSize(UINT nType, int /*cx*/, int /*cy*/)
 		GetWindowRect(&windowRect);
 		const int xDelta = windowRect.Width() - lastWidth_;
 		lastWidth_ += xDelta;
-        previousWidth_ = lastWidth_;
+		previousWidth_ = lastWidth_;
 		const int yDelta = windowRect.Height() - lastHeight_;
 		lastHeight_ += yDelta;
 		previousHeight_ = lastHeight_;
