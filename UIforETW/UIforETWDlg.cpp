@@ -354,6 +354,17 @@ BOOL CUIforETWDlg::OnInitDialog()
 	initialWidth_ = lastWidth_ = windowRect.Width();
 	initialHeight_ = lastHeight_ = windowRect.Height();
 
+	// Ensure previousWidth_ and previousHeight_ are valid
+	if (previousWidth_ < initialWidth_)
+	{
+		previousWidth_ = initialWidth_;
+	}
+
+	if (previousHeight_ < initialHeight_)
+	{
+		previousHeight_ = initialHeight_;
+	}
+
 	// Win+Ctrl+R is used to trigger recording of traces. This is compatible with
 	// wprui. If this is changed then be sure to change the text on *both* buttons
 	// in the main window.
@@ -688,6 +699,10 @@ BOOL CUIforETWDlg::OnInitDialog()
 
 	if (bVersionChecks_)
 		versionCheckerThread_.StartVersionCheckerThread(this);
+
+	const UINT flags = SWP_NOMOVE | SWP_NOOWNERZORDER | SWP_NOZORDER | SWP_NOACTIVATE;
+	// Resize our window per the previous dimensions if we have them
+	SetWindowPos(nullptr, 0, 0, previousWidth_, previousHeight_, flags);
 
 	return TRUE; // return TRUE unless you set the focus to a control
 }
@@ -1734,9 +1749,10 @@ void CUIforETWDlg::OnSize(UINT nType, int /*cx*/, int /*cy*/)
 		GetWindowRect(&windowRect);
 		const int xDelta = windowRect.Width() - lastWidth_;
 		lastWidth_ += xDelta;
+        previousWidth_ = lastWidth_;
 		const int yDelta = windowRect.Height() - lastHeight_;
 		lastHeight_ += yDelta;
-
+		previousHeight_ = lastHeight_;
 		const UINT flags = SWP_NOMOVE | SWP_NOOWNERZORDER | SWP_NOZORDER | SWP_NOACTIVATE;
 
 		// Resize the output window, trace list, and notes control.
