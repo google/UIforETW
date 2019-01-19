@@ -91,8 +91,6 @@ void CUIforETWDlg::TransferSettings(bool saving)
 		// settings, to avoid privacy problems.
 		{ L"InputTracing", reinterpret_cast<int*>(&InputTracing_), kKeyLoggerOff, kKeyLoggerAnonymized },
 		{ L"TracingMode", reinterpret_cast<int*>(&tracingMode_), kTracingToMemory, kHeapTracingToFile },
-		{ L"PreviousWidth", &previousWidth_, minWidth_, maxWidth_ },
-		{ L"PreviousHeight", &previousHeight_, minHeight_, maxHeight_ },
 	};
 
 	for (auto& m : ints)
