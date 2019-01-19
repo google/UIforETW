@@ -86,7 +86,7 @@ Most important tasks:
 - [ ] Handle the duplicate copies of etwproviders.man.
 - [ ] Add some unit tests.
 - [ ] Translate the error codes on starting tracing into English, and give advice.
-- [ ] Remember window height
+- [X] Remember window height
 
 To-do eventually:
 - [ ] Should have the option to run arbitrary scripts after each trace is recorded.
