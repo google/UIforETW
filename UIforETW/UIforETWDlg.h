@@ -211,8 +211,8 @@ private:
 	int initialHeight_ = 0;
 	int lastWidth_ = 0;
 	int lastHeight_ = 0;
-	const int minWidth_ = 870;
-	const int minHeight_ = 398;
+	int minWidth_ = 0;
+	int minHeight_ = 0;
 	const int maxWidth_ = 3000;
 	const int maxHeight_ = 3000;
 	// Width and height persisted to settings

@@ -351,8 +351,8 @@ BOOL CUIforETWDlg::OnInitDialog()
 
 	CRect windowRect;
 	GetWindowRect(&windowRect);
-	initialWidth_ = lastWidth_ = windowRect.Width();
-	initialHeight_ = lastHeight_ = windowRect.Height();
+	initialWidth_ = minWidth_ = lastWidth_ = windowRect.Width();
+	initialHeight_ = minHeight_ = lastHeight_ = windowRect.Height();
 
 	// Ensure previousWidth_ and previousHeight_ are valid
 	if (previousWidth_ < initialWidth_)
