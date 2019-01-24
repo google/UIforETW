@@ -143,4 +143,4 @@ for process in countersByProcess.keys():
   if totals[0] > 100000: # Arbitrary filtering
     # Filter to the specific process substring if requested.
     if len(sys.argv) == 2 or process.lower().count(sys.argv[2].lower()) > 0:
-      print "%43s: %5.2f%%, %s, %d context switches, time: %d" % (process, totals[0] * 100.0 / totals[1], totals, contextSwitchesByProcess[process], cpuTimeByProcess[process])
+      print "%43s: %5.2f%%, [%9d,%11d], %5d context switches, time: %8d" % (process, totals[0] * 100.0 / totals[1], totals[0], totals[1], contextSwitchesByProcess[process], cpuTimeByProcess[process])
