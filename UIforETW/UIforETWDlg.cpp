@@ -1354,6 +1354,9 @@ void CUIforETWDlg::StopTracingAndMaybeRecord(bool bSaveTrace)
 				ETWMarkPrintf("Chrome ETW events were requested with keyword 0x%llx", chromeKeywords_);
 			// Record the entire xperf startup command to the trace.
 			ETWMarkWPrintf(L"Tracing startup command was: %s", startupCommand_.c_str());
+			LARGE_INTEGER frequency;
+			QueryPerformanceFrequency(&frequency);
+			ETWMarkWPrintf(L"QueryPerformanceFrequency is %1.3f MHz", frequency.QuadPart / 1e6);
 		}
 		if (bSaveTrace && tracingMode_ == kTracingToMemory)
 		{
