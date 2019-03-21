@@ -91,6 +91,8 @@ xcopy %UIforETW%bin\UIforETWStatic_devrel32.exe %destdir%\bin\UIforETW32.exe /y
 xcopy %UIforETW%bin\UIforETWStatic_devrel.exe %destdir%\bin\UIforETW.exe /y
 xcopy %UIforETW%bin\EventEmitter.exe %destdir%\bin /y
 xcopy %UIforETW%bin\EventEmitter64.exe %destdir%\bin /y
+xcopy %UIforETW%third_party\dbghelp.dll %destdir%\bin /y
+xcopy %UIforETW%third_party\symsrv.dll %destdir%\bin /y
 
 @rem Sign the important (requiring elevation) binaries
 set bindir=%~dp0etwpackage\bin
