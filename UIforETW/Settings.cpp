@@ -57,6 +57,7 @@ const PCWSTR filtered_event_group_names[] =
 	L"disabled-by-default-toplevel.flow",               // 0x2000
 	L"startup",                                         // 0x4000
 	L"latency",                                         // 0x8000
+	L"blink.user_timing",                               // 0x10000
 };
 
 // 1ULL << 61 and 1ULL << 62 are special values that indicate to Chrome to
