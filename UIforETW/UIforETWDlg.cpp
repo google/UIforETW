@@ -560,6 +560,14 @@ BOOL CUIforETWDlg::OnInitDialog()
 	gpuViewPath_ = wpt10Dir_ + L"gpuview\\gpuview.exe";
 	wpa10Path_ = wpt10Dir_ + L"wpa.exe";
 
+	// When WPT has just been installed it will not be in the path, which means
+	// that Python scripts which rely on xperf.exe being in the path will fail.
+	// This adds the WPT10 directory to the path. We could just do this when WPT
+	// has been freshly installed but this seems cleaner.
+	auto path = GetEnvironmentVariableString(L"path");
+	path += L';' + wpt10Dir_;
+	SetEnvironmentVariable(L"path", path.c_str());
+
 	// The Media Experience Analyzer is a 64-bit installer, so we look for it in
 	// ProgramFiles.
 	wchar_t* progFilesDir = nullptr;
