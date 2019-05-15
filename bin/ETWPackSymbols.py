@@ -78,6 +78,7 @@ def main():
     verbose = True
 
   print("Extracting symbols from ETL file '%s'." % ETLName)
+  print("Note that you will probably need to update the 'interesting' calculation for your purposes.")
 
   # -tle = tolerate lost events
   # -tti = tolerate time ivnersions
@@ -107,6 +108,8 @@ def main():
     # Set SymCache to the C drive if not specified.
     symCachePathBase = "c:\\symcache\\"
     print("_NT_SYMCACHE_PATH not set. Looking for symcache in %s" % symCachePathBase)
+  if symCachePathBase[-1] != '\\':
+    symCachePathBase += '\\'
 
   for row in csv.reader(lines, delimiter = ",", quotechar = '"', skipinitialspace=True):
     results = ParseRow(row)
@@ -120,25 +123,37 @@ def main():
     # are counted, which filters out many Microsoft symbols. The ideal filter
     # would return all locally built symbols - all that cannot be found on
     # symbol servers - and this gets us partway there.
-    interesting = PDBPath.count(":") > 0
+    interesting = PDBPath.count(":") > 0 or PDBPath.count("chrome") > 0
     if interesting:
       interestingModuleCount += 1
-      # WPT has two different .symcache file patterns. Neither is documented but
-      # both occur in the symcache directory.
+      # WPT has three different .symcache file patterns. None are documented but
+      # all occur in the symcache directory.
       symCachePathv1 = "%s-%08x%08xv1.symcache" % (OrigFileName, TimeDateStamp, ImageSize)
       symCachePathv2 = "%s-%s%xv2.symcache" % (OrigFileName, guid, age)
+      pdb_file = os.path.split(PDBPath)[1]
+      symCachePathv3 = r"%s\%s%s\%s-v3.1.0.symcache" % (pdb_file, guid, age, pdb_file)
       symCachePathv1 = os.path.join(symCachePathBase, symCachePathv1)
       symCachePathv2 = os.path.join(symCachePathBase, symCachePathv2)
+      symCachePathv3 = os.path.join(symCachePathBase, symCachePathv3)
       foundPath = None
       if os.path.isfile(symCachePathv1):
         foundPath = symCachePathv1
       elif os.path.isfile(symCachePathv2):
         foundPath = symCachePathv2
+      elif os.path.isfile(symCachePathv3):
+        foundPath = symCachePathv3
 
       if foundPath:
         matchExists += 1
         print("Copying %s" % foundPath)
-        shutil.copyfile(foundPath, os.path.join(DestDirName, os.path.split(foundPath)[1]))
+        dest = foundPath[len(symCachePathBase):]
+        dest_dir, dest_file = os.path.split(dest)
+        if dest_dir:
+          try:
+            os.makedirs(os.path.join(DestDirName, dest_dir))
+          except:
+            pass # Continue on exceptions, directly probably already exists.
+        shutil.copyfile(foundPath, os.path.join(DestDirName, dest_dir, dest_file))
       else:
         if verbose:
           print("Symbols for '%s' are not in %s or %s" % (OrigFileName, symCachePathv1, symCachePathv2))
