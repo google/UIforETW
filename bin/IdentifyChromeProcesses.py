@@ -115,7 +115,7 @@ def main():
   # Dictionary of Pids and their lines of data
   lineByPid = {}
   output = subprocess.check_output(command, stderr=subprocess.STDOUT)
-  for line in output.split('\n'):
+  for line in output.splitlines():
     # Split the commandline from the .csv data and then extract the exePath.
     # It may or may not be quoted, and may or not have the .exe suffix.
     parts = line.split(", ")
