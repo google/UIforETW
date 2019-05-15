@@ -147,25 +147,30 @@ def main():
   command_output = str(raw_command_output).splitlines()
 
   for line in command_output:
-    dllMatch = None # This is the name to use when generating the .symcache files
-    if line.count("chrome_child.dll") > 0:
-      # The symcache files for chrome_child.dll use the name chrome.dll for some reason
-      dllMatch = "chrome.dll"
+    pe_match = None # This is the name to use when generating the .symcache files
     # Complete list of Chrome executables and binaries. Some are only used in internal builds.
     # Note that case matters for downloading PDBs.
-    for dllName in ["chrome.exe", "chrome.dll", "blink_web.dll", "content.dll", "chrome_elf.dll", "chrome_watcher.dll", "libEGL.dll", "libGLESv2.dll"]:
-      if line.count("\\" + dllName) > 0:
-        dllMatch = dllName
-    if dllMatch:
+    for pe_name in ["chrome.exe.pdb", "chrome_proxy.exe.pdb", "chrome.dll.pdb", "blink_web.dll.pdb", "content.dll.pdb", "chrome_elf.dll.pdb", "chrome_watcher.dll.pdb", "libEGL.dll.pdb", "libGLESv2.dll.pdb", "eventlog_provider.dll.pdb"]:
+      if line.count("Pdb: " + pe_name) > 0:
+        pe_match = pe_name
+    if pe_match:
       match = pdb_re.match(line)
       if match:
         guid, age, path = match.groups()
         guid = guid.replace("-", "")
         age = int(age) # Prepare for printing as hex
         filepart = os.path.split(path)[1]
-        symcache_file = r"c:\symcache\%s-%s%xv2.symcache" % (dllMatch, guid, age)
+        # Starting around 2018 xperf started generating symcache file names in a
+        # way that is more compatible with symbol servers. If the symbol server
+        # name is:
+        #   "C:\symbols\chrome_child.dll.pdb\90E6CD6C673057E64C4C44205044422E1\chrome_child.dll.pdb
+        # then the symcache name will be:
+        #   c:\symcache\chrome_child.dll.pdb\90E6CD6C673057E64C4C44205044422E1\chrome_child.dll.pdb-v3.1.0.symcache
+        # Handling all old names is out of scope for this script, so we just
+        # handle the new names.
+        symcache_file = r"c:\symcache\%s\%s%s\%s-v3.1.0.symcache" % (pe_match, guid, age, pe_match)
         if os.path.exists(symcache_file):
-          #print("Symcache file %s already exists. Skipping." % symcache_file)
+          print("Symcache file already exists: %s" % symcache_file)
           continue
         # Only print messages for chrome PDBs that aren't in the symcache
         found_uncached = True
