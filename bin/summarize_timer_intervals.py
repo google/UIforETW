@@ -150,6 +150,12 @@ for process in changes_by_process.keys():
     if pid in types_by_pid:
       type_name = ' (Chrome %s)' % types_by_pid[pid]
   print('%s%s: %d frequency changes %s' % (process, type_name, len(entries) - fake_events_count, ps))
+  if len(entries) == 1 and fake_events_count == 0:
+    if entries[0][0] == 0:
+      print('  timeEndPeriod called at %1.3f s' % entries[0][1])
+    else:
+      # This branch should never be hit.
+      print('  %1.1f ms set at %1.3f s' % entries[0])
   for interval in intervals.keys():
     if interval > 0:
       print('  %1.1f ms for %5.1f%% of the time' % (interval, 100 * intervals[interval] / final_timestamp))
