@@ -27,15 +27,7 @@ import re
 import subprocess
 import sys
 
-def main():
-  parser = argparse.ArgumentParser(description="Identify and categorize chrome processes in an ETW trace.")
-  parser.add_argument("trace", type=str, nargs=1, help="ETW trace to be processed")
-  parser.add_argument("-c", "--cpuusage", help="Summarize CPU usage and context switches per process", action="store_true")
-  args = parser.parse_args()
-
-  show_cpu_usage = args.cpuusage
-  tracename = args.trace[0]
-
+def _IdentifyChromeProcesses(tracename, show_cpu_usage, return_pid_map):
   if not os.path.exists(tracename):
     print("Trace file '%s' does not exist." % tracename)
     print("Usage: %s tracename [-cpuusage]" % sys.argv[0])
@@ -114,6 +106,8 @@ def main():
   pidsByParent = {}
   # Dictionary of Pids and their lines of data
   lineByPid = {}
+  # Dictionary of Pids and their types.
+  types_by_pid = {}
   output = subprocess.check_output(command, stderr=subprocess.STDOUT)
   for line in output.splitlines():
     # Split the commandline from the .csv data and then extract the exePath.
@@ -145,6 +139,7 @@ def main():
           type = "browser"
           browserPid = pid
           pathByBrowserPid[browserPid] = exePath
+        types_by_pid[pid] = type
         # Retrieve or create the list of processes associated with this
         # browser (parent) pid.
         pidsByType = pidsByParent.get(browserPid, {})
@@ -152,6 +147,9 @@ def main():
         pidList.append(pid)
         pidsByType[type] = pidList
         pidsByParent[browserPid] = pidsByType
+
+  if return_pid_map:
+    return types_by_pid
 
   # Scan a copy of the list of browser Pids looking for those with parents
   # in the list and no children. These represent child processes whose --type=
@@ -260,6 +258,20 @@ def main():
           print("%d " % pid, end="")
       print("\r")
     print("\r")
+
+def GetPIDToTypeMap(trace_name):
+  return _IdentifyChromeProcesses(trace_name, False, True)
+
+def main():
+  parser = argparse.ArgumentParser(description="Identify and categorize chrome processes in an ETW trace.")
+  parser.add_argument("trace", type=str, nargs=1, help="ETW trace to be processed")
+  parser.add_argument("-c", "--cpuusage", help="Summarize CPU usage and context switches per process", action="store_true")
+  args = parser.parse_args()
+
+  show_cpu_usage = args.cpuusage
+  tracename = args.trace[0]
+
+  _IdentifyChromeProcesses(tracename, show_cpu_usage, False)
 
 if __name__ == "__main__":
   main()
