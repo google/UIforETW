@@ -29,10 +29,13 @@ for details on wpaexporter.
 The output from wpaexporter goes to Generic_Events_Timer_Intervals_by_Process.csv.
 The first line is column labels and the rest is the fields from the profile.
 
-The one known flaw is that if a process raises the timer interrupt frequency
-before tracing starts and then lowers it towards the end of the trace then this
-will not be tracked because we have no way of knowing what frequency the
-proccess requested.
+If a process raises the timer interrupt frequency before tracing starts and then
+lowers it then the timer interval during this time period will be reported as
+'Unknown' because there is no way I know of to retrieve the actual interval.
+
+One known flaw of this script is that it doesn't handle having a single process
+doing nested calls to timeBeginPeriod. It could be added but would add
+complexity.
 '''
 
 from __future__ import print_function
@@ -150,12 +153,13 @@ for process in changes_by_process.keys():
     if pid in types_by_pid:
       type_name = ' (Chrome %s)' % types_by_pid[pid]
   print('%s%s: %d frequency changes %s' % (process, type_name, len(entries) - fake_events_count, ps))
-  if len(entries) == 1 and fake_events_count == 0:
-    if entries[0][0] == 0:
-      print('  timeEndPeriod called at %1.3f s' % entries[0][1])
-    else:
-      # This branch should never be hit.
-      print('  %1.1f ms set at %1.3f s' % entries[0])
+  # Look for raised timer frequencies that end as the first entry. We don't know
+  # what the timer interrupt frequency was before, but we know it was raised.
+  if entries[0][0] == 0:
+    intervals['Unknown'] = entries[0][1]
   for interval in intervals.keys():
-    if interval > 0:
-      print('  %1.1f ms for %5.1f%% of the time' % (interval, 100 * intervals[interval] / final_timestamp))
+    if type(interval) == type(0.0):
+      if interval > 0:
+        print('  %1.1f ms for %5.1f%% of the time' % (interval, 100 * intervals[interval] / final_timestamp))
+    else:
+      print('  Unknown ms for %5.1f%% of the time' % (100 * intervals[interval] / final_timestamp))
