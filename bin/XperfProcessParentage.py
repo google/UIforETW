@@ -79,8 +79,9 @@ def main():
 
   # This is the name of the file that wpaexporter creates when using
   # ProcessParentage.wpaProfile. Ideally this filename could be
-  # specified, but oh well.
-  csvFilename = "Processes_Summary_Table_ProcessParentage.csv"
+  # specified, but oh well. Note that this name changes depending on the version
+  # of wpaexporter that you use, so that's awesome.
+  csvFilename = "Processes_ProcessParentage.csv"
 
   if len(sys.argv) < 2:
     print("Usage: %s trace.etl" % sys.argv[0])
