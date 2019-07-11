@@ -208,7 +208,10 @@ def _IdentifyChromeProcesses(tracename, show_cpu_usage, return_pid_map):
     print("Chrome PIDs by process type:\r")
   else:
     print("No Chrome processes found.\r")
-  for browserPid in list(pidsByParent.keys()):
+  # Make sure the browsers are printed in a predictable order, sorted by Pid
+  browserPids = list(pidsByParent.keys())
+  browserPids.sort()
+  for browserPid in browserPids:
     # The crashpad fixes above should avoid this situation, but I'm leaving the
     # check to maintain robustness.
     exePath = pathByBrowserPid.get(browserPid, "Unknown parent")
@@ -247,6 +250,8 @@ def _IdentifyChromeProcesses(tracename, show_cpu_usage, return_pid_map):
             cpu_usage += cpu_usage_by_pid[pid]
         print("total - %6d context switches, %8.2f ms CPU" % (context_switches, cpu_usage), end="")
       list_by_type = pidsByType[type]
+      # Make sure the PIDs are printed in a consistent order.
+      list_by_type.sort()
       for pid in list_by_type:
         if show_cpu_usage:
           print("\r\n        ", end="")
