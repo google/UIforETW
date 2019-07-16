@@ -1,0 +1,93 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{42AC0C9A-BBE7-4C8E-BB00-84D9C9FC8EE3}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>IdentifyChromeProcesses</RootNamespace>
+    <AssemblyName>IdentifyChromeProcesses</AssemblyName>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <Deterministic>true</Deterministic>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.Windows.EventTracing.GenericEvents, Version=0.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Windows.EventTracing.Processing.All.0.1.0\lib\netstandard2.0\Microsoft.Windows.EventTracing.GenericEvents.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Windows.EventTracing.HyperV, Version=0.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Windows.EventTracing.Processing.All.0.1.0\lib\netstandard2.0\Microsoft.Windows.EventTracing.HyperV.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Windows.EventTracing.Interop, Version=0.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Windows.EventTracing.Processing.All.0.1.0\lib\netstandard2.0\Microsoft.Windows.EventTracing.Interop.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Windows.EventTracing.Power, Version=0.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Windows.EventTracing.Processing.All.0.1.0\lib\netstandard2.0\Microsoft.Windows.EventTracing.Power.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Windows.EventTracing.Processing, Version=0.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Windows.EventTracing.Processing.0.1.0\lib\netstandard2.0\Microsoft.Windows.EventTracing.Processing.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Windows.EventTracing.Processing.Community, Version=0.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Windows.EventTracing.Processing.All.0.1.0\lib\netstandard2.0\Microsoft.Windows.EventTracing.Processing.Community.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Windows.EventTracing.ScheduledTasks, Version=0.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Windows.EventTracing.Processing.All.0.1.0\lib\netstandard2.0\Microsoft.Windows.EventTracing.ScheduledTasks.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Windows.EventTracing.Syscalls, Version=0.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Windows.EventTracing.Processing.All.0.1.0\lib\netstandard2.0\Microsoft.Windows.EventTracing.Syscalls.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Windows.EventTracing.WindowInFocus, Version=0.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Windows.EventTracing.Processing.All.0.1.0\lib\netstandard2.0\Microsoft.Windows.EventTracing.WindowInFocus.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Security.Principal.Windows, Version=4.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Security.Principal.Windows.4.4.1\lib\net461\System.Security.Principal.Windows.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="IdentifyChromeProcesses.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="..\packages\Microsoft.Windows.EventTracing.Processing.All.0.1.0\build\Microsoft.Windows.EventTracing.Processing.All.targets" Condition="Exists('..\packages\Microsoft.Windows.EventTracing.Processing.All.0.1.0\build\Microsoft.Windows.EventTracing.Processing.All.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\Microsoft.Windows.EventTracing.Processing.All.0.1.0\build\Microsoft.Windows.EventTracing.Processing.All.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Windows.EventTracing.Processing.All.0.1.0\build\Microsoft.Windows.EventTracing.Processing.All.targets'))" />
+  </Target>
+</Project>

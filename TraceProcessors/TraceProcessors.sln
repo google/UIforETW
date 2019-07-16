@@ -1,0 +1,37 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.28803.202
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IdentifyChromeProcesses", "IdentifyChromeProcesses\IdentifyChromeProcesses.csproj", "{42AC0C9A-BBE7-4C8E-BB00-84D9C9FC8EE3}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|Any CPU = Release|Any CPU
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{42AC0C9A-BBE7-4C8E-BB00-84D9C9FC8EE3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{42AC0C9A-BBE7-4C8E-BB00-84D9C9FC8EE3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{42AC0C9A-BBE7-4C8E-BB00-84D9C9FC8EE3}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{42AC0C9A-BBE7-4C8E-BB00-84D9C9FC8EE3}.Debug|x64.Build.0 = Debug|Any CPU
+		{42AC0C9A-BBE7-4C8E-BB00-84D9C9FC8EE3}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{42AC0C9A-BBE7-4C8E-BB00-84D9C9FC8EE3}.Debug|x86.Build.0 = Debug|Any CPU
+		{42AC0C9A-BBE7-4C8E-BB00-84D9C9FC8EE3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{42AC0C9A-BBE7-4C8E-BB00-84D9C9FC8EE3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{42AC0C9A-BBE7-4C8E-BB00-84D9C9FC8EE3}.Release|x64.ActiveCfg = Release|Any CPU
+		{42AC0C9A-BBE7-4C8E-BB00-84D9C9FC8EE3}.Release|x64.Build.0 = Release|Any CPU
+		{42AC0C9A-BBE7-4C8E-BB00-84D9C9FC8EE3}.Release|x86.ActiveCfg = Release|Any CPU
+		{42AC0C9A-BBE7-4C8E-BB00-84D9C9FC8EE3}.Release|x86.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {42FB1B10-8E84-4E8A-AC89-4FB18B9FA2C4}
+	EndGlobalSection
+EndGlobal
