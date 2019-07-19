@@ -62,6 +62,7 @@ Error: Description for thread state (9) could not be found. Thread state array o
  
 """
 
+import re
 import sys
 
 if len(sys.argv) <= 1:
@@ -101,7 +102,6 @@ for x in range(len(l) - 1):
       # there are, and print the description.
       num_counters = len(pmc_parts) - 3
       description = l[x].strip()
-      print description
       continue
     counters = map(int, pmc_parts[3:])
     # Look for a CSwitch line. Ideally it will be next, but sometimes an Error: line
@@ -137,10 +137,48 @@ for x in range(len(l) - 1):
       print "Missing cswitch line at line %d" % x
       sys.exit(0)
 
-print "%43s: counter1/counter2, counters" % "Process name"
+if len(sys.argv) == 2:
+  mincounter = 500000
+  print 'Printing collated data for process names where the second counter exceeds %d' % mincounter
+else:
+  substring = sys.argv[2].lower()
+  print 'Printing per-process-data for processes that contain "%s"' % substring
+
+counterDescription = "<unknown counters>"
+if description:
+  counterDescription = ',' + ','.join(description.split(',')[3:])
+
+print "%43s: cnt1/cnt2%s" % ("Process name", counterDescription)
+procnameTotals = {}
 for process in countersByProcess.keys():
   totals = countersByProcess[process]
-  if totals[0] > 100000: # Arbitrary filtering
-    # Filter to the specific process substring if requested.
-    if len(sys.argv) == 2 or process.lower().count(sys.argv[2].lower()) > 0:
-      print "%43s: %5.2f%%, [%9d,%11d], %5d context switches, time: %8d" % (process, totals[0] * 100.0 / totals[1], totals[0], totals[1], contextSwitchesByProcess[process], cpuTimeByProcess[process])
+  # Extract the .exe name and separate it from the PID.
+  match = re.match(r"(.*).exe \(\d+\)", process)
+  if match:
+    procname = match.groups()[0]
+    counter0, counter1, contextSwitches, cpuTime = procnameTotals.get(procname, (0, 0, 0, 0))
+    procnameTotals[procname] = (counter0 + totals[0],
+                                counter1 + totals[1],
+                                contextSwitches + contextSwitchesByProcess[process],
+                                cpuTime + cpuTimeByProcess[process])
+  # Filter to the specific process substring if requested.
+  if len(sys.argv) > 2 and process.lower().count(substring) > 0:
+    print "%43s: %5.2f%%,   [%9d,%11d], %5d context switches, time: %8d" % (process,
+          totals[0] * 100.0 / totals[1], totals[0], totals[1],
+          contextSwitchesByProcess[process], cpuTimeByProcess[process])
+
+if len(sys.argv) == 2:
+  # Put one of the values and the keys into tuples, sort by the selected
+  # value, extract back out into two lists and grab the keys, which are
+  # now sorted by the specified value. The index in the map lambda specifies
+  # which of the values from the stored tuple is used for sorting.
+  sortingValues = map(lambda x: x[3], procnameTotals.values())
+  orderedKeys = list(zip(*sorted(zip(sortingValues, procnameTotals.keys())))[1])
+  orderedKeys.reverse()
+
+  for procname in orderedKeys:
+    totals0, totals1, contextSwitches, cpuTime = procnameTotals[procname]
+    # Arbitrary filtering to just get the most interesting data.
+    if totals1 > mincounter:
+      print "%43s: %5.2f%%,   [%9d,%11d], %5d context switches, time: %8d" % (procname,
+            totals0 * 100.0 / totals1, totals0, totals1, contextSwitches, cpuTime)
