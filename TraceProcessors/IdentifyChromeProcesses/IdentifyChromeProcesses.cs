@@ -60,7 +60,7 @@ class IdentifyChromeProcesses
     }
 
     // Get a list of Chrome processes. Most of the logic is from getting a
-    // a full path name. Don't return a Dictionary keyed by PID because
+    // a full exe path name. Don't return a Dictionary keyed by PID because
     // that will lose records whenever there is PID reuse, which is often.
     static List<ProcessSummary> GetProcessSummaries(IProcessDataSource processData)
     {
@@ -68,32 +68,24 @@ class IdentifyChromeProcesses
 
         foreach (var process in processData.Processes)
         {
-            string commandLine = process.CommandLine;
-            uint pid = process.Id;
-            uint parentPid = process.ParentId;
             string imageName = process.ImageName;
-            string exe_path = "";
             if (imageName != "chrome.exe")
                 continue;
 
-            // Try to find the path to the executable by matching the
-            // image name with individual image file names.
-            //for (int i = 0; i < process.Images.Count; ++i)
-            foreach (var image in process.Images)
-            {
-                // When processing a trace with AllowLostEvents some records
-                // may be missing.
-                try
-                {
-                    if (imageName == image.FileName) //process.Images[i].FileName)
-                    {
-                        exe_path = image.Path; // process.Images[i].Path;
-                        break;
-                    }
-                }
-                catch (System.InvalidOperationException)
-                { /* Ignore */ }
-            }
+            uint pid = process.Id;
+            uint parentPid = process.ParentId;
+            // Extract the exePath from the command line. It is also possible to
+            // grab it from the process.Images.Path attribute but that sometimes
+            // gives weird results, is not clearly better, and makes comparing
+            // with the Python script more difficult.
+            // The exePath may or may not be quoted, and may or not have the .exe
+            // suffix but if we strip quotes or split on spaces it works.
+            string commandLine = process.CommandLine != null ? process.CommandLine : "<Unknown>";
+            string exe_path;
+            if (commandLine.StartsWith("\""))
+                exe_path = commandLine.Substring(1, commandLine.IndexOf('\"', 1) - 1);
+            else
+                exe_path = commandLine.Split(' ')[0];
 
             processSummaries.Add(new ProcessSummary(imageName, exe_path, commandLine, pid, parentPid));
         }
@@ -230,22 +222,25 @@ class IdentifyChromeProcesses
                     destType = "gpu???";
                 }
 
-                // The browserPid *should* always be present, but when events are lost then
-                // all bets are off.
-                if (!eventsLost || parentPids.ContainsKey(browserPid))
+                // The browserPid *should* always be present, but in a large enough corpus
+                // of traces, all bets are off. This assumption failed in a 20-hour heap
+                // snapshot trace.
+                if (parentPids.ContainsKey(browserPid))
                 {
                     // The childPids["browser"] entry needs to be appended to its
                     // parent/grandparent process since that is its browser process.
                     uint parentPid = parentPids[browserPid];
                     // Create the destination type if necessary (needed for gpu???,
-                    // not needed for crashpad).
-                    if (!processesByBrowserPid[parentPid].ContainsKey(destType))
-                        processesByBrowserPid[parentPid][destType] = new List<uint>();
-                    processesByBrowserPid[parentPid][destType].Add(childPids[childType][0]);
+                    // not needed for crashpad). Handle missing data.
+                    if (processesByBrowserPid.ContainsKey(parentPid))
+                    {
+                        if (!processesByBrowserPid[parentPid].ContainsKey(destType))
+                            processesByBrowserPid[parentPid][destType] = new List<uint>();
+                        processesByBrowserPid[parentPid][destType].Add(childPids[childType][0]);
 
-                    // Remove the fake 'browser' entry so that we don't try to print it.
-                    processesByBrowserPid.Remove(browserPid);
-                    continue;
+                        // Remove the fake 'browser' entry so that we don't try to print it.
+                        processesByBrowserPid.Remove(browserPid);
+                    }
                 }
             }
         }
@@ -268,8 +263,7 @@ class IdentifyChromeProcesses
                 // short this is probably faster than using a dictionary.
                 if (!names.Contains(slice.Process.ImageName))
                     continue;
-                CPUUsageDetails last;
-                exec_times.TryGetValue(slice.Process.Id, out last);
+                exec_times.TryGetValue(slice.Process.Id, out CPUUsageDetails last);
                 last.imageName = slice.Process.ImageName;
                 last.ns += slice.Duration.Nanoseconds;
                 last.contextSwitches += 1;
@@ -312,8 +306,7 @@ class IdentifyChromeProcesses
                     var detailsSubTotal = new CPUUsageDetails();
                     foreach (uint pid in type.Value)
                     {
-                        CPUUsageDetails details;
-                        exec_times.TryGetValue(pid, out details);
+                        exec_times.TryGetValue(pid, out CPUUsageDetails details);
                         detailsTotal.ns += details.ns;
                         detailsTotal.contextSwitches += details.contextSwitches;
 
@@ -334,10 +327,9 @@ class IdentifyChromeProcesses
             }
             else
             {
-                // The browserPid *should* always be present, but when events are lost then
-                // all bets are off.
-                string browserPath = "<unknown path>";
-                if (!eventsLost || pathByBrowserPid.ContainsKey(browserPid))
+                // See earlier note about how the browserPid may be missing.
+                string browserPath = "Unknown parent";
+                if (pathByBrowserPid.ContainsKey(browserPid))
                     browserPath = pathByBrowserPid[browserPid];
                 Console.WriteLine("{0} ({1}) - {2} processes", browserPath, browserPid, totalProcesses);
             }
@@ -364,8 +356,7 @@ class IdentifyChromeProcesses
                     if (showCPUUsage)
                     {
                         Console.Write("\n        ");
-                        CPUUsageDetails details;
-                        exec_times.TryGetValue(pid, out details);
+                        exec_times.TryGetValue(pid, out CPUUsageDetails details);
                         if (details.contextSwitches > 0)
                             Console.Write("{0,5} - {1,6} context switches, {2,8:0.00} ms CPU", pid, details.contextSwitches, details.ns / 1e6);
                         else
@@ -414,20 +405,22 @@ class IdentifyChromeProcesses
         {
             using (ITraceProcessor trace = TraceProcessor.Create(traceName))
                 ProcessTrace(trace, showCPUUsage, false);
-            return;
         }
         catch (System.InvalidOperationException e)
         {
             // Note that wpaexporter doesn't seem to have a way to handle this,
-            // which is one advantage of TraceProcessing.
+            // which is one advantage of TraceProcessing. Note that traces with
+            // lost events are "corrupt" in some sense so the results will be
+            // unpredictable.
             Console.WriteLine(e.Message);
             Console.WriteLine("Trying again with AllowLostEvents and AllowTimeInversion specified. Results may be less reliable.");
             Console.WriteLine();
+
+            var settings = new TraceProcessorSettings();
+            settings.AllowLostEvents = true;
+            settings.AllowTimeInversion = true;
+            using (ITraceProcessor trace = TraceProcessor.Create(traceName, settings))
+                ProcessTrace(trace, showCPUUsage, true);
         }
-        var settings = new TraceProcessorSettings();
-        settings.AllowLostEvents = true;
-        settings.AllowTimeInversion = true;
-        using (ITraceProcessor trace = TraceProcessor.Create(traceName, settings))
-            ProcessTrace(trace, showCPUUsage, true);
     }
 }
