@@ -39,6 +39,9 @@ set vcvars32="C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\V
 :community_installed
 call %vcvars32%
 
+@rem Build DelayedCreateProcess.exe to the bin directory
+call DelayedCreateProcess\make.bat
+
 cd /d %UIforETW%ETWInsights
 devenv /rebuild "release|Win32" ETWInsights.sln
 @if ERRORLEVEL 1 goto BuildFailure

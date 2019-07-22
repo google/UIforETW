@@ -12,21 +12,28 @@
 @rem See the License for the specific language governing permissions and
 @rem limitations under the License.
 
+@setlocal
+@echo off
+
 @rem This is a convenience wrapper for recording heap snapshots for
 @rem investigating heap memory leaks, as discussed here:
 @rem https://docs.microsoft.com/en-us/windows-hardware/test/wpt/record-heap-snapshot
-@rem You run this script and pass it the pid of the process of interest.
+@rem You run this script and pass it the pid of the process of interest,
+@rem or a path to a process that you want started. Note that if this batch file
+@rem starts a process then it will, necessarily, be run as administrator, and
+@rem some initial allocations will be missed.
 @rem You can start recording heap data anytime you want, but right at
 @rem process startup is one obvious time. wpr will also let you specify the
 @rem process of interest by name but that works poorly with Chrome
 @rem and its dozens of processes and it is not supported by this script.
 @rem When the script runs it tells the specified process to start recording
 @rem call stacks for all outstanding memory allocations. When you hit
-@rem enter a snapshot of this data is recorded into an ETW trace and then
-@rem heap snapshots are disabled.
+@rem enter a snapshot of this data is recorded into an ETW trace. You then have
+@rem the option to record subsequent traces (one snapshot each) or exit and
+@rem disable heap snapshots. Note that it is quite possible to put multiple
+@rem snapshots in one file, but this script does not support this.
 
-@rem Set the etwtracedir environment variable if it
-@rem isn't set already.
+@rem Set the etwtracedir environment variable if it isn't set already.
 @if not "%etwtracedir%" == "" goto TraceDirSet
 @set etwtracedir=%homedrive%%homepath%\documents\etwtraces
 :TraceDirSet
@@ -36,6 +43,43 @@
 @mkdir "%etwtracedir%"
 :TraceDirExists
 
+if not "%1" == "" goto hasarg
+@echo Required argument is missing. Specify a PID or a path to an executable
+@echo to launch.
+@exit /b
+:hasarg
+
+@rem See if %1 is a PID or a process path, start a process if needed, put the
+@rem pid in %pid%. Note that if we start the process here then the first few
+@rem allocations will be missed. Start the process with DelayedCreateProcess.exe
+@rem in another command prompt and then (quickly) run this batch file with the
+@rem pid if you want to avoid this.
+set pid=none
+set "var="&for /f "delims=0123456789" %%i in ("%1") do @set var=%%i
+if defined var (
+    FOR /f "usebackq tokens=*" %%a in (`DelayedCreateProcess.exe "%*" 0`) do set pid=%%a
+    ) else (
+    set pid=%1
+    )
+
+@rem Exit if CreateProcess failed
+if %pid%==none exit /b
+
+@echo Starting at %date%, %time%
+
+@rem Enable echo so that users can see the commands that are being run.
+@echo on
+
+@rem Tell the process to start recording stacks on all subsequent outstanding
+@rem allocations.
+wpr -snapshotconfig heap -pid %pid% enable
+
+@echo Run your scenario and hit any key when you want a snapshot saved.
+@echo You can stay in this state for as long as you want - days if desired -
+@echo but performance of the target process may be worse during this time.
+@pause
+
+:SaveTrace
 @rem Generate a file name based on the current date and time and put it in
 @rem etwtracedir. This is compatible with UIforETW which looks for traces there.
 @rem Note: this probably fails in some locales. Sorry.
@@ -43,24 +87,26 @@
 @for /F "tokens=1-3 delims=:-. " %%A in ('echo %time%') do @set timevar=%%A-%%B-%%C&set hour=%%A
 @rem Make sure that morning hours such as 9:00 are handled as 09 rather than 9
 @if %hour% LSS 10 set timevar=0%timevar%
-@set FileName=%etwtracedir%\%datevar%_%timevar% %username% heapsnapshot %1.etl
+@set FileName=%etwtracedir%\%datevar%_%timevar% %username% heapsnapshot %pid%.etl
 @echo Trace will be saved to %FileName%
 
-@rem Tell the process to start recording stacks on all subsequent outstanding
-@rem allocations.
-wpr -snapshotconfig heap -pid %1 enable
-@echo Run your scenario and hit any key when you want a snapshot saved.
-@echo You can stay in this state for as long as you want - days if desired -
-@echo but performance of the target process may be worse during this time.
-@pause
 @rem Don't start tracing until we are ready to do the snapshot.
 @rem This avoids filling the trace with GB of process-create
 @rem events that we don't care about.
 wpr -start heapsnapshot -filemode
-wpr -singlesnapshot heap %1
+wpr -singlesnapshot heap %pid%
 wpr -stop "%temp%\UIforETW_heap_snapshot.etl"
-wpr -snapshotconfig heap -pid %1 disable
 xperf -merge "%temp%\UIforETW_heap_snapshot.etl" "%FileName%"
 del "%temp%\UIforETW_heap_snapshot.etl"
 @echo Trace data is in %FileName% -- load it with wpa or xperfview or gpuview.
 @dir "%FileName%" | find /i ".etl"
+
+@set /p quit=More snapshots can be recorded, or we can quit. Quit [y/n]?:
+@if %quit%==y goto leave
+@echo Heap tracing is still enabled. Hit any key when you want another snapshot saved.
+@pause
+@goto SaveTrace
+
+:leave
+@rem When we are done, turn off heap tracing for this process.
+wpr -snapshotconfig heap -pid %pid% disable

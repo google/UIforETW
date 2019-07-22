@@ -3,6 +3,7 @@
 # wpaexporter drops these
 *.csv
 *.etl
+*.obj
 *.exe
 *.exp
 *.ilk
