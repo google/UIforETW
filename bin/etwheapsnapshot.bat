@@ -74,12 +74,13 @@ if %pid%==none exit /b
 @rem allocations.
 wpr -snapshotconfig heap -pid %pid% enable
 
-@echo Run your scenario and hit any key when you want a snapshot saved.
+@echo Run your scenario and hit any non-'q' key when you want a snapshot saved.
 @echo You can stay in this state for as long as you want - days if desired -
 @echo but performance of the target process may be worse during this time.
-@pause
+:WaitAgain
+@set /p quit=Type 'q' and enter if you want to quit, or enter to save a snapshot:
+@if "%quit%"=="q" goto leave
 
-:SaveTrace
 @rem Generate a file name based on the current date and time and put it in
 @rem etwtracedir. This is compatible with UIforETW which looks for traces there.
 @rem Note: this probably fails in some locales. Sorry.
@@ -101,11 +102,7 @@ del "%temp%\UIforETW_heap_snapshot.etl"
 @echo Trace data is in %FileName% -- load it with wpa or xperfview or gpuview.
 @dir "%FileName%" | find /i ".etl"
 
-@set /p quit=More snapshots can be recorded, or we can quit. Quit [y/n]?:
-@if %quit%==y goto leave
-@echo Heap tracing is still enabled. Hit any key when you want another snapshot saved.
-@pause
-@goto SaveTrace
+@goto WaitAgain
 
 :leave
 @rem When we are done, turn off heap tracing for this process.
