@@ -22,6 +22,7 @@ limitations under the License.
 // Note that this URL has changed once already, so caveat blog lector
 // The algorithms were based on UIforETW\bin\IdentifyChromeProcesses.py and
 // the results were compared to that script to ensure correctness.
+// This uses the Microsoft.Windows.EventTracing.Processing.All package from NuGet
 
 using Microsoft.Windows.EventTracing;
 using Microsoft.Windows.EventTracing.Cpu;
