@@ -41,39 +41,19 @@ class IdentifyChromeProcesses
         public long contextSwitches;
     }
 
-    struct ProcessSummary
+    // Get a dictionary of Chrome process paths, indexed by the IProcess object
+    // which serves as a unique identifier. Don't return a Dictionary keyed by
+    // PID because that will lose records whenever there is PID reuse, which is
+    // often.
+    static Dictionary<IProcess, string> GetChromePaths(IProcessDataSource processData)
     {
-        public string imageName_;
-        public string exePath_;
-        public string commandLine_;
-        public uint pid_;
-        public uint parentPid_;
-
-        public ProcessSummary(string imageName, string exePath, string commandLine, uint pid, uint parentPid)
-        {
-            imageName_ = imageName;
-            exePath_ = exePath;
-            commandLine_ = commandLine;
-            pid_ = pid;
-            parentPid_ = parentPid;
-        }
-    }
-
-    // Get a list of Chrome processes. Most of the logic is from getting a
-    // a full exe path name. Don't return a Dictionary keyed by PID because
-    // that will lose records whenever there is PID reuse, which is often.
-    static List<ProcessSummary> GetProcessSummaries(IProcessDataSource processData)
-    {
-        var processSummaries = new List<ProcessSummary>();
+        var chromePaths = new Dictionary<IProcess, string>();
 
         foreach (var process in processData.Processes)
         {
-            string imageName = process.ImageName;
-            if (imageName != "chrome.exe")
+            if (process.ImageName != "chrome.exe")
                 continue;
 
-            uint pid = process.Id;
-            uint parentPid = process.ParentId;
             // Extract the exePath from the command line. It is also possible to
             // grab it from the process.Images.Path attribute but that sometimes
             // gives weird results, is not clearly better, and makes comparing
@@ -81,16 +61,16 @@ class IdentifyChromeProcesses
             // The exePath may or may not be quoted, and may or not have the .exe
             // suffix but if we strip quotes or split on spaces it works.
             string commandLine = process.CommandLine != null ? process.CommandLine : "<Unknown>";
-            string exe_path;
+            string exePath;
             if (commandLine.StartsWith("\""))
-                exe_path = commandLine.Substring(1, commandLine.IndexOf('\"', 1) - 1);
+                exePath = commandLine.Substring(1, commandLine.IndexOf('\"', 1) - 1);
             else
-                exe_path = commandLine.Split(' ')[0];
+                exePath = commandLine.Split(' ')[0];
 
-            processSummaries.Add(new ProcessSummary(imageName, exe_path, commandLine, pid, parentPid));
+            chromePaths[process] = exePath;
         }
 
-        return processSummaries;
+        return chromePaths;
     }
 
     // Scan through a trace and print a summary of the Chrome processes, optionally with
@@ -112,7 +92,7 @@ class IdentifyChromeProcesses
             schedulingData = pendingSchedulingData.Result;
 
         // Get a List<ProcessSummary> of all Chrome processes.
-        var processSummaries = GetProcessSummaries(pendingProcessData.Result);
+        var processSummaries = GetChromePaths(pendingProcessData.Result);
 
         // Group all of the chrome.exe processes by browser Pid, then by type.
         // pathByBrowserPid just maps from the browser Pid to the disk path to
@@ -129,7 +109,7 @@ class IdentifyChromeProcesses
         var parentPids = new Dictionary<uint, uint>();
 
         // Dictionary of Pids and their types.
-        var types_by_pid = new Dictionary<uint, string>();
+        var typesByPid = new Dictionary<uint, string>();
 
         // Find the space-terminated word after 'type='.
         // Mark the first .* as lazy/ungreedy/reluctant so that if there are multiple
@@ -137,12 +117,14 @@ class IdentifyChromeProcesses
         // first one will win. Or, at least, that's what the comments in the Python
         // version of this said.
         var r = new Regex(@".*? --type=(?<type>[^ ]*) .*");
-        foreach (var summary in processSummaries)
+        foreach (var entry in processSummaries)
         {
-            if (summary.imageName_ == "chrome.exe")
+            var process = entry.Key;
+            var exePath = entry.Value;
+            if (process.ImageName == "chrome.exe")
             {
-                uint pid = summary.pid_;
-                parentPids[pid] = summary.parentPid_;
+                uint pid = process.Id;
+                parentPids[pid] = process.ParentId;
 
                 // Look for the process type on the command-line in the
                 // --type= option. If no type is found then assume it is the
@@ -152,27 +134,27 @@ class IdentifyChromeProcesses
                 // many ways to do this.
                 string type;
                 uint browserPid;
-                var match = r.Match(summary.commandLine_);
+                var match = r.Match(process.CommandLine);
                 if (match.Success)
                 {
                     type = match.Groups["type"].ToString();
                     if (type == "crashpad-handler")
                         type = "crashpad"; // Shorten the tag for better formatting
-                    if (type == "renderer" && summary.commandLine_.Contains(" --extension-process "))
+                    if (type == "renderer" && process.CommandLine.Contains(" --extension-process "))
                     {
                         // Extension processes are renderers with --extension-process on the command line.
                         type = "extension";
                     }
-                    browserPid = summary.parentPid_;
+                    browserPid = process.ParentId;
                 }
                 else
                 {
                     type = "browser";
                     browserPid = pid;
-                    pathByBrowserPid[browserPid] = summary.exePath_;
+                    pathByBrowserPid[browserPid] = exePath;
                 }
 
-                types_by_pid[pid] = type;
+                typesByPid[pid] = type;
 
                 // Retrieve or create the list of processes associated with this
                 // browser (parent) pid.
@@ -246,7 +228,7 @@ class IdentifyChromeProcesses
         }
 
         // Map from PID to CPUUsageDetails.
-        var exec_times = new Dictionary<uint, CPUUsageDetails>();
+        var execTimes = new Dictionary<uint, CPUUsageDetails>();
         if (showCPUUsage)
         {
             var names = new string[] { "chrome.exe", "dwm.exe", "audiodg.exe", "System", "MsMpEng.exe", "software_reporter_tool.exe" };
@@ -263,14 +245,14 @@ class IdentifyChromeProcesses
                 // short this is probably faster than using a dictionary.
                 if (!names.Contains(slice.Process.ImageName))
                     continue;
-                exec_times.TryGetValue(slice.Process.Id, out CPUUsageDetails last);
+                execTimes.TryGetValue(slice.Process.Id, out CPUUsageDetails last);
                 last.imageName = slice.Process.ImageName;
                 last.ns += slice.Duration.Nanoseconds;
                 last.contextSwitches += 1;
-                exec_times[slice.Process.Id] = last;
+                execTimes[slice.Process.Id] = last;
             }
 
-            foreach (var times in exec_times)
+            foreach (var times in execTimes)
             {
                 CPUUsageDetails details = times.Value;
                 // Print details about other interesting processes:
@@ -306,7 +288,7 @@ class IdentifyChromeProcesses
                     var detailsSubTotal = new CPUUsageDetails();
                     foreach (uint pid in type.Value)
                     {
-                        exec_times.TryGetValue(pid, out CPUUsageDetails details);
+                        execTimes.TryGetValue(pid, out CPUUsageDetails details);
                         detailsTotal.ns += details.ns;
                         detailsTotal.contextSwitches += details.contextSwitches;
 
@@ -356,7 +338,7 @@ class IdentifyChromeProcesses
                     if (showCPUUsage)
                     {
                         Console.Write("\n        ");
-                        exec_times.TryGetValue(pid, out CPUUsageDetails details);
+                        execTimes.TryGetValue(pid, out CPUUsageDetails details);
                         if (details.contextSwitches > 0)
                             Console.Write("{0,5} - {1,6} context switches, {2,8:0.00} ms CPU", pid, details.contextSwitches, details.ns / 1e6);
                         else
