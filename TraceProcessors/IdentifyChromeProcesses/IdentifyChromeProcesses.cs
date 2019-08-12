@@ -61,7 +61,7 @@ class IdentifyChromeProcesses
             // with the Python script more difficult.
             // The exePath may or may not be quoted, and may or not have the .exe
             // suffix but if we strip quotes or split on spaces it works.
-            string commandLine = process.CommandLine != null ? process.CommandLine : "<Unknown>";
+            string commandLine = process.CommandLine ?? "<Unknown>";
             string exePath;
             if (commandLine.StartsWith("\""))
                 exePath = commandLine.Substring(1, commandLine.IndexOf('\"', 1) - 1);
@@ -76,7 +76,7 @@ class IdentifyChromeProcesses
 
     // Scan through a trace and print a summary of the Chrome processes, optionally with
     // CPU Usage details for Chrome and other key processes.
-    static void ProcessTrace(ITraceProcessor trace, bool showCPUUsage, bool eventsLost)
+    static void ProcessTrace(ITraceProcessor trace, bool showCPUUsage)
     {
         var pendingProcessData = trace.UseProcesses();
         // Only request CPU scheduling data when it is actually needed, to avoid
@@ -384,26 +384,29 @@ class IdentifyChromeProcesses
             return;
         }
 
+        var settings = new TraceProcessorSettings
+        {
+            // Don't print a setup message on first run.
+            SuppressFirstTimeSetupMessage = true
+        };
         try
         {
-            using (ITraceProcessor trace = TraceProcessor.Create(traceName))
-                ProcessTrace(trace, showCPUUsage, false);
+            using (ITraceProcessor trace = TraceProcessor.Create(traceName, settings))
+                ProcessTrace(trace, showCPUUsage);
         }
-        catch (System.InvalidOperationException e)
+        catch (TraceLostEventsException e)
         {
             // Note that wpaexporter doesn't seem to have a way to handle this,
             // which is one advantage of TraceProcessing. Note that traces with
             // lost events are "corrupt" in some sense so the results will be
             // unpredictable.
             Console.WriteLine(e.Message);
-            Console.WriteLine("Trying again with AllowLostEvents and AllowTimeInversion specified. Results may be less reliable.");
+            Console.WriteLine("Trying again with AllowLostEvents specified. Results may be less reliable.");
             Console.WriteLine();
 
-            var settings = new TraceProcessorSettings();
             settings.AllowLostEvents = true;
-            settings.AllowTimeInversion = true;
             using (ITraceProcessor trace = TraceProcessor.Create(traceName, settings))
-                ProcessTrace(trace, showCPUUsage, true);
+                ProcessTrace(trace, showCPUUsage);
         }
     }
 }
