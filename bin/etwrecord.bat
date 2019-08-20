@@ -114,18 +114,7 @@ xperf -stop %SessionName% -stop
 @rem New method -- allows requesting trace compression. This is a NOP on
 @rem Windows 7 but on Windows 8 creates 5-7x smaller traces (that don't load on Windows 7)
 
-@rem Rename c:\Windows\AppCompat\Programs\amcache.hve to avoid serious merge
-@rem performance problems (up to six minutes!)
-@set HVEDir=c:\Windows\AppCompat\Programs
-@rename %HVEDir%\Amcache.hve Amcache_temp.hve 2>nul
-@set RenameErrorCode=%errorlevel%
-
 xperf -merge "%kernelfile%" "%userfile%" %FileAndCompressFlags%
-
-@rem Rename the file back
-@if not "%RenameErrorCode%" equ "0" goto SkipRename
-@rename %HVEDir%\Amcache_temp.hve Amcache.hve
-:SkipRename
 
 @if not %errorlevel% equ 0 goto FailureToRecord
 @rem Delete the temporary ETL files
@@ -133,10 +122,6 @@ xperf -merge "%kernelfile%" "%userfile%" %FileAndCompressFlags%
 @del "%userfile%"
 @echo Trace data is in %FileName% -- load it with wpa or xperfview or gpuview.
 @dir "%FileName%" | find /i ".etl"
-@rem Preprocessing symbols to avoid delays with Chrome's huge symbols
-@pushd "%batchdir%"
-python StripChromeSymbols.py "%FileName%"
-@popd
 start wpa "%FileName%"
 @exit /b
 

@@ -59,11 +59,11 @@ set _NT_SYMBOL_PATH=SRV*c:\symbols*http://msdl.microsoft.com/download/symbols;SR
 @rem Windows 7+
 @echo Windows 7+ settings
 @rem Microsoft-Windows-Win32k adds Window focus events. This is available only
-@rem on Windows 7 and above.
-@set UserProviders=Microsoft-Windows-Win32k
-@rem Theoretically better power monitoring, Windows 7+, not proven to
-@rem actually work!
-@rem @set UserProviders=%UserProviders%+Microsoft-Windows-Kernel-Processor-Power+Microsoft-Windows-Kernel-Power
+@rem on Windows 7 and above. The filtering is to avoid excessive traffic from
+@rem the UserCrit events.
+@set UserProviders=Microsoft-Windows-Win32k:0xfdffffffefffffff
+@rem Memory and power monitoring, copied from UIforETW.
+@set UserProviders=%UserProviders%+Microsoft-Windows-Kernel-Memory:0xE0+Microsoft-Windows-Kernel-Power
 
 @ver | find "6.1."
 @if %errorlevel% == 0 goto Windows7
