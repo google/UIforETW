@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<WpaProfileContainer xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Version="2" xmlns="http://tempuri.org/SerializableElement.xsd">
+  <Content xsi:type="WpaProfile2">
+    <Sessions>
+      <Session Index="0">
+        <FileReferences />
+      </Session>
+    </Sessions>
+    <Views>
+      <View Guid="67b8486a-9cc3-4d36-978b-cfc07051f750" IsVisible="true" Title="Analysis">
+        <Graphs>
+          <Graph Guid="463048cb-2f2b-480d-8e94-a54f3fd88080" LayoutStyle="DataTable" Color="#FF0000FF" GraphHeight="125" IsMinimized="false" IsShown="true" IsExpanded="false">
+            <Preset Name="Count by Instance" GraphChartType="StackedBars" BarGraphIntervalCount="50" IsThreadActivityTable="false" GraphColumnCount="17" KeyColumnCount="8" LeftFrozenColumnCount="9" RightFrozenColumnCount="16" InitialFilterShouldKeep="true" GraphFilterColumnGuid="fdb0371a-7d64-47e7-8012-12d41db815eb" GraphFilterTopValue="0" GraphFilterThresholdValue="0">
+              <MetadataEntries>
+                <MetadataEntry Guid="555b3fb9-3e48-442c-a1f6-53cd48fcecf5" Name="Snap Time" ColumnMetadata="StartTime" />
+                <MetadataEntry Guid="555b3fb9-3e48-442c-a1f6-53cd48fcecf5" Name="Snap Time" ColumnMetadata="EndTime" />
+              </MetadataEntries>
+              <HighlightEntries />
+              <Columns>
+                <Column Guid="bd2378bf-dd18-4d0a-9678-ca787e1299f9" Name="Instance" SortOrder="Ascending" SortPriority="2" Width="60" IsVisible="false" />
+                <Column Guid="c636d2f3-9150-4f99-8f85-a42047541ed0" Name="Process" SortPriority="6" Width="190" IsVisible="false">
+                  <ProcessOptionsParameter />
+                </Column>
+                <Column Guid="2818954f-2d30-5569-4510-dade0a5a605c" Name="Annotation" SortPriority="16" Width="159" IsVisible="true">
+                  <AnnotationsOptionsParameter>
+                    <AnnotationQueryEntries />
+                  </AnnotationsOptionsParameter>
+                </Column>
+                <Column Guid="991604fa-45ec-45c8-825d-0504766a93ad" Name="PID" SortPriority="7" Width="60" IsVisible="false" />
+                <Column Guid="440a6f8f-b25d-4ffd-9e9e-56c63dc74479" Name="Pointer Size" SortPriority="8" Width="60" IsVisible="false" />
+                <Column Guid="7934aa50-2a3d-4384-b78a-d9b3bb835866" Name="Stack ID" SortPriority="10" Width="89" IsVisible="false" />
+                <Column Guid="24cf714b-7b4c-4049-a32e-df687d735f28" Name="Stack Ref#" SortPriority="11" Width="211" CellFormat="x" IsVisible="true" />
+                <Column Guid="e33da178-a863-4a38-975e-2562eccb8656" Name="Stack" SortPriority="3" Width="744" IsVisible="true" />
+                <Column Guid="b1d7650d-1022-4623-bd70-3feac846bf67" Name="Ref Count" SortOrder="Descending" SortPriority="4" Width="105" IsVisible="false" />
+                <Column Guid="fdb0371a-7d64-47e7-8012-12d41db815eb" Name="Size" AggregationMode="Sum" SortOrder="Descending" SortPriority="0" Width="111" CellFormat="B" IsVisible="true" />
+                <Column Guid="0bde4a08-6a88-4562-bd65-390626884bf7" Name="Count" AggregationMode="Sum" SortOrder="Descending" SortPriority="1" Width="80" IsVisible="true" />
+                <Column Guid="25d52de1-f5b8-4f42-8ce2-de477746e252" Name="Stack Depth" SortOrder="Descending" SortPriority="5" Width="60" IsVisible="false" />
+                <Column Guid="555b3fb9-3e48-442c-a1f6-53cd48fcecf5" Name="Snap Time" SortPriority="9" TextAlignment="Right" Width="80" CellFormat="sN" IsVisible="false">
+                  <DateTimeTimestampOptionsParameter DateTimeEnabled="false" />
+                </Column>
+                <Column Guid="ce84d427-a0a7-58d9-0fde-e8d2e84770bc" Name="Table" SortPriority="12" Width="16" IsVisible="false" />
+                <Column Guid="6a67fd39-b79b-54c3-d192-12ded31c68b1" Name="Trace #" SortPriority="13" Width="80" IsVisible="false" />
+                <Column Guid="82ddfdff-ee93-5f35-08ac-4705069618dc" Name="Thread Activity Tag" SortPriority="14" Width="16" IsVisible="false" />
+                <Column Guid="cb796d44-2927-5ac1-d231-4b71904c18f5" Name="Thread Name" SortPriority="15" Width="16" IsVisible="false" />
+              </Columns>
+            </Preset>
+          </Graph>
+        </Graphs>
+        <SessionIndices>
+          <SessionIndex>0</SessionIndex>
+        </SessionIndices>
+      </View>
+    </Views>
+    <ModifiedGraphs>
+      <GraphSchema Guid="463048cb-2f2b-480d-8e94-a54f3fd88080">
+        <ModifiedPresets />
+        <PersistedPresets>
+          <Preset Name="Count by Instance" GraphChartType="StackedBars" BarGraphIntervalCount="50" IsThreadActivityTable="false" GraphColumnCount="17" KeyColumnCount="8" LeftFrozenColumnCount="9" RightFrozenColumnCount="16" InitialFilterShouldKeep="true" GraphFilterColumnGuid="fdb0371a-7d64-47e7-8012-12d41db815eb" GraphFilterTopValue="0" GraphFilterThresholdValue="0">
+            <MetadataEntries>
+              <MetadataEntry Guid="555b3fb9-3e48-442c-a1f6-53cd48fcecf5" Name="Snap Time" ColumnMetadata="StartTime" />
+              <MetadataEntry Guid="555b3fb9-3e48-442c-a1f6-53cd48fcecf5" Name="Snap Time" ColumnMetadata="EndTime" />
+            </MetadataEntries>
+            <HighlightEntries />
+            <Columns>
+              <Column Guid="bd2378bf-dd18-4d0a-9678-ca787e1299f9" Name="Instance" SortOrder="Ascending" SortPriority="2" Width="60" IsVisible="false" />
+              <Column Guid="c636d2f3-9150-4f99-8f85-a42047541ed0" Name="Process" SortPriority="6" Width="190" IsVisible="false">
+                <ProcessOptionsParameter />
+              </Column>
+              <Column Guid="2818954f-2d30-5569-4510-dade0a5a605c" Name="Annotation" SortPriority="16" Width="159" IsVisible="true">
+                <AnnotationsOptionsParameter>
+                  <AnnotationQueryEntries />
+                </AnnotationsOptionsParameter>
+              </Column>
+              <Column Guid="991604fa-45ec-45c8-825d-0504766a93ad" Name="PID" SortPriority="7" Width="60" IsVisible="false" />
+              <Column Guid="440a6f8f-b25d-4ffd-9e9e-56c63dc74479" Name="Pointer Size" SortPriority="8" Width="60" IsVisible="false" />
+              <Column Guid="7934aa50-2a3d-4384-b78a-d9b3bb835866" Name="Stack ID" SortPriority="10" Width="89" IsVisible="false" />
+              <Column Guid="24cf714b-7b4c-4049-a32e-df687d735f28" Name="Stack Ref#" SortPriority="11" Width="211" CellFormat="x" IsVisible="true" />
+              <Column Guid="e33da178-a863-4a38-975e-2562eccb8656" Name="Stack" SortPriority="3" Width="744" IsVisible="true" />
+              <Column Guid="b1d7650d-1022-4623-bd70-3feac846bf67" Name="Ref Count" SortOrder="Descending" SortPriority="4" Width="105" IsVisible="false" />
+              <Column Guid="fdb0371a-7d64-47e7-8012-12d41db815eb" Name="Size" AggregationMode="Sum" SortOrder="Descending" SortPriority="0" Width="111" CellFormat="B" IsVisible="true" />
+              <Column Guid="0bde4a08-6a88-4562-bd65-390626884bf7" Name="Count" AggregationMode="Sum" SortOrder="Descending" SortPriority="1" Width="80" IsVisible="true" />
+              <Column Guid="25d52de1-f5b8-4f42-8ce2-de477746e252" Name="Stack Depth" SortOrder="Descending" SortPriority="5" Width="60" IsVisible="false" />
+              <Column Guid="555b3fb9-3e48-442c-a1f6-53cd48fcecf5" Name="Snap Time" SortPriority="9" TextAlignment="Right" Width="80" CellFormat="sN" IsVisible="false">
+                <DateTimeTimestampOptionsParameter DateTimeEnabled="false" />
+              </Column>
+              <Column Guid="ce84d427-a0a7-58d9-0fde-e8d2e84770bc" Name="Table" SortPriority="12" Width="16" IsVisible="false" />
+              <Column Guid="6a67fd39-b79b-54c3-d192-12ded31c68b1" Name="Trace #" SortPriority="13" Width="80" IsVisible="false" />
+              <Column Guid="82ddfdff-ee93-5f35-08ac-4705069618dc" Name="Thread Activity Tag" SortPriority="14" Width="16" IsVisible="false" />
+              <Column Guid="cb796d44-2927-5ac1-d231-4b71904c18f5" Name="Thread Name" SortPriority="15" Width="16" IsVisible="false" />
+            </Columns>
+          </Preset>
+        </PersistedPresets>
+      </GraphSchema>
+    </ModifiedGraphs>
+  </Content>
+</WpaProfileContainer>
