@@ -100,6 +100,13 @@ xperf -on %KernelProviders% %KernelStackWalk% %KBuffers% -f "%kernelfile%" -star
 xperf -on %KernelProviders% %KernelStackWalk% %KBuffers% -f "%kernelfile%"  -start %SessionName% -on %UserProviders% -f "%userfile%"
 :NotInvalidFlags
 @if not %errorlevel% equ 0 goto failure
+@rem Some providers need a capturestate command to make them work reliably. One
+@rem example that I have noticed is the Microsoft-Windows-Win32k. Without a
+@rem -capturestate command it will not capture the current window in focus.
+@rem Window focus will only be recorded if it changes during the trace. Adding a
+@rem -capturestate command makes it work reliably. It would sure be nice if This
+@rem was documented.
+xperf.exe -capturestate %SessionName% %UserProviders%
 
 @echo Run the test you want to profile here
 @pause
