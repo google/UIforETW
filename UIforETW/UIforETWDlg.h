@@ -152,9 +152,7 @@ private:
 	// this string object, so don't change it without adding synchronization.
 	std::wstring traceDir_;
 	std::wstring tempTraceDir_;
-	std::wstring wpt81Dir_; // This points to the WPT 8.1 directory if it exists, else nothing.
 	std::wstring wpt10Dir_; // If WPT 10 isn't installed UIforETW will exit.
-	std::wstring wpa81Path_;
 	std::wstring wpa10Path_;
 	std::wstring gpuViewPath_;
 	std::wstring wpaDefaultPath() const; // Default viewer.
@@ -292,7 +290,6 @@ private:
 	afx_msg void OnFullRenameKey();
 	afx_msg void FinishTraceRename();
 	afx_msg void CancelTraceRename();
-	afx_msg void OnOpenTraceWPA();
 	afx_msg void OnOpenTrace10WPA();
 	afx_msg void OnOpenTraceGPUView();
 	afx_msg void CopyTraceName();

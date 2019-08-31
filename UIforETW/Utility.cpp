@@ -53,7 +53,6 @@ std::wstring GetDocumentsFolderPath()
 
 void copyFileToDocumentsWPA(PCWSTR const fileName, const std::wstring& exeDir, const bool force)
 {
-	// First copy the WPA 8.1 startup.wpaProfile file
 	std::wstring docsPath(GetDocumentsFolderPath());
 
 	if (docsPath.empty())
@@ -88,7 +87,7 @@ void copyFileToDocumentsWPA(PCWSTR const fileName, const std::wstring& exeDir, c
 void copyWPAProfileToLocalAppData(const std::wstring& exeDir, const bool force)
 {
 	PCWSTR const localAppDataEnvVar = L"localappdata";
-	// Then copy the WPA 10 startup.wpaProfile file
+	// Copy the WPA 10 startup.wpaProfile file
 	const std::wstring localAppData = GetEnvironmentVariableString(localAppDataEnvVar);
 	if (localAppData.empty())
 	{
@@ -963,9 +962,6 @@ void CopyStartupProfiles(const std::wstring& exeDir, const bool force)
 {
 	if (force)
 		outputPrintf(L"\n");
-
-	// WPA 8.1 stores startup.wpaProfile file in Documents/WPA Files
-	copyFileToDocumentsWPA(kWPAStartupFileName, exeDir, force);
 
 	copyFileToDocumentsWPA(kChromeRegionsFileName, exeDir, force);
 

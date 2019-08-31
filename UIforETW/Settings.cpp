@@ -72,10 +72,9 @@ uint64_t disabled_other_events_keyword_bit = 1ULL << 62;
 
 IMPLEMENT_DYNAMIC(CSettings, CDialog)
 
-CSettings::CSettings(CWnd* pParent /*=NULL*/, const std::wstring& exeDir, const std::wstring& wpt81Dir, const std::wstring& wpt10Dir) noexcept
+CSettings::CSettings(CWnd* pParent /*=NULL*/, const std::wstring& exeDir, const std::wstring& wpt10Dir) noexcept
 	: CDialog(CSettings::IDD, pParent)
 	, exeDir_(exeDir)
-	, wpt81Dir_(wpt81Dir)
 	, wpt10Dir_(wpt10Dir)
 {
 
@@ -198,9 +197,8 @@ BOOL CSettings::OnInitDialog()
 					L"(proportional set size) calculated for monitored processes. This may consume "
 					L"dozens or hundreds of ms each time. Without this checked only full working "
 					L"set is calculated, which is cheap.");
-		toolTip_.AddTool(&btCopyStartupProfile_, L"Copies startup.wpaProfile files for WPA 8.1 and "
-					L"10 to the appropriate destinations so that the next time WPA starts up it will have "
-					L"reasonable analysis defaults.");
+		toolTip_.AddTool(&btCopyStartupProfile_, L"Copies configuration files so that the next time "
+					L"WPA starts up it will have reasonable analysis defaults.");
 		toolTip_.AddTool(&btUseOtherKernelLogger_, L"Check this to have UIforETW use the alternate kernel "
 					L"logger. This is needed on some machines where the main kernel logger is in use.");
 		toolTip_.AddTool(&btChromeDeveloper_, L"Check this to enable Chrome specific behavior such as "

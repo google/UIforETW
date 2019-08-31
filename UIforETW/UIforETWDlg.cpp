@@ -245,7 +245,6 @@ BEGIN_MESSAGE_MAP(CUIforETWDlg, CDialog)
 	ON_CBN_SELCHANGE(IDC_TRACINGMODE, &CUIforETWDlg::OnCbnSelchangeTracingmode)
 	ON_BN_CLICKED(IDC_SETTINGS, &CUIforETWDlg::OnBnClickedSettings)
 	ON_WM_CONTEXTMENU()
-	ON_BN_CLICKED(ID_TRACES_OPENTRACEINWPA, &CUIforETWDlg::OnOpenTraceWPA)
 	ON_BN_CLICKED(ID_TRACES_OPENTRACEIN10WPA, &CUIforETWDlg::OnOpenTrace10WPA)
 	ON_BN_CLICKED(ID_TRACES_OPENTRACEINGPUVIEW, &CUIforETWDlg::OnOpenTraceGPUView)
 	ON_BN_CLICKED(ID_RENAME, &CUIforETWDlg::OnRenameKey)
@@ -414,13 +413,7 @@ BOOL CUIforETWDlg::OnInitDialog()
 
 	// The WPT installer is always a 32-bit installer, so we look for it in
 	// ProgramFilesX86 / WOW6432Node, on 32-bit and 64-bit operating systems.
-	wpt81Dir_ = ReadRegistryString(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Microsoft SDKs\\Windows\\v8.1", L"InstallationFolder", true);
 	wpt10Dir_ = ReadRegistryString(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Microsoft SDKs\\Windows\\v10.0", L"InstallationFolder", true);
-	if (!wpt81Dir_.empty())
-	{
-		EnsureEndsWithDirSeparator(wpt81Dir_);
-		wpt81Dir_ += L"Windows Performance Toolkit\\";
-	}
 	if (!wpt10Dir_.empty())
 	{
 		EnsureEndsWithDirSeparator(wpt10Dir_);
@@ -428,7 +421,7 @@ BOOL CUIforETWDlg::OnInitDialog()
 	}
 
 	// If the registry entries were unavailable, fall back to assuming their installation directory.
-	if (wpt81Dir_.empty() || wpt10Dir_.empty())
+	if (wpt10Dir_.empty())
 	{
 		wchar_t* progFilesx86Dir = nullptr;
 		if (!SUCCEEDED(SHGetKnownFolderPath(FOLDERID_ProgramFilesX86, 0, nullptr, &progFilesx86Dir)))
@@ -436,10 +429,6 @@ BOOL CUIforETWDlg::OnInitDialog()
 		std::wstring windowsKitsDir = progFilesx86Dir;
 		CoTaskMemFree(progFilesx86Dir);
 		windowsKitsDir += L"\\Windows Kits\\";
-		if (wpt81Dir_.empty())
-		{
-			wpt81Dir_ = windowsKitsDir + L"8.1\\Windows Performance Toolkit\\";
-		}
 		if (wpt10Dir_.empty())
 		{
 			wpt10Dir_ = windowsKitsDir + L"10\\Windows Performance Toolkit\\";
@@ -552,11 +541,6 @@ BOOL CUIforETWDlg::OnInitDialog()
 		}
 	}
 
-	if (!PathFileExists((wpt81Dir_ + L"xperf.exe").c_str()))
-		wpt81Dir_ = L"";
-
-	if (!wpt81Dir_.empty())
-		wpa81Path_ = wpt81Dir_ + L"wpa.exe";
 	gpuViewPath_ = wpt10Dir_ + L"gpuview\\gpuview.exe";
 	wpa10Path_ = wpt10Dir_ + L"wpa.exe";
 
@@ -717,9 +701,7 @@ BOOL CUIforETWDlg::OnInitDialog()
 
 std::wstring CUIforETWDlg::wpaDefaultPath() const
 {
-	if (PathFileExists(wpa10Path_.c_str()))
-		return wpa10Path_;
-	return wpa81Path_;
+	return wpa10Path_;
 }
 
 std::wstring CUIforETWDlg::GetDirectory(PCWSTR env, const std::wstring& defaultDir)
@@ -1974,7 +1956,7 @@ void CUIforETWDlg::OnCbnSelchangeTracingmode()
 
 void CUIforETWDlg::OnBnClickedSettings()
 {
-	CSettings dlgSettings(nullptr, GetExeDir(), wpt81Dir_, wpt10Dir_);
+	CSettings dlgSettings(nullptr, GetExeDir(), wpt10Dir_);
 	dlgSettings.heapTracingExes_ = heapTracingExes_;
 	dlgSettings.WSMonitoredProcesses_ = WSMonitoredProcesses_;
 	dlgSettings.bExpensiveWSMonitoring_ = bExpensiveWSMonitoring_;
@@ -2052,18 +2034,8 @@ void CUIforETWDlg::OnContextMenu(CWnd* pWnd, CPoint point)
 		std::wstring tracePath;
 		if (selIndex >= 0)
 		{
-			// WPT 10 must be installed and 8.1 may be.
-			if (wpt81Dir_.empty())
-			{
-				// If WPT 8.1 is not installed then disable it.
-				pContextMenu->SetDefaultItem(ID_TRACES_OPENTRACEIN10WPA);
-				pContextMenu->EnableMenuItem(ID_TRACES_OPENTRACEINWPA, MF_BYCOMMAND | MF_GRAYED);
-			}
-			else
-			{
-				// Make WPT 10 the default.
-				pContextMenu->SetDefaultItem(ID_TRACES_OPENTRACEIN10WPA);
-			}
+			// WPT 10 must be installed. Make it the default.
+			pContextMenu->SetDefaultItem(ID_TRACES_OPENTRACEIN10WPA);
 			if (!PathFileExists(mxaPath_.c_str()))
 			{
 				pContextMenu->EnableMenuItem(ID_TRACES_OPENTRACEINEXPERIENCEANALYZER, MF_BYCOMMAND | MF_GRAYED);
@@ -2077,7 +2049,6 @@ void CUIforETWDlg::OnContextMenu(CWnd* pWnd, CPoint point)
 			// Those that are always available are commented out in this list.
 			int disableList[] =
 			{
-				ID_TRACES_OPENTRACEINWPA,
 				ID_TRACES_OPENTRACEIN10WPA,
 				ID_TRACES_OPENTRACEINGPUVIEW,
 				ID_TRACES_OPENTRACEINEXPERIENCEANALYZER,
@@ -2113,9 +2084,6 @@ void CUIforETWDlg::OnContextMenu(CWnd* pWnd, CPoint point)
 
 		switch (selection)
 		{
-			case ID_TRACES_OPENTRACEINWPA:
-				LaunchTraceViewer(tracePath, wpa81Path_);
-				break;
 			case ID_TRACES_OPENTRACEIN10WPA:
 				LaunchTraceViewer(tracePath, wpa10Path_);
 				break;
@@ -2216,18 +2184,6 @@ void CUIforETWDlg::CopyTraceName()
 	}
 }
 
-
-void CUIforETWDlg::OnOpenTraceWPA()
-{
-	const int selIndex = btTraces_.GetCurSel();
-
-	if (selIndex >= 0)
-	{
-		std::wstring tracePath = GetTraceDir() + traces_[selIndex] + L".etl";
-		// The default viewer is WPA 10
-		LaunchTraceViewer(tracePath, wpa10Path_);
-	}
-}
 
 void CUIforETWDlg::OnOpenTrace10WPA()
 {

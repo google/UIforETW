@@ -26,7 +26,7 @@ class CSettings : public CDialog
 	DECLARE_DYNAMIC(CSettings)
 
 public:
-	CSettings(CWnd* pParent, const std::wstring& exeDir, const std::wstring& wpt81Dir, const std::wstring& wpt10Dir) noexcept;   // standard constructor
+	CSettings(CWnd* pParent, const std::wstring& exeDir, const std::wstring& wpt10Dir) noexcept;   // standard constructor
 	~CSettings();
 
 // Dialog Data
@@ -80,7 +80,6 @@ protected:
 
 	const std::wstring exeDir_;
 	// Same meaning as in CUIforETWDlg
-	const std::wstring wpt81Dir_;
 	const std::wstring wpt10Dir_;
 
 	DECLARE_MESSAGE_MAP()
