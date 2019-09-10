@@ -66,7 +66,7 @@ if not os.path.exists(profilePath):
   print('Couldn\'t find \"%s\". This should be part of the UIforETW repo and releases' % profilePath)
   sys.exit(0)
 
-if os.environ.has_key('ProgramFiles(x86)'):
+if 'ProgramFiles(x86)' in os.environ:
   progFilesx86 = os.environ['ProgramFiles(x86)']
 else:
   progFilesx86 = os.environ['ProgramFiles']
@@ -78,7 +78,7 @@ if not os.path.exists(wpaExporterPath):
 wpaCommand = r'"%s" "%s" -profile "%s"' % (wpaExporterPath, trace_name, profilePath)
 
 print('> %s' % wpaCommand)
-print(subprocess.check_output(wpaCommand, stderr=subprocess.STDOUT))
+print(subprocess.check_output(wpaCommand, stderr=subprocess.STDOUT).decode())
 
 # This dictionary of lists accumulates the data. The key is a process (pid) name
 # and the payload is a list containing interval/timestamp pairs. The timer
