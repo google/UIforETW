@@ -110,6 +110,8 @@ def _IdentifyChromeProcesses(tracename, show_cpu_usage, return_pid_map):
   types_by_pid = {}
   output = subprocess.check_output(command, stderr=subprocess.STDOUT)
   for line in output.splitlines():
+    # Python 3 needs the line translated from bytes to str.
+    line = line.decode()
     # Split the commandline from the .csv data and then extract the exePath.
     # It may or may not be quoted, and may or not have the .exe suffix.
     parts = line.split(", ")
@@ -129,23 +131,23 @@ def _IdentifyChromeProcesses(tracename, show_cpu_usage, return_pid_map):
         lineByPid[pid] = line
         match = processTypeRe.match(commandLine)
         if match:
-          type = match.groups()[0]
+          process_type = match.groups()[0]
           if commandLine.count(" --extension-process ") > 0:
-            type = "extension"
-          if type == "crashpad-handler":
-            type = "crashpad" # Shorten the tag for better formatting
+            process_type = "extension"
+          if process_type == "crashpad-handler":
+            process_type = "crashpad" # Shorten the tag for better formatting
           browserPid = parentPid
         else:
-          type = "browser"
+          process_type = "browser"
           browserPid = pid
           pathByBrowserPid[browserPid] = exePath
-        types_by_pid[pid] = type
+        types_by_pid[pid] = process_type
         # Retrieve or create the list of processes associated with this
         # browser (parent) pid.
         pidsByType = pidsByParent.get(browserPid, {})
-        pidList = list(pidsByType.get(type, []))
+        pidList = list(pidsByType.get(process_type, []))
         pidList.append(pid)
-        pidsByType[type] = pidList
+        pidsByType[process_type] = pidList
         pidsByParent[browserPid] = pidsByType
 
   if return_pid_map:
@@ -171,10 +173,10 @@ def _IdentifyChromeProcesses(tracename, show_cpu_usage, return_pid_map):
         # Retrieve the list of processes associated with this
         # browser (parent) pid.
         pidsByType = pidsByParent[browserPid]
-        type = "gpu???"
-        pidList = list(pidsByType.get(type, []))
+        process_type = "gpu???"
+        pidList = list(pidsByType.get(process_type, []))
         pidList.append(pid)
-        pidsByType[type] = pidList
+        pidsByType[process_type] = pidList
         pidsByParent[browserPid] = pidsByType
         # Delete the references to the process that we now know isn't a browser
         # process.
@@ -225,8 +227,8 @@ def _IdentifyChromeProcesses(tracename, show_cpu_usage, return_pid_map):
     total_processes = 0
     total_context_switches = 0
     total_cpu_usage = 0.0
-    for type in keys:
-      for pid in pidsByType[type]:
+    for process_type in keys:
+      for pid in pidsByType[process_type]:
         total_processes += 1
         if show_cpu_usage and pid in cpu_usage_by_pid:
           total_context_switches += context_switches_by_pid[pid]
@@ -239,17 +241,17 @@ def _IdentifyChromeProcesses(tracename, show_cpu_usage, return_pid_map):
       print("%s (%d) - %d processes\r" % (exePath, browserPid, total_processes))
     # Note the importance of printing the '\r' so that the
     # output will be compatible with Windows edit controls.
-    for type in keys:
-      print("    %-11s : " % type, end="")
+    for process_type in keys:
+      print("    %-11s : " % process_type, end="")
       context_switches = 0
       cpu_usage = 0.0
       if show_cpu_usage:
-        for pid in pidsByType[type]:
+        for pid in pidsByType[process_type]:
           if pid in cpu_usage_by_pid:
             context_switches += context_switches_by_pid[pid]
             cpu_usage += cpu_usage_by_pid[pid]
         print("total - %6d context switches, %8.2f ms CPU" % (context_switches, cpu_usage), end="")
-      list_by_type = pidsByType[type]
+      list_by_type = pidsByType[process_type]
       # Make sure the PIDs are printed in a consistent order.
       list_by_type.sort()
       for pid in list_by_type:
