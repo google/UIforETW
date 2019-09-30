@@ -97,8 +97,16 @@ wpr -snapshotconfig heap -pid %pid% enable
 wpr -start heapsnapshot -filemode
 wpr -singlesnapshot heap %pid%
 wpr -stop "%temp%\UIforETW_heap_snapshot.etl"
-xperf -merge "%temp%\UIforETW_heap_snapshot.etl" "%FileName%"
+@rem Merging the trace ensures that machine-specific data is pulled in, and
+@rem gives an opportunity to compress the trace.
+xperf -merge "%temp%\UIforETW_heap_snapshot.etl" "%FileName%" -compress
+@if not %errorlevel% equ 0 goto noxperf
 del "%temp%\UIforETW_heap_snapshot.etl"
+@goto xperf_worked
+:noxperf
+@echo xperf.exe failed (or wasn't found). Skipping merge step. Trace may not work.
+move "%temp%\UIforETW_heap_snapshot.etl" "%FileName%"
+:xperf_worked
 @echo Trace data is in %FileName% -- load it with wpa or xperfview or gpuview.
 @dir "%FileName%" | find /i ".etl"
 
