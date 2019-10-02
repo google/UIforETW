@@ -10,7 +10,7 @@
       <View Guid="67b8486a-9cc3-4d36-978b-cfc07051f750" IsVisible="true" Title="Analysis">
         <Graphs>
           <Graph Guid="463048cb-2f2b-480d-8e94-a54f3fd88080" LayoutStyle="DataTable" Color="#FF0000FF" GraphHeight="125" IsMinimized="false" IsShown="true" IsExpanded="false">
-            <Preset Name="Count by Instance" GraphChartType="StackedBars" BarGraphIntervalCount="50" IsThreadActivityTable="false" GraphColumnCount="17" KeyColumnCount="8" LeftFrozenColumnCount="9" RightFrozenColumnCount="16" InitialFilterShouldKeep="true" GraphFilterColumnGuid="fdb0371a-7d64-47e7-8012-12d41db815eb" GraphFilterTopValue="0" GraphFilterThresholdValue="0">
+            <Preset Name="Count by Instance" GraphChartType="StackedBars" BarGraphIntervalCount="50" IsThreadActivityTable="false" GraphColumnCount="18" KeyColumnCount="9" LeftFrozenColumnCount="10" RightFrozenColumnCount="17" InitialFilterShouldKeep="true" GraphFilterColumnGuid="fdb0371a-7d64-47e7-8012-12d41db815eb" GraphFilterTopValue="0" GraphFilterThresholdValue="0">
               <MetadataEntries>
                 <MetadataEntry Guid="555b3fb9-3e48-442c-a1f6-53cd48fcecf5" Name="Snap Time" ColumnMetadata="StartTime" />
                 <MetadataEntry Guid="555b3fb9-3e48-442c-a1f6-53cd48fcecf5" Name="Snap Time" ColumnMetadata="EndTime" />
@@ -26,6 +26,7 @@
                     <AnnotationQueryEntries />
                   </AnnotationsOptionsParameter>
                 </Column>
+                <Column Guid="cea6c387-e307-4b03-83e7-0ba97cc74336" Name="Heap Handle" SortPriority="0" Width="150" CellFormat="x" IsVisible="true" />
                 <Column Guid="991604fa-45ec-45c8-825d-0504766a93ad" Name="PID" SortPriority="7" Width="60" IsVisible="false" />
                 <Column Guid="440a6f8f-b25d-4ffd-9e9e-56c63dc74479" Name="Pointer Size" SortPriority="8" Width="60" IsVisible="false" />
                 <Column Guid="7934aa50-2a3d-4384-b78a-d9b3bb835866" Name="Stack ID" SortPriority="10" Width="89" IsVisible="false" />
@@ -55,7 +56,7 @@
       <GraphSchema Guid="463048cb-2f2b-480d-8e94-a54f3fd88080">
         <ModifiedPresets />
         <PersistedPresets>
-          <Preset Name="Count by Instance" GraphChartType="StackedBars" BarGraphIntervalCount="50" IsThreadActivityTable="false" GraphColumnCount="17" KeyColumnCount="8" LeftFrozenColumnCount="9" RightFrozenColumnCount="16" InitialFilterShouldKeep="true" GraphFilterColumnGuid="fdb0371a-7d64-47e7-8012-12d41db815eb" GraphFilterTopValue="0" GraphFilterThresholdValue="0">
+          <Preset Name="Count by Instance" GraphChartType="StackedBars" BarGraphIntervalCount="50" IsThreadActivityTable="false" GraphColumnCount="18" KeyColumnCount="9" LeftFrozenColumnCount="10" RightFrozenColumnCount="17" InitialFilterShouldKeep="true" GraphFilterColumnGuid="fdb0371a-7d64-47e7-8012-12d41db815eb" GraphFilterTopValue="0" GraphFilterThresholdValue="0">
             <MetadataEntries>
               <MetadataEntry Guid="555b3fb9-3e48-442c-a1f6-53cd48fcecf5" Name="Snap Time" ColumnMetadata="StartTime" />
               <MetadataEntry Guid="555b3fb9-3e48-442c-a1f6-53cd48fcecf5" Name="Snap Time" ColumnMetadata="EndTime" />
@@ -71,6 +72,7 @@
                   <AnnotationQueryEntries />
                 </AnnotationsOptionsParameter>
               </Column>
+              <Column Guid="cea6c387-e307-4b03-83e7-0ba97cc74336" Name="Heap Handle" SortPriority="0" Width="150" CellFormat="x" IsVisible="true" />
               <Column Guid="991604fa-45ec-45c8-825d-0504766a93ad" Name="PID" SortPriority="7" Width="60" IsVisible="false" />
               <Column Guid="440a6f8f-b25d-4ffd-9e9e-56c63dc74479" Name="Pointer Size" SortPriority="8" Width="60" IsVisible="false" />
               <Column Guid="7934aa50-2a3d-4384-b78a-d9b3bb835866" Name="Stack ID" SortPriority="10" Width="89" IsVisible="false" />
