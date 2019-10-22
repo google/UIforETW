@@ -15,7 +15,7 @@
                 <MetadataEntry Guid="944ed37a-5774-421e-b2d5-84f17a4b3a05" Name="New Thread Id" ColumnMetadata="EndThreadId" />
                 <MetadataEntry Guid="5417f63c-9b79-45aa-beb9-73e3c1959221" Name="Switch-In Time" ColumnMetadata="StartTime" />
                 <MetadataEntry Guid="03a1d898-7231-4cc5-9712-4bfbf53908c7" Name="New Switch-In Time" ColumnMetadata="Duration" />
-                <MetadataEntry Guid="2575f38e-f991-4ce5-bafb-793e2ba1936a" Name="Cpu" ColumnMetadata="ResourceId" />
+                <MetadataEntry Guid="2575f38e-f991-4ce5-bafb-793e2ba1936a" Name="CPU" ColumnMetadata="ResourceId" />
                 <MetadataEntry Guid="17a03387-5d14-405a-a5b2-0201c934f917" Name="Time Since Last" ColumnMetadata="WaitDuration" />
                 <MetadataEntry Guid="5417f63c-9b79-45aa-beb9-73e3c1959221" Name="Switch-In Time" ColumnMetadata="WaitEndTime" />
               </MetadataEntries>
@@ -56,7 +56,7 @@
                 <Column Guid="906ea81e-ab68-4dfd-9b9f-3adafab60f83" Name="Ready" AggregationMode="Max" SortPriority="21" TextAlignment="Right" Width="100" CellFormat="uN" IsVisible="false" />
                 <Column Guid="6d598aa8-2ec4-46cd-b71a-88a239dfacf7" Name="Waits" AggregationMode="Sum" SortPriority="22" TextAlignment="Right" Width="100" CellFormat="uN" IsVisible="false" />
                 <Column Guid="6d598aa8-2ec4-46cd-b71a-88a239dfacf7" Name="Waits" AggregationMode="Max" SortPriority="23" TextAlignment="Right" Width="100" CellFormat="uN" IsVisible="false" />
-                <Column Guid="1db45bc8-4cd5-49f3-a0ec-7f861d33c7a2" Name="Count:Waits" AggregationMode="Sum" SortPriority="24" TextAlignment="Right" Width="70" IsVisible="false" />
+                <Column Guid="1db45bc8-4cd5-49f3-a0ec-7f861d33c7a2" Name="Count: Waits" AggregationMode="Sum" SortPriority="24" TextAlignment="Right" Width="70" IsVisible="false" />
                 <Column Guid="5417f63c-9b79-45aa-beb9-73e3c1959221" Name="Switch-In Time" SortPriority="25" TextAlignment="Right" Width="120" IsVisible="false" />
                 <Column Guid="71d9a1a9-f32c-4b0b-8f09-09b56cbbb843" Name="Last Switch-Out Time" SortPriority="26" TextAlignment="Right" Width="120" IsVisible="false" />
                 <Column Guid="b0394c3a-60ba-4305-84d6-82384bd863cb" Name="Next Switch-Out Time" SortPriority="27" TextAlignment="Right" Width="120" IsVisible="false" />
@@ -69,7 +69,7 @@
                 <Column Guid="d8d5d554-5877-4b5a-8df5-7cfa1935430a" Name="New Wait Reason" SortPriority="34" Width="100" IsVisible="false" />
                 <Column Guid="e93e468d-86a2-4f3a-a750-bb3b07c14a0b" Name="Old Process" SortPriority="35" Width="200" IsVisible="false" />
                 <Column Guid="7e24b8da-fe12-4e69-b8cc-9ab0c22c9734" Name="Old Thread Id" SortPriority="36" TextAlignment="Right" Width="80" IsVisible="false" />
-                <Column Guid="2575f38e-f991-4ce5-bafb-793e2ba1936a" Name="Cpu" SortPriority="37" TextAlignment="Right" Width="50" IsVisible="false" />
+                <Column Guid="2575f38e-f991-4ce5-bafb-793e2ba1936a" Name="CPU" SortPriority="37" TextAlignment="Right" Width="50" IsVisible="false" />
                 <Column Guid="e93dcc3d-9960-446a-aa1d-fa05d47d5aa4" Name="Ideal Cpu" SortPriority="38" TextAlignment="Right" Width="60" IsVisible="false" />
                 <Column Guid="59117e0d-0465-42c7-a758-52728c5b0099" Name="New Thread Start Module" SortPriority="39" Width="200" IsVisible="false" />
                 <Column Guid="b09b3bba-08ea-4e1b-9c16-4d0bb97926fb" Name="New Thread Start Function" SortPriority="40" Width="200" IsVisible="false" />
@@ -80,16 +80,16 @@
                 <Column Guid="03a1d898-7231-4cc5-9712-4bfbf53908c7" Name="New Switch-In Time" AggregationMode="Sum" SortPriority="45" TextAlignment="Right" Width="100" CellFormat="uN" IsVisible="false" />
                 <Column Guid="145e9709-1fc8-4cbf-8119-6a4c9b6bf945" Name="NewThreadRank" SortPriority="46" TextAlignment="Right" Width="80" IsVisible="false" />
                 <Column Guid="10400bbf-b55c-4034-94d7-9f190ae0b2c5" Name="New Prev Thread Rank" SortPriority="47" Width="146" IsVisible="false" />
-                <Column Guid="12d422df-3a1b-4030-afad-e99eaf4f0bb8" Name="NewThreadRemainingQuantum" SortPriority="48" TextAlignment="Right" Width="100" IsVisible="false" />
-                <Column Guid="92e39fbc-474d-4552-9b6b-102c770c66a8" Name="NewThreadPrevRemainingQuantum" SortPriority="49" TextAlignment="Right" Width="100" IsVisible="false" />
-                <Column Guid="f0350651-fec4-4716-9fdb-8ccc82bd5c8b" Name="OldThreadRank" SortPriority="50" TextAlignment="Right" Width="80" IsVisible="false" />
-                <Column Guid="f3c40e2a-ad5b-4ec3-ac26-7b966a6da1cb" Name="OldThreadRemainingQuantum" SortPriority="51" TextAlignment="Right" Width="100" IsVisible="false" />
-                <Column Guid="009bfba2-9a07-4a98-92a8-56b5970d365d" Name="AdjustReason" SortPriority="52" Width="120" IsVisible="false" />
-                <Column Guid="c0c14208-2fc6-4077-928c-3df6f2f847fe" Name="AdjustIncrement" SortPriority="53" TextAlignment="Right" Width="120" IsVisible="false" />
-                <Column Guid="cecd6383-5322-4832-9e8b-6706fe3dcaa1" Name="ReadyThreadInDPC" SortPriority="54" Width="120" IsVisible="false" />
-                <Column Guid="196563c2-6480-4353-8ea4-ed9663fd5a6d" Name="KernelStackNotResident" SortPriority="55" Width="120" IsVisible="false" />
-                <Column Guid="c730d632-ba9f-41db-8c2b-ed97918ecd50" Name="ProcessOutOfMemory" SortPriority="56" Width="120" IsVisible="false" />
-                <Column Guid="6536b3d9-1bbd-4268-974d-4f9377122feb" Name="DirectSwitchAttempt" SortPriority="57" Width="120" IsVisible="false" />
+                <Column Guid="12d422df-3a1b-4030-afad-e99eaf4f0bb8" Name="New Thread Remaining Quantum" SortPriority="48" TextAlignment="Right" Width="100" IsVisible="false" />
+                <Column Guid="92e39fbc-474d-4552-9b6b-102c770c66a8" Name="New Thread Prev Remaining Quantum" SortPriority="49" TextAlignment="Right" Width="100" IsVisible="false" />
+                <Column Guid="f0350651-fec4-4716-9fdb-8ccc82bd5c8b" Name="Old Thread Rank" SortPriority="50" TextAlignment="Right" Width="80" IsVisible="false" />
+                <Column Guid="f3c40e2a-ad5b-4ec3-ac26-7b966a6da1cb" Name="Old Thread Remaining Quantum" SortPriority="51" TextAlignment="Right" Width="100" IsVisible="false" />
+                <Column Guid="009bfba2-9a07-4a98-92a8-56b5970d365d" Name="Adjust Reason" SortPriority="52" Width="120" IsVisible="false" />
+                <Column Guid="c0c14208-2fc6-4077-928c-3df6f2f847fe" Name="Adjust Increment" SortPriority="53" TextAlignment="Right" Width="120" IsVisible="false" />
+                <Column Guid="cecd6383-5322-4832-9e8b-6706fe3dcaa1" Name="Ready Thread In DPC" SortPriority="54" Width="120" IsVisible="false" />
+                <Column Guid="196563c2-6480-4353-8ea4-ed9663fd5a6d" Name="Kernel Stack Not Resident" SortPriority="55" Width="120" IsVisible="false" />
+                <Column Guid="c730d632-ba9f-41db-8c2b-ed97918ecd50" Name="Process Out of Memory" SortPriority="56" Width="120" IsVisible="false" />
+                <Column Guid="6536b3d9-1bbd-4268-974d-4f9377122feb" Name="Direct Switch Attempt" SortPriority="57" Width="120" IsVisible="false" />
                 <Column Guid="e008ed7a-15b0-40ab-854b-b5f6392f298b" Name="CPU Usage (in view)" AggregationMode="Sum" SortOrder="Descending" SortPriority="0" TextAlignment="Right" Width="100" CellFormat="mN" IsVisible="true" />
                 <Column Guid="fc672588-da05-4f43-991f-6b644a3f5b3d" Name="% CPU Usage" AggregationMode="Sum" SortPriority="59" TextAlignment="Right" Width="100" CellFormat="N2" IsVisible="false" />
               </Columns>
