@@ -40,8 +40,8 @@ def _IdentifyChromeProcesses(tracename, show_cpu_usage, return_pid_map):
   cpu_usage_by_pid = {}
   context_switches_by_pid = {}
   if show_cpu_usage:
-    csv_filename = os.path.join(script_dir, "CPU_Usage_(Precise)_Randomascii_CPU_Summary_by_Process.csv")
-    profile_filename = os.path.join(script_dir, "CPUSummaryByProcess.wpaProfile")
+    csv_filename = os.path.join(script_dir, "CPU_Usage_(Precise)_Randomascii_CPU_Usage_by_Process.csv")
+    profile_filename = os.path.join(script_dir, "CPUUsageByProcess.wpaProfile")
     try:
       # Try to delete any old results files but continue if this fails.
       os.remove(csv_filename)
