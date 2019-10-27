@@ -437,8 +437,8 @@ BOOL CUIforETWDlg::OnInitDialog()
 
 	auto xperfVersion = GetFileVersion(GetXperfPath());
 	const int64_t requiredXperfVersion = (10llu << 48) + 0 + (10586llu << 16) + (15llu << 0);
-	// Windows 10 fall 2018 version, 10.0.17763.132 - requires Windows 8 or higher?
-	const int64_t preferredXperfVersion = (10llu << 48) + 0 + (17763llu << 16) + (132llu << 0);
+	// Windows 10 spring 2019 version, 10.0.18362.1 - requires Windows 8 or higher?
+	const int64_t preferredXperfVersion = (10llu << 48) + 0 + (18362llu << 16) + (1llu << 0);
 
 	wchar_t systemDir[MAX_PATH];
 	systemDir[0] = 0;
