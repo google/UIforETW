@@ -22,8 +22,8 @@ if exist "C:\Program Files (x86)\Windows Kits\10\bin\x64\tracelog.exe" goto trac
 @set path=%path%;C:\Program Files (x86)\Windows Kits\10\bin\x64
 
 @set batchdir=%~dp0
-@set demo_app=%batchdir%ConditionalCount\Release\ConditionalCount.exe
-@set demo_app_name=ConditionalCount
+@set demo_app=C:\Windows\System32\wbem\WinMgmt.exe
+@set demo_app_name=WinMgmt
 
 @if exist "%demo_app%" goto demo_exists
 @echo Please build the release configuration of ConditionalCount.exe. It needs
@@ -62,8 +62,7 @@ tracelog.exe -start pmc_counters -f pmc_counter_test.etl -eflag CSWITCH+PROC_THR
 
 @rem @echo Run your scenario and then press Enter when finished
 
-"%demo_app%"
-"%demo_app%" -sort
+"%demo_app%" /verifyrepository
 
 xperf -stop pmc_counters >nul
 xperf -merge pmc_counter_test.etl pmc_counters_test_merged.etl
