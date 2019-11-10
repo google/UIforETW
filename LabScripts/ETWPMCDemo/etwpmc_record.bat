@@ -14,12 +14,15 @@
 
 @setlocal
 
-if exist "C:\Program Files (x86)\Windows Kits\10\bin\x64\tracelog.exe" goto tracelog_exists
+@set tracelogdir=C:\Program Files (x86)\Windows Kits\10\bin\x64
+@for /d %%f in ("C:\Program Files (x86)\Windows Kits\10\bin\10.*") do if exist "%%f\x64\tracelog.exe" set tracelogdir=%%f\x64
+
+@if exist "%tracelogdir%\tracelog.exe" goto tracelog_exists
 @echo Can't find tracelog.exe
 @exit /b
 :tracelog_exists
 
-@set path=%path%;C:\Program Files (x86)\Windows Kits\10\bin\x64
+set path=%path%;%tracelogdir%
 
 @set batchdir=%~dp0
 @set demo_app=%batchdir%ConditionalCount\Release\ConditionalCount.exe
