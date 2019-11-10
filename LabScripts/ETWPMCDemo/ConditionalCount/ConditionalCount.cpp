@@ -18,6 +18,8 @@ limitations under the License.
 #include <string>
 #include <algorithm>
 
+#include <intrin.h>
+
 int sum_array(unsigned char* p, size_t count);
 
 int main(int argc, char* argv[])
