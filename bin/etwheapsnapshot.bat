@@ -83,8 +83,15 @@ wpr -snapshotconfig heap -pid %pid% enable
 
 @rem Generate a file name based on the current date and time and put it in
 @rem etwtracedir. This is compatible with UIforETW which looks for traces there.
-@rem Note: this probably fails in some locales. Sorry.
-@for /F "tokens=2-4 delims=/- " %%A in ('date/T') do @set datevar=%%C-%%A-%%B
+@rem Adapted from https://superuser.com/a/1287820
+@rem get the date in locale independent way
+@rem use findstr to strip blank lines from wmic output
+@for /f "usebackq skip=1 tokens=1-3" %%g in (`wmic Path Win32_LocalTime Get Day^,Month^,Year ^| findstr /r /v "^$"`) do @set _day=00%%g&set _month=00%%h&set _year=%%i
+@rem pad day and month with leading zeros
+@set _month=%_month:~-2%
+@set _day=%_day:~-2%
+@set datevar=%_year%-%_month%-%_day%
+
 @for /F "tokens=1-3 delims=:-. " %%A in ('echo %time%') do @set timevar=%%A-%%B-%%C&set hour=%%A
 @rem Make sure that morning hours such as 9:00 are handled as 09 rather than 9
 @if %hour% LSS 10 set timevar=0%timevar%
