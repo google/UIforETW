@@ -47,7 +47,9 @@ def _IdentifyChromeProcesses(tracename, show_cpu_usage, return_pid_map):
       os.remove(csv_filename)
     except:
       pass
-    command = 'wpaexporter "%s" -outputfolder "%s" -profile "%s"' % (tracename, script_dir, profile_filename)
+    # -tle and -tti are undocumented for wpaexporter but they do work. They tell wpaexporter to ignore
+    # lost events and time inversions, just like with xperf.
+    command = 'wpaexporter "%s" -outputfolder "%s" -tle -tti -profile "%s"' % (tracename, script_dir, profile_filename)
     output = str(subprocess.check_output(command, stderr=subprocess.STDOUT))
     # Typical output in the .csv file looks like this:
     # New Process,Count,CPU Usage (in view) (ms)
@@ -77,9 +79,9 @@ def _IdentifyChromeProcesses(tracename, show_cpu_usage, return_pid_map):
                 int(context_switches), float(cpu_usage.replace(",", ""))))
       print("\r")
     else:
-      print("Expected output file not found.")
-      print("Expected to find: %s" % csv_filename)
-      print("Should have been produced by: %s" % command)
+      print("Expected output file not found.\r")
+      print("Expected to find: %s\r" % csv_filename)
+      print("Should have been produced by: %s\r" % command)
 
   # Typical output of -a process -withcmdline looks like:
   #        MIN,   24656403, Process, 0XA1141C60,       chrome.exe ( 748),      10760,          1, 0x11e8c260, "C:\...\chrome.exe" --type=renderer ...
@@ -92,11 +94,9 @@ def _IdentifyChromeProcesses(tracename, show_cpu_usage, return_pid_map):
   # first one will win.
   processTypeRe = re.compile(r".*? --type=([^ ]*) .*")
 
-  #-tle = tolerate lost events
-  #-tti = tolerate time ivnersions
   #-a process = show process, thread, image information (see xperf -help processing)
   #-withcmdline = show command line in process reports (see xperf -help process)
-  command = 'xperf -i "%s" -tle -tti -a process -withcmdline' % tracename
+  command = 'xperf -i "%s" -a process -withcmdline' % tracename
   # Group all of the chrome.exe processes by browser Pid, then by type.
   # pathByBrowserPid just maps from the browser Pid to the disk path to chrome.exe
   pathByBrowserPid = {}
@@ -108,7 +108,16 @@ def _IdentifyChromeProcesses(tracename, show_cpu_usage, return_pid_map):
   lineByPid = {}
   # Dictionary of Pids and their types.
   types_by_pid = {}
-  output = subprocess.check_output(command, stderr=subprocess.STDOUT)
+  try:
+    output = subprocess.check_output(command, stderr=subprocess.STDOUT)
+  except subprocess.CalledProcessError:
+    # Try again. If it succeeds then there were lost events or a time inversion.
+    #-tle = tolerate lost events
+    #-tti = tolerate time inversions
+    command = 'xperf -i "%s" -tle -tti -a process -withcmdline' % tracename
+    output = subprocess.check_output(command, stderr=subprocess.STDOUT)
+    print('Trace had a time inversion or (most likely) lost events. Results may be anomalous.\r')
+    print('\r')
   for line in output.splitlines():
     # Python 3 needs the line translated from bytes to str.
     line = line.decode()
