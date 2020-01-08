@@ -58,6 +58,8 @@ const PCWSTR filtered_event_group_names[] =
 	L"startup",                                         // 0x4000
 	L"latency",                                         // 0x8000
 	L"blink.user_timing",                               // 0x10000
+	L"media",                                           // 0x20000
+	L"loading",                                         // 0x40000
 };
 
 // 1ULL << 61 and 1ULL << 62 are special values that indicate to Chrome to
