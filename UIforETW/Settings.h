@@ -49,6 +49,7 @@ public:
 	bool bHeapStacks_ = false;
 	bool bVirtualAllocStacks_ = false;
 	bool bVersionChecks_ = false;
+	bool bRecordTraceCommand_ = false;
 	uint64_t chromeKeywords_ = 0;
 
 protected:
@@ -103,4 +104,5 @@ public:
 	CSettings& operator=(const CSettings&&) = delete;
 	CSettings(const CSettings&) = delete;
 	CSettings(const CSettings&&) = delete;
+  afx_msg void OnBnClickedRecordTraceCommand();
 };

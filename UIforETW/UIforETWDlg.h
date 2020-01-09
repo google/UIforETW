@@ -234,6 +234,7 @@ private:
 	// Editable only by the settings dialog.
 	bool bBackgroundMonitoring_ = true;
 	bool bChromeDeveloper_ = false;
+	bool bRecordTraceCommand_ = false; // Should the trace command be put in the .txt file?
 	bool bIdentifyChromeProcessesCPU_ = false;
 	bool bAutoViewTraces_ = false;
 	bool bRecordPreTrace_ = false;

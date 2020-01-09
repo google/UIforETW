@@ -1973,6 +1973,7 @@ void CUIforETWDlg::OnBnClickedSettings()
 	dlgSettings.bHeapStacks_ = bHeapStacks_;
 	dlgSettings.bVirtualAllocStacks_ = bVirtualAllocStacks_;
 	dlgSettings.bVersionChecks_ = bVersionChecks_;
+	dlgSettings.bRecordTraceCommand_ = bRecordTraceCommand_;
 	dlgSettings.chromeKeywords_ = chromeKeywords_;
 	if (dlgSettings.DoModal() == IDOK)
 	{
@@ -2014,6 +2015,7 @@ void CUIforETWDlg::OnBnClickedSettings()
 		bHeapStacks_ = dlgSettings.bHeapStacks_;
 		bVirtualAllocStacks_ = dlgSettings.bVirtualAllocStacks_;
 		bVersionChecks_ = dlgSettings.bVersionChecks_;
+		bRecordTraceCommand_ = dlgSettings.bRecordTraceCommand_;
 		chromeKeywords_ = dlgSettings.chromeKeywords_;
 	}
 }
@@ -2349,6 +2351,31 @@ void CUIforETWDlg::CreateFlameGraph(const std::wstring& traceFilename)
 
 void CUIforETWDlg::PreprocessTrace(const std::wstring& traceFilename)
 {
+	if (bRecordTraceCommand_)
+	{
+		// For debugging or just better understanding of what was recorded, optionally
+		// record the xperf command line. This is excessiverly verbose so make it
+		// optional.
+		std::wstring textFilename = StripExtensionFromPath(traceFilename) + L".txt";
+		std::wstring data = LoadFileAsText(textFilename);
+		data += L"Trace recording command was \r\n";
+		data += startupCommand_;
+		data += L"\r\n";
+		switch (tracingMode_)
+		{
+		case kTracingToMemory:
+			data += L"(circular buffer tracing)";
+			break;
+		case kTracingToFile:
+			data += L"(tracing to file)";
+			break;
+		case kHeapTracingToFile:
+			data += L"(heap tracing to file)";
+			break;
+		}
+		data += L"\r\n\r\n";
+		WriteTextAsFile(textFilename, data);
+	}
 	if (bChromeDeveloper_)
 	{
 		IdentifyChromeProcesses(traceFilename, bIdentifyChromeProcessesCPU_);

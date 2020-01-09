@@ -125,6 +125,7 @@ BEGIN_MESSAGE_MAP(CSettings, CDialog)
 	ON_BN_CLICKED(IDC_RECORD_PRE_TRACE, &CSettings::OnBnClickedRecordPreTrace)
 	ON_BN_CLICKED(IDC_IDENTIFY_CHROME_CPU, &CSettings::OnBnClickedIdentifyChromeCpu)
 	ON_BN_CLICKED(IDC_BACKGROUND_MONITORING, &CSettings::OnBnClickedBackgroundMonitoring)
+	ON_BN_CLICKED(IDC_RECORD_TRACE_COMMAND, &CSettings::OnBnClickedRecordTraceCommand)
 END_MESSAGE_MAP()
 
 BOOL CSettings::OnInitDialog()
@@ -141,6 +142,7 @@ BOOL CSettings::OnInitDialog()
 	CheckDlgButton(IDC_HEAPSTACKS, bHeapStacks_);
 	CheckDlgButton(IDC_VIRTUALALLOCSTACKS, bVirtualAllocStacks_);
 	CheckDlgButton(IDC_CHECKFORNEWVERSIONS, bVersionChecks_);
+	CheckDlgButton(IDC_RECORD_TRACE_COMMAND, bRecordTraceCommand_);
 
 	btIdentifyChromeProcessesCPU_.EnableWindow(bChromeDeveloper_);
 	if (IsWindows8Point1OrGreater())
@@ -424,4 +426,10 @@ void CSettings::OnBnClickedRecordPreTrace() noexcept
 void CSettings::OnBnClickedBackgroundMonitoring() noexcept
 {
 	bBackgroundTracing_ = !bBackgroundTracing_;
+}
+
+
+void CSettings::OnBnClickedRecordTraceCommand()
+{
+	bRecordTraceCommand_ = !bRecordTraceCommand_;
 }
