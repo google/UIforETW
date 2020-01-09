@@ -33,9 +33,9 @@ xcopy "%wpt10%Licenses\10.0.15063.0\sdk_license.rtf" %destdir%\third_party\wpt10
 ren %destdir%\third_party\wpt10\sdk_license.rtf LICENSE.rtf
 
 @rem Add VS tools to the path. Also adds signtool.exe to the path.
-set vcvars32="C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars32.bat"
+set vcvars32="C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvars32.bat"
 if exist %vcvars32% goto community_installed
-set vcvars32="C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Auxiliary\Build\vcvars32.bat"
+set vcvars32="C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Auxiliary\Build\vcvars32.bat"
 :community_installed
 call %vcvars32%
 

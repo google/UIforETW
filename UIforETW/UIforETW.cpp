@@ -18,7 +18,7 @@ limitations under the License.
 #include "UIforETW.h"
 #include "UIforETWDlg.h"
 #include "Utility.h"
-#include <exception>
+#include <stdexcept>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
