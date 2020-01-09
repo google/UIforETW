@@ -1021,7 +1021,17 @@ void CUIforETWDlg::OnBnClickedStarttracing()
 		child.GetOutput();
 	}
 
-	std::wstring kernelProviders = L" Latency+POWER+DISPATCHER+DISK_IO_INIT+FILE_IO+FILE_IO_INIT+VIRT_ALLOC+MEMINFO";
+	// According to "xperf -providers k" the Latency kernel group is equivalent to:
+	// PROC_THREAD+LOADER+DISK_IO+HARD_FAULTS+DPC+INTERRUPT+CSWITCH+PROFILE
+	// On some machines (Google workstations) the DISK_IO provider causes (presumed
+	// to be spurious) lost event reports when doing circular buffer recording. So,
+	// omit DISK_IO when doing circular buffer recording.
+	// Doing so also improves the performance of saving circular buffer traces
+	// to disk.
+	std::wstring latency = L" Latency";
+	if (tracingMode_ == kTracingToMemory)
+		latency = L" PROC_THREAD+LOADER+HARD_FAULTS+DPC+INTERRUPT+CSWITCH+PROFILE";
+	std::wstring kernelProviders = latency + L"+POWER+DISPATCHER+DISK_IO_INIT+FILE_IO+FILE_IO_INIT+VIRT_ALLOC+MEMINFO";
 	bool cswitch_and_profile = true;
 	if (tracingMode_ == kHeapTracingToFile)
 	{
