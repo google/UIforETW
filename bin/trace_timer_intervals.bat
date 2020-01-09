@@ -23,6 +23,11 @@
 
 @setlocal
 
+@echo Run this batch file with -f=ProcessName to filter results to a specified
+@echo process. To reprocess the results afterwards run:
+@echo   python summarize_timer_intervals.py "%temp%\TimerDetails.etl"
+@echo and optionally specify -f=ProcessName
+
 @set user_providers=Microsoft-Windows-Kernel-Power:0x4000000000000004
 xperf.exe -start "NT Kernel Logger" -on PROC_THREAD+LOADER -f "%temp%\TimerDetailskernel.etl" -start TimerSession -on %user_providers%::'stack' -f "%temp%\TimerDetailsuser.etl"
 @echo Run your scenario and then press enter.
@@ -31,4 +36,4 @@ pause
 xperf.exe -stop TimerSession -stop "NT Kernel Logger"
 xperf.exe -merge "%temp%\TimerDetailskernel.etl" "%temp%\TimerDetailsuser.etl" "%temp%\TimerDetails.etl" -compress
 
-call python summarize_timer_intervals.py "%temp%\TimerDetails.etl"
+call python summarize_timer_intervals.py "%temp%\TimerDetails.etl" %*

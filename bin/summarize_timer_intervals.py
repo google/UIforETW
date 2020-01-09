@@ -40,11 +40,17 @@ complexity.
 
 from __future__ import print_function
 
+import argparse
 import os
 import re
 import subprocess
 import sys
 import time
+
+parser = argparse.ArgumentParser(description="Identify and categorize chrome processes in an ETW trace.")
+parser.add_argument("trace", type=str, help="ETW trace to be processed")
+parser.add_argument("-f", "--filter_process", help="Only show results for the specified processes")
+args = parser.parse_args()
 
 # Our usage of subprocess seems to require Python 2.7+
 if sys.version_info.major == 2 and sys.version_info.minor < 7:
@@ -52,11 +58,11 @@ if sys.version_info.major == 2 and sys.version_info.minor < 7:
   print('Python version is %s' % sys.version)
   sys.exit(0)
 
-if len(sys.argv) < 2:
-  print('Usage: %s tracename.etl')
-  sys.exit(0)
+trace_name = args.trace
 
-trace_name = sys.argv[1]
+if not os.path.exists(trace_name):
+  print('ETW trace file %s does not exist.' % trace_name)
+  sys.exit(0)
 
 scriptPath = os.path.abspath(sys.argv[0])
 scriptDir = os.path.split(scriptPath)[0]
@@ -128,6 +134,8 @@ types_by_pid = IdentifyChromeProcesses.GetPIDToTypeMap(trace_name)
 
 print('Trace duration is %1.3f seconds.' % final_timestamp)
 for process in changes_by_process.keys():
+  if args.filter_process and process.count(args.filter_process) < 1:
+    continue
   entries = changes_by_process[process]
   # Scan through all adjacent pairs to find how long the interval was at various
   # levels.
@@ -152,7 +160,6 @@ for process in changes_by_process.keys():
     pid = int(pid_match.groups()[0])
     if pid in types_by_pid:
       type_name = ' (Chrome %s)' % types_by_pid[pid]
-  print('%s%s: %d frequency changes %s' % (process, type_name, len(entries) - fake_events_count, ps))
   # Look for raised timer frequencies that end as the first entry. We don't know
   # what the timer interrupt frequency was before, but we know it was raised.
   if entries[0][0] == 0:
@@ -160,6 +167,7 @@ for process in changes_by_process.keys():
   for interval in intervals.keys():
     if type(interval) == type(0.0):
       if interval > 0:
-        print('  %1.1f ms for %5.1f%% of the time' % (interval, 100 * intervals[interval] / final_timestamp))
-    else:
-      print('  Unknown ms for %5.1f%% of the time' % (100 * intervals[interval] / final_timestamp))
+        print('  %1.1f ms for %5.1f%% of the time' % (interval, 100 * intervals[interval] / final_timestamp), end='')
+    #else:
+    #  print('  Unknown ms for %5.1f%% of the time' % (100 * intervals[interval] / final_timestamp), end='')
+  print('    %s%s: %d frequency changes %s' % (process, type_name, len(entries) - fake_events_count, ps))
