@@ -64,6 +64,7 @@ protected:
 	CButton btCopyStartupProfile_;
 
 	CButton btUseOtherKernelLogger_;
+	CButton btRecordTraceCommand_;
 	CButton btChromeDeveloper_;
 	CButton btIdentifyChromeProcessesCPU_;
 	CButton btBackgroundMonitoring_;

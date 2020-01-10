@@ -98,6 +98,7 @@ void CSettings::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_PERFORMANCECOUNTERS, btPerfCounters_);
 	DDX_Control(pDX, IDC_COPYSTARTUPPROFILE, btCopyStartupProfile_);
 	DDX_Control(pDX, IDC_USE_OTHER_KERNEL_LOGGER, btUseOtherKernelLogger_);
+	DDX_Control(pDX, IDC_RECORD_TRACE_COMMAND, btRecordTraceCommand_);
 	DDX_Control(pDX, IDC_CHROMEDEVELOPER, btChromeDeveloper_);
 	DDX_Control(pDX, IDC_AUTOVIEWTRACES, btAutoViewTraces_);
 	DDX_Control(pDX, IDC_RECORD_PRE_TRACE, btRecordPreTrace_);
@@ -205,6 +206,8 @@ BOOL CSettings::OnInitDialog()
 					L"WPA starts up it will have reasonable analysis defaults.");
 		toolTip_.AddTool(&btUseOtherKernelLogger_, L"Check this to have UIforETW use the alternate kernel "
 					L"logger. This is needed on some machines where the main kernel logger is in use.");
+		toolTip_.AddTool(&btRecordTraceCommand_, L"Check this to have UIforETW record the initial xperf "
+					L"command in the trace information file.");
 		toolTip_.AddTool(&btChromeDeveloper_, L"Check this to enable Chrome specific behavior such as "
 					L"setting the Chrome symbol server path, and identifying Chrome processes.");
 		toolTip_.AddTool(&btAutoViewTraces_, L"Check this to have UIforETW launch the trace viewer "
