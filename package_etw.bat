@@ -181,6 +181,12 @@ call python rename_to_version.py UIforETW\Version.h
 @echo Now upload the new etwpackage*.zip and etwsymbols*.zip
 @echo But make sure that the PersistedPresets section from startup10.wpaProfile
 @echo been deleted to avoid shipping modified presets and bloating the file.
+@echo After releasing a version with an updated version number be sure to trigger
+@echo the new version checking by running:
+@echo xcopy UIforETW\Version.h UIforETW\VersionCopy.h /y
+@echo git add UIforETW\VersionCopy.h
+@echo git commit -m "Updating VersionCopy.h for updated version checking"
+@echo git push
 @exit /b
 
 :pleasecloseUIforETW
