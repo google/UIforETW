@@ -71,14 +71,12 @@ namespace HeapSnapshotCompare
         static SnapshotSummary GetAllocSummary(ITraceProcessor trace)
         {
             var pendingSnapshotData = trace.UseHeapSnapshots();
-            IPendingResult<ISymbolDataSource> pendingSymbols = null;
-            pendingSymbols = trace.UseSymbols();
+            var pendingSymbols = trace.UseSymbols();
+
             trace.Process();
 
             var snapshotData = pendingSnapshotData.Result;
-
-            ISymbolDataSource symbols = null;
-            symbols = pendingSymbols.Result;
+            var symbols = pendingSymbols.Result;
             symbols.LoadSymbolsAsync(new SymCachePath(@"c:\symcache")).GetAwaiter().GetResult();
 
             if (snapshotData.Snapshots.Count != 1)
