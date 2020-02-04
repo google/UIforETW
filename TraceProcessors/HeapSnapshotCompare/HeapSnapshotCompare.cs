@@ -91,19 +91,12 @@ namespace HeapSnapshotCompare
             // accumulating the bytes allocated, allocation count, and the
             // stack.
             var allocsByStackId = new Dictionary<ulong, AllocDetails>();
-            long highestCount = 0;
-            var highestCountDetails = new AllocDetails();
             foreach (IHeapAllocation row in snapshotData.Snapshots[0].Allocations)
             {
                 allocsByStackId.TryGetValue(row.SnapshotUniqueStackId, out AllocDetails value);
                 value.Stack = row.Stack;
                 value.Size += row.Size;
                 value.Count += 1;
-                if (value.Count > highestCount)
-                {
-                    highestCount = value.Count;
-                    highestCountDetails = value;
-                }
                 allocsByStackId[row.SnapshotUniqueStackId] = value;
             }
 
