@@ -98,19 +98,19 @@ class IdentifyChromeProcesses
         // Group all of the chrome.exe processes by browser Pid, then by type.
         // pathByBrowserPid just maps from the browser Pid to the disk path to
         // chrome.exe
-        var pathByBrowserPid = new Dictionary<uint, string>();
+        var pathByBrowserPid = new Dictionary<int, string>();
 
         // processesByBrowserPid is a dictionary that is indexed by the browser Pid.
         // It contains a dictionary that is indexed by process type with each
         // entry's payload being a list of Pids (for example, a list of renderer
         // processes).
-        var processesByBrowserPid = new Dictionary<uint, Dictionary<string, List<uint>>>();
+        var processesByBrowserPid = new Dictionary<int, Dictionary<string, List<int>>>();
 
         // parentPids is a dictionary that maps from Pids to parent Pids.
-        var parentPids = new Dictionary<uint, uint>();
+        var parentPids = new Dictionary<int, int>();
 
         // Dictionary of Pids and their types.
-        var typesByPid = new Dictionary<uint, string>();
+        var typesByPid = new Dictionary<int, string>();
 
         // Find the space-terminated word after 'type='.
         // Mark the first .* as lazy/ungreedy/reluctant so that if there are multiple
@@ -124,7 +124,7 @@ class IdentifyChromeProcesses
             var exePath = entry.Value;
             if (process.ImageName == "chrome.exe")
             {
-                uint pid = process.Id;
+                int pid = process.Id;
                 parentPids[pid] = process.ParentId;
 
                 // Look for the process type on the command-line in the
@@ -134,7 +134,7 @@ class IdentifyChromeProcesses
                 // process whose parent is not chrome, but I didn't. There are
                 // many ways to do this.
                 string type;
-                uint browserPid;
+                int browserPid;
                 var match = r.Match(process.CommandLine);
                 if (match.Success)
                 {
@@ -162,9 +162,9 @@ class IdentifyChromeProcesses
                 // This involves a lot of redundant dictionary lookups, but it is
                 // the cleanest way to do it.
                 if (!processesByBrowserPid.ContainsKey(browserPid))
-                    processesByBrowserPid[browserPid] = new Dictionary<string, List<uint>>();
+                    processesByBrowserPid[browserPid] = new Dictionary<string, List<int>>();
                 if (!processesByBrowserPid[browserPid].ContainsKey(type))
-                    processesByBrowserPid[browserPid][type] = new List<uint>();
+                    processesByBrowserPid[browserPid][type] = new List<int>();
                 var pidList = processesByBrowserPid[browserPid][type];
                 pidList.Add(pid);
             }
@@ -172,7 +172,7 @@ class IdentifyChromeProcesses
 
         // Clean up the data, because process trees are never simple.
         // Iterate through a copy of the keys so that we can modify the dictionary.
-        foreach (var browserPid in new List<uint>(processesByBrowserPid.Keys))
+        foreach (var browserPid in new List<int>(processesByBrowserPid.Keys))
         {
             var childPids = processesByBrowserPid[browserPid];
             if (childPids.Count == 1)
@@ -212,13 +212,13 @@ class IdentifyChromeProcesses
                 {
                     // The childPids["browser"] entry needs to be appended to its
                     // parent/grandparent process since that is its browser process.
-                    uint parentPid = parentPids[browserPid];
+                    int parentPid = parentPids[browserPid];
                     // Create the destination type if necessary (needed for gpu???,
                     // not needed for crashpad). Handle missing data.
                     if (processesByBrowserPid.ContainsKey(parentPid))
                     {
                         if (!processesByBrowserPid[parentPid].ContainsKey(destType))
-                            processesByBrowserPid[parentPid][destType] = new List<uint>();
+                            processesByBrowserPid[parentPid][destType] = new List<int>();
                         processesByBrowserPid[parentPid][destType].Add(childPids[childType][0]);
 
                         // Remove the fake 'browser' entry so that we don't try to print it.
@@ -229,7 +229,7 @@ class IdentifyChromeProcesses
         }
 
         // Map from PID to CPUUsageDetails.
-        var execTimes = new Dictionary<uint, CPUUsageDetails>();
+        var execTimes = new Dictionary<int, CPUUsageDetails>();
         if (showCPUUsage)
         {
             var names = new string[] { "chrome.exe", "dwm.exe", "audiodg.exe", "System", "MsMpEng.exe", "software_reporter_tool.exe" };
@@ -269,7 +269,7 @@ class IdentifyChromeProcesses
             Console.WriteLine("Chrome PIDs by process type:");
         else
             Console.WriteLine("No Chrome processes found.");
-        var browserPids = new List<uint>(processesByBrowserPid.Keys);
+        var browserPids = new List<int>(processesByBrowserPid.Keys);
         browserPids.Sort();
         foreach (var browserPid in browserPids)
         {
@@ -287,7 +287,7 @@ class IdentifyChromeProcesses
                 if (showCPUUsage)
                 {
                     var detailsSubTotal = new CPUUsageDetails();
-                    foreach (uint pid in type.Value)
+                    foreach (int pid in type.Value)
                     {
                         execTimes.TryGetValue(pid, out CPUUsageDetails details);
                         detailsTotal.ns += details.ns;
@@ -318,7 +318,7 @@ class IdentifyChromeProcesses
             }
 
             // Sort the types alphabetically for consistent printing.
-            var types = new List<KeyValuePair<string, List<uint>>>(processes);
+            var types = new List<KeyValuePair<string, List<int>>>(processes);
             types.Sort((x, y) => x.Key.CompareTo(y.Key));
 
             // Print all of the child processes, grouped by type.

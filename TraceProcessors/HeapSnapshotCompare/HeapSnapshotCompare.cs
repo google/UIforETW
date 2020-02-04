@@ -50,7 +50,7 @@ namespace HeapSnapshotCompare
     // number of bytes and allocations outstanding.
     class SnapshotSummary
     {
-        public SnapshotSummary(Dictionary<ulong, AllocDetails> allocsByStackId, ulong pid)
+        public SnapshotSummary(Dictionary<ulong, AllocDetails> allocsByStackId, int pid)
         {
             allocsByStackId_ = allocsByStackId;
             pid_ = pid;
@@ -59,7 +59,7 @@ namespace HeapSnapshotCompare
         // column.
         public Dictionary<ulong, AllocDetails> allocsByStackId_;
         public Dictionary<string, long> hotStackFrames_ = null;
-        public ulong pid_;
+        public int pid_;
 
         public DataSize totalBytes_;
         public long allocCount_;
