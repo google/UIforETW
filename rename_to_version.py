@@ -9,6 +9,5 @@ for line in open(version_header).readlines():
 		version = line[len(prefix) : len(prefix) + 4]
 		print 'Renaming zip files to version "%s"' % version
 		os.rename('etwpackage.zip', 'etwpackage%s.zip' % version)
-		os.rename('etwsymbols.zip', 'etwsymbols%s.zip' % version)
 		sys.exit(0)
 assert(0)

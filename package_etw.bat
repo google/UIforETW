@@ -159,8 +159,11 @@ powershell ..\GitHub-Source-Indexer\github-sourceindexer.ps1 -symbolsFolder etws
 @echo %temp%\srcsrv\pdbstr -r -p:etwsymbols\UIforETWStatic_devrel32.pdb -s:srcsrv
 :NoSourceIndexing
 
-@rem Put the ETW symbols in symbol server format and .zip that.
-@rem First, add them to a local symbol server directory
+@rem Copy the critical PE files to the symbol server as well, to demonstrate best practices.
+copy etwpackage\bin\UIforETW*.exe etwsymbols
+
+@rem Add the PE and PDB files to a local symbol server directory, to get the
+@rem required directory structure:
 if exist etwsymserver rmdir /s/q etwsymserver 
 "c:\Program Files (x86)\Windows Kits\10\Debuggers\x64\symstore.exe" add /r /f etwsymbols /s etwsymserver /t uiforetw
 @rem Delete the excess files.
@@ -168,17 +171,24 @@ rmdir etwsymserver\000Admin /s/q
 del etwsymserver\pingme.txt
 del etwsymserver\refs.ptr /s
 
+cd etwsymserver
+@rem Upload to the randomascii-symbols public symbol server.
+@echo Ready to upload the symbols?
+@pause
+call python c:\src\depot_tools\gsutil.py cp -Z -R  . gs://randomascii-symbols
+cd ..
+@echo on
+
+@rem Make the redistributable .zip file
 del *.zip 2>nul
 call python make_zip_file.py etwpackage.zip etwpackage
 @echo on
-cd etwsymserver
-call python ..\make_zip_file.py ..\etwsymbols.zip .
-cd ..
-@echo on
+
+@rem Rename to the current version.
 call python rename_to_version.py UIforETW\Version.h
 @echo on
 
-@echo Now upload the new etwpackage*.zip and etwsymbols*.zip
+@echo Now upload the new etwpackage*.zip
 @echo But make sure that the PersistedPresets section from startup10.wpaProfile
 @echo been deleted to avoid shipping modified presets and bloating the file.
 @echo After releasing a version with an updated version number be sure to trigger
