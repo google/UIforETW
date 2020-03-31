@@ -845,16 +845,7 @@ std::wstring FindPython()
 		for (const auto& part : pathParts)
 		{
 			const std::wstring pythonPath = part + exeName;
-			// The Windows Store ships a copy of Python 3 that is not installed
-			// and therefore doesn't work. Since that non-existent Python is
-			// called python.exe it takes precedence over python.bat by
-			// UIforETW's logic, even if python.bat is first in the path. This
-			// leads to the following message being printed:
-			//     Python was not found but can be installed from the Microsoft
-			//     Store: https://go.microsoft.com/fwlink?linkID=2082640
-			// This problem can be avoided by checking the size of the file - the
-			// uninstalled store version of Python is a zero byte file.
-			if (::PathFileExistsW(pythonPath.c_str()) && GetFileSize(pythonPath) > 0)
+			if (::PathFileExistsW(pythonPath.c_str()))
 				return pythonPath;
 		}
 	}
