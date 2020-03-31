@@ -1093,11 +1093,10 @@ void CUIforETWDlg::OnBnClickedStarttracing()
 	// Memory-> Virtual Memory Snapshots. On windows 8.1 and above this makes the working set
 	// scanning in UIforETW unnecessary.
 	userProviders += L"+Microsoft-Windows-Kernel-Memory:0xE0";
-	if (IsWindowsTenOrGreater())
+	if (IsWindows8Point1OrGreater())
 	{
 		// This includes process freeze events, thread priority change events, and
-		// other good stuff. I don't know when it was first created and I can't easily
-		// test so I'm gating this to Windows 10.
+		// other good stuff. This was apparently added in Windows 8.1.
 		userProviders += L"+Microsoft-Windows-Kernel-Process";
 	}
 
