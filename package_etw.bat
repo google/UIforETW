@@ -171,14 +171,6 @@ rmdir etwsymserver\000Admin /s/q
 del etwsymserver\pingme.txt
 del etwsymserver\refs.ptr /s
 
-cd etwsymserver
-@rem Upload to the randomascii-symbols public symbol server.
-@echo Ready to upload the symbols?
-@pause
-call python c:\src\depot_tools\gsutil.py cp -Z -R  . gs://randomascii-symbols
-cd ..
-@echo on
-
 @rem Make the redistributable .zip file
 del *.zip 2>nul
 call python make_zip_file.py etwpackage.zip etwpackage
@@ -197,6 +189,15 @@ call python rename_to_version.py UIforETW\Version.h
 @echo git add UIforETW\VersionCopy.h
 @echo git commit -m "Updating VersionCopy.h for updated version checking"
 @echo git push
+
+cd etwsymserver
+@rem Upload to the randomascii-symbols public symbol server.
+@echo Final step - ready to upload the symbols?
+@pause
+call python c:\src\depot_tools\gsutil.py cp -Z -R  . gs://randomascii-symbols
+cd ..
+@echo on
+
 @exit /b
 
 :pleasecloseUIforETW
