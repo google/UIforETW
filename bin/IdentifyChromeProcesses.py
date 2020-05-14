@@ -94,6 +94,12 @@ def _IdentifyChromeProcesses(tracename, show_cpu_usage, return_pid_map):
   # first one will win.
   processTypeRe = re.compile(r".*? --type=([^ ]*) .*")
 
+  # Starting around M84 Chrome's utility processes have a --utility-sub-type
+  # parameter which identifies the type of utility process. Typical command
+  # lines look something like this:
+  # --type=utility --utility-sub-type=audio.mojom.AudioService --field-trial...
+  processSubTypeRe = re.compile(r".*? --utility-sub-type=([^ ]*) .*")
+
   #-a process = show process, thread, image information (see xperf -help processing)
   #-withcmdline = show command line in process reports (see xperf -help process)
   command = 'xperf -i "%s" -a process -withcmdline' % tracename
@@ -108,6 +114,8 @@ def _IdentifyChromeProcesses(tracename, show_cpu_usage, return_pid_map):
   lineByPid = {}
   # Dictionary of Pids and their types.
   types_by_pid = {}
+  # Dictionary of Pids and their sub-types (currently utility-processes only).
+  sub_types_by_pid = {}
   try:
     output = subprocess.check_output(command, stderr=subprocess.STDOUT)
   except subprocess.CalledProcessError:
@@ -150,6 +158,9 @@ def _IdentifyChromeProcesses(tracename, show_cpu_usage, return_pid_map):
           process_type = "browser"
           browserPid = pid
           pathByBrowserPid[browserPid] = exePath
+        sub_type_match = processSubTypeRe.match(commandLine)
+        if sub_type_match:
+          sub_types_by_pid[pid] = sub_type_match.groups()[0]
         types_by_pid[pid] = process_type
         # Retrieve or create the list of processes associated with this
         # browser (parent) pid.
@@ -264,14 +275,17 @@ def _IdentifyChromeProcesses(tracename, show_cpu_usage, return_pid_map):
       # Make sure the PIDs are printed in a consistent order.
       list_by_type.sort()
       for pid in list_by_type:
+        sub_type_text = ''
+        if pid in sub_types_by_pid:
+          sub_type_text = ' (%s)' % sub_types_by_pid[pid]
         if show_cpu_usage:
           print("\r\n        ", end="")
           if pid in cpu_usage_by_pid: # Skip per-process details if there's only one.:
-            print("%5d - %6d context switches, %8.2f ms CPU" % (pid, context_switches_by_pid[pid], cpu_usage_by_pid[pid]), end="")
+            print("%5d - %6d context switches, %8.2f ms CPU%s" % (pid, context_switches_by_pid[pid], cpu_usage_by_pid[pid], sub_type_text), end="")
           else:
-            print("%5d" % pid, end="")
+            print("%5d%s" % (pid, sub_type_text), end="")
         else:
-          print("%d " % pid, end="")
+          print("%d%s " % (pid, sub_type_text), end="")
       print("\r")
     print("\r")
 
