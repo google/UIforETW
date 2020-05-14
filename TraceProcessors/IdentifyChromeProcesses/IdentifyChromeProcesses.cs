@@ -111,6 +111,8 @@ class IdentifyChromeProcesses
 
         // Dictionary of Pids and their types.
         var typesByPid = new Dictionary<int, string>();
+        // Dictionary of Pids and their sub-types.
+        var subTypesByPid = new Dictionary<int, string>();
 
         // Find the space-terminated word after 'type='.
         // Mark the first .* as lazy/ungreedy/reluctant so that if there are multiple
@@ -118,6 +120,8 @@ class IdentifyChromeProcesses
         // first one will win. Or, at least, that's what the comments in the Python
         // version of this said.
         var r = new Regex(@".*? --type=(?<type>[^ ]*) .*");
+        // Find the utility sub-type, if present.
+        var r_sub = new Regex(@".*? --utility-sub-type=(?<subtype>[^ ]*) .*");
         foreach (var entry in processSummaries)
         {
             var process = entry.Key;
@@ -156,6 +160,10 @@ class IdentifyChromeProcesses
                 }
 
                 typesByPid[pid] = type;
+
+                var match_sub = r_sub.Match(process.CommandLine);
+                if (match_sub.Success)
+                    subTypesByPid[pid] = match_sub.Groups["subtype"].ToString();
 
                 // Retrieve or create the list of processes associated with this
                 // browser (parent) pid.
@@ -336,17 +344,20 @@ class IdentifyChromeProcesses
                 type.Value.Sort();
                 foreach (var pid in type.Value)
                 {
+                    string subTypeText = "";
+                    if (subTypesByPid.ContainsKey(pid))
+                        subTypeText = " (" + subTypesByPid[pid] + ")";
                     if (showCPUUsage)
                     {
                         Console.Write("\n        ");
                         execTimes.TryGetValue(pid, out CPUUsageDetails details);
                         if (details.contextSwitches > 0)
-                            Console.Write("{0,5} - {1,6} context switches, {2,8:0.00} ms CPU", pid, details.contextSwitches, details.ns / 1e6);
+                            Console.Write("{0,5} - {1,6} context switches, {2,8:0.00} ms CPU{3}", pid, details.contextSwitches, details.ns / 1e6, subTypeText);
                         else
-                            Console.Write("{0,5}", pid);
+                            Console.Write("{0,5}{1}", pid, subTypeText);
                     }
                     else
-                        Console.Write("{0} ", pid);
+                        Console.Write("{0}{1} ", pid, subTypeText);
                 }
                 Console.WriteLine();
             }
