@@ -1,0 +1,146 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{C37B7893-D2B9-4DA1-835C-04339B38BFF7}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>VideoConfCPUCounters</RootNamespace>
+    <AssemblyName>VideoConfCPUCounters</AssemblyName>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <Deterministic>true</Deterministic>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.Windows.EventTracing.BootPrefetch, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Windows.EventTracing.BootPrefetch.1.0.0\lib\netstandard2.0\Microsoft.Windows.EventTracing.BootPrefetch.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Windows.EventTracing.Cpu, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Windows.EventTracing.Cpu.1.0.0\lib\netstandard2.0\Microsoft.Windows.EventTracing.Cpu.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Windows.EventTracing.Disk, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Windows.EventTracing.Disk.1.0.0\lib\netstandard2.0\Microsoft.Windows.EventTracing.Disk.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Windows.EventTracing.Events, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Windows.EventTracing.Events.1.0.0\lib\netstandard2.0\Microsoft.Windows.EventTracing.Events.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Windows.EventTracing.Graphics, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Windows.EventTracing.Graphics.1.0.0\lib\netstandard2.0\Microsoft.Windows.EventTracing.Graphics.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Windows.EventTracing.HyperV, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Windows.EventTracing.HyperV.1.0.0\lib\netstandard2.0\Microsoft.Windows.EventTracing.HyperV.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Windows.EventTracing.Memory, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Windows.EventTracing.Memory.1.0.0\lib\netstandard2.0\Microsoft.Windows.EventTracing.Memory.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Windows.EventTracing.Metadata, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Windows.EventTracing.Metadata.1.0.0\lib\netstandard2.0\Microsoft.Windows.EventTracing.Metadata.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Windows.EventTracing.Network, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Windows.EventTracing.Network.1.0.0\lib\netstandard2.0\Microsoft.Windows.EventTracing.Network.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Windows.EventTracing.Power, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Windows.EventTracing.Power.1.0.0\lib\netstandard2.0\Microsoft.Windows.EventTracing.Power.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Windows.EventTracing.Processes, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Windows.EventTracing.Processes.1.0.0\lib\netstandard2.0\Microsoft.Windows.EventTracing.Processes.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Windows.EventTracing.Processing, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Windows.EventTracing.Processing.1.0.0\lib\netstandard2.0\Microsoft.Windows.EventTracing.Processing.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Windows.EventTracing.Processing.Community, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Windows.EventTracing.Processing.Community.1.0.0\lib\netstandard2.0\Microsoft.Windows.EventTracing.Processing.Community.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Windows.EventTracing.Processing.OutputRedirection, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Windows.EventTracing.Processing.OutputRedirection.1.0.0\lib\netstandard2.0\Microsoft.Windows.EventTracing.Processing.OutputRedirection.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Windows.EventTracing.Regions, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Windows.EventTracing.Regions.1.0.0\lib\netstandard2.0\Microsoft.Windows.EventTracing.Regions.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Windows.EventTracing.Registry, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Windows.EventTracing.Registry.1.0.0\lib\netstandard2.0\Microsoft.Windows.EventTracing.Registry.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Windows.EventTracing.ScheduledTasks, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Windows.EventTracing.ScheduledTasks.1.0.0\lib\netstandard2.0\Microsoft.Windows.EventTracing.ScheduledTasks.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Windows.EventTracing.Services, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Windows.EventTracing.Services.1.0.0\lib\netstandard2.0\Microsoft.Windows.EventTracing.Services.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Windows.EventTracing.Syscalls, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Windows.EventTracing.Syscalls.1.0.0\lib\netstandard2.0\Microsoft.Windows.EventTracing.Syscalls.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Windows.EventTracing.Utc, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Windows.EventTracing.Utc.1.0.0\lib\netstandard2.0\Microsoft.Windows.EventTracing.Utc.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Windows.EventTracing.WindowInFocus, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Windows.EventTracing.WindowInFocus.1.0.0\lib\netstandard2.0\Microsoft.Windows.EventTracing.WindowInFocus.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Buffers, Version=4.0.2.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Buffers.4.4.0\lib\netstandard2.0\System.Buffers.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Core" />
+    <Reference Include="System.Memory, Version=4.0.1.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Memory.4.5.3\lib\netstandard2.0\System.Memory.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Numerics" />
+    <Reference Include="System.Numerics.Vectors, Version=4.1.3.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Numerics.Vectors.4.4.0\lib\net46\System.Numerics.Vectors.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=4.0.4.1, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Runtime.CompilerServices.Unsafe.4.5.2\lib\netstandard2.0\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Security.Principal.Windows, Version=4.1.2.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Security.Principal.Windows.4.6.0\lib\net461\System.Security.Principal.Windows.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="VideoConfCPUCounters.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="..\packages\Microsoft.Windows.EventTracing.Processing.Toolkit.1.0.0\build\Microsoft.Windows.EventTracing.Processing.Toolkit.targets" Condition="Exists('..\packages\Microsoft.Windows.EventTracing.Processing.Toolkit.1.0.0\build\Microsoft.Windows.EventTracing.Processing.Toolkit.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\Microsoft.Windows.EventTracing.Processing.Toolkit.1.0.0\build\Microsoft.Windows.EventTracing.Processing.Toolkit.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Windows.EventTracing.Processing.Toolkit.1.0.0\build\Microsoft.Windows.EventTracing.Processing.Toolkit.targets'))" />
+    <Error Condition="!Exists('..\packages\Microsoft.Windows.EventTracing.Processing.OutputRedirection.1.0.0\build\Microsoft.Windows.EventTracing.Processing.OutputRedirection.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Windows.EventTracing.Processing.OutputRedirection.1.0.0\build\Microsoft.Windows.EventTracing.Processing.OutputRedirection.targets'))" />
+  </Target>
+  <Import Project="..\packages\Microsoft.Windows.EventTracing.Processing.OutputRedirection.1.0.0\build\Microsoft.Windows.EventTracing.Processing.OutputRedirection.targets" Condition="Exists('..\packages\Microsoft.Windows.EventTracing.Processing.OutputRedirection.1.0.0\build\Microsoft.Windows.EventTracing.Processing.OutputRedirection.targets')" />
+</Project>

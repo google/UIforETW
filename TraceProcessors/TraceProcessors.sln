@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CPUSummary", "CPUSummary\CP
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HeapSnapshotCompare", "HeapSnapshotCompare\HeapSnapshotCompare.csproj", "{96201BE4-B511-49A3-A98D-537B77E054C6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VideoConfCPUCounters", "VideoConfCPUCounters\VideoConfCPUCounters.csproj", "{C37B7893-D2B9-4DA1-835C-04339B38BFF7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -55,6 +57,18 @@ Global
 		{96201BE4-B511-49A3-A98D-537B77E054C6}.Release|x64.Build.0 = Release|Any CPU
 		{96201BE4-B511-49A3-A98D-537B77E054C6}.Release|x86.ActiveCfg = Release|Any CPU
 		{96201BE4-B511-49A3-A98D-537B77E054C6}.Release|x86.Build.0 = Release|Any CPU
+		{C37B7893-D2B9-4DA1-835C-04339B38BFF7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C37B7893-D2B9-4DA1-835C-04339B38BFF7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C37B7893-D2B9-4DA1-835C-04339B38BFF7}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{C37B7893-D2B9-4DA1-835C-04339B38BFF7}.Debug|x64.Build.0 = Debug|Any CPU
+		{C37B7893-D2B9-4DA1-835C-04339B38BFF7}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{C37B7893-D2B9-4DA1-835C-04339B38BFF7}.Debug|x86.Build.0 = Debug|Any CPU
+		{C37B7893-D2B9-4DA1-835C-04339B38BFF7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C37B7893-D2B9-4DA1-835C-04339B38BFF7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C37B7893-D2B9-4DA1-835C-04339B38BFF7}.Release|x64.ActiveCfg = Release|Any CPU
+		{C37B7893-D2B9-4DA1-835C-04339B38BFF7}.Release|x64.Build.0 = Release|Any CPU
+		{C37B7893-D2B9-4DA1-835C-04339B38BFF7}.Release|x86.ActiveCfg = Release|Any CPU
+		{C37B7893-D2B9-4DA1-835C-04339B38BFF7}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
