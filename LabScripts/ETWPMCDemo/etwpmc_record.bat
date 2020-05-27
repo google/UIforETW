@@ -15,14 +15,14 @@
 @setlocal
 
 @set tracelogdir=C:\Program Files (x86)\Windows Kits\10\bin\x64
-@for /d %%f in ("C:\Program Files (x86)\Windows Kits\10\bin\10.*") do if exist "%%f\x64\tracelog.exe" set tracelogdir=%%f\x64
+@for /d %%f in ("C:\Program Files (x86)\Windows Kits\10\bin\10.*") do @if exist "%%f\x64\tracelog.exe" set tracelogdir=%%f\x64
 
 @if exist "%tracelogdir%\tracelog.exe" goto tracelog_exists
 @echo Can't find tracelog.exe
 @exit /b
 :tracelog_exists
 
-set path=%path%;%tracelogdir%
+@set path=%path%;%tracelogdir%
 
 @set batchdir=%~dp0
 @set demo_app=%batchdir%ConditionalCount\Release\ConditionalCount.exe
@@ -37,7 +37,7 @@ set path=%path%;%tracelogdir%
 
 @rem Start tracing with context switches and with a few CPU performance
 @rem counters being recorded for each context switch.
-tracelog.exe -start pmc_counters -f pmc_counter_test.etl -eflag CSWITCH+PROC_THREAD+LOADER -PMC BranchMispredictions,BranchInstructions:CSWITCH
+tracelog.exe -start pmc_counters -f pmc_counter_temp.etl -eflag CSWITCH+PROC_THREAD+LOADER -PMC BranchMispredictions,BranchInstructions:CSWITCH
 @if %errorlevel% equ 0 goto started
 @echo Make sure you are running from an administrator command prompt
 @exit /b
@@ -69,6 +69,7 @@ tracelog.exe -start pmc_counters -f pmc_counter_test.etl -eflag CSWITCH+PROC_THR
 "%demo_app%" -sort
 
 xperf -stop pmc_counters >nul
-xperf -merge pmc_counter_test.etl pmc_counters_test_merged.etl
-xperf -i pmc_counters_test_merged.etl -o pmc_counters_test.txt
+xperf -merge pmc_counter_temp.etl pmc_counters_test.etl -compress
+@del pmc_counter_temp.etl
+xperf -i pmc_counters_test.etl -o pmc_counters_test.txt
 python %batchdir%etwpmc_parser.py pmc_counters_test.txt %demo_app_name%
