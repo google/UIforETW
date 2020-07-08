@@ -1040,3 +1040,27 @@ HeapTracedProcesses ParseHeapTracingSettings(std::wstring heapTracingExes)
 
 	return result;
 }
+
+// This should really be called from a background thread to avoid UI hangs.
+void OpenFolderAndSelectItem(std::wstring filename, std::wstring dir)
+{
+	bool opened = false;
+
+	if (!filename.empty())
+	{
+		// Parse the full filename into a pidl
+		PIDLIST_ABSOLUTE pidl;
+		SFGAOF flags;
+		if (SHParseDisplayName(filename.c_str(), nullptr, &pidl, 0, &flags) == S_OK)
+		{
+			// Open Explorer and select the thing
+			if (SHOpenFolderAndSelectItems(pidl, 0, nullptr, 0) == S_OK)
+				opened = true;
+			// Use the task allocator to free the pidl
+			CoTaskMemFree(pidl);
+		}
+	}
+
+	if (!opened)
+		ShellExecute(NULL, L"open", dir.c_str(), NULL, dir.c_str(), SW_SHOW);
+}

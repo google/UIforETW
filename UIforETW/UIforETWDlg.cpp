@@ -2130,7 +2130,7 @@ void CUIforETWDlg::OnContextMenu(CWnd* pWnd, CPoint point)
 				AfxMessageBox(L"Not implemented yet.");
 				break;
 			case ID_TRACES_BROWSEFOLDER:
-				ShellExecute(NULL, L"open", GetTraceDir().c_str(), NULL, GetTraceDir().c_str(), SW_SHOW);
+				OpenFolderAndSelectItem(tracePath, GetTraceDir());
 				break;
 			case ID_TRACES_STRIPCHROMESYMBOLS:
 				outputPrintf(L"\n");

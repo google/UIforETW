@@ -238,3 +238,6 @@ struct HeapTracedProcesses
 
 // Parse the semi-colon separated heap trace settings
 HeapTracedProcesses ParseHeapTracingSettings(std::wstring heapTracingExes);
+
+// This should really be called from a background thread to avoid UI hangs.
+void OpenFolderAndSelectItem(std::wstring filename, std::wstring dir);
