@@ -20,8 +20,9 @@ limitations under the License.
 
 #include <bcrypt.h>
 
-#include <vector>
 #include <array>
+#include <system_error>
+#include <vector>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
