@@ -27,10 +27,9 @@ import re
 import subprocess
 import sys
 
-def _IdentifyChromeProcesses(tracename, show_cpu_usage, return_pid_map):
+def _IdentifyChromeProcesses(tracename, show_cpu_usage, tabbed_output, return_pid_map):
   if not os.path.exists(tracename):
     print("Trace file '%s' does not exist." % tracename)
-    print("Usage: %s tracename [-cpuusage]" % sys.argv[0])
     sys.exit(0)
 
   script_dir = os.path.dirname(sys.argv[0])
@@ -75,7 +74,10 @@ def _IdentifyChromeProcesses(tracename, show_cpu_usage, return_pid_map):
         elif process_name in ['dwm.exe', 'audiodg.exe', 'System', 'MsMpEng.exe',
                               'software_reporter_tool.exe']:
           # Print information about other relevant processes:
-          print("%11s - %6d context switches, %8.2f ms CPU\r" % (process_name,
+          if tabbed_output:
+            print('%s\t%d\t%.2f' % (process_name, int(context_switches), float(cpu_usage.replace(",", ""))))
+          else:
+            print("%11s - %6d context switches, %8.2f ms CPU\r" % (process_name,
                 int(context_switches), float(cpu_usage.replace(",", ""))))
       print("\r")
     else:
@@ -160,7 +162,7 @@ def _IdentifyChromeProcesses(tracename, show_cpu_usage, return_pid_map):
           pathByBrowserPid[browserPid] = exePath
         sub_type_match = processSubTypeRe.match(commandLine)
         if sub_type_match:
-          sub_types_by_pid[pid] = sub_type_match.groups()[0]
+          sub_types_by_pid[pid] = sub_type_match.groups()[0].split('.')[-1]
         types_by_pid[pid] = process_type
         # Retrieve or create the list of processes associated with this
         # browser (parent) pid.
@@ -265,12 +267,19 @@ def _IdentifyChromeProcesses(tracename, show_cpu_usage, return_pid_map):
       print("    %-11s : " % process_type, end="")
       context_switches = 0
       cpu_usage = 0.0
+      num_processes_of_type = 0
       if show_cpu_usage:
         for pid in pidsByType[process_type]:
           if pid in cpu_usage_by_pid:
             context_switches += context_switches_by_pid[pid]
             cpu_usage += cpu_usage_by_pid[pid]
-        print("total - %6d context switches, %8.2f ms CPU" % (context_switches, cpu_usage), end="")
+            num_processes_of_type += 1
+        if num_processes_of_type > 1:
+          # Summarize by type when relevant.
+          if tabbed_output:
+            print('\t%d\t%.2f' % (context_switches, cpu_usage), end="")
+          else:
+            print("total - %6d context switches, %8.2f ms CPU" % (context_switches, cpu_usage), end="")
       list_by_type = pidsByType[process_type]
       # Make sure the PIDs are printed in a consistent order.
       list_by_type.sort()
@@ -279,11 +288,15 @@ def _IdentifyChromeProcesses(tracename, show_cpu_usage, return_pid_map):
         if pid in sub_types_by_pid:
           sub_type_text = ' (%s)' % sub_types_by_pid[pid]
         if show_cpu_usage:
-          print("\r\n        ", end="")
-          if pid in cpu_usage_by_pid: # Skip per-process details if there's only one.:
-            print("%5d - %6d context switches, %8.2f ms CPU%s" % (pid, context_switches_by_pid[pid], cpu_usage_by_pid[pid], sub_type_text), end="")
+          if tabbed_output:
+            print('\n%d%s\t%d\t%.2f' % (pid, sub_type_text, context_switches_by_pid.get(pid, 0), cpu_usage_by_pid.get(pid, 0)), end="")
           else:
-            print("%5d%s" % (pid, sub_type_text), end="")
+            print("\r\n        ", end="")
+            if pid in cpu_usage_by_pid:
+              # Print CPU usage details if they exist
+              print("%5d - %6d context switches, %8.2f ms CPU%s" % (pid, context_switches_by_pid[pid], cpu_usage_by_pid[pid], sub_type_text), end="")
+            else:
+              print("%5d%s" % (pid, sub_type_text), end="")
         else:
           print("%d%s " % (pid, sub_type_text), end="")
       print("\r")
@@ -296,12 +309,13 @@ def main():
   parser = argparse.ArgumentParser(description="Identify and categorize chrome processes in an ETW trace.")
   parser.add_argument("trace", type=str, nargs=1, help="ETW trace to be processed")
   parser.add_argument("-c", "--cpuusage", help="Summarize CPU usage and context switches per process", action="store_true")
+  parser.add_argument("-t", "--tabbed", help="Print CPU usage as a tab-separated grid", action="store_true")
   args = parser.parse_args()
 
   show_cpu_usage = args.cpuusage
   tracename = args.trace[0]
 
-  _IdentifyChromeProcesses(tracename, show_cpu_usage, False)
+  _IdentifyChromeProcesses(tracename, show_cpu_usage, args.tabbed, False)
 
 if __name__ == "__main__":
   main()
