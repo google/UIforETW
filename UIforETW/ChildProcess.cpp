@@ -100,10 +100,25 @@ DWORD ChildProcess::ListenerThread()
 #ifdef OUTPUT_DEBUG_STRINGS
 				OutputDebugStringA(buffer);
 #endif
+				// Convert from LF to CRLF line endings.
+				char buffer2[sizeof(buffer) * 2];
+				bool lastWasCR = false;
+				for (int in = 0, out = 0; /**/; /**/)
+				{
+					char c = buffer[in++];
+					// Edit controls on older versions of Windows (and by default on newer
+					// versions) need \r\n line endings, \n is not sufficient.
+					if (c == '\n' && !lastWasCR)
+						buffer2[out++] = '\r';
+					buffer2[out++] = c;
+					lastWasCR = c == '\r';
+					if (!c)
+						break;
+				}
 #ifdef _UNICODE
-				processOutput_ += AnsiToUnicode(buffer);
+				processOutput_ += AnsiToUnicode(buffer2);
 #else
-				processOutput_ += buffer;
+				processOutput += buffer2;
 #endif
 			}
 			SetEvent(hOutputAvailable_);
