@@ -314,13 +314,13 @@ def _IdentifyChromeProcesses(tracename, show_cpu_usage, tabbed_output, return_pi
       list_by_type.sort()
       for pid in list_by_type:
         sub_type_text = ''
+        if pid in sub_types_by_pid:
+          sub_type_text = ' (%s)' % sub_types_by_pid[pid]
         if show_cpu_usage:
           if tabbed_output:
             type = 'utility (%s)' % sub_types_by_pid[pid] if pid in sub_types_by_pid else process_type
             print('%s\t%s\t%d\t%.2f' % (type, pid, context_switches_by_pid.get(pid, 0), cpu_usage_by_pid.get(pid, 0)))
           else:
-            if pid in sub_types_by_pid:
-              sub_type_text = ' (%s)' % sub_types_by_pid[pid]
             print('\n        ', end='')
             if pid in cpu_usage_by_pid:
               # Print CPU usage details if they exist
