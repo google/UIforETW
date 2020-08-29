@@ -13,7 +13,7 @@ void CVersionChecker::VersionCheckerThread()
 	try
 	{
 		CInternetSession	MySession;
-		const wchar_t* const url = L"https://raw.githubusercontent.com/google/UIforETW/master/UIforETW/VersionCopy.h";
+		const wchar_t* const url = L"https://raw.githubusercontent.com/google/UIforETW/main/UIforETW/VersionCopy.h";
 		std::unique_ptr<CStdioFile> webFile(MySession.OpenURL(url));
 		// Read into the buffer -- set the maximum to one less than the length
 		// of the buffer.
