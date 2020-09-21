@@ -41,7 +41,7 @@ typedef long long int64;
 
 // Flag to indicate that a mouse-down actually corresponds to a double-click.
 // Add this to the button number.
-const int kFlagDoubleClick = 100;
+constexpr int kFlagDoubleClick = 100;
 
 #ifdef	ETW_MARKS_ENABLED
 

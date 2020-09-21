@@ -37,8 +37,8 @@ limitations under the License.
 #define new DEBUG_NEW
 #endif
 
-const int kRecordTraceHotKey = 1234;
-const int kTimerID = 5678;
+constexpr int kRecordTraceHotKey = 1234;
+constexpr int kTimerID = 5678;
 
 // This static pointer to the main window is used by the global
 // outputPrintf function.
@@ -47,7 +47,7 @@ static CUIforETWDlg* pMainWindow;
 // This convenient hack function is so that the ChildProcess code can
 // print to the main output window. This function can only be called
 // from the main thread.
-void outputPrintf(_Printf_format_string_ const wchar_t* pFormat, ...)
+void outputPrintf(_Printf_format_string_ const wchar_t* pFormat, ...) noexcept
 {
 	va_list args;
 	va_start(args, pFormat);
@@ -324,7 +324,7 @@ void CUIforETWDlg::CheckSymbolDLLs()
 
 	// Previous versions of symsrv.dll may not be multithreading safe and therefore can't
 	// be used with the latest WPA.
-	const int64_t requiredSymsrvVersion = (10llu << 48) + 0 + (14321llu << 16) + (1024llu << 0);
+	constexpr int64_t requiredSymsrvVersion = (10llu << 48) + 0 + (14321llu << 16) + (1024llu << 0);
 	const auto symsrvVersion = GetFileVersion(symsrv_path);
 	if (symsrvVersion < requiredSymsrvVersion)
 	{
@@ -436,9 +436,9 @@ BOOL CUIforETWDlg::OnInitDialog()
 	}
 
 	auto xperfVersion = GetFileVersion(GetXperfPath());
-	const int64_t requiredXperfVersion = (10llu << 48) + 0 + (10586llu << 16) + (15llu << 0);
+	constexpr int64_t requiredXperfVersion = (10llu << 48) + 0 + (10586llu << 16) + (15llu << 0);
 	// Windows 10 spring 2019 version, 10.0.18362.1 - requires Windows 8 or higher?
-	const int64_t preferredXperfVersion = (10llu << 48) + 0 + (18362llu << 16) + (1llu << 0);
+	constexpr int64_t preferredXperfVersion = (10llu << 48) + 0 + (18362llu << 16) + (1llu << 0);
 
 	wchar_t systemDir[MAX_PATH];
 	systemDir[0] = 0;
@@ -692,7 +692,7 @@ BOOL CUIforETWDlg::OnInitDialog()
 	if (bVersionChecks_)
 		versionCheckerThread_.StartVersionCheckerThread(this);
 
-	const UINT flags = SWP_NOMOVE | SWP_NOOWNERZORDER | SWP_NOZORDER | SWP_NOACTIVATE;
+	constexpr UINT flags = SWP_NOMOVE | SWP_NOOWNERZORDER | SWP_NOZORDER | SWP_NOACTIVATE;
 	// Resize our window per the previous dimensions if we have them
 	SetWindowPos(nullptr, 0, 0, previousWidth_, previousHeight_, flags);
 
@@ -1086,7 +1086,7 @@ void CUIforETWDlg::OnBnClickedStarttracing()
 	// This should also make the UI Delays and window-in-focus graphs more
 	// reliable, by not having them lose messages so frequently, although it is not
 	// clear that it actually helps.
-	const uint64_t kCritFlags = 0x0200000010000000;
+	constexpr uint64_t kCritFlags = 0x0200000010000000;
 	std::wstring userProviders = stringPrintf(L"Microsoft-Windows-Win32k:0x%llx", ~kCritFlags);
 	if (IsWindowsVistaOrLesser())
 		userProviders = L"Microsoft-Windows-LUA"; // Because Microsoft-Windows-Win32k doesn't work on Vista.
@@ -1765,7 +1765,7 @@ void CUIforETWDlg::OnSize(UINT nType, int /*cx*/, int /*cy*/)
 		lastHeight_ += yDelta;
 		previousHeight_ = lastHeight_;
 
-		const UINT flags = SWP_NOMOVE | SWP_NOOWNERZORDER | SWP_NOZORDER | SWP_NOACTIVATE;
+		constexpr UINT flags = SWP_NOMOVE | SWP_NOOWNERZORDER | SWP_NOZORDER | SWP_NOACTIVATE;
 
 		// Resize the output window, trace list, and notes control.
 

@@ -53,7 +53,7 @@ public:
 	// it will return zero. If the process is still running it
 	// will wait until the process returns and then get the exit code.
 	// This function will print output as it arrives with outputPrintf.
-	DWORD GetExitCode();
+	DWORD GetExitCode() noexcept;
 
 	// Normally all output is printed as it is received. If this function
 	// is called after Run() then all output will be returned, and not
