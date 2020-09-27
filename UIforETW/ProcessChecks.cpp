@@ -3,7 +3,7 @@
 #include <TlHelp32.h>
 #include <Wincrypt.h>
 
-const size_t MD5LEN = 16;
+constexpr size_t MD5LEN = 16;
 
 void Hash(const wchar_t* const szExeFile)
 {

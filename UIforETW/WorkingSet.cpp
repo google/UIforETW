@@ -26,7 +26,7 @@ limitations under the License.
 
 #pragma comment(lib, "psapi.lib")
 
-const DWORD kSamplingInterval = 1000;
+constexpr DWORD kSamplingInterval = 1000;
 
 void CWorkingSetMonitor::SampleWorkingSets()
 {
@@ -62,7 +62,7 @@ void CWorkingSetMonitor::SampleWorkingSets()
 	// divided out without loss of precision. That is, an unshared page
 	// is recorded by adding 420. A page shared by seven processes (the
 	// maximum recorded) is recorded by adding 420/7.
-	const uint64_t PSSMultiplier = 420; // LCM of 1, 2, 3, 4, 5, 6, 7
+	constexpr uint64_t PSSMultiplier = 420; // LCM of 1, 2, 3, 4, 5, 6, 7
 	uint64_t totalPSSPages = 0;
 	ULONG_PTR totalPrivateWSPages = 0;
 

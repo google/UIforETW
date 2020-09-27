@@ -61,7 +61,7 @@ private:
 	// Auto-save trace if tracing to a file runs for longer than this length of time.
 	// Otherwise the trace files can fill hard drives and be unusably large.
 	// This should be configurable. But it is not.
-	const ULONGLONG kMaxFileTraceMs = 300000;
+	static constexpr ULONGLONG kMaxFileTraceMs = 300000;
 
 	CButton btStartTracing_;
 	CButton btSaveTraceBuffers_;
@@ -97,7 +97,7 @@ private:
 	// 2015-03-21_08-52-11_Bruce
 	// The first 19 characters are the date and time.
 	// The remainder are eligible for editing.
-	const size_t kPrefixLength = 19;
+	static constexpr size_t kPrefixLength = 19;
 	void StartRenameTrace(bool fullRename);
 
 	bool useChromeProviders_ = false;
@@ -211,8 +211,8 @@ private:
 	int lastHeight_ = 0;
 	int minWidth_ = 0;
 	int minHeight_ = 0;
-	const int maxWidth_ = 3000;
-	const int maxHeight_ = 3000;
+	static constexpr int maxWidth_ = 3000;
+	static constexpr int maxHeight_ = 3000;
 	// Width and height persisted to settings
 	int previousWidth_ = 0;
 	int previousHeight_ = 0;

@@ -372,7 +372,7 @@ void CSettings::OnBnClickedSelectPerfCounters()
 	std::vector<std::wstring> counters;
 	PDH_BROWSE_DLG_CONFIG config = {};
 	CallbackArg arg = {};
-	const size_t arbitrary_magic_buffer_size = 10000;
+	constexpr size_t arbitrary_magic_buffer_size = 10000;
 	arg.counter_names.resize(arbitrary_magic_buffer_size);
 	arg.config = &config;
 	arg.counters = &counters;

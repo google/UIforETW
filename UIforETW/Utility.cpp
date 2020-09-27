@@ -135,7 +135,7 @@ void copyWPAProfileToLocalAppData(const std::wstring& exeDir, const bool force)
 
 void outputLastError(const DWORD lastErr)
 {
-	const DWORD errMsgSize = 1024u;
+	constexpr DWORD errMsgSize = 1024;
 	wchar_t errBuff[errMsgSize] = {};
 	const DWORD ret = ::FormatMessageW(
 		(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS),
@@ -150,7 +150,7 @@ void outputLastError(const DWORD lastErr)
 void debugLastError(const DWORD lastErr) noexcept
 {
 #ifdef OUTPUT_DEBUG_STRINGS
-	const DWORD errMsgSize = 1024u;
+	constexpr DWORD errMsgSize = 1024;
 	wchar_t errBuff[errMsgSize] = {};
 	const DWORD ret = ::FormatMessageW(
 		(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS),
@@ -260,7 +260,7 @@ std::wstring LoadFileAsText(const std::wstring& fileName)
 	data[length] = 0;
 	data[length+1] = 0;
 
-	const wchar_t bom = 0xFEFF;
+	constexpr wchar_t bom = 0xFEFF;
 	UIETWASSERT(data.size() > sizeof(bom));
 	if (memcmp(&bom, &data[0], sizeof(bom)) == 0)
 	{
@@ -279,7 +279,7 @@ void WriteTextAsFile(const std::wstring& fileName, const std::wstring& text)
 	if (!outFile)
 		return;
 
-	const wchar_t bom = 0xFEFF; // Always write a byte order mark
+	constexpr wchar_t bom = 0xFEFF; // Always write a byte order mark
 	outFile.write(reinterpret_cast<const char*>(&bom), sizeof(bom));
 	outFile.write(reinterpret_cast<const char*>(text.c_str()), text.size() * sizeof(text[0]));
 }
@@ -306,7 +306,7 @@ std::wstring ConvertToCRLF(const std::wstring& input)
 std::wstring ReadRegistryString(HKEY root, const std::wstring& subkey, const std::wstring& valueName, bool force32Bit)
 {
 	std::wstring value;
-	const DWORD flags = RRF_RT_REG_SZ | RRF_RT_REG_EXPAND_SZ | RRF_ZEROONFAILURE;
+	constexpr DWORD flags = RRF_RT_REG_SZ | RRF_RT_REG_EXPAND_SZ | RRF_ZEROONFAILURE;
 
 	REGSAM openOptions = KEY_QUERY_VALUE;
 	if (force32Bit)
@@ -347,7 +347,7 @@ bool GetRegistryDWORD(const HKEY root, const std::wstring& subkey, const std::ws
 {
 	DWORD type = 0;
 	DWORD byteCount = sizeof(*pValue);
-	auto result = ::RegGetValueW(root, subkey.c_str(), valueName.c_str(), RRF_RT_REG_DWORD | RRF_ZEROONFAILURE, &type, pValue, &byteCount);
+	const auto result = ::RegGetValueW(root, subkey.c_str(), valueName.c_str(), RRF_RT_REG_DWORD | RRF_ZEROONFAILURE, &type, pValue, &byteCount);
 	return result == ERROR_SUCCESS;
 }
 
@@ -905,7 +905,7 @@ std::wstring GetEXEBuildTime()
 }
 
 // From https://msdn.microsoft.com/en-us/library/xcb2z8hs.aspx
-const DWORD MS_VC_EXCEPTION = 0x406D1388;
+constexpr DWORD MS_VC_EXCEPTION = 0x406D1388;
 
 #pragma pack(push,8)
 typedef struct tagTHREADNAME_INFO
@@ -934,7 +934,7 @@ void SetCurrentThreadName(PCSTR const threadName) noexcept
 	const THREADNAME_INFO info = { 0x1000, threadName, dwThreadID, 0 };
 	__try
 	{
-		const DWORD numArguments = sizeof(info) / sizeof(ULONG_PTR);
+		constexpr DWORD numArguments = sizeof(info) / sizeof(ULONG_PTR);
 
 		::RaiseException(MS_VC_EXCEPTION, 0, numArguments, reinterpret_cast<const ULONG_PTR*>(&info));
 	}
@@ -977,7 +977,7 @@ void CloseValidHandle(_In_ _Pre_valid_ _Post_ptr_invalid_ const HANDLE handle) n
 // Put MFC specific code here
 void MoveControl(const CWnd* pParent, CWnd& control, int xDelta, int yDelta)
 {
-	const UINT flags = SWP_NOSIZE | SWP_NOOWNERZORDER | SWP_NOZORDER | SWP_NOACTIVATE;
+	constexpr UINT flags = SWP_NOSIZE | SWP_NOOWNERZORDER | SWP_NOZORDER | SWP_NOACTIVATE;
 	CRect controlRect;
 	control.GetWindowRect(&controlRect);
 	POINT p = { controlRect.left, controlRect.top };

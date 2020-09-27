@@ -39,18 +39,18 @@ limitations under the License.
 
 // This sampling frequency leads to roughly 20 context switches per second, which is
 // perhaps okay when tracing but must be avoided when tracing is not running.
-const int kHeavySamplingInterval = 200;
-const int kLightSamplingInterval = 1000;
+constexpr int kHeavySamplingInterval = 200;
+constexpr int kLightSamplingInterval = 1000;
 
 // These correspond to the funcID values returned by GetMsrFunc
 // They are documented here:
 // https://software.intel.com/en-us/blogs/2014/01/07/using-the-intel-power-gadget-30-api-on-windows
 // Sample code from there was used to help create the Power Gadget API
 // code.
-const int MSR_FUNC_FREQ = 0;
-const int MSR_FUNC_POWER = 1;
-const int MSR_FUNC_TEMP = 2;
-const int MSR_FUNC_MAX_POWER = 3; /* ????? */
+constexpr int MSR_FUNC_FREQ = 0;
+constexpr int MSR_FUNC_POWER = 1;
+constexpr int MSR_FUNC_TEMP = 2;
+constexpr int MSR_FUNC_MAX_POWER = 3; /* ????? */
 
 namespace
 {
@@ -224,7 +224,7 @@ void CPowerStatusMonitor::SampleBatteryStat()
 	}
 
 	// Avoid infinite loops.
-	const int maxBatteries = 5;
+	constexpr int maxBatteries = 5;
 	for (int deviceNum = 0; deviceNum < maxBatteries; deviceNum++)
 	{
 		SP_DEVICE_INTERFACE_DATA did = { sizeof(did) };
@@ -333,7 +333,7 @@ void CPowerStatusMonitor::SampleBatteryStat()
 typedef _Return_type_success_(return >= 0) LONG NTSTATUS;
 // Other definitions copied from tribal knowledge on the Internet because
 // NtQueryTimerResolution is not officially documented.
-const NTSTATUS STATUS_SUCCESS = 0;
+constexpr NTSTATUS STATUS_SUCCESS = 0;
 extern "C" NTSYSAPI NTSTATUS NTAPI NtQueryTimerResolution(
 	_Out_ PULONG minimumResolution,
 	_Out_ PULONG maximumResolution,

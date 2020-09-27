@@ -33,13 +33,13 @@ typedef _Return_type_success_(return >= 0) LONG NTSTATUS;
 
 // How many ms to wait between sampling the CPU speeds. Don't sample
 // 'too' fast or it will waste power and affect the results.
-const DWORD kSamplingInterval = 3000;
+constexpr DWORD kSamplingInterval = 3000;
 
 #ifdef DO_SPIN_LOOP_MEASUREMENTS
 // Do this many samples each time and take the fastest. That helps to
 // avoid problems where an interrupt or other blip causes a CPU to miss
 // some cycles occasionally. This should be set as low as possible.
-const int kRetryCount = 5;
+constexpr int kRetryCount = 5;
 // How many iterations of SpinALot to make each time. This should be
 // set as low as possible.
 // A spin count of 10,000 implies 500,000 cycles for each call to
@@ -48,12 +48,12 @@ const int kRetryCount = 5;
 // CPU frequency and perturbing what we are measuring. A spin count
 // of 2,000 should complete in under a ms when the CPU is at its
 // lowest speed, and far faster when the CPU is running fast.
-const int kSpinCount = 2000;
+constexpr int kSpinCount = 2000;
 
 // Spin in a loop for 50*spinCount cycles - this function is defined
 // in 32-bit and 64-bit specific .asm files.
 extern "C" void SpinALot(int spinCount);
-const int kSpinsPerLoop = 50;
+constexpr int kSpinsPerLoop = 50;
 
 // Calculate the frequency of the current CPU in MHz, one time.
 static float MeasureFrequencyOnce() noexcept
