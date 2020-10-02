@@ -334,7 +334,7 @@ def _IdentifyChromeProcesses(tracename, show_cpu_usage, tabbed_output, return_pi
     print()
 
 def GetPIDToTypeMap(trace_name):
-  return _IdentifyChromeProcesses(trace_name, False, True)
+  return _IdentifyChromeProcesses(trace_name, False, False, True)
 
 def main():
   parser = argparse.ArgumentParser(description='Identify and categorize chrome processes in an ETW trace.')
