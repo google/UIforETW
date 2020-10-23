@@ -122,9 +122,13 @@ int main(int argc, _Pre_readable_size_(argc) char* argv[])
      }
      if (gText.size() != 32)
      {
-         printf("Error: PDB GUIDs must be exactly 32 characters"
-                " (%s was stripped to %s).\n", gTextArg.c_str(), gText.c_str());
-         return 10;
+        if (gText == gTextArg)
+          printf("Error: PDB GUIDs must be exactly 32 characters, length of %s is %zu.",
+            gText.c_str(), gText.size());
+        else
+          printf("Error: PDB GUIDs must be exactly 32 characters, length of %s (stripped from %s) is %zu.",
+            gText.c_str(), gTextArg.c_str(), gText.size());
+        return 10;
      }
 
      int count = sscanf_s(gText.substr(0, 8).c_str(), "%x", &g.Data1);
