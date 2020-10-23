@@ -168,7 +168,7 @@ int main(int argc, _Pre_readable_size_(argc) char* argv[])
    //The documentation says the buffer needs to be MAX_PATH - hurray for
    //consistency - but better safe than owned.
    char filePath[MAX_PATH+1] = {};
-   DWORD three = 0;
+   constexpr DWORD three = 0;
 
    if (SymFindFileInPath(fakeProcess, NULL, fileName, id, two, three,
                flags, filePath, NULL, NULL))
