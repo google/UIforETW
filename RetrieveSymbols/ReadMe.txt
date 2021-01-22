@@ -12,7 +12,7 @@ Sample usage:
           400000 image base (00400000 to 004D2FFF)
             0.00 image version
            D3000 size of image
-    54E3AECF cv           5D 0008DF80    8D380    Format: RSDS, {283A66AE-3EF3-4383-8798-F6617112B1F6}, 1, C:\b\build\slave\win\build\src\out\Release\initialexe\chrome.exe.pdb
+    54E3AECF cv           5D 0008DF80    8D380    Format: RSDS, {283A66AE-3EF3-4383-8798-F6617112B1F6}, 1, chrome.exe.pdb
 
 > RetrieveSymbols {283A66AE-3EF3-4383-8798-F6617112B1F6}, 1 chrome.exe.pdb
 Looking for PDB file 283A66AE3EF343838798F6617112B1F6 1 chrome.exe.pdb.
