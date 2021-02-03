@@ -191,26 +191,35 @@ BOOL CUIforETWApp::InitInstance()
 
 	SetRegistryKey(L"RandomASCII");
 
-	HWND prevWindow = FindWindow(NULL, L"UI for ETW");
-	if (prevWindow)
-	{
-		// Only allow one copy to be running at a time.
-		SetForegroundWindow(prevWindow);
-	}
-	else
-	{
-		CUIforETWDlg dlg;
-		m_pMainWnd = &dlg;
-		const INT_PTR nResponse = dlg.DoModal();
-		if (nResponse == -1)
+	constexpr wchar_t identifier[] = L"{B7D2F8B8-2F28-4366-9D7A-691019D89185}";
+	HANDLE mutex = CreateMutexW(nullptr, FALSE, identifier);
+	// Only allow one copy to be running at a time.
+	if (mutex && GetLastError() == ERROR_ALREADY_EXISTS) {
+		// Activate the previous window if possible. Note that if you have another
+		// window with this title (an explorer window for a UI for ETW folder for
+		// instance) then the wrong window may be activated. See
+		// https://github.com/google/UIforETW/issues/147 for details.
+		HWND prevWindow = FindWindow(NULL, L"UI for ETW");
+		if (prevWindow)
 		{
-			ATLTRACE("Warning: dialog creation failed, "
-					 "so application is terminating unexpectedly.\r\n");
-
-			ATLTRACE("Warning: if you are using MFC controls on the dialog, "
-					 "you cannot #define _AFX_NO_MFC_CONTROLS_IN_DIALOGS.\r\n");
-			std::terminate( );
+			SetForegroundWindow(prevWindow);
 		}
+
+		// Already running.
+		return FALSE;
+	}
+
+	CUIforETWDlg dlg;
+	m_pMainWnd = &dlg;
+	const INT_PTR nResponse = dlg.DoModal();
+	if (nResponse == -1)
+	{
+		ATLTRACE("Warning: dialog creation failed, "
+					"so application is terminating unexpectedly.\r\n");
+
+		ATLTRACE("Warning: if you are using MFC controls on the dialog, "
+					"you cannot #define _AFX_NO_MFC_CONTROLS_IN_DIALOGS.\r\n");
+		std::terminate( );
 	}
 
 	// Since the dialog has been closed, return FALSE so that we exit the
