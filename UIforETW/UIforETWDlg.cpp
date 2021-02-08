@@ -260,6 +260,7 @@ BEGIN_MESSAGE_MAP(CUIforETWDlg, CDialog)
 	ON_WM_ACTIVATE()
 	ON_WM_TIMER()
 	ON_BN_CLICKED(IDC_CLRTRACING, &CUIforETWDlg::OnBnClickedClrtracing)
+	ON_REGISTERED_MESSAGE(uwmAreYouMe, &CUIforETWDlg::OnAreYouMe)
 END_MESSAGE_MAP()
 
 
@@ -2537,4 +2538,9 @@ void CUIforETWDlg::OnActivate(UINT nState, CWnd* pWndOther, BOOL bMinimized)
 		SaveNotesIfNeeded();
 	}
 	CDialog::OnActivate(nState, pWndOther, bMinimized);
+}
+
+LRESULT CUIforETWDlg::OnAreYouMe(WPARAM, LPARAM) noexcept
+{
+	return uwmAreYouMe;
 }

@@ -258,6 +258,7 @@ private:
 	bool bShutdownCompleted_ = false;
 
 	// Generated message map functions
+	afx_msg LRESULT OnAreYouMe(WPARAM, LPARAM) noexcept;
 	virtual BOOL OnInitDialog() override;
 	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
 	afx_msg void OnPaint();
