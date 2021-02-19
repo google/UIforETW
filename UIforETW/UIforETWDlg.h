@@ -106,7 +106,7 @@ private:
 	CComboBox btInputTracing_;
 	CStatic btInputTracingLabel_;
 
-	TracingMode tracingMode_ = kTracingToMemory;
+	TracingMode tracingMode_ = kTracingToFile;
 	// Increase the buffer count by some proportion when tracing to a file
 	// on a large-memory machine.
 	int BufferCountBoost(int requestCount) const noexcept;
