@@ -1055,8 +1055,8 @@ void CUIforETWDlg::OnBnClickedStarttracing()
 		kernelStackWalk += L"+CSwitch+ReadyThread";
 	// Record VirtualAlloc call stacks from the VIRT_ALLOC provider. Also
 	// record VirtualFree to allow investigation of memory leaks, even though
-	// WPA fails to display these stacks. You can use UIforETW\bin\VirtualFreeStacks.pyl
-	// to summarize the VirtualFree stacks.
+	// WPA fails to display these stacks. You can use
+	// UIforETW\bin\VirtualFreeStacks.py to summarize the VirtualFree stacks.
 	if (bVirtualAllocStacks_ || tracingMode_ == kHeapTracingToFile)
 		kernelStackWalk += L"+VirtualAlloc+VirtualFree";
 	// Add in any manually requested call stack flags.
