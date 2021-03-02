@@ -306,7 +306,7 @@ std::wstring ConvertToCRLF(const std::wstring& input)
 std::wstring ReadRegistryString(HKEY root, const std::wstring& subkey, const std::wstring& valueName, bool force32Bit)
 {
 	std::wstring value;
-	constexpr DWORD flags = RRF_RT_REG_SZ | RRF_RT_REG_EXPAND_SZ | RRF_ZEROONFAILURE;
+	constexpr DWORD flags = RRF_RT_REG_SZ | RRF_ZEROONFAILURE;
 
 	REGSAM openOptions = KEY_QUERY_VALUE;
 	if (force32Bit)
