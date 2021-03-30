@@ -235,6 +235,7 @@ private:
 	bool bBackgroundMonitoring_ = true;
 	bool bChromeDeveloper_ = false;
 	bool bRecordTraceCommand_ = false; // Should the trace command be put in the .txt file?
+	bool bTraceJavaScript_ = false; // Should we trace IE/Chrome JavaScript?
 	bool bIdentifyChromeProcessesCPU_ = false;
 	bool bAutoViewTraces_ = false;
 	bool bRecordPreTrace_ = false;

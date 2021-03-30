@@ -1092,6 +1092,10 @@ void CUIforETWDlg::OnBnClickedStarttracing()
 	if (IsWindowsVistaOrLesser())
 		userProviders = L"Microsoft-Windows-LUA"; // Because Microsoft-Windows-Win32k doesn't work on Vista.
 	userProviders += L"+Multi-MAIN+Multi-FrameRate+Multi-Input+Multi-Worker";
+	// Recommended IE/Chromium JavaScript tracing settings per https://bugs.chromium.org/p/v8/issues/detail?id=11043#c15
+	// Note that currently Chromium must be built with v8_enable_system_instrumentation = true.
+	if (bTraceJavaScript_)
+		userProviders += L"+Microsoft-JScript:0x3";
 	// Suggested in https://github.com/google/UIforETW/issues/80. The data shows up in WPA in
 	// Memory-> Virtual Memory Snapshots. On windows 8.1 and above this makes the working set
 	// scanning in UIforETW unnecessary.
@@ -1993,6 +1997,7 @@ void CUIforETWDlg::OnBnClickedSettings()
 	dlgSettings.bVirtualAllocStacks_ = bVirtualAllocStacks_;
 	dlgSettings.bVersionChecks_ = bVersionChecks_;
 	dlgSettings.bRecordTraceCommand_ = bRecordTraceCommand_;
+	dlgSettings.bTraceJavaScript_ = bTraceJavaScript_;
 	dlgSettings.chromeKeywords_ = chromeKeywords_;
 	if (dlgSettings.DoModal() == IDOK)
 	{
@@ -2035,6 +2040,7 @@ void CUIforETWDlg::OnBnClickedSettings()
 		bVirtualAllocStacks_ = dlgSettings.bVirtualAllocStacks_;
 		bVersionChecks_ = dlgSettings.bVersionChecks_;
 		bRecordTraceCommand_ = dlgSettings.bRecordTraceCommand_;
+		bTraceJavaScript_ = dlgSettings.bTraceJavaScript_;
 		chromeKeywords_ = dlgSettings.chromeKeywords_;
 	}
 }

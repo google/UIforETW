@@ -50,6 +50,7 @@ public:
 	bool bVirtualAllocStacks_ = false;
 	bool bVersionChecks_ = false;
 	bool bRecordTraceCommand_ = false;
+	bool bTraceJavaScript_ = false;
 	uint64_t chromeKeywords_ = 0;
 
 protected:
@@ -73,6 +74,7 @@ protected:
 	CButton btHeapStacks_;
 	CButton btVirtualAllocStacks_;
 	CButton btVersionChecks_;
+	CButton btTraceJavaScript_;
 	CCheckListBox btChromeCategories_;
 
 	CToolTipCtrl toolTip_;
@@ -106,4 +108,5 @@ public:
 	CSettings(const CSettings&) = delete;
 	CSettings(const CSettings&&) = delete;
   afx_msg void OnBnClickedRecordTraceCommand();
+	afx_msg void OnBnClickedTracejavascript();
 };

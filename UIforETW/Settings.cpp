@@ -105,6 +105,7 @@ void CSettings::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_HEAPSTACKS, btHeapStacks_);
 	DDX_Control(pDX, IDC_VIRTUALALLOCSTACKS, btVirtualAllocStacks_);
 	DDX_Control(pDX, IDC_CHECKFORNEWVERSIONS, btVersionChecks_);
+	DDX_Control(pDX, IDC_TRACEJAVASCRIPT, btTraceJavaScript_);
 	DDX_Control(pDX, IDC_CHROME_CATEGORIES, btChromeCategories_);
 	DDX_Control(pDX, IDC_IDENTIFY_CHROME_CPU, btIdentifyChromeProcessesCPU_);
 	DDX_Control(pDX, IDC_BACKGROUND_MONITORING, btBackgroundMonitoring_);
@@ -127,6 +128,7 @@ BEGIN_MESSAGE_MAP(CSettings, CDialog)
 	ON_BN_CLICKED(IDC_IDENTIFY_CHROME_CPU, &CSettings::OnBnClickedIdentifyChromeCpu)
 	ON_BN_CLICKED(IDC_BACKGROUND_MONITORING, &CSettings::OnBnClickedBackgroundMonitoring)
 	ON_BN_CLICKED(IDC_RECORD_TRACE_COMMAND, &CSettings::OnBnClickedRecordTraceCommand)
+	ON_BN_CLICKED(IDC_TRACEJAVASCRIPT, &CSettings::OnBnClickedTracejavascript)
 END_MESSAGE_MAP()
 
 BOOL CSettings::OnInitDialog()
@@ -144,6 +146,7 @@ BOOL CSettings::OnInitDialog()
 	CheckDlgButton(IDC_VIRTUALALLOCSTACKS, bVirtualAllocStacks_);
 	CheckDlgButton(IDC_CHECKFORNEWVERSIONS, bVersionChecks_);
 	CheckDlgButton(IDC_RECORD_TRACE_COMMAND, bRecordTraceCommand_);
+	CheckDlgButton(IDC_TRACEJAVASCRIPT, bTraceJavaScript_);
 
 	btIdentifyChromeProcessesCPU_.EnableWindow(bChromeDeveloper_);
 	if (IsWindows8Point1OrGreater())
@@ -220,6 +223,7 @@ BOOL CSettings::OnInitDialog()
 		toolTip_.AddTool(&btVirtualAllocStacks_, L"Check this to record call stacks on VirtualAlloc on all "
 					L"traces instead of just heap traces.");
 		toolTip_.AddTool(&btVersionChecks_, L"Check this to have UIforETW check for new versions at startup.");
+		toolTip_.AddTool(&btTraceJavaScript_, L"Check this to have UIforETW trace the IE/Chrome JavaScript provider.");
 		toolTip_.AddTool(&btChromeCategories_, L"Check the chrome tracing categories that you want Chrome "
 					L"to emit ETW events for. This requires running Chrome version 46 or later, and "
 					L"using chrome://flags/ to \"Enable exporting of tracing events to ETW\" - search for "
@@ -435,4 +439,10 @@ void CSettings::OnBnClickedBackgroundMonitoring() noexcept
 void CSettings::OnBnClickedRecordTraceCommand()
 {
 	bRecordTraceCommand_ = !bRecordTraceCommand_;
+}
+
+
+void CSettings::OnBnClickedTracejavascript()
+{
+	bTraceJavaScript_ = !bTraceJavaScript_;
 }

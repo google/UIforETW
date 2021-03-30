@@ -70,6 +70,8 @@
 #define IDC_CHECK3                      1035
 #define IDC_CHECKFORNEWVERSIONS         1035
 #define IDC_TRACESIZE                   1036
+#define IDC_CHECKFORNEWVERSIONS2        1036
+#define IDC_TRACEJAVASCRIPT             1036
 #define IDC_SELECT_PERF_COUNTERS        1037
 #define IDC_CHECK4                      1038
 #define IDC_USE_OTHER_KERNEL_LOGGER     1038
