@@ -107,6 +107,8 @@ std::wstring StringToWString(const std::string& string) {
   return std::wstring(string.begin(), string.end());
 }
 
+#pragma warning(disable : 4244)
+// warning C4244: 'argument': conversion from 'const wchar_t' to 'const _Elem', possible loss of data
 std::string WStringToString(const std::wstring& string) {
   return std::string(string.begin(), string.end());
 }
