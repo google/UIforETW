@@ -34,6 +34,7 @@ The text file which this file parses was created with this xperf command:
 
 from __future__ import print_function
 
+import os
 import sys
 import re
 
@@ -42,6 +43,12 @@ def main():
     print('Required argument missing.')
     print('Usage:')
     print('    %s <tracesummary.csv>' % sys.argv[0])
+    print('tracesummary.csv should be created beforehand like this:')
+    print('xperf -i trace.etl -symbols -target machine -o tracesummary.csv -a dumper')
+    return 0
+
+  if os.path.splitext(sys.argv[1])[1].lower() == '.etl':
+    print('Argument should be a .csv file, not a .etl file.')
     return 0
 
   total = 0
