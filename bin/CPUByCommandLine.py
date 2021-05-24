@@ -27,10 +27,19 @@ Chromium's build.
 from __future__ import print_function
 
 import re
+import os
 import sys
 
-commandlines = open("Processes_ProcessCommandLines.csv").readlines()
-cpuusages = open("CPU_Usage_(Precise)_Randomascii_CPU_Summary_by_Process.csv").readlines()
+command_line_csv = 'Processes_ProcessCommandLines.csv'
+cpu_usage_csv = 'CPU_Usage_(Precise)_Randomascii_CPU_Summary_by_Process.csv'
+
+if not os.path.exists(command_line_csv) or not os.path.exists(cpu_usage_csv):
+  print('Required .csv files are missing. To generate them run:')
+  print('wpaexporter -i trace.etl -profile CPUUsageByCommandLine.wpaProfile')
+  sys.exit(0)
+
+commandlines = open(command_line_csv).readlines()
+cpuusages = open(cpu_usage_csv).readlines()
 
 commandLinesByProcess = {}
 for line in commandlines[1:]:
