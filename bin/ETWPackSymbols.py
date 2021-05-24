@@ -97,8 +97,7 @@ def main():
   #   0x4da89d03, 0x00bcb000, "client.dll", "[RSDS] PdbSig: {7b2a9028-87cd-448d-8500-1a18cdcf6166}; Age: 753; Pdb: u:\buildbot\dota_staging_win32\build\src\game\client\Release_dota\client.pdb"
 
   print("Executing command '%s'" % command)
-  lines = str(subprocess.check_output(command)).splitlines()
-
+  lines = subprocess.check_output(command).decode().splitlines()
   matchCount = 0
   matchExists = 0
   interestingModuleCount = 0
