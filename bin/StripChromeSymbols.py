@@ -64,53 +64,53 @@ strip_and_translate = True
 
 def main():
   if len(sys.argv) < 2:
-    print("Usage: %s trace.etl" % sys.argv[0])
+    print('Usage: %s trace.etl' % sys.argv[0])
     sys.exit(0)
 
   # Our usage of subprocess seems to require Python 2.7+
   if sys.version_info.major == 2 and sys.version_info.minor < 7:
-    print("Your python version is too old - 2.7 or higher required.")
-    print("Python version is %s" % sys.version)
+    print('Your python version is too old - 2.7 or higher required.')
+    print('Python version is %s' % sys.version)
     sys.exit(0)
 
-  symbol_path = os.environ.get("_NT_SYMBOL_PATH", "")
-  if symbol_path.count("chromium-browser-symsrv") == 0:
-    print("Chromium symbol server is not in _NT_SYMBOL_PATH. No symbol stripping needed.")
+  symbol_path = os.environ.get('_NT_SYMBOL_PATH', '')
+  if symbol_path.count('chromium-browser-symsrv') == 0:
+    print('Chromium symbol server is not in _NT_SYMBOL_PATH. No symbol stripping needed.')
     sys.exit(0)
 
   script_dir = os.path.dirname(sys.argv[0])
-  retrieve_path = os.path.join(script_dir, "RetrieveSymbols.exe")
-  pdbcopy_path = os.path.join(script_dir, "pdbcopy.exe")
-  if os.environ.has_key("programfiles(x86)"):
+  retrieve_path = os.path.join(script_dir, 'RetrieveSymbols.exe')
+  pdbcopy_path = os.path.join(script_dir, 'pdbcopy.exe')
+  if 'programfiles(x86)' in os.environ:
     # The UIforETW copy of pdbcopy.exe fails to copy some Chrome PDBs that the
     # Windows 10 SDK version can copy - use it if present.
-    pdbcopy_install = os.path.join(os.environ["programfiles(x86)"], r"Windows kits\10\debuggers\x86\pdbcopy.exe")
+    pdbcopy_install = os.path.join(os.environ['programfiles(x86)'], r'Windows kits\10\debuggers\x86\pdbcopy.exe')
     if os.path.exists(pdbcopy_install):
       pdbcopy_path = pdbcopy_install
 
   # This tool converts PDBs created with /debug:fastlink (VC++ 2015 feature) to
   # regular PDBs that contain all of the symbol information directly. This is
   # required so that pdbcopy can copy the symbols.
-  un_fastlink_tool = r"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\amd64\mspdbcmf.exe"
+  un_fastlink_tool = r'C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\amd64\mspdbcmf.exe'
   if not os.path.exists(un_fastlink_tool):
     un_fastlink_tool = None
 
   # RetrieveSymbols.exe requires some support files. dbghelp.dll and symsrv.dll
   # have to be in the same directory as RetrieveSymbols.exe and pdbcopy.exe must
   # be in the path, so copy them all to the script directory.
-  for third_party in ["pdbcopy.exe", "dbghelp.dll", "symsrv.dll"]:
+  for third_party in ['pdbcopy.exe', 'dbghelp.dll', 'symsrv.dll']:
     if not os.path.exists(third_party):
-      source = os.path.normpath(os.path.join(script_dir, r"..\third_party", \
+      source = os.path.normpath(os.path.join(script_dir, r'..\third_party', \
           third_party))
       dest = os.path.normpath(os.path.join(script_dir, third_party))
       shutil.copy2(source, dest)
 
   if not os.path.exists(pdbcopy_path):
-    print("pdbcopy.exe not found. No symbol stripping is possible.")
+    print('pdbcopy.exe not found. No symbol stripping is possible.')
     sys.exit(0)
 
   if not os.path.exists(retrieve_path):
-    print("RetrieveSymbols.exe not found. No symbol retrieval is possible.")
+    print('RetrieveSymbols.exe not found. No symbol retrieval is possible.')
     sys.exit(0)
 
   tracename = sys.argv[1]
@@ -126,10 +126,10 @@ def main():
   # In particular, note that the xperf action prints the age in decimal, but the
   # symcache names use the age in hexadecimal!
   pdb_re = re.compile(r'"\[RSDS\] PdbSig: {(.*-.*-.*-.*-.*)}; Age: (.*); Pdb: (.*)"')
-  pdb_cached_re = re.compile(r"Found .*file - placed it in (.*)")
+  pdb_cached_re = re.compile(r'Found .*file - placed it in (.*)')
 
-  print("Pre-translating chrome symbols from stripped PDBs to avoid 10-15 minute translation times "
-        "and to work around WPA symbol download bugs.")
+  print('Pre-translating chrome symbols from stripped PDBs to avoid 10-15 minute translation times '
+        'and to work around WPA symbol download bugs.')
 
   symcache_files = []
   # Keep track of the local symbol files so that we can temporarily rename them
@@ -141,7 +141,7 @@ def main():
   #-a symcache = show image and symbol identification (see xperf -help processing)
   #-dbgid = show symbol identification information (see xperf -help symcache)
   command = 'xperf -i "%s" -tle -tti -a symcache -dbgid' % tracename
-  print("> %s" % command)
+  print('> %s' % command)
   found_uncached = False
   raw_command_output = subprocess.check_output(command, stderr=subprocess.STDOUT)
   command_output = str(raw_command_output).splitlines()
@@ -150,41 +150,41 @@ def main():
     pe_match = None # This is the name to use when generating the .symcache files
     # Complete list of Chrome executables and binaries. Some are only used in internal builds.
     # Note that case matters for downloading PDBs.
-    for pe_name in ["chrome.exe.pdb", "chrome_proxy.exe.pdb", "chrome.dll.pdb", "blink_web.dll.pdb", "content.dll.pdb", "chrome_elf.dll.pdb", "chrome_watcher.dll.pdb", "libEGL.dll.pdb", "libGLESv2.dll.pdb", "eventlog_provider.dll.pdb"]:
-      if line.count("Pdb: " + pe_name) > 0:
+    for pe_name in ['chrome.exe.pdb', 'chrome_proxy.exe.pdb', 'chrome.dll.pdb', 'blink_web.dll.pdb', 'content.dll.pdb', 'chrome_elf.dll.pdb', 'chrome_watcher.dll.pdb', 'libEGL.dll.pdb', 'libGLESv2.dll.pdb', 'eventlog_provider.dll.pdb']:
+      if line.count('Pdb: ' + pe_name) > 0:
         pe_match = pe_name
     if pe_match:
       match = pdb_re.match(line)
       if match:
         guid, age, path = match.groups()
-        guid = guid.replace("-", "")
+        guid = guid.replace('-', '')
         age = int(age) # Prepare for printing as hex
         filepart = os.path.split(path)[1]
         # Starting around 2018 xperf started generating symcache file names in a
         # way that is more compatible with symbol servers. If the symbol server
         # name is:
-        #   "C:\symbols\chrome_child.dll.pdb\90E6CD6C673057E64C4C44205044422E1\chrome_child.dll.pdb
+        #   c:\symbols\chrome_child.dll.pdb\90E6CD6C673057E64C4C44205044422E1\chrome_child.dll.pdb
         # then the symcache name will be:
         #   c:\symcache\chrome_child.dll.pdb\90E6CD6C673057E64C4C44205044422E1\chrome_child.dll.pdb-v3.1.0.symcache
         # Handling all old names is out of scope for this script, so we just
         # handle the new names.
-        symcache_file = r"c:\symcache\%s\%s%s\%s-v3.1.0.symcache" % (pe_match, guid, age, pe_match)
+        symcache_file = r'c:\symcache\%s\%s%s\%s-v3.1.0.symcache' % (pe_match, guid, age, pe_match)
         if os.path.exists(symcache_file):
-          print("Symcache file already exists: %s" % symcache_file)
+          print('Symcache file already exists: %s' % symcache_file)
           continue
         # Only print messages for chrome PDBs that aren't in the symcache
         found_uncached = True
-        print("Found uncached reference to %s: %s - %s" % (filepart, guid, age, ))
+        print('Found uncached reference to %s: %s - %s' % (filepart, guid, age, ))
         symcache_files.append(symcache_file)
         pdb_cache_path = None
-        retrieve_command = "%s %s %s %s" % (retrieve_path, guid, age, filepart)
-        print("  > %s" % retrieve_command)
+        retrieve_command = '%s %s %s %s' % (retrieve_path, guid, age, filepart)
+        print('  > %s' % retrieve_command)
         for subline in os.popen(retrieve_command):
           cache_match = pdb_cached_re.match(subline.strip())
           if cache_match:
             pdb_cache_path = cache_match.groups()[0]
             # RetrieveSymbols puts a period at the end of the output, so strip that.
-            if pdb_cache_path.endswith("."):
+            if pdb_cache_path.endswith('.'):
               pdb_cache_path = pdb_cache_path[:-1]
         if strip_and_translate and not pdb_cache_path:
           # Look for locally built symbols
@@ -196,50 +196,50 @@ def main():
             tempdir = tempfile.mkdtemp()
             tempdirs.append(tempdir)
             dest_path = os.path.join(tempdir, os.path.basename(pdb_cache_path))
-            print("  Copying PDB to %s" % dest_path)
+            print('  Copying PDB to %s' % dest_path)
             # For some reason putting quotes around the command to be run causes
             # it to fail. So don't do that.
             copy_command = '%s "%s" "%s" -p' % (pdbcopy_path, pdb_cache_path, dest_path)
-            print("  > %s" % copy_command)
+            print('  > %s' % copy_command)
             if un_fastlink_tool:
               # If the un_fastlink_tool is available then run the pdbcopy command in a
               # try block. If pdbcopy fails then run the un_fastlink_tool and try again.
               try:
                 output = str(subprocess.check_output(copy_command, stderr=subprocess.STDOUT))
                 if output:
-                  print("  %s" % output, end="")
+                  print('  %s' % output, end='')
               except:
                 convert_command = '%s "%s"' % (un_fastlink_tool, pdb_cache_path)
-                print("Attempting to un-fastlink PDB so that pdbcopy can strip it. This may be slow.")
-                print("  > %s" % convert_command)
+                print('Attempting to un-fastlink PDB so that pdbcopy can strip it. This may be slow.')
+                print('  > %s' % convert_command)
                 subprocess.check_output(convert_command)
                 output = str(subprocess.check_output(copy_command, stderr=subprocess.STDOUT))
                 if output:
-                  print("  %s" % output, end="")
+                  print('  %s' % output, end='')
             else:
               output = str(subprocess.check_output(copy_command, stderr=subprocess.STDOUT))
               if output:
-                print("  %s" % output, end="")
+                print('  %s' % output, end='')
             if not os.path.exists(dest_path):
-              print("Aborting symbol generation because stripped PDB '%s' does not exist. WPA symbol loading may be slow." % dest_path)
+              print('Aborting symbol generation because stripped PDB "%s" does not exist. WPA symbol loading may be slow.' % dest_path)
               sys.exit(0)
           else:
-            print("   Symbols retrieved.")
+            print('   Symbols retrieved.')
         else:
-          print("  Failed to retrieve symbols.")
+          print('  Failed to retrieve symbols.')
 
   if tempdirs:
-    symbol_path = ";".join(tempdirs)
-    print("Stripped PDBs are in %s. Converting to symcache files now." % symbol_path)
-    os.environ["_NT_SYMBOL_PATH"] = symbol_path
+    symbol_path = ';'.join(tempdirs)
+    print('Stripped PDBs are in %s. Converting to symcache files now.' % symbol_path)
+    os.environ['_NT_SYMBOL_PATH'] = symbol_path
     # Create a list of to/from renamed tuples
     renames = []
     error = False
     try:
       rename_errors = False
       for local_pdb in local_symbol_files:
-        temp_name = local_pdb + "x"
-        print("Renaming %s to %s to stop unstripped PDBs from being used." % (local_pdb, temp_name))
+        temp_name = local_pdb + 'x'
+        print('Renaming %s to %s to stop unstripped PDBs from being used.' % (local_pdb, temp_name))
         try:
           # If the destination file exists we have to rename it or else the
           # rename will fail.
@@ -249,23 +249,23 @@ def main():
         except:
           # Rename can and does throw exceptions. We must catch and continue.
           e = sys.exc_info()[0]
-          print("Hit exception while renaming %s to %s. Continuing.\n%s" % (local_pdb, temp_name, e))
+          print('Hit exception while renaming %s to %s. Continuing.\n%s' % (local_pdb, temp_name, e))
           rename_errors = True
         else:
           renames.append((local_pdb, temp_name))
 
       #-build = build the symcache store for this trace (see xperf -help symcache)
       if rename_errors:
-        print("Skipping symbol generation due to PDB rename errors. WPA symbol loading may be slow.")
+        print('Skipping symbol generation due to PDB rename errors. WPA symbol loading may be slow.')
       else:
         gen_command = 'xperf -i "%s" -symbols -tle -tti -a symcache -build' % tracename
-        print("> %s" % gen_command)
+        print('> %s' % gen_command)
         for line in os.popen(gen_command).readlines():
           pass # Don't print line
     except KeyboardInterrupt:
       # Catch Ctrl+C exception so that PDBs will get renamed back.
       if renames:
-        print("Ctrl+C detected. Renaming PDBs back.")
+        print('Ctrl+C detected. Renaming PDBs back.')
       error = True
     for rename_names in renames:
       try:
@@ -273,26 +273,26 @@ def main():
       except:
         # Rename can and does throw exceptions. We must catch and continue.
         e = sys.exc_info()[0]
-        print("Hit exception while renaming %s back. Continuing.\n%s" % (rename_names[1], e))
+        print('Hit exception while renaming %s back. Continuing.\n%s' % (rename_names[1], e))
     for symcache_file in symcache_files:
       if os.path.exists(symcache_file):
-        print("%s generated." % symcache_file)
+        print('%s generated.' % symcache_file)
       else:
-        print("Error: %s not generated." % symcache_file)
+        print('Error: %s not generated.' % symcache_file)
         error = True
     # Delete the stripped PDB files
     if error:
-      print("Retaining PDBs to allow rerunning xperf command-line.")
-      print("If re-running the command be sure to go:")
-      print("set _NT_SYMBOL_PATH=%s" % symbol_path)
+      print('Retaining PDBs to allow rerunning xperf command-line.')
+      print('If re-running the command be sure to go:')
+      print('set _NT_SYMBOL_PATH=%s' % symbol_path)
     else:
       for directory in tempdirs:
         shutil.rmtree(directory, ignore_errors=True)
   elif strip_and_translate:
     if found_uncached:
-      print("No PDBs copied, nothing to do.")
+      print('No PDBs copied, nothing to do.')
     else:
-      print("No uncached PDBS found, nothing to do.")
+      print('No uncached PDBS found, nothing to do.')
 
-if __name__ == "__main__":
+if __name__ == '__main__':
   main()
