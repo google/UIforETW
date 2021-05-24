@@ -3,7 +3,7 @@ import os
 import zipfile
 
 if len(sys.argv) < 3:
-  print "Usage: %s zipfile directory" % sys.argv[0]
+  print('Usage: %s zipfile directory' % sys.argv[0])
   sys.exit(0)
 
 filename = sys.argv[1]
