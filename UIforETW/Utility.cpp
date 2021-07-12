@@ -846,15 +846,6 @@ std::wstring FindInPath(const std::wstring& exeName)
 
 std::wstring FindPython()
 {
-	const std::wstring pytwoseven = GetEnvironmentVariableString(L"python27");
-
-	// Some people, like me, (Alexander Riccio) have an environment variable
-	// that specifically points to Python 2.7.
-	// As a workaround for issue #13, we'll use that version of Python.
-	// See the issue: https://github.com/google/UIforETW/issues/13
-	if (!pytwoseven.empty())
-		return pytwoseven;
-
 	// First look for python.exe. If that isn't found then look for
 	// python.bat, part of Chromium's depot_tools
 	for (const auto& exeName : { L"python.exe", L"python.bat" })
