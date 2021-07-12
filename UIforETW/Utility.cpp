@@ -820,6 +820,30 @@ std::wstring GetEnvironmentVariableString(_In_z_ PCWSTR const variable)
 	return L"";
 }
 
+std::wstring FindInPath(const std::wstring& exeName)
+{
+	const std::wstring path = GetEnvironmentVariableString(L"path");
+	if (path.empty())
+	{
+		// Nothing found.
+		return L"";
+	}
+
+	const std::vector<std::wstring> pathParts = split(path, ';');
+
+	for (const auto& part : pathParts)
+	{
+		if (part.empty())
+			continue;
+		const std::wstring foundPath = part + L'\\' + exeName;
+		if (::PathFileExistsW(foundPath.c_str()))
+			return foundPath;
+	}
+
+	// Nothing found.
+	return L"";
+}
+
 std::wstring FindPython()
 {
 	const std::wstring pytwoseven = GetEnvironmentVariableString(L"python27");
@@ -830,25 +854,16 @@ std::wstring FindPython()
 	// See the issue: https://github.com/google/UIforETW/issues/13
 	if (!pytwoseven.empty())
 		return pytwoseven;
-	const std::wstring path = GetEnvironmentVariableString(L"path");
-	if (path.empty())
-	{
-		// No python found.
-		return L"";
-	}
 
-	const std::vector<std::wstring> pathParts = split(path, ';');
 	// First look for python.exe. If that isn't found then look for
 	// python.bat, part of Chromium's depot_tools
-	for (const auto& exeName : { L"\\python.exe", L"\\python.bat" })
+	for (const auto& exeName : { L"python.exe", L"python.bat" })
 	{
-		for (const auto& part : pathParts)
-		{
-			const std::wstring pythonPath = part + exeName;
-			if (::PathFileExistsW(pythonPath.c_str()))
-				return pythonPath;
-		}
+		auto result = FindInPath(exeName);
+		if (!result.empty())
+			return result;
 	}
+
 	// No python found.
 	return L"";
 }

@@ -101,7 +101,10 @@ bool IsWindowsXPOrLesser();
 bool IsWindowsSevenOrLesser();
 bool IsWindowsVistaOrLesser();
 
-std::wstring FindPython(); // Returns a full path to python.exe or nothing.
+// Finds an executable in the path.
+std::wstring FindInPath(const std::wstring& exeName);
+
+std::wstring FindPython(); // Returns a full path to python.exe, python.bat, or nothing.
 
 // Helpful timer class using trendy C++ 11 features.
 class ElapsedTimer final

@@ -542,7 +542,10 @@ BOOL CUIforETWDlg::OnInitDialog()
 	}
 
 	gpuViewPath_ = wpt10Dir_ + L"gpuview\\gpuview.exe";
-	wpa10Path_ = wpt10Dir_ + L"wpa.exe";
+	// look for wpa.exe in the path so that the store version can be used.
+	wpa10Path_ = FindInPath(L"wpa.exe");
+	if (wpa10Path_.empty())
+		wpa10Path_ = wpt10Dir_ + L"wpa.exe";
 
 	// When WPT has just been installed it will not be in the path, which means
 	// that Python scripts which rely on xperf.exe being in the path will fail.
