@@ -37,9 +37,11 @@ public:
 	virtual BOOL InitInstance() override;
 	afx_msg void OnHelp() noexcept;
 
+	static BOOL CALLBACK findDupeWindow(HWND hWnd, LPARAM lParam);
 // Implementation
 
 	DECLARE_MESSAGE_MAP()
 };
 
+inline const UINT uwmAreYouMe = RegisterWindowMessage(L"678fd291e05741edb987c0a4f5650866");
 extern CUIforETWApp theApp;
