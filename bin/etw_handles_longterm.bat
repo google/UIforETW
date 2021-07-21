@@ -61,7 +61,7 @@
 
 @echo Trace can be loaded using UIforETW or with:
 @echo wpa "%tracefile%"
-@echo Look for handle data in Memory-> Heap Snapshot
+@echo To find the handle data look in WPA's Graph Explorer, Memory section, Handles, Outstanding Count by Process
 @exit /b
 
 :failure
