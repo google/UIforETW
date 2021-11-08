@@ -16,19 +16,14 @@ mkdir %destdir%\lib
 mkdir %destdir%\third_party
 mkdir %symboldir%
 
-set wptredistmsi=Windows Performance Toolkit\Redistributables\WPTx64-x86_en-us.msi
-set oldwptredistmsi=Windows Performance Toolkit\OldRedistributables\WPTx64-x86_en-us.msi
+set wptredistmsi=Windows Performance Toolkit\Redistributables\WPTx64 (DesktopEditions)-x86_en-us.msi
 
 set wpt10=c:\Program Files (x86)\Windows Kits\10\
 if not exist "%wpt10%%wptredistmsi%" goto nowpt10
-if not exist "%wpt10%%oldwptredistmsi%" goto nooldwpt10
 mkdir %destdir%\third_party\wpt10
-mkdir %destdir%\third_party\oldwpt10
 xcopy "%wpt10%%wptredistmsi%" %destdir%\third_party\wpt10
 @if errorlevel 1 goto copyfailure
-xcopy "%wpt10%%oldwptredistmsi%" %destdir%\third_party\oldwpt10
-@if errorlevel 1 goto copyfailure
-xcopy "%wpt10%Licenses\10.0.15063.0\sdk_license.rtf" %destdir%\third_party\wpt10
+xcopy "%wpt10%Licenses\10.0.22000.0\sdk_license.rtf" %destdir%\third_party\wpt10
 @if errorlevel 1 goto copyfailure
 ren %destdir%\third_party\wpt10\sdk_license.rtf LICENSE.rtf
 
@@ -42,6 +37,7 @@ call %vcvars32%
 @rem Build DelayedCreateProcess.exe to the bin directory
 @echo Building DelayedCreateProcess.exe
 call DelayedCreateProcess\make.bat
+del DelayedCreateProcess.obj
 
 cd /d %UIforETW%ETWInsights
 @echo Building ETWInsights

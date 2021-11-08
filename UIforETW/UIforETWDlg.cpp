@@ -438,64 +438,37 @@ BOOL CUIforETWDlg::OnInitDialog()
 	auto xperfVersion = GetFileVersion(GetXperfPath());
 	constexpr int64_t requiredXperfVersion = (10llu << 48) + 0 + (10586llu << 16) + (15llu << 0);
 	// Windows 10 spring 2019 version, 10.0.18362.1 - requires Windows 8 or higher?
-	constexpr int64_t preferredXperfVersion = (10llu << 48) + 0 + (18362llu << 16) + (1llu << 0);
+	constexpr int64_t preferredXperfVersion = (10llu << 48) + 0 + (22000llu << 16) + (194llu << 0);
 
 	wchar_t systemDir[MAX_PATH];
 	systemDir[0] = 0;
 	GetSystemDirectory(systemDir, ARRAYSIZE(systemDir));
 	std::wstring msiExecPath = systemDir + std::wstring(L"\\msiexec.exe");
 
-	if (Is64BitWindows() && PathFileExists(msiExecPath.c_str()))
+	if (IsWindowsTenOrGreater() && Is64BitWindows() && PathFileExists(msiExecPath.c_str()))
 	{
 		// The installers are available as part of etwpackage.zip on
 		// https://github.com/google/UIforETW/releases
-		if (IsWindowsSevenOrLesser())
+		// Install 64-bit WPT 10 if needed and if available.
+		if (xperfVersion < preferredXperfVersion)
 		{
-			// The newest (Anniversary Edition or beyond) WPT doesn't work on Windows 7.
-			// Install the older 64-bit WPT 10 if needed and if available.
-			if (xperfVersion < requiredXperfVersion)
+			const std::wstring installPath10 = CanonicalizePath(GetExeDir() + L"..\\third_party\\wpt10\\WPTx64 (DesktopEditions)-x86_en-us.msi");
+			if (PathFileExists(installPath10.c_str()))
 			{
-				const std::wstring installPathOld10 = CanonicalizePath(GetExeDir() + L"..\\third_party\\oldwpt10\\WPTx64-x86_en-us.msi");
-				if (PathFileExists(installPathOld10.c_str()))
+				ChildProcess child(msiExecPath);
+				std::wstring args = L" /i \"" + installPath10 + L"\"";
+				child.Run(true, L"msiexec.exe" + args);
+				const DWORD installResult10 = child.GetExitCode();
+				if (!installResult10)
 				{
-					ChildProcess child(msiExecPath);
-					std::wstring args = L" /i \"" + installPathOld10 + L"\"";
-					child.Run(true, L"msiexec.exe" + args);
-					const DWORD installResult10 = child.GetExitCode();
-					if (!installResult10)
-					{
-						outputPrintf(L"WPT version 10.0.10586 was installed.\n");
-					}
-					else
-					{
-						outputPrintf(L"Failure code %u while installing WPT 10.\n", installResult10);
-					}
+					xperfVersion = GetFileVersion(GetXperfPath());
+					outputPrintf(L"WPT version %llu.%llu.%llu.%llu was installed.\n",
+						xperfVersion >> 48, (xperfVersion >> 32) & 0xFFFF,
+						(xperfVersion >> 16) & 0xFFFF, xperfVersion & 0xFFFF);
 				}
-			}
-		}
-		else
-		{
-			// Install 64-bit WPT 10 if needed and if available.
-			if (xperfVersion < preferredXperfVersion)
-			{
-				const std::wstring installPath10 = CanonicalizePath(GetExeDir() + L"..\\third_party\\wpt10\\WPTx64-x86_en-us.msi");
-				if (PathFileExists(installPath10.c_str()))
+				else
 				{
-					ChildProcess child(msiExecPath);
-					std::wstring args = L" /i \"" + installPath10 + L"\"";
-					child.Run(true, L"msiexec.exe" + args);
-					const DWORD installResult10 = child.GetExitCode();
-					if (!installResult10)
-					{
-						xperfVersion = GetFileVersion(GetXperfPath());
-						outputPrintf(L"WPT version %llu.%llu.%llu.%llu was installed.\n",
-							xperfVersion >> 48, (xperfVersion >> 32) & 0xFFFF,
-							(xperfVersion >> 16) & 0xFFFF, xperfVersion & 0xFFFF);
-					}
-					else
-					{
-						outputPrintf(L"Failure code %u while installing WPT 10.\n", installResult10);
-					}
+					outputPrintf(L"Failure code %u while installing WPT 10.\n", installResult10);
 				}
 			}
 			xperfVersion = GetFileVersion(GetXperfPath());
@@ -551,6 +524,8 @@ BOOL CUIforETWDlg::OnInitDialog()
 	// that Python scripts which rely on xperf.exe being in the path will fail.
 	// This adds the WPT10 directory to the path. We could just do this when WPT
 	// has been freshly installed but this seems cleaner.
+	// We add it to the end of the path so that it won't affect systems that
+	// already have WPT in the path, perhaps from the store.
 	auto path = GetEnvironmentVariableString(L"path");
 	path += L';' + wpt10Dir_;
 	SetEnvironmentVariable(L"path", path.c_str());
