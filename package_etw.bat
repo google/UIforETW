@@ -51,17 +51,14 @@ cd /d %UIforETW%UIforETW
 sed "s/UIforETW.vcxproj/UIforETWStatic.vcxproj/" <UIforETW.sln >UIforETWStatic.sln
 @echo First do a test build with ETW marks disabled to test the inline functions.
 sed "s/_WINDOWS/_WINDOWS;DISABLE_ETW_MARKS/" <UIforETW.vcxproj >UIforETWStatic.vcxproj
-@echo Building UIforETW 32-bit test build
-devenv /rebuild "release|Win32" UIforETWStatic.sln
+@echo Building UIforETW 64-bit test build
+devenv /rebuild "release|x64" UIforETWStatic.sln
 @if ERRORLEVEL 1 goto BuildFailure
 
 @rem Now prepare for the real builds
 sed "s/UseOfMfc>Dynamic/UseOfMfc>Static/" <UIforETW.vcxproj >UIforETWStatic.vcxproj
 if exist Release rmdir Release /s/q
 if exist x64\Release rmdir x64\Release /s/q
-@echo Building UIforETW 32-bit official build
-devenv /rebuild "release|Win32" UIforETWStatic.sln
-@if ERRORLEVEL 1 goto BuildFailure
 @echo Building UIforETW 64-bit official build
 devenv /rebuild "release|x64" UIforETWStatic.sln
 @if ERRORLEVEL 1 goto BuildFailure
@@ -90,8 +87,6 @@ xcopy /exclude:%UIforETW%excludecopy.txt %UIforETW%lib %destdir%\lib /s
 xcopy /exclude:%UIforETW%excludecopy.txt %UIforETW%third_party %destdir%\third_party /s
 @rem Get the destinations to exist so that the xcopy proceeds without a question.
 echo >%destdir%\bin\UIforETW.exe
-echo >%destdir%\bin\UIforETW32.exe
-xcopy %UIforETW%bin\UIforETWStatic_devrel32.exe %destdir%\bin\UIforETW32.exe /y
 xcopy %UIforETW%bin\UIforETWStatic_devrel.exe %destdir%\bin\UIforETW.exe /y
 xcopy %UIforETW%bin\EventEmitter.exe %destdir%\bin /y
 xcopy %UIforETW%bin\EventEmitter64.exe %destdir%\bin /y
@@ -100,7 +95,7 @@ xcopy %UIforETW%third_party\symsrv.dll %destdir%\bin /y
 
 @rem Sign the important (requiring elevation) binaries
 set bindir=%~dp0etwpackage\bin
-signtool sign /a /d "UIforETW" /du "https://github.com/google/UIforETW/releases" /n "Bruce Dawson" /tr http://timestamp.digicert.com /td SHA256 /fd SHA256 %bindir%\UIforETW.exe %bindir%\UIforETW32.exe %bindir%\EventEmitter.exe %bindir%\EventEmitter64.exe %bindir%\flame_graph.exe %bindir%\RetrieveSymbols.exe %bindir%\DelayedCreateProcess.exe %bindir%\DummyChrome.dll %bindir%\ETWProviders.dll %bindir%\ETWProviders64.dll %bindir%\ETWProvidersARM64.dll
+signtool sign /a /d "UIforETW" /du "https://github.com/google/UIforETW/releases" /n "Bruce Dawson" /tr http://timestamp.digicert.com /td SHA256 /fd SHA256 %bindir%\UIforETW.exe %bindir%\EventEmitter.exe %bindir%\EventEmitter64.exe %bindir%\flame_graph.exe %bindir%\RetrieveSymbols.exe %bindir%\DelayedCreateProcess.exe %bindir%\DummyChrome.dll %bindir%\ETWProviders.dll %bindir%\ETWProviders64.dll %bindir%\ETWProvidersARM64.dll
 @if not %errorlevel% equ 0 goto signing_failure
 
 @rem Copy the official binaries back to the local copy, for development purposes.
@@ -157,7 +152,6 @@ powershell ..\GitHub-Source-Indexer\github-sourceindexer.ps1 -symbolsFolder etws
     -verifyLocalRepo -gitHubUrl https://raw.githubusercontent.com -serverIsRaw
 @echo Run these commands if you want to verify what has been indexed:
 @echo %temp%\srcsrv\pdbstr -r -p:etwsymbols\UIforETWStatic_devrel.pdb -s:srcsrv
-@echo %temp%\srcsrv\pdbstr -r -p:etwsymbols\UIforETWStatic_devrel32.pdb -s:srcsrv
 :NoSourceIndexing
 
 @rem Copy the critical PE files to the symbol server as well, to demonstrate best practices.

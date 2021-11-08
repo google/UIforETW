@@ -1,5 +1,6 @@
 .aps
 
+UIforETW32.exe
 .csv
 .etl
 .exp
