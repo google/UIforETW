@@ -1,7 +1,7 @@
 import os
 import sys
 
-prefix = 'constexpr float kCurrentVersion = '
+prefix = 'const float kCurrentVersion = '
 
 version_header = sys.argv[1]
 for line in open(version_header).readlines():
