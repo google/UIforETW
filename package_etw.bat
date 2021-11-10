@@ -16,12 +16,17 @@ mkdir %destdir%\lib
 mkdir %destdir%\third_party
 mkdir %symboldir%
 
-set wptredistmsi=Windows Performance Toolkit\Redistributables\WPTx64 (DesktopEditions)-x86_en-us.msi
+@rem Prerequisite for the WPT installer
+set wptredistmsi1=Windows Performance Toolkit\Redistributables\WPTx64 (OnecoreUAP)-x86_en-us.msi
+@rem The WPT installer
+set wptredistmsi2=Windows Performance Toolkit\Redistributables\WPTx64 (DesktopEditions)-x86_en-us.msi
 
 set wpt10=c:\Program Files (x86)\Windows Kits\10\
-if not exist "%wpt10%%wptredistmsi%" goto nowpt10
+if not exist "%wpt10%%wptredistmsi1%" goto nowpt10
+if not exist "%wpt10%%wptredistmsi2%" goto nowpt10
 mkdir %destdir%\third_party\wpt10
-xcopy "%wpt10%%wptredistmsi%" %destdir%\third_party\wpt10
+xcopy "%wpt10%%wptredistmsi1%" %destdir%\third_party\wpt10
+xcopy "%wpt10%%wptredistmsi2%" %destdir%\third_party\wpt10
 @if errorlevel 1 goto copyfailure
 xcopy "%wpt10%Licenses\10.0.22000.0\sdk_license.rtf" %destdir%\third_party\wpt10
 @if errorlevel 1 goto copyfailure

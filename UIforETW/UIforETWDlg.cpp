@@ -452,14 +452,25 @@ BOOL CUIforETWDlg::OnInitDialog()
 		// Install 64-bit WPT 10 if needed and if available.
 		if (xperfVersion < preferredXperfVersion)
 		{
-			const std::wstring installPath10 = CanonicalizePath(GetExeDir() + L"..\\third_party\\wpt10\\WPTx64 (DesktopEditions)-x86_en-us.msi");
-			if (PathFileExists(installPath10.c_str()))
+			const std::wstring installPath10[] =
 			{
-				ChildProcess child(msiExecPath);
-				std::wstring args = L" /i \"" + installPath10 + L"\"";
-				child.Run(true, L"msiexec.exe" + args);
-				const DWORD installResult10 = child.GetExitCode();
-				if (!installResult10)
+				CanonicalizePath(GetExeDir() + L"..\\third_party\\wpt10\\WPTx64 (OnecoreUAP)-x86_en-us.msi"),
+				CanonicalizePath(GetExeDir() + L"..\\third_party\\wpt10\\WPTx64 (DesktopEditions)-x86_en-us.msi"),
+			};
+			if (PathFileExists(installPath10[0].c_str()) && PathFileExists(installPath10[1].c_str()))
+			{
+				bool success = true;
+				DWORD installResult10 = 0;
+				for (const auto& installPath : installPath10)
+				{
+					ChildProcess child(msiExecPath);
+					std::wstring args = L" /i \"" + installPath + L"\"";
+					child.Run(true, L"msiexec.exe" + args);
+					installResult10 = child.GetExitCode();
+					if (installResult10)
+						success = false;
+				}
+				if (success)
 				{
 					xperfVersion = GetFileVersion(GetXperfPath());
 					outputPrintf(L"WPT version %llu.%llu.%llu.%llu was installed.\n",
