@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.28803.202
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31919.166
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IdentifyChromeProcesses", "IdentifyChromeProcesses\IdentifyChromeProcesses.csproj", "{42AC0C9A-BBE7-4C8E-BB00-84D9C9FC8EE3}"
 EndProject
@@ -10,6 +10,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HeapSnapshotCompare", "HeapSnapshotCompare\HeapSnapshotCompare.csproj", "{96201BE4-B511-49A3-A98D-537B77E054C6}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VideoConfCPUCounters", "VideoConfCPUCounters\VideoConfCPUCounters.csproj", "{C37B7893-D2B9-4DA1-835C-04339B38BFF7}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IdleWakeups", "IdleWakeups\IdleWakeups.csproj", "{3CD706EF-50E6-46EF-BF11-3AFB86C57E10}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -69,6 +71,18 @@ Global
 		{C37B7893-D2B9-4DA1-835C-04339B38BFF7}.Release|x64.Build.0 = Release|Any CPU
 		{C37B7893-D2B9-4DA1-835C-04339B38BFF7}.Release|x86.ActiveCfg = Release|Any CPU
 		{C37B7893-D2B9-4DA1-835C-04339B38BFF7}.Release|x86.Build.0 = Release|Any CPU
+		{3CD706EF-50E6-46EF-BF11-3AFB86C57E10}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3CD706EF-50E6-46EF-BF11-3AFB86C57E10}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3CD706EF-50E6-46EF-BF11-3AFB86C57E10}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{3CD706EF-50E6-46EF-BF11-3AFB86C57E10}.Debug|x64.Build.0 = Debug|Any CPU
+		{3CD706EF-50E6-46EF-BF11-3AFB86C57E10}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{3CD706EF-50E6-46EF-BF11-3AFB86C57E10}.Debug|x86.Build.0 = Debug|Any CPU
+		{3CD706EF-50E6-46EF-BF11-3AFB86C57E10}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3CD706EF-50E6-46EF-BF11-3AFB86C57E10}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3CD706EF-50E6-46EF-BF11-3AFB86C57E10}.Release|x64.ActiveCfg = Release|Any CPU
+		{3CD706EF-50E6-46EF-BF11-3AFB86C57E10}.Release|x64.Build.0 = Release|Any CPU
+		{3CD706EF-50E6-46EF-BF11-3AFB86C57E10}.Release|x86.ActiveCfg = Release|Any CPU
+		{3CD706EF-50E6-46EF-BF11-3AFB86C57E10}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

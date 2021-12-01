@@ -14,6 +14,7 @@
 *.svg
 *.pdb
 *.user
+*.launchSettings.json
 # New Visual Studio 2015 intellisense DB files
 # http://blogs.msdn.com/b/vcblog/archive/2015/11/11/new-improved-and-faster-database-engine.aspx
 *.VC.db
@@ -40,6 +41,9 @@ etwpackage/
 etwpackage*.zip
 etwsymbols*.zip
 sourceindex.txt
+
+# Avoid shipping nuget files and others in /obj/ directories.
+obj/
 
 Debug/
 Release/
