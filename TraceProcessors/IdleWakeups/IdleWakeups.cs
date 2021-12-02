@@ -26,6 +26,40 @@ limitations under the License.
 using Microsoft.Windows.EventTracing;
 class IdleWakeups
 {
+    static void ProcessTrace(ITraceProcessor trace)
+    {
+        // Specify what data we want, process the trace, then get the data.
+        var pendingContextSwitchData = trace.UseContextSwitchData();
+        trace.Process();
+        var csData = pendingContextSwitchData.Result;
+
+        long chromeSwitches = 0;
+        long chromeIdleSwitches = 0;
+        // Iterate through all context switches in the trace.
+        foreach (var contextSwitch in csData.ContextSwitches)
+        {
+            var imageName = contextSwitch.SwitchIn.Process.ImageName;
+            var oldImageName = contextSwitch.SwitchOut.Process.ImageName;
+            // Gets the stack of the thread switching in.
+            var callStack = contextSwitch.SwitchIn.Stack;
+            if (imageName == "chrome.exe")
+            {
+                chromeSwitches++;
+                if (oldImageName == "Idle")
+                {
+                    chromeIdleSwitches++;
+                    if (callStack != null)
+                    {
+                        Console.WriteLine("IThreadStack.IsIdle: {0}", callStack.IsIdle);
+                    }
+                }
+            }
+        }
+        Console.WriteLine("{0} idlewakeups out of {1} context switches ({2:P}).",
+            chromeIdleSwitches, chromeSwitches,
+            chromeIdleSwitches / (double)chromeSwitches);
+    }
+
     static void Main(string[] args)
     {
         foreach (string traceName in args)
@@ -36,31 +70,22 @@ class IdleWakeups
                 // Don't print a setup message on first run.
                 SuppressFirstTimeSetupMessage = true
             };
-            using (ITraceProcessor trace = TraceProcessor.Create(traceName, settings))
+            try
             {
-                // Specify what data we want, process the trace, then get the data.
-                var pendingContextSwitchData = trace.UseContextSwitchData();
-                trace.Process();
-                var csData = pendingContextSwitchData.Result;
+                using (ITraceProcessor trace = TraceProcessor.Create(traceName, settings))
+                    ProcessTrace(trace);
+            }
+            catch (TraceLostEventsException e)
+            {
+                Console.WriteLine(e.Message);
+                Console.WriteLine("Trying again with AllowLostEvents specified. Results may be less reliable.");
+                Console.WriteLine();
 
-                long chromeSwitches = 0;
-                long chromeIdleSwitches = 0;
-                // Iterate through all context switches in the trace.
-                foreach (var contextSwitch in csData.ContextSwitches)
-                {
-                    var imageName = contextSwitch.SwitchIn.Process.ImageName;
-                    var oldImageName = contextSwitch.SwitchOut.Process.ImageName;
-                    if (imageName == "chrome.exe")
-                    {
-                        chromeSwitches++;
-                        if (oldImageName == "Idle")
-                            chromeIdleSwitches++;
-                    }
-                }
-                Console.WriteLine("{0} idlewakeups out of {1} context switches ({2:P}).",
-                    chromeIdleSwitches, chromeSwitches,
-                    chromeIdleSwitches / (double)chromeSwitches);
+                settings.AllowLostEvents = true;
+                using (ITraceProcessor trace = TraceProcessor.Create(traceName, settings))
+                    ProcessTrace(trace);
             }
         }
     }
 }
+
