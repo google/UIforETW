@@ -141,59 +141,59 @@ for x in range(len(l) - 1):
       print('Missing cswitch line at line %d' % x)
       sys.exit(0)
 
+summarizeByName = True
+filter_by_process_name = False
 if len(sys.argv) == 2:
   mincounter = 500000
   print('Printing collated data for process names where the second counter exceeds %d' % mincounter)
 else:
-  substring = sys.argv[2].lower()
-  print('Printing per-process-data for processes that contain "%s"' % substring)
+  mincounter = 0
+  filter_substring = sys.argv[2].lower()
+  print('Printing per-process-data for processes that contain "%s"' % filter_substring)
+  filter_by_process_name = True
+  # If we are filtering to a specific process name then we cannot
+  # also summarize by name.
+  summarizeByName = False
 
 counterDescription = '<unknown counters>'
 if description:
   counterDescription = ',' + ','.join(description.split(',')[3:])
 
-format = '%43s: %6.2f%%,   [' + ','.join(4 * ['%10d']) + '], %5d context switches, time: %8d'
-
 print('%43s: cnt1/cnt2%s' % ('Process name', counterDescription))
-procnameTotals = {}
+totals_to_print = {}
 for process in countersByProcess.keys():
   totals = countersByProcess[process]
   assert(len(totals) == num_counters)
   # Extract the .exe name and separate it from the PID.
   match = re.match(r'(.*).exe \(\d+\)', process)
-  summarizeByName = True
-  if len(sys.argv) > 2:
-    # If we are filtering to a specific process name then we cannot
-    # also summarize by name.
-    summarizeByName = False
   if match:
     if summarizeByName:
       procname = match.groups()[0]
     else:
+      # If not summarizing by name then we group data by name (PID).
       procname = process
     # First num_counters values are the CPU performance counters. The next two are contextSwitches and cpuTime.
-    data = procnameTotals.get(procname, (num_counters + 2) * [0])
+    data = totals_to_print.get(procname, (num_counters + 2) * [0])
     # Extend the totals list so that it also contains contextSwitches and cpuTime
     totals += [contextSwitchesByProcess[process], cpuTimeByProcess[process]]
-    procnameTotals[procname] = list(map(lambda x, y: x + y, data, totals))
-  # Filter to the specific process substring if requested.
-  if len(sys.argv) > 2 and process.lower().count(substring) > 0:
-    totals0, totals1 = procnameTotals[procname][:2]
-    args = tuple([procname, totals0 * 100.0 / totals1] + procnameTotals[procname])
-    print(format % args)
+    if not filter_by_process_name or process.lower().count(filter_substring) > 0:
+      totals_to_print[procname] = list(map(lambda x, y: x + y, data, totals))
 
-if len(sys.argv) == 2:
+if totals_to_print:
   # Put one of the values and the keys into tuples, sort by the selected
   # value, extract back out into two lists and grab the keys, which are
   # now sorted by the specified value. The index in the map lambda specifies
-  # which of the values from the stored tuple is used for sorting.
-  sortingValues = list(map(lambda x: x[3], procnameTotals.values()))
-  orderedKeys = list(list(zip(*sorted(zip(sortingValues, procnameTotals.keys()))))[1])
+  # which of the values from the stored tuple is used for sorting. The -1
+  # index is the time field (unclear units).
+  sortingValues = list(map(lambda x: x[-1], totals_to_print.values()))
+  orderedKeys = list(list(zip(*sorted(zip(sortingValues, totals_to_print.keys()))))[1])
   orderedKeys.reverse()
 
+  format = '%43s: %6.2f%%,   [' + ','.join(num_counters * ['%11d']) + '], %5d context switches, time: %8d'
+
   for procname in orderedKeys:
-    totals0, totals1 = procnameTotals[procname][:2]
+    totals0, totals1 = totals_to_print[procname][:2]
     # Arbitrary filtering to just get the most interesting data.
     if totals1 > mincounter:
-      args = tuple([procname, totals0 * 100.0 / totals1] + procnameTotals[procname])
+      args = tuple([procname, totals0 * 100.0 / totals1] + totals_to_print[procname])
       print(format % args)
