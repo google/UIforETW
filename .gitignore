@@ -19,6 +19,7 @@
 # http://blogs.msdn.com/b/vcblog/archive/2015/11/11/new-improved-and-faster-database-engine.aspx
 *.VC.db
 symsrv.yes
+pmc_counters_test.txt
 
 # GPUView likes to drop these files when run.
 FuncStats.txt
