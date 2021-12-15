@@ -62,15 +62,17 @@ Error: Description for thread state (9) could not be found. Thread state array o
  
 """
 
+from __future__ import print_function
+
 import re
 import sys
 
 if len(sys.argv) <= 1:
-  print 'Usage: %s xperfoutput [processname]' % sys.argv[0]
-  print 'The first parameter is the name of a file containing the results'
-  print 'of "xperf -i trace.etl". The second (optional) parameter is a'
-  print 'process name substring filter used to restrict which results are'
-  print 'shown - only processes that match are displayed.'
+  print('Usage: %s xperfoutput [processname]' % sys.argv[0])
+  print('The first parameter is the name of a file containing the results')
+  print('of "xperf -i trace.etl". The second (optional) parameter is a')
+  print('process name substring filter used to restrict which results are')
+  print('shown - only processes that match are displayed.')
   sys.exit(0)
 
 xperfoutputfilename = sys.argv[1]
@@ -95,37 +97,39 @@ processByCPU = {} # Which process has been switched in to a particular CPU
 description = None
 
 for x in range(len(l) - 1):
-  if l[x].startswith("                    Pmc,"):
-    pmc_parts = l[x].split(",")
+  if l[x].startswith('                    Pmc,'):
+    pmc_parts = l[x].split(',')
     if not description:
       # Grab the description of the Pmc counter records, see how many counters
       # there are, and print the description.
       num_counters = len(pmc_parts) - 3
       description = l[x].strip()
       continue
-    counters = map(int, pmc_parts[3:])
+    counters = list(map(int, pmc_parts[3:]))
+    assert(len(counters) == num_counters)
     # Look for a CSwitch line. Ideally it will be next, but sometimes an Error: line
     # might be in-between.
-    cswitch_line = ""
-    if l[x+1].startswith("                CSwitch,"):
+    cswitch_line = ''
+    if l[x+1].startswith('                CSwitch,'):
       cswitch_line = l[x+1]
-    elif l[x+1].startswith("Error: ") and l[x+2].startswith("                CSwitch,"):
+    elif l[x+1].startswith('Error: ') and l[x+2].startswith('                CSwitch,'):
       cswitch_line = l[x+2]
     if cswitch_line:
-      cswitch_parts = cswitch_line.split(",")
+      cswitch_parts = cswitch_line.split(',')
       CPU = int(cswitch_parts[16].strip())
       process = cswitch_parts[2].strip()
       timeStamp = int(cswitch_parts[1])
       # See if we've got previous Pmc records for this CPU:
-      if countersByCPU.has_key(CPU):
-        diffs = map(lambda a,b : a - b, counters, countersByCPU[CPU])
+      if CPU in countersByCPU:
+        diffs = list(map(lambda a,b : a - b, counters, countersByCPU[CPU]))
         old_process = cswitch_parts[8].strip()
         # Sanity checking...
         if old_process != processByCPU[CPU]:
-          print "Old process mismatch at line %d, %s versus %s" % (x, old_process, processByCPU[CPU])
+          print('Old process mismatch at line %d, %s versus %s' % (x, old_process, processByCPU[CPU]))
           sys.exit(0)
-        if old_process != "Idle (   0)":
-          countersByProcess[old_process] = map(lambda x, y: x + y, countersByProcess.get(old_process, num_counters * [0]), diffs)
+        if old_process != 'Idle (   0)':
+          countersByProcess[old_process] = list(map(lambda x, y: x + y, countersByProcess.get(old_process, num_counters * [0]), diffs))
+          assert(len(countersByProcess[old_process]) == num_counters)
           contextSwitchesByProcess[old_process] = contextSwitchesByProcess.get(old_process, 0) + 1
           cpuTimeByProcess[old_process] = cpuTimeByProcess.get(old_process, 0) + (timeStamp - lastCSwitchTimeByCPU[CPU])
 
@@ -134,51 +138,62 @@ for x in range(len(l) - 1):
       countersByCPU[CPU] = counters
       lastLineByCPU[CPU] = x
     else:
-      print "Missing cswitch line at line %d" % x
+      print('Missing cswitch line at line %d' % x)
       sys.exit(0)
 
 if len(sys.argv) == 2:
   mincounter = 500000
-  print 'Printing collated data for process names where the second counter exceeds %d' % mincounter
+  print('Printing collated data for process names where the second counter exceeds %d' % mincounter)
 else:
   substring = sys.argv[2].lower()
-  print 'Printing per-process-data for processes that contain "%s"' % substring
+  print('Printing per-process-data for processes that contain "%s"' % substring)
 
-counterDescription = "<unknown counters>"
+counterDescription = '<unknown counters>'
 if description:
   counterDescription = ',' + ','.join(description.split(',')[3:])
 
-print "%43s: cnt1/cnt2%s" % ("Process name", counterDescription)
+format = '%43s: %6.2f%%,   [' + ','.join(4 * ['%10d']) + '], %5d context switches, time: %8d'
+
+print('%43s: cnt1/cnt2%s' % ('Process name', counterDescription))
 procnameTotals = {}
 for process in countersByProcess.keys():
   totals = countersByProcess[process]
+  assert(len(totals) == num_counters)
   # Extract the .exe name and separate it from the PID.
-  match = re.match(r"(.*).exe \(\d+\)", process)
+  match = re.match(r'(.*).exe \(\d+\)', process)
+  summarizeByName = True
+  if len(sys.argv) > 2:
+    # If we are filtering to a specific process name then we cannot
+    # also summarize by name.
+    summarizeByName = False
   if match:
-    procname = match.groups()[0]
-    counter0, counter1, contextSwitches, cpuTime = procnameTotals.get(procname, (0, 0, 0, 0))
-    procnameTotals[procname] = (counter0 + totals[0],
-                                counter1 + totals[1],
-                                contextSwitches + contextSwitchesByProcess[process],
-                                cpuTime + cpuTimeByProcess[process])
+    if summarizeByName:
+      procname = match.groups()[0]
+    else:
+      procname = process
+    # First num_counters values are the CPU performance counters. The next two are contextSwitches and cpuTime.
+    data = procnameTotals.get(procname, (num_counters + 2) * [0])
+    # Extend the totals list so that it also contains contextSwitches and cpuTime
+    totals += [contextSwitchesByProcess[process], cpuTimeByProcess[process]]
+    procnameTotals[procname] = list(map(lambda x, y: x + y, data, totals))
   # Filter to the specific process substring if requested.
   if len(sys.argv) > 2 and process.lower().count(substring) > 0:
-    print "%43s: %5.2f%%,   [%9d,%11d], %5d context switches, time: %8d" % (process,
-          totals[0] * 100.0 / totals[1], totals[0], totals[1],
-          contextSwitchesByProcess[process], cpuTimeByProcess[process])
+    totals0, totals1 = procnameTotals[procname][:2]
+    args = tuple([procname, totals0 * 100.0 / totals1] + procnameTotals[procname])
+    print(format % args)
 
 if len(sys.argv) == 2:
   # Put one of the values and the keys into tuples, sort by the selected
   # value, extract back out into two lists and grab the keys, which are
   # now sorted by the specified value. The index in the map lambda specifies
   # which of the values from the stored tuple is used for sorting.
-  sortingValues = map(lambda x: x[3], procnameTotals.values())
-  orderedKeys = list(zip(*sorted(zip(sortingValues, procnameTotals.keys())))[1])
+  sortingValues = list(map(lambda x: x[3], procnameTotals.values()))
+  orderedKeys = list(list(zip(*sorted(zip(sortingValues, procnameTotals.keys()))))[1])
   orderedKeys.reverse()
 
   for procname in orderedKeys:
-    totals0, totals1, contextSwitches, cpuTime = procnameTotals[procname]
+    totals0, totals1 = procnameTotals[procname][:2]
     # Arbitrary filtering to just get the most interesting data.
     if totals1 > mincounter:
-      print "%43s: %5.2f%%,   [%9d,%11d], %5d context switches, time: %8d" % (procname,
-            totals0 * 100.0 / totals1, totals0, totals1, contextSwitches, cpuTime)
+      args = tuple([procname, totals0 * 100.0 / totals1] + procnameTotals[procname])
+      print(format % args)
