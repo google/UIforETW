@@ -56,6 +56,7 @@ parser.set_defaults(output=os.environ['temp'])
 parser.add_argument('-n', '--numshow', help='Number of top processes to generate flame graph for. Default is 1', type=int)
 parser.set_defaults(numshow=1)
 parser.add_argument('-d', '--dontopen', help='Do not open the generated SVG file automatically. Default is open', action='store_true')
+parser.add_argument('-c', '--collapsethreads', help='Collapse all threads in a process together. Default is to keep threads separate', action='store_true')
 parser.set_defaults(dontopen=False)
 args = parser.parse_args()
 
@@ -140,7 +141,13 @@ for line in open(csvName).readlines()[1:]:
 	stackSummary = stackSummary.replace('/', ';')
 	#stackSummary = 'A;B;C'
 
-	processAndThread = '%s_%s' % (process.replace(' ', '_'), threadID)
+	if args.collapseprocesses:
+		# Omit the thread ID from the collation ID and final file name.
+		processAndThread = '%s' % (process.replace(' ', '_'))
+		# Add a fake stack entry at the root that is the thread ID.
+		stackSummary = ('TID:%s;' % threadID) + stackSummary
+	else:
+		processAndThread = '%s_%s' % (process.replace(' ', '_'), threadID)
 	processAndThread = processAndThread.replace('(', '')
 	processAndThread = processAndThread.replace(')', '')
 	# Add the record to the nested dictionary, and increment the count
