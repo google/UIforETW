@@ -1,0 +1,7 @@
+# Ignore reason: These signed files all come from a Microsoft SDK and are needed for UIforETW's functionality.
+ignorePaths:
+- third_party/dbghelp.dll
+- third_party/pdbcopy.exe
+- third_party/symsrv.dll
+- third_party/x64/dbghelp.dll
+- third_party/x64/symsrv.dll
