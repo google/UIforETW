@@ -49,6 +49,23 @@ cd /d %UIforETW%ETWInsights
 devenv /rebuild "release|Win32" ETWInsights.sln
 @if ERRORLEVEL 1 goto BuildFailure
 xcopy Release\flame_graph.exe %UIforETW%\bin /y
+cd /d %UIforETW%
+
+@echo Building DummyChrome (DLL for registering Chrome ETW events)
+devenv /rebuild "release|Win32" DummyChrome\DummyChrome.sln
+@if ERRORLEVEL 1 goto BuildFailure
+
+@echo Building ETWProviders (three versions)
+devenv /rebuild "release|Win32" ETWProviders\ETWProviders.sln
+@if ERRORLEVEL 1 goto BuildFailure
+devenv /rebuild "release|x64" ETWProviders\ETWProviders.sln
+@if ERRORLEVEL 1 goto BuildFailure
+devenv /rebuild "release|arm64" ETWProviders\ETWProviders.sln
+@if ERRORLEVEL 1 goto BuildFailure
+
+@echo Building RetrieveSymbols
+devenv /rebuild "release|Win32" RetrieveSymbols\RetrieveSymbols.sln
+@if ERRORLEVEL 1 goto BuildFailure
 
 cd /d %UIforETW%UIforETW
 @rem Modify the UIforETW project to be statically linked and build that version
