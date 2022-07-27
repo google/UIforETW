@@ -33,11 +33,11 @@ xcopy "%wpt10%Licenses\10.0.22000.0\sdk_license.rtf" %destdir%\third_party\wpt10
 ren %destdir%\third_party\wpt10\sdk_license.rtf LICENSE.rtf
 
 @rem Add VS tools to the path. Also adds signtool.exe to the path.
-set vcvars32="C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvars32.bat"
+set vcvars32="c:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvarsall.bat"
 if exist %vcvars32% goto community_installed
-set vcvars32="C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Auxiliary\Build\vcvars32.bat"
+set vcvars32="C:\Program Files\Microsoft Visual Studio\2022\Professional\VC\Auxiliary\Build\vcvarsall.bat"
 :community_installed
-call %vcvars32%
+call %vcvars32% amd64
 
 @rem Build DelayedCreateProcess.exe to the bin directory
 @echo Building DelayedCreateProcess.exe
