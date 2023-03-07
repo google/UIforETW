@@ -17,9 +17,9 @@ mkdir %destdir%\third_party
 mkdir %symboldir%
 
 @rem Prerequisite for the WPT installer
-set wptredistmsi1=Windows Performance Toolkit\Redistributables\WPTx64 (OnecoreUAP)-x86_en-us.msi
+set wptredistmsi1=Windows Performance Toolkit\Redistributables\WPTx64 (OnecoreUAP)-x64_en-us.msi
 @rem The WPT installer
-set wptredistmsi2=Windows Performance Toolkit\Redistributables\WPTx64 (DesktopEditions)-x86_en-us.msi
+set wptredistmsi2=Windows Performance Toolkit\Redistributables\WPTx64 (DesktopEditions)-x64_en-us.msi
 
 set wpt10=c:\Program Files (x86)\Windows Kits\10\
 if not exist "%wpt10%%wptredistmsi1%" goto nowpt10

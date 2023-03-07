@@ -437,8 +437,8 @@ BOOL CUIforETWDlg::OnInitDialog()
 
 	auto xperfVersion = GetFileVersion(GetXperfPath());
 	constexpr int64_t requiredXperfVersion = (10llu << 48) + 0 + (10586llu << 16) + (15llu << 0);
-	// Windows 10 spring 2019 version, 10.0.18362.1 - requires Windows 8 or higher?
-	constexpr int64_t preferredXperfVersion = (10llu << 48) + 0 + (22000llu << 16) + (194llu << 0);
+	// Windows 11 22H2 version, requires Windows 8 or higher?
+	constexpr int64_t preferredXperfVersion = (10llu << 48) + 0 + (22621llu << 16) + (755llu << 0);
 
 	wchar_t systemDir[MAX_PATH];
 	systemDir[0] = 0;
@@ -454,8 +454,8 @@ BOOL CUIforETWDlg::OnInitDialog()
 		{
 			const std::wstring installPath10[] =
 			{
-				CanonicalizePath(GetExeDir() + L"..\\third_party\\wpt10\\WPTx64 (OnecoreUAP)-x86_en-us.msi"),
-				CanonicalizePath(GetExeDir() + L"..\\third_party\\wpt10\\WPTx64 (DesktopEditions)-x86_en-us.msi"),
+				CanonicalizePath(GetExeDir() + L"..\\third_party\\wpt10\\WPTx64 (OnecoreUAP)-x64_en-us.msi"),
+				CanonicalizePath(GetExeDir() + L"..\\third_party\\wpt10\\WPTx64 (DesktopEditions)-x64_en-us.msi"),
 			};
 			if (PathFileExists(installPath10[0].c_str()) && PathFileExists(installPath10[1].c_str()))
 			{
