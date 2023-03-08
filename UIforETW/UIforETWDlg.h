@@ -185,6 +185,7 @@ private:
 	// false), saving the trace as well if bSaveTrace is true.
 	void StopTracingAndMaybeRecord(bool bSaveTrace);
 
+	void GetInstallFolder();
 	std::wstring GetXperfPath() const { return wpt10Dir_ + L"xperf.exe"; }
 	std::wstring GetTraceDir() const { return traceDir_; }
 	std::wstring GetExeDir() const;

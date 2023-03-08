@@ -335,6 +335,51 @@ void CUIforETWDlg::CheckSymbolDLLs()
 	}
 }
 
+void CUIforETWDlg::GetInstallFolder()
+{
+	// The WPT installer is always a 32-bit installer, so we look for it in
+	// ProgramFilesX86 / WOW6432Node, on 32-bit and 64-bit operating systems.
+	wpt10Dir_ = ReadRegistryString(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Microsoft SDKs\\Windows\\v10.0", L"InstallationFolder", true);
+	if (!wpt10Dir_.empty())
+	{
+		EnsureEndsWithDirSeparator(wpt10Dir_);
+		wpt10Dir_ += L"Windows Performance Toolkit\\";
+	}
+
+	// Look for alternate install paths if needed.
+	{
+		const wchar_t* const suffix = L"\\Windows Kits\\10\\Windows Performance Toolkit\\";
+		wchar_t* progFilesx86Dir = nullptr;
+		if (!SUCCEEDED(SHGetKnownFolderPath(FOLDERID_ProgramFilesX86, 0, nullptr, &progFilesx86Dir)))
+			std::terminate();
+		std::wstring windowsKits86Dir = progFilesx86Dir;
+		CoTaskMemFree(progFilesx86Dir);
+		windowsKits86Dir += suffix;
+
+		wchar_t* progFilesDir = nullptr;
+		if (!SUCCEEDED(SHGetKnownFolderPath(FOLDERID_ProgramFiles, 0, nullptr, &progFilesDir)))
+			std::terminate();
+		std::wstring windowsKitsDir = progFilesDir;
+		CoTaskMemFree(progFilesDir);
+		windowsKitsDir += suffix;
+
+		// If the registry entries were unavailable, fall back to assuming their installation directory.
+		// Starting with the 22H2 SDK this is the ProgramFiles directory rather than ProgramFilesX86
+		if (wpt10Dir_.empty())
+		{
+			wpt10Dir_ = windowsKitsDir;
+		}
+		// If xperf.exe doesn't exist in wpt10Dir_ and it does exist elsewhere, switch to that.
+		else if (!PathFileExists((wpt10Dir_ + L"xperf.exe").c_str()))
+		{
+			if (PathFileExists((windowsKits86Dir + L"xperf.exe").c_str()))
+				wpt10Dir_ = windowsKits86Dir;
+			else if (PathFileExists((windowsKitsDir + L"xperf.exe").c_str()))
+				wpt10Dir_ = windowsKitsDir;
+		}
+	}
+}
+
 BOOL CUIforETWDlg::OnInitDialog()
 {
 	CDialog::OnInitDialog();
@@ -410,30 +455,7 @@ BOOL CUIforETWDlg::OnInitDialog()
 	systemDrive_ = static_cast<char>(windowsDir_[0]);
 	systemDrive_ += ":\\";
 
-
-	// The WPT installer is always a 32-bit installer, so we look for it in
-	// ProgramFilesX86 / WOW6432Node, on 32-bit and 64-bit operating systems.
-	wpt10Dir_ = ReadRegistryString(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Microsoft SDKs\\Windows\\v10.0", L"InstallationFolder", true);
-	if (!wpt10Dir_.empty())
-	{
-		EnsureEndsWithDirSeparator(wpt10Dir_);
-		wpt10Dir_ += L"Windows Performance Toolkit\\";
-	}
-
-	// If the registry entries were unavailable, fall back to assuming their installation directory.
-	if (wpt10Dir_.empty())
-	{
-		wchar_t* progFilesx86Dir = nullptr;
-		if (!SUCCEEDED(SHGetKnownFolderPath(FOLDERID_ProgramFilesX86, 0, nullptr, &progFilesx86Dir)))
-			std::terminate();
-		std::wstring windowsKitsDir = progFilesx86Dir;
-		CoTaskMemFree(progFilesx86Dir);
-		windowsKitsDir += L"\\Windows Kits\\";
-		if (wpt10Dir_.empty())
-		{
-			wpt10Dir_ = windowsKitsDir + L"10\\Windows Performance Toolkit\\";
-		}
-	}
+	GetInstallFolder();
 
 	auto xperfVersion = GetFileVersion(GetXperfPath());
 	constexpr int64_t requiredXperfVersion = (10llu << 48) + 0 + (10586llu << 16) + (15llu << 0);
@@ -472,6 +494,8 @@ BOOL CUIforETWDlg::OnInitDialog()
 				}
 				if (success)
 				{
+					// Re-run GetInstallFolder() to make sure we have the correct path.
+					GetInstallFolder();
 					xperfVersion = GetFileVersion(GetXperfPath());
 					outputPrintf(L"WPT version %llu.%llu.%llu.%llu was installed.\n",
 						xperfVersion >> 48, (xperfVersion >> 32) & 0xFFFF,
@@ -489,27 +513,14 @@ BOOL CUIforETWDlg::OnInitDialog()
 	// Because of bugs in the initial WPT 10 we require the TH2 version.
 	if (xperfVersion < requiredXperfVersion)
 	{
-		if (Is64BitWindows())
-		{
-			if (xperfVersion)
-				AfxMessageBox((GetXperfPath() + L" must be version 10.0.10586.15 or higher. If you run UIforETW from etwpackage.zip\n"
-					L"from https://github.com/google/UIforETW/releases\n"
-					L"then WPT will be automatically installed. Exiting.").c_str());
-			else
-				AfxMessageBox((GetXperfPath() + L" does not exist. If you run UIforETW from etwpackage.zip\n"
-					L"from https://github.com/google/UIforETW/releases\n"
-					L"then WPT will be automatically installed. Exiting.").c_str());
-		}
+		if (xperfVersion)
+			AfxMessageBox((GetXperfPath() + L" must be version 10.0.10586.15 or higher. If you run UIforETW from etwpackage.zip\n"
+				L"from https://github.com/google/UIforETW/releases\n"
+				L"then WPT will be automatically installed. Exiting.").c_str());
 		else
-		{
-			if (xperfVersion)
-				AfxMessageBox((GetXperfPath() + L" must be version 10.0.10586.15 or higher. You'll need to find the installer in the "
-					L"Windows 10 SDK or you can xcopy install it. Exiting.").c_str());
-			else
-				AfxMessageBox((GetXperfPath() + L" does not exist. You'll need to find the installer in the "
-					L"Windows 10 SDK or you can xcopy install it. Exiting.").c_str());
-		}
-		exit(10);
+			AfxMessageBox((GetXperfPath() + L" does not exist. If you run UIforETW from etwpackage.zip\n"
+				L"from https://github.com/google/UIforETW/releases\n"
+				L"then WPT will be automatically installed. Exiting.").c_str());
 	}
 
 	if (xperfVersion >= preferredXperfVersion)
