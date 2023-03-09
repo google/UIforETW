@@ -21,6 +21,13 @@
 symsrv.yes
 pmc_counters_test.txt
 
+# Binaries that are built instead of committed as of commit ea32da8
+bin/DummyChrome.dll
+bin/ETWProviders.dll
+bin/ETWProviders64.dll
+bin/ETWProvidersARM64.dll
+lib/*
+
 # GPUView likes to drop these files when run.
 FuncStats.txt
 GuidStats.txt
