@@ -60,6 +60,7 @@ const PCWSTR filtered_event_group_names[] =
 	L"blink.user_timing",                               // 0x10000
 	L"media",                                           // 0x20000
 	L"loading",                                         // 0x40000
+	L"base",                                            // 0x80000
 };
 
 // 1ULL << 61 and 1ULL << 62 are special values that indicate to Chrome to
