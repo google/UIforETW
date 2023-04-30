@@ -337,46 +337,71 @@ void CUIforETWDlg::CheckSymbolDLLs()
 
 void CUIforETWDlg::GetInstallFolder()
 {
-	// The WPT installer is always a 32-bit installer, so we look for it in
+	// The WPT installer is (was?) always a 32-bit installer, so we look for it in
 	// ProgramFilesX86 / WOW6432Node, on 32-bit and 64-bit operating systems.
 	wpt10Dir_ = ReadRegistryString(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Microsoft SDKs\\Windows\\v10.0", L"InstallationFolder", true);
 	if (!wpt10Dir_.empty())
 	{
 		EnsureEndsWithDirSeparator(wpt10Dir_);
 		wpt10Dir_ += L"Windows Performance Toolkit\\";
+		if (!PathFileExists((wpt10Dir_ + L"xperf.exe").c_str()))
+			wpt10Dir_.clear();
 	}
 
-	// Look for alternate install paths if needed.
+	// Some users (issue #159) reported that the registry key above doesn't work,
+	// and that this registry key should be used instead.
+	if (wpt10Dir_.empty())
 	{
-		const wchar_t* const suffix = L"\\Windows Kits\\10\\Windows Performance Toolkit\\";
+		// Other sources suggest looking here:
+		// HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\Windows Kits\Installed Roots
+		// https://stackoverflow.com/questions/35119223/how-to-programmatically-detect-and-locate-the-windows-10-sdk/35121768#35121768
+		wpt10Dir_ = ReadRegistryString(HKEY_LOCAL_MACHINE, L"SOFTWARE\\WOW6432Node\\Microsoft\\Windows Kits\\Installed Roots", L"KitsRoot10", true);
+		EnsureEndsWithDirSeparator(wpt10Dir_);
+		wpt10Dir_ += L"Windows Performance Toolkit\\";
+		if (!PathFileExists((wpt10Dir_ + L"xperf.exe").c_str()))
+			wpt10Dir_.clear();
+	}
+
+	// Look for alternate install paths if needed. This was needed in 2023 for
+	// when UIforETW installed WPT without first installing the SDK, causing WPT to
+	// be installed into the 64-bit program files directory, but with no
+	// InstallationFolder reg key. It's not clear whether KitsRoot10 resolves this.
+	const wchar_t* const suffix = L"\\Windows Kits\\10\\Windows Performance Toolkit\\";
+	std::wstring windowsKits86Dir;
+	{
 		wchar_t* progFilesx86Dir = nullptr;
 		if (!SUCCEEDED(SHGetKnownFolderPath(FOLDERID_ProgramFilesX86, 0, nullptr, &progFilesx86Dir)))
 			std::terminate();
-		std::wstring windowsKits86Dir = progFilesx86Dir;
+		windowsKits86Dir = progFilesx86Dir;
 		CoTaskMemFree(progFilesx86Dir);
 		windowsKits86Dir += suffix;
+	}
 
+	std::wstring windowsKitsDir;
+	{
 		wchar_t* progFilesDir = nullptr;
 		if (!SUCCEEDED(SHGetKnownFolderPath(FOLDERID_ProgramFiles, 0, nullptr, &progFilesDir)))
 			std::terminate();
-		std::wstring windowsKitsDir = progFilesDir;
+		windowsKitsDir = progFilesDir;
 		CoTaskMemFree(progFilesDir);
 		windowsKitsDir += suffix;
+	}
 
-		// If the registry entries were unavailable, fall back to assuming their installation directory.
-		// Starting with the 22H2 SDK this is the ProgramFiles directory rather than ProgramFilesX86
-		if (wpt10Dir_.empty())
-		{
+	// If the registry entries were unavailable, fall back to assuming their installation directory.
+	// Starting with the 22H2 SDK this is the ProgramFiles directory rather than ProgramFilesX86
+	if (wpt10Dir_.empty())
+	{
+		wpt10Dir_ = windowsKitsDir;
+	}
+
+	// If xperf.exe doesn't exist in wpt10Dir_ and it does exist in one of the two
+	// default paths then switch to that.
+	if (!PathFileExists((wpt10Dir_ + L"xperf.exe").c_str()))
+	{
+		if (PathFileExists((windowsKits86Dir + L"xperf.exe").c_str()))
+			wpt10Dir_ = windowsKits86Dir;
+		else if (PathFileExists((windowsKitsDir + L"xperf.exe").c_str()))
 			wpt10Dir_ = windowsKitsDir;
-		}
-		// If xperf.exe doesn't exist in wpt10Dir_ and it does exist elsewhere, switch to that.
-		else if (!PathFileExists((wpt10Dir_ + L"xperf.exe").c_str()))
-		{
-			if (PathFileExists((windowsKits86Dir + L"xperf.exe").c_str()))
-				wpt10Dir_ = windowsKits86Dir;
-			else if (PathFileExists((windowsKitsDir + L"xperf.exe").c_str()))
-				wpt10Dir_ = windowsKitsDir;
-		}
 	}
 }
 
