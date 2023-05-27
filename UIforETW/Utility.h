@@ -40,6 +40,8 @@ void CreateRegistryKey(HKEY root, const std::wstring& subkey, const std::wstring
 std::wstring ReadRegistryString(HKEY root, const std::wstring& subkey, const std::wstring& valueName, bool force32Bit);
 
 std::wstring GetEditControlText(HWND hwnd);
+// The Trimmed version trims leading and trailing whitespace.
+std::wstring GetTrimmedEditControlText(const HWND hEdit);
 std::wstring AnsiToUnicode(const std::string& text);
 
 // Return a string from a format string and some printf-style arguments.

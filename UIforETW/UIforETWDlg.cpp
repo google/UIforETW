@@ -2503,7 +2503,7 @@ void CUIforETWDlg::FinishTraceRename()
 	// Make sure this doesn't get double-called.
 	if (!btTraceNameEdit_.IsWindowVisible())
 		return;
-	std::wstring newText = GetEditControlText(btTraceNameEdit_);
+	std::wstring newText = GetTrimmedEditControlText(btTraceNameEdit_);
 	std::wstring newTraceName = newText;
 	if (validRenameDate_)
 		newTraceName = preRenameTraceName_.substr(0, kPrefixLength) + newText;

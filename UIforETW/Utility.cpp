@@ -407,6 +407,21 @@ std::wstring GetEditControlText(const HWND hEdit)
 	return &buffer[0];
 }
 
+std::wstring GetTrimmedEditControlText(const HWND hEdit)
+{
+	std::wstring text = GetEditControlText(hEdit);
+	// Trim leading and trailing spaces. Otherwise a trailing-but-invisible \n can
+	// wreak havoc. This can happen when pasting from the clipboard, even on a
+	// single-line edit control. This issue was hitting when pasting from Signal.
+	const std::wstring whitespace = L" \n\r\t\f\v";
+	const size_t start = text.find_first_not_of(whitespace);
+	if (start == std::wstring::npos)
+		return L"";
+	const size_t end = text.find_last_not_of(whitespace);
+	text = text.substr(start, end + 1 - start);
+	return text;
+}
+
 // MultiByteToWideChar: https://msdn.microsoft.com/en-us/library/windows/desktop/dd319072.aspx
 //
 // Remarks:

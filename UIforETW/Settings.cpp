@@ -260,12 +260,12 @@ BOOL CSettings::OnInitDialog()
 
 void CSettings::OnOK()
 {
-	heapTracingExes_ = GetEditControlText(btHeapTracingExe_);
-	WSMonitoredProcesses_ = GetEditControlText(btWSMonitoredProcesses_);
-	extraKernelStacks_ = GetEditControlText(btExtraStackwalks_);
-	extraKernelFlags_ = GetEditControlText(btExtraKernelFlags_);
-	extraUserProviders_ = GetEditControlText(btExtraUserProviders_);
-	perfCounters_ = GetEditControlText(btPerfCounters_);
+	heapTracingExes_ = GetTrimmedEditControlText(btHeapTracingExe_);
+	WSMonitoredProcesses_ = GetTrimmedEditControlText(btWSMonitoredProcesses_);
+	extraKernelStacks_ = GetTrimmedEditControlText(btExtraStackwalks_);
+	extraKernelFlags_ = GetTrimmedEditControlText(btExtraKernelFlags_);
+	extraUserProviders_ = GetTrimmedEditControlText(btExtraUserProviders_);
+	perfCounters_ = GetTrimmedEditControlText(btPerfCounters_);
 
 	// Extract the Chrome categories settings and put the result in chromeKeywords_.
 	chromeKeywords_ = 0;
