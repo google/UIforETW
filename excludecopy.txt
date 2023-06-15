@@ -1,4 +1,11 @@
 .aps
+.pyproj
+.sln
+.pyc
+.bak
+TestIdentifyChromeProcesses.bat
+__pycache__\
+_deb64.exe
 
 UIforETW32.exe
 .csv
