@@ -139,6 +139,10 @@ void CCPUFrequencyMonitor::Sample()
 	const DWORD actualNumberCPUs = systemInfo.dwNumberOfProcessors;
 
 	// Ask Windows what frequency it thinks the CPUs are running at.
+	// Note that PROCESSOR_POWER_INFORMATION.CurrentMhz no longer shows current
+	// MHz as of Windows 10 21H1 (19043). This is due to changes in how the CPU
+	// and OS coordinate to choose CPU frequencies. See this tweet for details:
+	// https://twitter.com/BruceDawson0xB/status/1453453602949722116
 	std::vector<PROCESSOR_POWER_INFORMATION> processorInfo(actualNumberCPUs);
 	const NTSTATUS powerStatus = CallNtPowerInformation(ProcessorInformation, nullptr,
 		0, &processorInfo[0],
