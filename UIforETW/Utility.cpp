@@ -407,13 +407,17 @@ std::wstring GetEditControlText(const HWND hEdit)
 	return &buffer[0];
 }
 
-std::wstring GetTrimmedEditControlText(const HWND hEdit)
+std::wstring GetTrimmedEditControlText(const HWND hEdit, bool trim_space)
 {
 	std::wstring text = GetEditControlText(hEdit);
-	// Trim leading and trailing spaces. Otherwise a trailing-but-invisible \n can
-	// wreak havoc. This can happen when pasting from the clipboard, even on a
-	// single-line edit control. This issue was hitting when pasting from Signal.
-	const std::wstring whitespace = L" \n\r\t\f\v";
+	// Trim leading and trailing problematic white-space. Otherwise a
+	// trailing-but-invisible \n can wreak havoc. This can happen when pasting
+	// from the clipboard, even on a single-line edit control. This issue was
+	// hitting when pasting from Signal. The space character itself is only
+	// trimmed optionally because it may be wanted, especially for trace names.
+	std::wstring whitespace = L"\n\r\t\f\v";
+	if (trim_space)
+		whitespace += ' ';
 	const size_t start = text.find_first_not_of(whitespace);
 	if (start == std::wstring::npos)
 		return L"";
