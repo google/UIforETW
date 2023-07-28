@@ -127,7 +127,7 @@ def _IdentifyChromeProcesses(tracename, show_cpu_usage, tabbed_output, return_pi
 
   for line in output.splitlines():
     # Python 3 needs the line translated from bytes to str.
-    line = line.decode()
+    line = line.decode(encoding='utf-8', errors='ignore')
     # Split the commandline from the .csv data and then extract the exePath.
     # It may or may not be quoted, and may or not have the .exe suffix.
     parts = line.split(', ')
