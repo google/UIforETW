@@ -165,7 +165,7 @@ LRESULT CALLBACK LowLevelKeyboardHook(int nCode, WPARAM wParam, LPARAM lParam)
 		ETWKeyDown(code, keyDownDetails.c_str(), 0, 0);
 	}
 
-	return CallNextHookEx(0, nCode, wParam, lParam);
+	return CallNextHookEx(nullptr, nCode, wParam, lParam);
 }
 
 _Pre_satisfies_(nCode == HC_ACTION)
@@ -228,7 +228,7 @@ LRESULT CALLBACK LowLevelMouseHook(int nCode, WPARAM wParam, LPARAM lParam) noex
 		}
 	}
 
-	return CallNextHookEx(0, nCode, wParam, lParam);
+	return CallNextHookEx(nullptr, nCode, wParam, lParam);
 }
 
 
@@ -252,30 +252,43 @@ DWORD __stdcall InputThread(LPVOID) noexcept
 	// processed in a timely manner or else bad things will happen. Doing this on a
 	// separate thread is a good idea, but even then bad things will happen to your system
 	// if you halt in a debugger. Even simple things like calling printf() from the hook
-	// can easily cause system deadlocks which render the mouse unable to move!
-	HHOOK keyHook = SetWindowsHookEx(WH_KEYBOARD_LL, LowLevelKeyboardHook, NULL, 0);
-	HHOOK mouseHook = SetWindowsHookEx(WH_MOUSE_LL, LowLevelMouseHook, NULL, 0);
+	// can easily cause system deadlocks which cause all input to be processed
+	// very slowly.
+	// The default OS hook timeout seems to be 300 ms, which is long enough to
+	// make input delays noticeable, but short enough to make the system sort of
+	// usable. You can set a shorter timeout (10 ms in this case) with this
+	// command:
+	// reg add "HKCU\Control Panel\Desktop" /v LowLevelHooksTimeout /t REG_DWORD /f /d 10
+	// Occasional input delays were, in one case, tracked down to an input hook
+	// (unknown owner) that was briefly timing out. Twitter discussion is here:
+	// https://twitter.com/BruceDawson0xB/status/1673375468127670273
+	HHOOK keyHook = SetWindowsHookEx(WH_KEYBOARD_LL, LowLevelKeyboardHook, nullptr, 0);
+	HHOOK mouseHook = SetWindowsHookEx(WH_MOUSE_LL, LowLevelMouseHook, nullptr, 0);
 
-	if (!keyHook && !mouseHook)
-		return 0;
-
-	// Run a message pump -- necessary so that the hooks will be processed
-	BOOL bRet;
-	MSG msg;
-	// Keeping pumping messages until WM_QUIT is received. If this is opened
-	// in a child thread then you can terminate it by using PostThreadMessage
-	// to send WM_QUIT.
-	while ((bRet = GetMessage(&msg, NULL, 0, 0)) != 0)
+	// Run the message pump if either hook is successfully registered (they should
+	// always both be registered).
+	if (keyHook || mouseHook)
 	{
-		if (bRet == -1)
+		// Run a message pump -- necessary so that the hooks will be processed
+		BOOL bRet;
+		MSG msg;
+		// Keeping pumping messages until WM_QUIT is received. If this is running
+		// in a child thread then you can terminate it by using PostThreadMessage
+		// to send WM_QUIT.
+		while ((bRet = GetMessageW(&msg, nullptr, 0, 0)) != 0)
 		{
-			// handle the error and possibly exit
-			break;
-		}
-		else
-		{
-			TranslateMessage(&msg);
-			DispatchMessage(&msg);
+			// GetMessageW will normally only return when WM_QUIT is received, so this
+			// loop normally doesn't ever run.
+			if (bRet == -1)
+			{
+				// Unexpected error. Quit.
+				break;
+			}
+			else
+			{
+				TranslateMessage(&msg);
+				DispatchMessage(&msg);
+			}
 		}
 	}
 
@@ -312,7 +325,7 @@ void SetKeyloggingState(enum KeyLoggerState state) noexcept
 	// it isn't running.
 	if (!s_hThread)
 	{
-		s_hThread = CreateThread(NULL, 0, InputThread, NULL, 0, &s_threadID);
+		s_hThread = CreateThread(nullptr, 0, InputThread, nullptr, 0, &s_threadID);
 	}
 
 	switch (state)
