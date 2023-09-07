@@ -58,7 +58,7 @@
 @echo Tracing ran from %starttime% to %time% > "%textfile%"
 
 @echo Trace can be loaded using UIforETW or with:
-@echo wpa "%tracefile%" -profile CPUUsageByProcess.wpaProfile
+@echo wpa "%tracefile%" -profile TransientProcessTree.wpaProfile
 @exit /b
 
 :failure
