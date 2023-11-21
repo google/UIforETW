@@ -170,6 +170,25 @@ CUIforETWApp::CUIforETWApp() noexcept
 
 CUIforETWApp theApp;
 
+BOOL CALLBACK CUIforETWApp::findDupeWindow(HWND hWnd, LPARAM lParam)
+{
+	DWORD_PTR result;
+	LRESULT msgRet = SendMessageTimeout(hWnd, uwmAreYouMe, 0, 0,
+		SMTO_BLOCK |      // Don't process any other requests until the function returns
+		SMTO_ABORTIFHUNG, // No waiting if the thread appears to not respond
+		200, &result);    // Timeout in ms
+		if(msgRet == 0)           // failed to send message to this window, ignore it
+		{
+			return TRUE;
+		}
+		if(result == uwmAreYouMe) // found a dupe window
+		{
+			HWND * target = (HWND *)lParam;
+			*target = hWnd;
+			return FALSE;           // stop window enumeration
+		}
+		return TRUE;              // not a dupe window, continue window enumeration
+}
 
 // CUIforETWApp initialization
 
@@ -191,18 +210,22 @@ BOOL CUIforETWApp::InitInstance()
 
 	SetRegistryKey(L"RandomASCII");
 
-	constexpr wchar_t identifier[] = L"{B7D2F8B8-2F28-4366-9D7A-691019D89185}";
+	constexpr wchar_t identifier[] = L"Global\\{B7D2F8B8-2F28-4366-9D7A-691019D89185}";
 	HANDLE mutex = CreateMutexW(nullptr, FALSE, identifier);
 	// Only allow one copy to be running at a time.
-	if (mutex && GetLastError() == ERROR_ALREADY_EXISTS) {
-		// Activate the previous window if possible. Note that if you have another
-		// window with this title (an explorer window for a UI for ETW folder for
-		// instance) then the wrong window may be activated. See
-		// https://github.com/google/UIforETW/issues/147 for details.
-		HWND prevWindow = FindWindow(NULL, L"UI for ETW");
-		if (prevWindow)
+	if (mutex && GetLastError() == ERROR_ALREADY_EXISTS ||
+	             GetLastError() == ERROR_ACCESS_DENIED) // created in another session
+	{
+		// Activate the previous window
+		HWND prevWindow = NULL;
+		EnumWindows(findDupeWindow,(LPARAM)&prevWindow);
+		if (prevWindow != NULL)
 		{
 			SetForegroundWindow(prevWindow);
+			if (IsIconic(prevWindow)) // restore minimized window
+			{
+				ShowWindow(prevWindow, SW_RESTORE);
+			}
 		}
 
 		// Already running.
