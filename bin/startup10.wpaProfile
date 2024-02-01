@@ -10,7 +10,7 @@
       <View Guid="67b8486a-9cc3-4d36-978b-cfc07051f750" IsVisible="true" Title="Analysis">
         <Graphs>
           <Graph Guid="04f69f98-176e-4d1c-b44e-97f734996ab8" LayoutStyle="All" Color="#FF005DE0" GraphHeight="46" IsMinimized="false" IsShown="true" IsExpanded="false" HelpText="{}{\rtf1\ansi\ansicpg1252\uc1\htmautsp\deff2{\fonttbl{\f0\fcharset0 Times New Roman;}{\f2\fcharset0 Segoe UI;}}{\colortbl\red0\green0\blue0;\red255\green255\blue255;}\loch\hich\dbch\pard\plain\ltrpar\itap0{\lang1033\fs18\f2\cf0 \cf0\ql{\f2 {\ltrch Shows every event in the trace, including the associated payload fields.}\li0\ri0\sa0\sb0\fi0\ql\par}&#xD;&#xA;{\f2 \li0\ri0\sa0\sb0\fi0\ql\par}&#xD;&#xA;{\f2 {\ltrch New capability - graph payload fields!}\li0\ri0\sa0\sb0\fi0\ql\par}&#xD;&#xA;{\f2 \li0\ri0\sa0\sb0\fi0\ql\par}&#xD;&#xA;{\f2 {\ltrch 1. Filter down to the event with the payload field you want to graph.}\li0\ri0\sa0\sb0\fi0\ql\par}&#xD;&#xA;{\f2 {\ltrch 2. Drag the column corresponding to the payload field you want to graph to the right of the blue bar.}\li0\ri0\sa0\sb0\fi0\ql\par}&#xD;&#xA;{\f2 {\ltrch 3. If the automatic graphing isn't representing your data correctly, go to View Editor and:}\li0\ri0\sa0\sb0\fi0\ql\par}&#xD;&#xA;{\f2 {\ltrch a. Adjust the aggregation mode for your column, or}\li0\ri0\sa0\sb0\fi0\ql\par}&#xD;&#xA;{\f2 {\ltrch b. Go to Advanced &gt; Graph Configuration and change your graphing aggregation mode.}\li0\ri0\sa0\sb0\fi0\ql\par}&#xD;&#xA;}&#xD;&#xA;}">
-            <Preset Name="Randomascii Chrome and Multi Events" BarGraphIntervalCount="50" IsThreadActivityTable="false" GraphColumnCount="26" KeyColumnCount="8" LeftFrozenColumnCount="7" RightFrozenColumnCount="25" InitialFilterQuery="[Provider Name]:*&quot;Multi-.*|Chrome.*&quot;" InitialFilterShouldKeep="true" GraphFilterTopValue="0" GraphFilterThresholdValue="0">
+            <Preset Name="Randomascii Chrome and Multi Events" BarGraphIntervalCount="50" IsThreadActivityTable="false" GraphColumnCount="26" KeyColumnCount="8" LeftFrozenColumnCount="7" RightFrozenColumnCount="25" InitialFilterQuery="[Provider Name]:*&quot;Multi-.*|Google.Chrome.*&quot;" InitialFilterShouldKeep="true" GraphFilterTopValue="0" GraphFilterThresholdValue="0">
               <MetadataEntries>
                 <MetadataEntry Guid="edf01e5d-3644-4dbc-ab9d-f8954e6db6ea" Name="ThreadId" ColumnMetadata="EndThreadId" />
                 <MetadataEntry Guid="bbfc990a-b6c9-4dcd-858b-f040ab4a1efe" Name="Time" ColumnMetadata="StartTime" />
@@ -654,7 +654,7 @@
               <Column Guid="bbfc990a-b6c9-4dcd-858b-f040ab4a1efe" Name="Time" SortPriority="29" Width="80" IsVisible="true" />
             </Columns>
           </Preset>
-          <Preset Name="Randomascii Graph Field 1" GraphChartType="StackedBars" BarGraphIntervalCount="50" IsThreadActivityTable="false" GraphColumnCount="26" KeyColumnCount="8" LeftFrozenColumnCount="7" RightFrozenColumnCount="25" InitialFilterQuery="[Provider Name]:*&quot;Multi-.*|Chrome.*&quot;" InitialFilterShouldKeep="true" GraphFilterTopValue="0" GraphFilterThresholdValue="0">
+          <Preset Name="Randomascii Graph Field 1" GraphChartType="StackedBars" BarGraphIntervalCount="50" IsThreadActivityTable="false" GraphColumnCount="26" KeyColumnCount="8" LeftFrozenColumnCount="7" RightFrozenColumnCount="25" InitialFilterQuery="[Provider Name]:*&quot;Multi-.*|Google.Chrome.*&quot;" InitialFilterShouldKeep="true" GraphFilterTopValue="0" GraphFilterThresholdValue="0">
             <MetadataEntries>
               <MetadataEntry Guid="edf01e5d-3644-4dbc-ab9d-f8954e6db6ea" Name="ThreadId" ColumnMetadata="EndThreadId" />
               <MetadataEntry Guid="bbfc990a-b6c9-4dcd-858b-f040ab4a1efe" Name="Time" ColumnMetadata="StartTime" />
@@ -688,7 +688,7 @@
               <Column Guid="0c5cf8cd-9b9e-5798-1a5d-09d429f7fa3c" Name="Field 1" AggregationMode="Average" SortPriority="5" Width="111" IsVisible="true" />
             </Columns>
           </Preset>
-          <Preset Name="Randomascii Graph Field 2" GraphChartType="StackedBars" BarGraphIntervalCount="50" IsThreadActivityTable="false" GraphColumnCount="26" KeyColumnCount="8" LeftFrozenColumnCount="7" RightFrozenColumnCount="25" InitialFilterQuery="[Provider Name]:*&quot;Multi-.*|Chrome.*&quot;" InitialFilterShouldKeep="true" GraphFilterColumnGuid="342f7677-17b2-4c7e-b9ec-e89612c49792" GraphFilterTopValue="0" GraphFilterThresholdValue="0">
+          <Preset Name="Randomascii Graph Field 2" GraphChartType="StackedBars" BarGraphIntervalCount="50" IsThreadActivityTable="false" GraphColumnCount="26" KeyColumnCount="8" LeftFrozenColumnCount="7" RightFrozenColumnCount="25" InitialFilterQuery="[Provider Name]:*&quot;Multi-.*|Google.Chrome.*&quot;" InitialFilterShouldKeep="true" GraphFilterColumnGuid="342f7677-17b2-4c7e-b9ec-e89612c49792" GraphFilterTopValue="0" GraphFilterThresholdValue="0">
             <MetadataEntries>
               <MetadataEntry Guid="edf01e5d-3644-4dbc-ab9d-f8954e6db6ea" Name="ThreadId" ColumnMetadata="EndThreadId" />
               <MetadataEntry Guid="bbfc990a-b6c9-4dcd-858b-f040ab4a1efe" Name="Time" ColumnMetadata="StartTime" />
@@ -722,7 +722,7 @@
               <Column Guid="71badd11-26e5-56bc-44ec-12f4cc6a8f3e" Name="Field 2" AggregationMode="Average" SortPriority="6" Width="80" IsVisible="true" />
             </Columns>
           </Preset>
-          <Preset Name="Randomascii Graph Field 3" GraphChartType="StackedBars" BarGraphIntervalCount="50" IsThreadActivityTable="false" GraphColumnCount="26" KeyColumnCount="8" LeftFrozenColumnCount="7" RightFrozenColumnCount="25" InitialFilterQuery="[Provider Name]:*&quot;Multi-.*|Chrome.*&quot;" InitialFilterShouldKeep="true" GraphFilterColumnGuid="342f7677-17b2-4c7e-b9ec-e89612c49792" GraphFilterTopValue="0" GraphFilterThresholdValue="0">
+          <Preset Name="Randomascii Graph Field 3" GraphChartType="StackedBars" BarGraphIntervalCount="50" IsThreadActivityTable="false" GraphColumnCount="26" KeyColumnCount="8" LeftFrozenColumnCount="7" RightFrozenColumnCount="25" InitialFilterQuery="[Provider Name]:*&quot;Multi-.*|Google.Chrome.*&quot;" InitialFilterShouldKeep="true" GraphFilterColumnGuid="342f7677-17b2-4c7e-b9ec-e89612c49792" GraphFilterTopValue="0" GraphFilterThresholdValue="0">
             <MetadataEntries>
               <MetadataEntry Guid="edf01e5d-3644-4dbc-ab9d-f8954e6db6ea" Name="ThreadId" ColumnMetadata="EndThreadId" />
               <MetadataEntry Guid="bbfc990a-b6c9-4dcd-858b-f040ab4a1efe" Name="Time" ColumnMetadata="StartTime" />
@@ -756,7 +756,7 @@
               <Column Guid="411dba2d-5d6e-5272-8287-636d0841768c" Name="Field 3" AggregationMode="Average" SortPriority="7" Width="80" IsVisible="true" />
             </Columns>
           </Preset>
-          <Preset Name="Randomascii Graph Field 4" GraphChartType="StackedBars" BarGraphIntervalCount="50" IsThreadActivityTable="false" GraphColumnCount="26" KeyColumnCount="8" LeftFrozenColumnCount="7" RightFrozenColumnCount="25" InitialFilterQuery="[Provider Name]:*&quot;Multi-.*|Chrome.*&quot;" InitialFilterShouldKeep="true" GraphFilterColumnGuid="342f7677-17b2-4c7e-b9ec-e89612c49792" GraphFilterTopValue="0" GraphFilterThresholdValue="0">
+          <Preset Name="Randomascii Graph Field 4" GraphChartType="StackedBars" BarGraphIntervalCount="50" IsThreadActivityTable="false" GraphColumnCount="26" KeyColumnCount="8" LeftFrozenColumnCount="7" RightFrozenColumnCount="25" InitialFilterQuery="[Provider Name]:*&quot;Multi-.*|Google.Chrome.*&quot;" InitialFilterShouldKeep="true" GraphFilterColumnGuid="342f7677-17b2-4c7e-b9ec-e89612c49792" GraphFilterTopValue="0" GraphFilterThresholdValue="0">
             <MetadataEntries>
               <MetadataEntry Guid="edf01e5d-3644-4dbc-ab9d-f8954e6db6ea" Name="ThreadId" ColumnMetadata="EndThreadId" />
               <MetadataEntry Guid="bbfc990a-b6c9-4dcd-858b-f040ab4a1efe" Name="Time" ColumnMetadata="StartTime" />
@@ -790,7 +790,7 @@
               <Column Guid="048f5050-1f17-59b3-fa22-4b0781ee630b" Name="Field 4" AggregationMode="Average" SortPriority="8" Width="80" IsVisible="true" />
             </Columns>
           </Preset>
-          <Preset Name="Randomascii Graph Field 5" GraphChartType="StackedBars" BarGraphIntervalCount="50" IsThreadActivityTable="false" GraphColumnCount="26" KeyColumnCount="8" LeftFrozenColumnCount="7" RightFrozenColumnCount="25" InitialFilterQuery="[Provider Name]:*&quot;Multi-.*|Chrome.*&quot;" InitialFilterShouldKeep="true" GraphFilterColumnGuid="342f7677-17b2-4c7e-b9ec-e89612c49792" GraphFilterTopValue="0" GraphFilterThresholdValue="0">
+          <Preset Name="Randomascii Graph Field 5" GraphChartType="StackedBars" BarGraphIntervalCount="50" IsThreadActivityTable="false" GraphColumnCount="26" KeyColumnCount="8" LeftFrozenColumnCount="7" RightFrozenColumnCount="25" InitialFilterQuery="[Provider Name]:*&quot;Multi-.*|Google.Chrome.*&quot;" InitialFilterShouldKeep="true" GraphFilterColumnGuid="342f7677-17b2-4c7e-b9ec-e89612c49792" GraphFilterTopValue="0" GraphFilterThresholdValue="0">
             <MetadataEntries>
               <MetadataEntry Guid="edf01e5d-3644-4dbc-ab9d-f8954e6db6ea" Name="ThreadId" ColumnMetadata="EndThreadId" />
               <MetadataEntry Guid="bbfc990a-b6c9-4dcd-858b-f040ab4a1efe" Name="Time" ColumnMetadata="StartTime" />
@@ -824,7 +824,7 @@
               <Column Guid="94e48f22-d499-5227-bb04-be011b4159b0" Name="Field 5" AggregationMode="Average" SortPriority="9" Width="80" IsVisible="true" />
             </Columns>
           </Preset>
-          <Preset Name="Randomascii Graph Field 6" GraphChartType="StackedBars" BarGraphIntervalCount="50" IsThreadActivityTable="false" GraphColumnCount="26" KeyColumnCount="8" LeftFrozenColumnCount="7" RightFrozenColumnCount="25" InitialFilterQuery="[Provider Name]:*&quot;Multi-.*|Chrome.*&quot;" InitialFilterShouldKeep="true" GraphFilterColumnGuid="342f7677-17b2-4c7e-b9ec-e89612c49792" GraphFilterTopValue="0" GraphFilterThresholdValue="0">
+          <Preset Name="Randomascii Graph Field 6" GraphChartType="StackedBars" BarGraphIntervalCount="50" IsThreadActivityTable="false" GraphColumnCount="26" KeyColumnCount="8" LeftFrozenColumnCount="7" RightFrozenColumnCount="25" InitialFilterQuery="[Provider Name]:*&quot;Multi-.*|Google.Chrome.*&quot;" InitialFilterShouldKeep="true" GraphFilterColumnGuid="342f7677-17b2-4c7e-b9ec-e89612c49792" GraphFilterTopValue="0" GraphFilterThresholdValue="0">
             <MetadataEntries>
               <MetadataEntry Guid="edf01e5d-3644-4dbc-ab9d-f8954e6db6ea" Name="ThreadId" ColumnMetadata="EndThreadId" />
               <MetadataEntry Guid="bbfc990a-b6c9-4dcd-858b-f040ab4a1efe" Name="Time" ColumnMetadata="StartTime" />
@@ -858,7 +858,7 @@
               <Column Guid="c1054028-424a-59ba-e760-6d30abbd69c5" Name="Field 6" AggregationMode="Average" SortPriority="10" Width="80" IsVisible="true" />
             </Columns>
           </Preset>
-          <Preset Name="Randomascii Chrome and Multi Events" BarGraphIntervalCount="50" IsThreadActivityTable="false" GraphColumnCount="26" KeyColumnCount="8" LeftFrozenColumnCount="7" RightFrozenColumnCount="25" InitialFilterQuery="[Provider Name]:*&quot;Multi-.*|Chrome.*&quot;" InitialFilterShouldKeep="true" GraphFilterTopValue="0" GraphFilterThresholdValue="0">
+          <Preset Name="Randomascii Chrome and Multi Events" BarGraphIntervalCount="50" IsThreadActivityTable="false" GraphColumnCount="26" KeyColumnCount="8" LeftFrozenColumnCount="7" RightFrozenColumnCount="25" InitialFilterQuery="[Provider Name]:*&quot;Multi-.*|Google.Chrome.*&quot;" InitialFilterShouldKeep="true" GraphFilterTopValue="0" GraphFilterThresholdValue="0">
             <MetadataEntries>
               <MetadataEntry Guid="edf01e5d-3644-4dbc-ab9d-f8954e6db6ea" Name="ThreadId" ColumnMetadata="EndThreadId" />
               <MetadataEntry Guid="bbfc990a-b6c9-4dcd-858b-f040ab4a1efe" Name="Time" ColumnMetadata="StartTime" />
