@@ -220,7 +220,7 @@ def _IdentifyChromeProcesses(tracename, show_cpu_usage, tabbed_output, return_pi
       pids = pidsRe.match(line)
       pid = int(pids.groups()[0])
       parentPid = int(pids.groups()[1])
-      if pathByBrowserPid.has_key(parentPid):
+      if parentPid in pathByBrowserPid:
         browserPid = parentPid
         # Retrieve the list of processes associated with this
         # browser (parent) pid.
