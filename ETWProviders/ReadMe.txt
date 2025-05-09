@@ -3,7 +3,7 @@ projects you can make it easier to analyze ETW traces. The emitted ETW events ca
 as signposts or can contain additional context.
 
 As a sample of how to use this DLL see UIforETW and ETWEventDemo, both available at
-https://github.com/google/UIforETW.
+https://github.com/randomascii/UIforETW.
 
 UIforETW is also the recommended way to record traces that are using this DLL since it
 registers the DLL and records ETW traces that listen to its providers.

@@ -18,7 +18,6 @@ https://randomascii.wordpress.com/2013/03/26/summarizing-xperf-cpu-usage-with-fl
 
 https://randomascii.wordpress.com/2015/04/14/uiforetw-windows-performance-made-easier/
 - UIforETW.exe
-- UIforETW32.exe
 
 For a general overview of using UIforETW and ETW in general see
 https://randomascii.wordpress.com/2015/09/24/etw-central/
@@ -27,8 +26,8 @@ All of these scripts assume that you have a recent copy of the Windows
 Performance Toolkit, or WPT installed. Some of these scripts rely on Microsoft
 DLLs or executables that come with the Debuggers package, which also comes with
 the Windows SDK. The best way to get all of these is to download and unzip
-etwpackage.bat from https://github.com/google/UIforETW/releases as it contains
-the WPT installers and other binaries.
+etwpackage*.zip from https://github.com/randomascii/UIforETW/releases and run
+bin\UIforETW.exeas as that will install WPT.
 - pdbcopy.exe is used by StripChromeSymbols.py which is used by etwrecord.bat
 if you are using the Chromium symbol server.
 - x86 versions of dbghelp.dll and symsrv.dll are used by RetrieveSymbols.exe

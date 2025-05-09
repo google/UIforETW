@@ -495,7 +495,7 @@ BOOL CUIforETWDlg::OnInitDialog()
 	if (IsWindowsTenOrGreater() && Is64BitWindows() && PathFileExists(msiExecPath.c_str()))
 	{
 		// The installers are available as part of etwpackage.zip on
-		// https://github.com/google/UIforETW/releases
+		// https://github.com/randomascii/UIforETW/releases
 		// Install 64-bit WPT 10 if needed and if available.
 		if (xperfVersion < preferredXperfVersion)
 		{
@@ -540,11 +540,11 @@ BOOL CUIforETWDlg::OnInitDialog()
 	{
 		if (xperfVersion)
 			AfxMessageBox((GetXperfPath() + L" must be version 10.0.10586.15 or higher. If you run UIforETW from etwpackage.zip\n"
-				L"from https://github.com/google/UIforETW/releases\n"
+				L"from https://github.com/randomascii/UIforETW/releases\n"
 				L"then WPT will be automatically installed. Exiting.").c_str());
 		else
 			AfxMessageBox((GetXperfPath() + L" does not exist. If you run UIforETW from etwpackage.zip\n"
-				L"from https://github.com/google/UIforETW/releases\n"
+				L"from https://github.com/randomascii/UIforETW/releases\n"
 				L"then WPT will be automatically installed. Exiting.").c_str());
 	}
 
@@ -1124,6 +1124,7 @@ void CUIforETWDlg::OnBnClickedStarttracing()
 	// Suggested in https://github.com/google/UIforETW/issues/80. The data shows up in WPA in
 	// Memory-> Virtual Memory Snapshots. On windows 8.1 and above this makes the working set
 	// scanning in UIforETW unnecessary.
+	// google/UIforETW URL used because issues aren't copied when you fork.
 	userProviders += L"+Microsoft-Windows-Kernel-Memory:0xE0";
 	if (IsWindows8Point1OrGreater())
 	{
@@ -1259,6 +1260,7 @@ void CUIforETWDlg::OnBnClickedStarttracing()
 	if (tracingMode_ == kTracingToFile && bRecordPreTrace_)
 	{
 		// Implement the fix to https://github.com/google/UIforETW/issues/97
+		// google/UIforETW URL used because issues aren't copied when you fork.
 		// Grab an initial trace that will contain imageID, fileversion, etc., so that ETW
 		// traces that cover a Chrome upgrade will get before and after information.
 		const std::wstring imageIDCommands[] = {
@@ -1746,13 +1748,13 @@ LRESULT CUIforETWDlg::NewVersionAvailable(WPARAM wParam, LPARAM /*lParam*/)
 {
 	PackagedFloatVersion newVersion;
 	newVersion.u = static_cast<unsigned>(wParam);
-	std::wstring message = stringPrintf(L"A newer version of UIforETW is available from https://github.com/google/UIforETW/releases/\n"
+	std::wstring message = stringPrintf(L"A newer version of UIforETW is available from https://github.com/randomascii/UIforETW/releases/\n"
 		"The version you have installed is %1.2f and the new version is %1.2f.\n"
 		"Would you like to download the new version?", kCurrentVersion, newVersion.f);
 
 	const int result = AfxMessageBox(message.c_str(), MB_YESNO);
 	if (result == IDYES)
-		ShellExecute(*this, L"open", L"https://github.com/google/UIforETW/releases/", 0, L".", SW_SHOWNORMAL);
+		ShellExecute(*this, L"open", L"https://github.com/randomascii/UIforETW/releases/", 0, L".", SW_SHOWNORMAL);
 	if (result == IDNO)
 		AfxMessageBox(L"Version checking can be turned off in the settings dialog.");
 
