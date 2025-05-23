@@ -39,7 +39,7 @@ Discussion can be found here:
 https://randomascii.wordpress.com/2013/03/09/symbols-the-microsoft-way/
 
 Source code for RetrieveSymbols.exe can be found here:
-https://github.com/google/UIforETW/tree/master/RetrieveSymbols
+https://github.com/randomascii/UIforETW/tree/master/RetrieveSymbols
 
 If "chromium-browser-symsrv" is not found in _NT_SYMBOL_PATH or RetrieveSymbols.exe
 and pdbcopy.exe are not found then this script will exit early.

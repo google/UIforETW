@@ -1,3 +1,13 @@
+NOTE: You are looking at the archived repo for UIforEW.
+This repo is no longer maintained, and will not receive further updates.
+
+Development for UIforETW has moved to
+https://github.com/randomascii/UIforETW and all new releases will be at
+https://github.com/randomascii/UIforETW/releases/. Old releases can be found at
+https://github.com/google/UIforETW/releases/.
+New issues can be found at https://github.com/randomascii/UIforETW/issues. Old
+issues can be found at https://github.com/google/UIforETW/issues.
+
 UIforETW is a user interface for recording ETW (Event Tracing for
 Windows) traces, which allow amazingly deep investigations of
 performance problems on Windows. Its goals include:
@@ -36,10 +46,10 @@ EventSource providers should automatically match.
 
 If you want to use UIforETW then you should download the latest
 etwpackage.zip from the releases page at:
-https://github.com/google/UIforETW/releases
+https://github.com/randomascii/UIforETW/releases
 
 If you want to build or modify UIforETW then you should clone the repo
-from https://github.com/google/UIforETW.git and then build
+from https://github.com/randomascii/UIforETW.git and then build
 UIforETW\UIforETW.sln.
 
 Pull requests are welcomed. For information on contributing see the

@@ -117,7 +117,7 @@ xcopy %UIforETW%third_party\symsrv.dll %destdir%\bin /y
 
 @rem Sign the important (requiring elevation) binaries
 set bindir=%~dp0etwpackage\bin
-signtool sign /a /d "UIforETW" /du "https://github.com/google/UIforETW/releases" /n "Bruce Dawson" /tr http://timestamp.digicert.com /td SHA256 /fd SHA256 %bindir%\UIforETW.exe %bindir%\EventEmitter.exe %bindir%\EventEmitter64.exe %bindir%\flame_graph.exe %bindir%\RetrieveSymbols.exe %bindir%\DelayedCreateProcess.exe %bindir%\DummyChrome.dll %bindir%\ETWProviders.dll %bindir%\ETWProviders64.dll %bindir%\ETWProvidersARM64.dll
+signtool sign /a /d "UIforETW" /du "https://github.com/randomascii/UIforETW/releases" /n "Bruce Dawson" /tr http://timestamp.digicert.com /td SHA256 /fd SHA256 %bindir%\UIforETW.exe %bindir%\EventEmitter.exe %bindir%\EventEmitter64.exe %bindir%\flame_graph.exe %bindir%\RetrieveSymbols.exe %bindir%\DelayedCreateProcess.exe %bindir%\DummyChrome.dll %bindir%\ETWProviders.dll %bindir%\ETWProviders64.dll %bindir%\ETWProvidersARM64.dll
 @if not %errorlevel% equ 0 goto signing_failure
 
 @rem Copy the official binaries back to the local copy, for development purposes.
@@ -163,7 +163,7 @@ call sethash.bat
 del sethash.bat
 
 @rem We need to create this sort of URL:
-@rem https://raw.githubusercontent.com/google/UIforETW/ea1129d25ba58efd03ef649829348ca553f82383/.gitignore
+@rem https://raw.githubusercontent.com/randomascii/UIforETW/ea1129d25ba58efd03ef649829348ca553f82383/.gitignore
 @rem From this template:
 @rem HTTP_EXTRACT_TARGET=%HTTP_ALIAS%/%var2%/%var3%/raw/%var4%/%var5%
 @rem With these sort of arguments:

@@ -199,6 +199,7 @@ BOOL CUIforETWApp::InitInstance()
 		// window with this title (an explorer window for a UI for ETW folder for
 		// instance) then the wrong window may be activated. See
 		// https://github.com/google/UIforETW/issues/147 for details.
+		// google/UIforETW URL used because issues aren't copied when you fork.
 		HWND prevWindow = FindWindow(NULL, L"UI for ETW");
 		if (prevWindow)
 		{
